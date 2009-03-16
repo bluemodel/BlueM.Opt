@@ -123,7 +123,8 @@ namespace IHWB.EVO.MetaEvo
                     algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref monitor1, ref this.result);
 
                     //### Hauptprogramm ###
-                    start_single_pc();
+                    if (settings.General.useMultithreading) start_network_client_multithreading();
+                    else start_single_pc();
                     break;
 
                 case "Network Server":
@@ -169,7 +170,8 @@ namespace IHWB.EVO.MetaEvo
                     meClient = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
                     clienttmp = new double[5];
 
-                    start_network_client2();
+                    if (settings.General.useMultithreading) start_network_client_multithreading();
+                    else start_network_client();
                     break;
             }
         }
@@ -211,9 +213,147 @@ namespace IHWB.EVO.MetaEvo
 
 
         //### Methoden ### Hauptprogramm
-
-        // Single PC
+        #region Single PC ohne Multithreading
         private bool start_single_pc()
+        {
+            Client mePC = new Client();
+            mePC.status = "Init Genpool";
+            settings.MetaEvo.CurrentGeneration = 1;
+
+            while (mePC.status != "finished")
+            {
+                this.monitor1.LogAppend("Controller: Status: " + mePC.status);
+
+                if (this.stopped) return false;
+
+                #region Zustand: Init Genpool
+                if (mePC.status == "Init Genpool")
+                {
+                    //Zufällige Parents setzen
+                    set_random_parents(ref generation);
+
+                    //Genpool simulieren
+                    this.monitor1.LogAppend("Controller: Genpool: Simulating Individuums...");
+                    for (int i = 0; i < generation.Length; i++)
+                    {
+                        evaluate(ref generation[i], i);
+                        this.monitor1.LogAppend("Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)");
+                        System.Windows.Forms.Application.DoEvents();
+                    }
+
+                    //Genpool speichern
+                    algomanager.set_genpool(ref generation);
+
+                    generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent * this.settings.MetaEvo.PopulationSize];
+
+                    mePC.status = "generate Individuums";
+                }
+                #endregion
+
+                #region Zustand: generate Individuums
+                else if (mePC.status == "generate Individuums")
+                {
+                    this.monitor1.LogAppend("Controller: ### Building new Individuums for Generation " + settings.MetaEvo.CurrentGeneration + " ###");
+                    algomanager.new_individuals_build(ref generation);
+                    mePC.status = "simulate Individuums";
+                }
+                #endregion
+
+                #region Zustand: simulate Individuums
+                else if (mePC.status == "simulate Individuums")
+                {
+                    this.monitor1.LogAppend("Controller: Individuums for Generation " + settings.MetaEvo.CurrentGeneration + ": Simulating Individuums...");
+                    progress1.iNachf = 0;
+                    for (int i = 0; i < generation.Length; i++)
+                    {
+                        //Simulieren und zeichnen
+                        if (generation[i].get_toSimulate())
+                        {
+                            this.monitor1.LogAppend("Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name);
+                            evaluate(ref generation[i], i);
+                            System.Windows.Forms.Application.DoEvents();
+
+                            progress1.NextNachf();
+                            if (this.stopped) return false;
+                        }
+                    }
+                    mePC.status = "select Individuums";
+                }
+                #endregion
+
+                #region Zustand: select Individuums
+                else if (mePC.status == "select Individuums")
+                {
+                    algomanager.new_individuals_merge_with_genpool(ref generation);
+
+                    //Sekpop zeichnen und ggf. speichern
+                    this.draw_and_store_sekpop(ref algomanager.genpool);
+
+                    settings.MetaEvo.CurrentGeneration++;
+
+                    //Umschalt- und Abbruchbedingungen prüfen
+                    //  Maximale Anzahl der Generationen erreicht oder Umschaltpunkt erreicht
+                    if ((settings.MetaEvo.CurrentGeneration == settings.MetaEvo.NumberGenerations) || (settings.MetaEvo.AlgoMode == "Global: Finished"))
+                    {
+                        //Umschalten zur lokalen Optimierung
+                        if (settings.MetaEvo.OpMode == "Both")
+                        {
+                            settings.MetaEvo.OpMode = "Local Optimizer";
+
+                            algomanager.set_calculationmode_local(ref generation);
+                            settings.MetaEvo.CurrentGeneration--;
+
+                            progress1.Initialize(1, 1, (short)settings.MetaEvo.NumberGenerations, (short)(settings.MetaEvo.NumberResults));
+                            progress1.iGen = (short)settings.MetaEvo.CurrentGeneration;
+                            mePC.status = "generate Individuums";
+                        }
+
+                        //Reduzierung auf gewünschte Anzahl der Ergebnisse und Ausgabe
+                        else if (settings.MetaEvo.OpMode == "Global Optimizer")
+                        {
+                            algomanager.set_calculationmode_global_finished(ref generation);
+                            mePC.status = "finished";
+                        }
+                    }
+                    //  Abbruchbedingung der lokalen Optimierung  
+                    else if (settings.MetaEvo.AlgoMode == "Local: Finished")
+                    {
+                        mePC.status = "finished";
+                    }
+
+                    else
+                    {
+                        mePC.status = "generate Individuums";
+                    }
+
+                    if (settings.MetaEvo.OpMode != "Local Optimizer")
+                    {
+                        try
+                        {
+                            progress1.NextGen();
+                        }
+                        catch { }
+                    }
+                }
+                #endregion
+            }
+
+            //Zusatzresulte der lokalen Optimierung speichern
+            if (settings.MetaEvo.OpMode == "Local Optimizer")
+            {
+                this.result[progress1.iGen + 1, 0] = algomanager.localausgabe;
+                this.result[progress1.iGen + 1, algomanager.algos.algofeedbackarray.Length] = algomanager.localausgabe2;
+            }
+            progress1.iGen = progress1.NGen;
+            this.monitor1.LogAppend("Controller: Calculation Finished");
+            this.appendResultToLog();
+            this.monitor1.savelog();
+            return true;
+        }
+        #endregion
+
+        #region Single PC mit Multithreading
+        private bool start_single_pc_multithreading()
         {
             Client mePC = new Client(); 
             mePC.status = "Init Genpool";
@@ -368,7 +508,67 @@ namespace IHWB.EVO.MetaEvo
             return true;
         }
 
-        // Network Server
+        /// <summary>
+        /// Evaluiert Meta-Individuen mit Multithreadding (nicht bei Testproblemen)
+        /// </summary>
+        /// <param name="ind_meta">das Individuum</param>
+        /// <param name="iNachf">Nachfahrennummer</param>
+        private void evaluate_multi_4single(ref EVO.Common.Individuum_MetaEvo[] ind_meta)
+        {
+            bool[] evaluate_success;
+            EVO.Common.Individuum[] ind = new EVO.Common.Individuum[ind_meta.Length];
+
+            //Funktion für Event registrieren
+            sim.IndividuumEvaluated += new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4single_Event);
+
+
+            for (int i = 0; i < ind_meta.Length; i++)
+            {
+                ind_meta[i].set_toSimulate(false);
+                //Als Referenz gesetzt
+                ind[i] = (EVO.Common.Individuum)ind_meta[i];
+            }
+
+            //Simulation mit Events starten
+            evaluate_success = sim.Evaluate(ref ind, true);
+
+            for (int i = 0; i < ind_meta.Length; i++)
+            {
+                if (!evaluate_success[i]) ind_meta[i].set_status("false");
+                if (!ind_meta[i].Is_Feasible) ind_meta[i].set_status("false#constraints#");
+                else
+                {
+                    ind_meta[i].set_status("true");
+                }
+            }
+
+            //Regsitrierung der Funktion für das Event zurücknehmen
+            sim.IndividuumEvaluated -= new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4single_Event);
+        }
+
+        /// <summary>
+        /// Vom Event getriggerte Methode zur Weiterverarbeitung bei laufendem Multithreadding
+        /// </summary>
+        /// <param name="ind">ein Individuum</param>
+        /// <param name="zahl">Nummer des Individuums in der Generation</param>
+        /// <remarks>Es werden nur Individuen mit Status "true" verwendet!</remarks>
+        public void evaluate_multi_4single_Event(ref EVO.Common.Individuum ind, int zahl)
+        {
+            this.monitor1.LogAppend("Controller: Simulating Individuum " + ind.ID + "   (" + Math.Round(((double)(progress1.iNachf + 1) / (double)generation.Length), 2) * 100 + "%)...");
+            System.Windows.Forms.Application.DoEvents();
+
+            progress1.NextNachf();
+
+            if (this.stopped)
+            {
+                sim.isStopped = true;
+            }
+
+            this.hauptdiagramm1.ZeichneIndividuum(ind, 1, 1, 1, this.individuumnumber % generation.Length, System.Drawing.Color.Orange, false);
+        }
+        #endregion;
+
+        #region Network Server
         private bool start_network_server()
         {
             Client meServer = new Client(); 
@@ -512,8 +712,9 @@ namespace IHWB.EVO.MetaEvo
             this.monitor1.savelog();
             return true;
         }
+        #endregion;
 
-        // Network Client
+        #region Network Client ohne Multithreading
         private bool start_network_client()
         {
             Client meClient = new Client();
@@ -580,9 +781,10 @@ namespace IHWB.EVO.MetaEvo
             this.monitor1.LogAppend("Controller: Calculation Finished");
             return true;
         }
+        #endregion
 
-        // Network Client2
-        private bool start_network_client2()
+        #region Network Client mit Multithreading
+        private bool start_network_client_multithreading()
         {
             IHWB.EVO.Common.Individuum[] generation_tmp;
 
@@ -590,7 +792,6 @@ namespace IHWB.EVO.MetaEvo
             bool[] evaluate_success;
             
             //clienttmp[]: [0:Menge der zugeordneten Individuen, 1:Laufnummer in der Serie, 2: Berechnungsdauer
-            //ToDo: 3: Anzahl Individuen für die Berechnungsdauer (wird zur Zuordnung genutzt wenn meClient.speed_av = 1000 ist)
 
             //Solange der Server noch nicht fertig ist
             while (serverstatus[0] != "finished")
@@ -675,22 +876,25 @@ namespace IHWB.EVO.MetaEvo
             }
             clienttmp[1]++;
 
+            //Multithreading beenden
             if ((networkmanager.Individuums_CountMineRawInDB() != clienttmp[0]) || (this.stopped))
             {
                 sim.isStopped = true;
                 
-                //Neuen Speed-Daten berechnen
-                clienttmp[2] = Math.Round((DateTime.Now.Subtract(Berechnungsstart)).TotalMilliseconds, 0);
-                if (clienttmp[1] == 1) meClient.speed_av = clienttmp[2];
-                //Je mehr Individuen eine Serie enthält, desto ausschlaggebender ist ihre Berechnungsgeschwindigkeit (1/20 bis 1/10) 
-                else meClient.speed_av += Math.Round((clienttmp[2] / clienttmp[1] - meClient.speed_av) / Math.Max(20 - clienttmp[1], 10), 0);
-                if (clienttmp[2] > meClient.speed_low) meClient.speed_low = clienttmp[2];
-                this.monitor1.LogAppend("Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to " + meClient.speed_low + " Milliseconds");
-
                 //Clientdaten in DB Updaten
                 meClient.set_AlsoInDB("", meClient.speed_av, meClient.speed_low);
             }
+
+            //Berechnung der Client-Geschwindigkeit für im Idealfall 5 Individuen
+            if ((clienttmp[1] == 5) || (networkmanager.Individuums_CountMineRawInDB() != clienttmp[0]) || (this.stopped))
+            {
+                clienttmp[2] = Math.Round((DateTime.Now.Subtract(Berechnungsstart)).TotalMilliseconds, 0);
+                meClient.speed_av += Math.Round(((clienttmp[2] / clienttmp[1]) - meClient.speed_av) / (5 + Math.Abs(5 - clienttmp[1])), 0);
+                if (clienttmp[2] > meClient.speed_low) meClient.speed_low = clienttmp[2];
+                this.monitor1.LogAppend("Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to " + meClient.speed_low + " Milliseconds");
+            }
         }
+        #endregion;
 
         /// <summary>
         /// Evaluiert ein Meta-Individuum
@@ -743,65 +947,7 @@ namespace IHWB.EVO.MetaEvo
 
         }
 
-        /// <summary>
-        /// Evaluiert Meta-Individuen mit Multithreadding (nicht bei Testproblemen)
-        /// </summary>
-        /// <param name="ind_meta">das Individuum</param>
-        /// <param name="iNachf">Nachfahrennummer</param>
-        private void evaluate_multi_4single(ref EVO.Common.Individuum_MetaEvo[] ind_meta)
-        {
-            bool[] evaluate_success;
-            EVO.Common.Individuum[] ind = new EVO.Common.Individuum[ind_meta.Length];
-
-            //Funktion für Event registrieren
-            sim.IndividuumEvaluated += new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4single_Event);
-
-
-            for (int i = 0; i < ind_meta.Length; i++ )
-            {
-                ind_meta[i].set_toSimulate(false);
-                //Als Referenz gesetzt
-                ind[i] = (EVO.Common.Individuum)ind_meta[i];
-            }
-
-            //Simulation mit Events starten
-            evaluate_success = sim.Evaluate(ref ind, true);
-
-            for (int i = 0; i < ind_meta.Length; i++ )
-            {
-                if (!evaluate_success[i]) ind_meta[i].set_status("false");
-                if (!ind_meta[i].Is_Feasible) ind_meta[i].set_status("false#constraints#");
-                else
-                {
-                    ind_meta[i].set_status("true");   
-                }
-            }
-
-            //Regsitrierung der Funktion für das Event zurücknehmen
-            sim.IndividuumEvaluated -= new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4single_Event);
-        }
-
-        /// <summary>
-        /// Vom Event getriggerte Methode zur Weiterverarbeitung bei laufendem Multithreadding
-        /// </summary>
-        /// <param name="ind">ein Individuum</param>
-        /// <param name="zahl">Nummer des Individuums in der Generation</param>
-        /// <remarks>Es werden nur Individuen mit Status "true" verwendet!</remarks>
-        public void evaluate_multi_4single_Event(ref EVO.Common.Individuum ind, int zahl)
-        {
-            this.monitor1.LogAppend("Controller: Simulating Individuum " + ind.ID + "   (" + Math.Round(((double)(progress1.iNachf + 1) / (double)generation.Length), 2) * 100 + "%)...");
-            System.Windows.Forms.Application.DoEvents();
-
-            progress1.NextNachf();
-
-            if (this.stopped)
-            {
-                sim.isStopped = true;
-            }
-
-            this.hauptdiagramm1.ZeichneIndividuum(ind, 1, 1, 1, this.individuumnumber % generation.Length, System.Drawing.Color.Orange, false);
-        }
-
+        
         /// <summary>
         /// Zeichnet (und speichert ggf. im OptResult) die Sekundäre Population (aktuelle Front)
         /// </summary>
