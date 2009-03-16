@@ -145,6 +145,12 @@ Partial Class Form1
         'Diagramm
         Call Me.Hauptdiagramm1.Reset()
 
+        'SolutionDialog
+        If (Not isNothing(Me.solutionDialog)) Then
+            Me.solutionDialog.Close()
+            Me.solutionDialog = Nothing
+        End If
+
         Me.IsInitializing = False
 
     End Sub
