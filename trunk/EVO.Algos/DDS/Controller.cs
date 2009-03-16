@@ -71,7 +71,7 @@ namespace modelEAU.DDS
             //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
             int i, j;
-            int run = 1;
+            int run = 0;
             double[] Ini_Parameter;
             double[] Current_Parameter;
             IHWB.EVO.Common.Individuum ind;
@@ -130,7 +130,7 @@ namespace modelEAU.DDS
 
                 Current_Parameter = DDS.ini_solution_candidate();
 
-                ind = new IHWB.EVO.Common.Individuum_PES("DDS", run);
+                ind = new IHWB.EVO.Common.Individuum_PES("DDS", run + 1); //+1 wegen Evaluierung der Starwerte vor Optimierungsbeginn
 
                 //OptParameter ins Individuum kopieren
                 //------------------------------------
