@@ -45,6 +45,7 @@
     <Compile Include="MO_IndicatorFabrik.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Solutionvolume.cs" />
+    <Compile Include="Solutionvolume2.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EVO.Common\EVO.Common.vbproj">
