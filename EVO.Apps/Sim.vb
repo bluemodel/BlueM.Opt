@@ -807,6 +807,7 @@ Handler:
 
             StrWriteSync.Close()
             StrWrite.Close()
+            FiStr.Close()
         Next
 
         If (Not WriteCheck) Then
