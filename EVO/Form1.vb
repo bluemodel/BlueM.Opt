@@ -931,7 +931,7 @@ Partial Class Form1
 
             'Ausgabe der Optimierungszeit
             OptTime.Stop()
-            MsgBox("Die Optimierung dauerte:   " & OptTime.Elapsed.Hours & "h  " & OptTime.Elapsed.Minutes & "m  " & OptTime.Elapsed.Seconds & "s     " & OptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
+            'MsgBox("Die Optimierung dauerte:   " & OptTime.Elapsed.Hours & "h  " & OptTime.Elapsed.Minutes & "m  " & OptTime.Elapsed.Seconds & "s     " & OptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
 
         End If
 
