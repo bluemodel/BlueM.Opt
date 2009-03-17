@@ -1147,15 +1147,30 @@ Public Class Problem
     Public Function getIndividuumStart() As EVO.Common.Individuum
 
         Dim startind As EVO.Common.Individuum
+        Dim IndCES As New EVO.Common.Individuum_CES("start", 1)
+
+        Dim i As Integer
 
         Select Case Me.Method
             Case METH_CES
                 startind = New EVO.Common.Individuum_CES("start", 1)
-                'TODO: Start-Pfad setzen
+                'Startpfad setzen
+                For i = 0 To IndCES.Path.GetUpperBound(0)
+                    IndCES.Path(i) = 0
+                Next
+                ''ToDO:
+                'For i = 0 To Me.List_Locations.GetUpperBound(0)
+                '    For j = 0 To Me.List_Locations(i).List_Massnahmen.GetUpperBound(0)
+                '        If Not Me.List_Locations(i).List_Massnahmen(j).TestModus = 0 Then
+                '            IndCES.path(i) = 
+                '        End If
+                '    Next
+                'Next
+                startind = IndCES
             Case Else
                 startind = New EVO.Common.Individuum_PES("start", 1)
                 'Startwerte der OptParameter setzen
-                For i As Integer = 0 To Me.NumParams - 1
+                For i = 0 To Me.NumParams - 1
                     startind.OptParameter(i) = Me.List_OptParameter(i).Clone()
                     startind.OptParameter(i).RWert = Me.List_OptParameter(i).StartWert
                 Next
