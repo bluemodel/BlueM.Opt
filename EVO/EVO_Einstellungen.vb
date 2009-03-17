@@ -713,6 +713,7 @@ Public Class EVO_Einstellungen
             Next
 
             'OptParameter
+            ReDim .Selected_OptParameters(Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count - 1)
             For Each selectedIndex As Integer In .Selected_OptParameters
                 Me.SensiPlot_ListBox_OptParameter.SetSelected(selectedIndex, True)
             Next
