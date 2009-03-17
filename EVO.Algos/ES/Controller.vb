@@ -200,7 +200,7 @@ Public Class Controller
             'HACK: IDs an Individuen vergeben
             For Each ind As EVO.Common.Individuum_CES In CES1.Childs
                 durchlauf_all += 1
-                ind.ID = durchlauf_all
+                ind.ID = durchlauf_all + 1
             Next
 
             'Individuen mit Multithreading evaluieren
