@@ -198,7 +198,7 @@ namespace modelEAU.DDS
 
                 Current_Parameter = DDS.determine_DV(i);
 
-                ind = new IHWB.EVO.Common.Individuum_PES("DDS", run);
+                ind = new IHWB.EVO.Common.Individuum_PES("DDS", run + 1);
                 //OptParameter ins Individuum kopieren
                 //------------------------------------
                 for (j = 0; j < ind.OptParameter.Length; j++)
