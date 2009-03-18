@@ -340,6 +340,7 @@ Public Class EVO_Settings
         Public show_Wave As Boolean
 
         Public Sub setStandard()
+            'Standardm‰ﬂig ersten OptParameter und erstes Objective ausw‰hlen
             ReDim Me.Selected_OptParameters(0)
             Me.Selected_OptParameters(0) = 0
             Me.Selected_Objective = 0
