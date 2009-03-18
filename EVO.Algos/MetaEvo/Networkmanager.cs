@@ -23,12 +23,13 @@ namespace IHWB.EVO.MetaEvo
         int number_objectives;   //Anzahl Objectivefunctionwerte (inkl. primary objectives !!!)
 
         //### Konstruktor ###
-        public Networkmanager(ref EVO.Common.Individuum_MetaEvo individuum_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Common.Problem prob_input, ref EVO.Diagramm.Monitor monitor_input)
+        public Networkmanager(ref EVO.Common.Individuum_MetaEvo individuum_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Common.Problem prob_input)
         {
             number_optparas = individuum_input.get_optparas().Length;
             number_constraints = individuum_input.Constraints.Length;
             number_objectives = individuum_input.Objectives.Length;
-            monitor1 = monitor_input;
+
+            monitor1 = EVO.Diagramm.Monitor.getInstance();
 
             myCommand = new MySqlCommand();
 

@@ -14,12 +14,13 @@ Public Class Controller
 
     Private stopped As Boolean
 
-    Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.EVO_Settings, ByRef inputProgress As Common.Progress, ByRef inputMonitor As Diagramm.Monitor, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
+    Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.EVO_Settings, ByRef inputProgress As Common.Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
         Me.myProgress = inputProgress
-        Me.myMonitor = inputMonitor
         Me.myHauptDiagramm = inputHptDiagramm
+
+        Me.myMonitor = EVO.Diagramm.Monitor.getInstance()
     End Sub
 
     Public Sub InitApp(ByRef inputSim As Apps.Sim) Implements IController.InitApp

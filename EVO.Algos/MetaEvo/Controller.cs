@@ -46,14 +46,15 @@ namespace IHWB.EVO.MetaEvo
         /// <param name="progress1_input">der Verlauf</param>
         /// <param name="monitor_input">der Monitor</param>
         /// <param name="hauptdiagramm_input">das Hauptdiagramm</param>
-        public void Init(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Common.Progress progress1_input, ref EVO.Diagramm.Monitor monitor_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)  
+        public void Init(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Common.Progress progress1_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)  
         {
             //Daten einlesen
             this.prob = prob_input;
             this.settings = settings_input;
             this.progress1 = progress1_input;
-            this.monitor1 = monitor_input;
             this.hauptdiagramm1 = hauptdiagramm_input;
+
+            this.monitor1 = EVO.Diagramm.Monitor.getInstance();
 
             //Result initialisieren
             this.result = new string[this.settings.MetaEvo.NumberGenerations + 2, 9];
@@ -120,7 +121,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref monitor1, ref this.result);
+                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref this.result);
 
                     //### Hauptprogramm ###
                     if (settings.General.useMultithreading) start_network_client_multithreading();
@@ -139,10 +140,10 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref monitor1, ref this.result);
+                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref this.result);
 
                     //### Hauptprogramm ###
-                    networkmanager = new Networkmanager(ref this.generation[0], ref this.settings, ref prob, ref monitor1);
+                    networkmanager = new Networkmanager(ref this.generation[0], ref this.settings, ref prob);
                     //Info-Datenbank füllen
                     networkmanager.DB_set_info("Datensatz", "" + prob.Datensatz);
                     networkmanager.DB_set_info("Individuen im Genpool", "" + settings.MetaEvo.PopulationSize);
@@ -163,7 +164,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //### Hauptprogramm ###
-                    networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref prob, ref monitor1);
+                    networkmanager = new Networkmanager(ref this.individuumForClient, ref this.settings, ref prob);
 
                     //Initialisierung einiger Variablen
                     meClient.numberindividuums = 0;

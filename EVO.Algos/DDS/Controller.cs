@@ -27,16 +27,16 @@ namespace modelEAU.DDS
         /// <param name="inputProblem">das Problem</param>
         /// <param name="inputSettings">die Einstellungen</param>
         /// <param name="inputProgress">der Verlauf</param>
-        /// <param name="inputMonitor">der Monitor</param>
         /// <param name="inputHauptdiagramm">das Hauptdiagramm</param>
-        public void Init(ref IHWB.EVO.Common.Problem inputProblem, ref IHWB.EVO.Common.EVO_Settings inputSettings, ref IHWB.EVO.Common.Progress inputProgress, ref IHWB.EVO.Diagramm.Monitor inputMonitor, ref IHWB.EVO.Diagramm.Hauptdiagramm inputHauptdiagramm)
+        public void Init(ref IHWB.EVO.Common.Problem inputProblem, ref IHWB.EVO.Common.EVO_Settings inputSettings, ref IHWB.EVO.Common.Progress inputProgress, ref IHWB.EVO.Diagramm.Hauptdiagramm inputHauptdiagramm)
         {
             //Objekte übergeben
             this.mProblem = inputProblem;
             this.mSettings = inputSettings;
             this.mProgress = inputProgress;
-            this.mMonitor = inputMonitor;
             this.Hauptdiagramm1 = inputHauptdiagramm;
+
+            this.mMonitor = IHWB.EVO.Diagramm.Monitor.getInstance();
         }
 
         /// <summary>

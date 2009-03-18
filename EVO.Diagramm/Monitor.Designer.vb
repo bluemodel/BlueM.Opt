@@ -80,7 +80,7 @@ Partial Class Monitor
         Me.Diag.Legend.Alignment = Steema.TeeChart.LegendAlignments.Bottom
         Me.Diag.Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
         Me.Diag.Location = New System.Drawing.Point(0, 0)
-        Me.Diag.Name = "Diag"
+        Me.Diag.Name = "Monitor"
         '
         '
         '

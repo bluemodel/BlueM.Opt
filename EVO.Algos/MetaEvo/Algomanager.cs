@@ -22,10 +22,10 @@ namespace IHWB.EVO.MetaEvo
         int localcounter2;
         string[,] result;
 
-        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref EVO.Diagramm.Monitor monitor_input, ref string[,] result_input) 
+        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input, ref string[,] result_input) 
         {
             settings = settings_input;
-            monitor1 = monitor_input;
+            monitor1 = EVO.Diagramm.Monitor.getInstance();
             localausgabe = "";
             localausgabe2 = "";
             localcounter = settings.MetaEvo.NumberResults;

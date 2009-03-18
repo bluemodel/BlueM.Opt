@@ -6,6 +6,12 @@
 Partial Public Class Monitor
     Inherits System.Windows.Forms.Form
 
+    Private Shared myInstance As Monitor 'Singleton
+
+    ' This delegate enables asynchronous calls for setting
+    ' the text property on a TextBox control.
+    Delegate Sub LogAppendTextCallback(ByVal [text] As String)
+
     Private starttime As DateTime
 
     Public Event MonitorClosed()
@@ -21,46 +27,60 @@ Partial Public Class Monitor
     ''' <summary>
     ''' Der Log-Text
     ''' </summary>
-    Public Property LogText() As String
+    Public ReadOnly Property LogText() As String
         Get
             Return Me.TextBox_Log.Text
         End Get
-        Set(ByVal value As String)
-            Me.TextBox_Log.Text = value
-        End Set
     End Property
 
 #End Region 'Properties
 
 #Region "Methoden"
 
+#Region "Public Methoden"
+
     ''' <summary>
     ''' Konstruktor
     ''' </summary>
-    Public Sub New()
+    Private Sub New()
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        Me.starttime = DateTime.Now
+        Call Me.Reset()
 
     End Sub
+
+    ''' <summary>
+    ''' Gibt die (einzige) Instanz des Monitors zurück
+    ''' </summary>
+    ''' <returns>Instanz des Monitors</returns>
+    Public Shared Function getInstance() As Monitor
+        If (IsNothing(Monitor.myInstance)) Then
+            Monitor.myInstance = New Monitor()
+        End If
+
+        Return Monitor.myInstance
+
+    End Function
 
     ''' <summary>
     ''' Fügt dem Log einen Text hinzu
     ''' </summary>
     ''' <param name="text">der Text</param>
     Public Sub LogAppend(ByVal text As String)
-        Call Me.TextBox_Log.AppendText(Format((DateTime.Now - starttime).TotalSeconds, "###,###,##0.00") & ": " & text & EVO.Common.Constants.eol)
+        Call Me.LogAppendText(Format((DateTime.Now - starttime).TotalSeconds, "###,###,##0.00") & ": " & text & EVO.Common.Constants.eol)
         System.Windows.Forms.Application.DoEvents()
     End Sub
 
     ''' <summary>
-    ''' Löscht den Log
+    ''' Alles zurücksetzen
     ''' </summary>
-    Public Sub LogClear()
+    Public Sub Reset()
+        Call Me.InitMonitorDiagramm()
         Call Me.TextBox_Log.Clear()
+        Me.starttime = DateTime.Now
     End Sub
 
     ''' <summary>
@@ -102,7 +122,56 @@ Partial Public Class Monitor
         End If
     End Sub
 
-#Region "UI"
+#End Region 'Public Methoden
+
+#Region "Private Methoden"
+
+    ''' <summary>
+    ''' Setzt das Monitordiagramm zurück
+    ''' </summary>
+    Private Sub InitMonitorDiagramm()
+        Me.Diag.Reset()
+        Me.Diag.Aspect.View3D = False
+        Me.Diag.Aspect.ZOffset = 0
+        Me.Diag.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+        Me.Diag.Axes.Bottom.MaximumOffset = 3
+        Me.Diag.Axes.Bottom.MinimumOffset = 3
+        Me.Diag.Axes.Left.MaximumOffset = 3
+        Me.Diag.Axes.Left.MinimumOffset = 3
+        Me.Diag.Axes.Right.Visible = False
+        Me.Diag.Axes.Top.Visible = False
+        Me.Diag.BackColor = System.Drawing.Color.Transparent
+        Me.Diag.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Diag.Header.Visible = False
+        Me.Diag.Legend.Alignment = Steema.TeeChart.LegendAlignments.Bottom
+        Me.Diag.Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
+        Me.Diag.Location = New System.Drawing.Point(0, 0)
+        Me.Diag.Panel.Brush.Color = System.Drawing.Color.Transparent
+        Me.Diag.Panning.Allow = Steema.TeeChart.ScrollModes.None
+    End Sub
+
+    ' This method demonstrates a pattern for making thread-safe
+    ' calls on a Windows Forms control. 
+    '
+    ' If the calling thread is different from the thread that
+    ' created the TextBox control, this method creates a
+    ' LogAppendTextCallback and calls itself asynchronously using the
+    ' Invoke method.
+    '
+    ' If the calling thread is the same as the thread that created
+    ' the TextBox control, the Text property is set directly. 
+    Private Sub LogAppendText(ByVal [text] As String)
+
+        ' InvokeRequired required compares the thread ID of the
+        ' calling thread to the thread ID of the creating thread.
+        ' If these threads are different, it returns true.
+        If (Me.TextBox_Log.InvokeRequired) Then
+            Dim d As New LogAppendTextCallback(AddressOf LogAppendText)
+            Me.Invoke(d, New Object() {[text]})
+        Else
+            Me.TextBox_Log.AppendText([text])
+        End If
+    End Sub
 
     'Diagramm bearbeiten
     '*******************
@@ -134,7 +203,7 @@ Partial Public Class Monitor
 
     End Sub
 
-#End Region 'UI
+#End Region 'Private Methoden
 
 #End Region 'Methoden
 
