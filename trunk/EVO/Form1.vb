@@ -76,6 +76,9 @@ Partial Class Form1
         'Anzahl der möglichen Threads wird ermittelt
         Me.n_Threads = Me.determineNoOfThreads()
 
+        'Monitor zuweisen
+        Me.Monitor1 = EVO.Diagramm.Monitor.getInstance()
+
         'Formular initialisieren
         Call Me.INI()
 
@@ -124,8 +127,8 @@ Partial Class Form1
         Me.EVO_Einstellungen1.setStandard_All()
         Me.EVO_Einstellungen1.ResetUI()
 
-        'Monitor instanzieren
-        Me.Monitor1 = New EVO.Diagramm.Monitor()
+        'Monitor zurücksetzen
+        Me.Monitor1.Reset()
 
         'Progress instanzieren und an EVO_Opt_Verlauf übergeben
         Me.mProgress = New EVO.Common.Progress()
@@ -879,7 +882,7 @@ Partial Class Form1
                     End Select
 
                     'Controller für Sim initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Sim1)
                     Call controller.Start()
 
@@ -907,7 +910,7 @@ Partial Class Form1
                     End Select
 
                     'Controller für Testproblem initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Monitor1, Me.Hauptdiagramm1)
+                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Testprobleme1)
                     Call controller.Start()
 

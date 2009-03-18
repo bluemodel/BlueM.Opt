@@ -44,19 +44,18 @@ Public Class Controller
     ''' <param name="inputProblem"></param>
     ''' <param name="inputSettings"></param>
     ''' <param name="inputProgress"></param>
-    ''' <param name="inputMonitor"></param>
     ''' <param name="inputHptDiagramm"></param>
     Public Sub Init(ByRef inputProblem As EVO.Common.Problem, _
                     ByRef inputSettings As EVO.Common.EVO_Settings, _
                     ByRef inputProgress As EVO.Common.Progress, _
-                    ByRef inputMonitor As EVO.Diagramm.Monitor, _
                     ByRef inputHptDiagramm As EVO.Diagramm.Hauptdiagramm) Implements IController.Init
 
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
         Me.myProgress = inputProgress
-        Me.myMonitor = inputMonitor
         Me.myHauptDiagramm = inputHptDiagramm
+
+        Me.myMonitor = EVO.Diagramm.Monitor.getInstance()
 
     End Sub
 

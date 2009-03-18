@@ -50,7 +50,7 @@ Public Class BlueMThread
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "BlueM")
+            EVO.Diagramm.Monitor.getInstance().LogAppend(ex.Message)
 
             'Simulation abschliessen
             Call bluem_dll.Finish()
