@@ -14,15 +14,18 @@ namespace IHWB.EVO.MO_Indicators
         double[] basepoint;
         double faktor2switch; //Wenn der Wert für Diversität oder Entwicklung zur Paretofront geringer ist als 1/faktor2switch wird umgeschaltet
         EVO.Diagramm.Monitor monitor1;
+        string completeinfo;
 
-        public Solutionvolume2(ref EVO.Common.Individuum_MetaEvo settings_input, int historylength_input, int faktor2switch_input, ref EVO.Diagramm.Monitor monitor_input)
+        public Solutionvolume2(ref EVO.Common.Problem probelm_input, int historylength_input, int faktor2switch_input, ref EVO.Diagramm.Monitor monitor_input)
         {
             historylength = historylength_input;
             values = new double[historylength,2];
             monitor1 = monitor_input;
-            basepoint = new double[settings_input.PrimObjectives.Length];
+            basepoint = new double[probelm_input.List_PrimObjectiveFunctions.Length];
+            basepoint_old = new double[probelm_input.List_PrimObjectiveFunctions.Length];
             maxvaluesum = new double[2];
             faktor2switch = faktor2switch_input;
+            completeinfo = "";
         }
 
         //Summierte Distanzquadrate der Lösungen zum Nullpunkt
@@ -38,7 +41,7 @@ namespace IHWB.EVO.MO_Indicators
             basepoint = durchschnittsIndividuum(ref generation);
 
             //changes pushen 
-            for (int i = values.Length-1; i > 0; i--)
+            for (int i = (values.Length/2)-1; i > 0; i--)
             {
                 values[i, 0] = values[i - 1, 0];
                 values[i, 1] = values[i - 1, 1];
@@ -55,11 +58,11 @@ namespace IHWB.EVO.MO_Indicators
             tmp[1] = 0;
             for (int i = 0; i < historylength; i++)
             {
-                tmp[0] += values[0, i];
-                tmp[1] += values[1, i];
+                tmp[0] += values[i, 0];
+                tmp[1] += values[i, 1];
             }
 
-            //Neue Maxwerte setzen oder neue Werte sind weniger als halb so gross wie bisherige -> Umschalten
+            //Neue Maxwerte setzen oder neue Werte sind weniger als 1/faktor2switch so gross wie bisherige -> Umschalten
             if (tmp[0] > maxvaluesum[0])  //Diversität
             {
                 maxvaluesum[0] = tmp[0];
@@ -79,7 +82,19 @@ namespace IHWB.EVO.MO_Indicators
                 back = true;
             }
 
+            completeinfo = "Div: " + values[0, 0] + " Sum of last " + historylength + " generations: " + tmp[0] + " (MaxSum:" + maxvaluesum[0] + ") Evo: " + values[0, 1] + " Sum of last " + historylength + " generations: " + tmp[1] + " (MaxSum:" + maxvaluesum[1] + ") - Faktor2switch: " + faktor2switch;
+            if (back) completeinfo += " -> switch to local optimization)";
             return back;
+        }
+
+        public string get_last_infos()
+        {
+            return "Div: " + values[0,0] + " Evo: " + values[0,1];
+        }
+
+        public string get_complete_infos()
+        {
+            return completeinfo;
         }
 
         private double abstand(double[] eins, double[] zwei)

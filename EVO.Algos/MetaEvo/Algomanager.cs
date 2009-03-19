@@ -15,7 +15,7 @@ namespace IHWB.EVO.MetaEvo
         EVO.Diagramm.Monitor monitor1;
         public Algos algos;
         bool firstrun = true;
-        public EVO.MO_Indicators.Solutionvolume solutionvolume;
+        public EVO.MO_Indicators.Solutionvolume2 solutionvolume;
         public string localausgabe;
         public string localausgabe2;
         int localcounter;
@@ -46,7 +46,7 @@ namespace IHWB.EVO.MetaEvo
                 settings.MetaEvo.AlgoMode = "Local: Calculating";
             }
 
-            solutionvolume = new EVO.MO_Indicators.Solutionvolume(5, 0.05, ref monitor1);
+            solutionvolume = new EVO.MO_Indicators.Solutionvolume2(ref prob_input, 5, 2, ref monitor1);
         }
 
         //new_generation mit Genpool verarbeiten und neue Individuen in new_generation erzeugen
@@ -73,7 +73,7 @@ namespace IHWB.EVO.MetaEvo
                 if (localcounter != difference2genpool)
                 {
                     localausgabe = localausgabe + "\t" + localcounter2 + "x " + localcounter;
-                    localausgabe2 = localausgabe2 + "\t" + solutionvolume.get_last_volume();
+                    localausgabe2 = localausgabe2 + "\t" + solutionvolume.get_last_infos();
                     localcounter2 = 0;
                     localcounter = difference2genpool;
                 }
@@ -117,15 +117,15 @@ namespace IHWB.EVO.MetaEvo
                 this.monitor1.LogAppend("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
                 
                 //5.Solutionvolume berechnen (Reihenfolge im IF wichtig, da immer das solutionvolume berechnet werden soll)
-                if ((solutionvolume.calculate_and_decide(ref genpool)) && (settings.MetaEvo.OpMode == "Both"))
+                if ((solutionvolume.calculate(ref genpool)) && (settings.MetaEvo.OpMode == "Both"))
                 {
                     //Solutionvolume entscheidet auf Umschaltung zur lokalen Optimierung
                     settings.MetaEvo.AlgoMode = "Global: Finished";
                 }
-                this.result[settings.MetaEvo.CurrentGeneration, 8] = solutionvolume.get_last_volume().ToString();
+                this.result[settings.MetaEvo.CurrentGeneration, 8] = solutionvolume.get_last_infos();
             }
 
-            this.monitor1.LogAppend("Algo Manager: Solutionvolume: Last Volume: " + solutionvolume.get_last_volume());
+            this.monitor1.LogAppend("Algo Manager: Solutionvolume: Last Volume: " + solutionvolume.get_complete_infos());
         }
 
         //Erzeugt mit Hilfe von Algos die neuen Individuen
