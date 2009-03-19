@@ -650,7 +650,7 @@ namespace IHWB.EVO.MetaEvo
                     this.draw_and_store_sekpop(ref algomanager.genpool);
 
                     networkmanager.DB_set_info("Berechnungsmodus", "" + settings.MetaEvo.OpMode);
-                    networkmanager.DB_set_info("Solutionvolume", "" + algomanager.solutionvolume.get_last_volume());
+                    networkmanager.DB_set_info("Solutionvolume", "" + algomanager.solutionvolume.get_last_infos());
                     settings.MetaEvo.CurrentGeneration++;
 
                     //Umschalt- und Abbruchbedingungen prüfen
