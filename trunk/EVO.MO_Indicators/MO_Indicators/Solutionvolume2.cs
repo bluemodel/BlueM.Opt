@@ -7,8 +7,10 @@ namespace IHWB.EVO.MO_Indicators
 {
     public class Solutionvolume2
     {
-        double[,] values;    //[]([0] = Diversität der Generation(Abstandssumme zu Basepoint), [1] = Abstand der Basepoints
-        double[] maxvaluesum;
+        double diversity;  //Diversität
+        double[] evo;    //Abstand der Basepoints zueinander
+        double evosum;     //Durchschnitt der Evolution der letzten historylength Generationen
+        double maxevosum;  //Maximaler Durchschnitt der Evolution der letzten historylength Generationen
         int historylength;    //Anzahl der Generationen die zum Vergleich herangenommen werden
         double[] basepoint_old;   //Basiswert von dem aus die Distanzquadrate berechnet werden
         double[] basepoint;
@@ -16,9 +18,9 @@ namespace IHWB.EVO.MO_Indicators
         EVO.Diagramm.Monitor monitor1;
         string completeinfo;
         EVO.Common.EVO_Settings settings;
+        bool firstrun;
 
         //Monitor
-        private Steema.TeeChart.Styles.Line Line1; 
         private Steema.TeeChart.Styles.Line Line2;
         private Steema.TeeChart.Styles.Line Line3;
         private Steema.TeeChart.Styles.Line Line4; 
@@ -27,13 +29,19 @@ namespace IHWB.EVO.MO_Indicators
         {
             historylength = historylength_input;
             settings = settings_input;
-            values = new double[historylength,2];
+            faktor2switch = faktor2switch_input;
+     
             monitor1 = monitor_input;
             basepoint = new double[probelm_input.List_PrimObjectiveFunctions.Length];
             basepoint_old = new double[probelm_input.List_PrimObjectiveFunctions.Length];
-            maxvaluesum = new double[2];
-            faktor2switch = faktor2switch_input;
+            evo = new double[historylength];
+
+            evosum = 0;
+            maxevosum = 0;
+            diversity = 0;
             completeinfo = "";
+            firstrun = true;
+
             this.InitMonitor();
             monitor1.SelectTabDiagramm();
             monitor1.Show();
@@ -42,8 +50,8 @@ namespace IHWB.EVO.MO_Indicators
         
         public bool calculate(ref EVO.Common.Individuum_MetaEvo[] generation)
         {
-            double[] tmp = new double[2];
             bool back = false;
+            
 
             //Speichern von basepoint in basepoint_old
             basepoint.CopyTo(basepoint_old, 0);
@@ -51,62 +59,52 @@ namespace IHWB.EVO.MO_Indicators
             //basepoint = Durchschnittswerte im Zielfunktionsraum der Generation
             basepoint = durchschnittsIndividuum(ref generation);
 
-            //values der Generationen pushen 
-            for (int i = (values.Length/2)-1; i > 0; i--)
-            {
-                values[i, 0] = values[i - 1, 0];
-                values[i, 1] = values[i - 1, 1];
-            }
 
             //Durchschnittliche Distanz der Individuen zum basepoint (Diversität)
-            values[0, 0] = durchschnittliche_distanz(ref generation, basepoint);
- 
+            diversity = durchschnittliche_distanz(ref generation, basepoint);
+            
+
+
+            //values der Generationen pushen 
+            for (int i = evo.Length-1; i > 0; i--)
+            {
+                evo[i] = evo[i - 1];
+            }
+
             //Abstand der Durchschnittsindividuen (Entwicklung richtung Paretofront)
-            values[0, 1] = abstand(basepoint, basepoint_old);
+            if (firstrun) { evo[0] = 0; firstrun = false; }
+            else evo[0] = abstand(basepoint, basepoint_old);
 
             //SUMMEN der Indikatorwerte über historylength Generationen
-            tmp[0] = 0;
-            tmp[1] = 0;
+            evosum = 0;
             for (int i = 0; i < historylength; i++)
             {
-                tmp[0] += values[i, 0];
-                tmp[1] += values[i, 1];
+                evosum += evo[i];
             }
 
             //Neue Maxwerte setzen oder neue Werte sind weniger als 1/faktor2switch so gross wie bisherige -> Umschalten
-            if (tmp[0] > maxvaluesum[0])  //Diversität
+            if (evosum > maxevosum)  //Entwicklung richtung Paretofront
             {
-                maxvaluesum[0] = tmp[0];
+                maxevosum = evosum;
             }
-
-            else if (maxvaluesum[0] > tmp[0] * faktor2switch)
-            {
-                back = true;
-            }
-
-            if (tmp[1] > maxvaluesum[1])  //Entwicklung richtung Paretofront
-            {
-                maxvaluesum[1] = tmp[1];
-            }
-            else if (maxvaluesum[1] > tmp[1] * faktor2switch)
+            else if (maxevosum > evosum * faktor2switch)
             {
                 back = true;
             }
 
             //Zeichnen
-            this.ZeichneLinie("Diversität", tmp[0]);
-            this.ZeichneLinie("Diversität Grenze", maxvaluesum[0]/faktor2switch);
-            this.ZeichneLinie("Entwicklung", tmp[1]);
-            this.ZeichneLinie("Entwicklung Grenze", maxvaluesum[1]/faktor2switch);
+            this.ZeichneLinie("Diversität", diversity);
+            this.ZeichneLinie("Entwicklung", evosum);
+            this.ZeichneLinie("Entwicklung Grenze", maxevosum / faktor2switch);
 
-            completeinfo = "Div: " + values[0, 0] + " Sum of last " + historylength + " generations: " + tmp[0] + " (MaxSum:" + maxvaluesum[0] + ") Evo: " + values[0, 1] + " Sum of last " + historylength + " generations: " + tmp[1] + " (MaxSum:" + maxvaluesum[1] + ") - Faktor2switch: " + faktor2switch;
+            completeinfo = "Div: " + diversity + " Evo: " + evo[0] + " Sum of last " + historylength + " generations: " + evosum + " (Frontier:" + maxevosum + ") - Faktor2switch: " + faktor2switch;
             if (back) completeinfo += " -> switch to local optimization)";
             return back;
         }
 
         public string get_last_infos()
         {
-            return "Div: " + values[0,0] + " Evo: " + values[0,1];
+            return "Div: " + diversity + " Evo: " + evo[0];
         }
 
         public string get_complete_infos()
@@ -134,26 +132,15 @@ namespace IHWB.EVO.MO_Indicators
             monitor1.Diag.Axes.Right.Title.Angle = 90;
             monitor1.Diag.Axes.Right.Automatic = true;
             monitor1.Diag.Axes.Right.Grid.Visible = false;
-            
-            //Linien Diversität
-            Line1 = monitor1.Diag.getSeriesLine("Durchschnittliche Diversität über " + historylength + " Generationen", "Blue");
-            Line1.CustomHorizAxis = monitor1.Diag.Axes.Top;
-            Line1.CustomVertAxis = monitor1.Diag.Axes.Left;
-            Line1.Pointer.Visible = true;
-            Line1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle;
-            Line1.Pointer.Brush.Color = System.Drawing.Color.Blue;
-            Line1.Pointer.HorizSize = 2;
-            Line1.Pointer.VertSize = 2;
-            Line1.Pointer.Pen.Visible = false;
 
-            //Linien Diversität Grenze
-            Line2 = monitor1.Diag.getSeriesLine("Diversität Grenze", "Red");
+            //Linien Diversität 
+            Line2 = monitor1.Diag.getSeriesLine("Diversität (Durchschnittlicher Abstand zu einem Mittelpunkt)", "Red");
             Line2.CustomHorizAxis = monitor1.Diag.Axes.Top;
             Line2.CustomVertAxis = monitor1.Diag.Axes.Left;
-            Line2.Color = System.Drawing.Color.SteelBlue;
+            Line2.Color = System.Drawing.Color.Blue;
             Line2.Pointer.Visible = true;
             Line2.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle;
-            Line2.Pointer.Brush.Color = System.Drawing.Color.SteelBlue;
+            //Line2.Pointer.Brush.Color = System.Drawing.Color.Blue;
             Line2.Pointer.HorizSize = 2;
             Line2.Pointer.VertSize = 2;
             Line2.Pointer.Pen.Visible = false;
@@ -162,9 +149,10 @@ namespace IHWB.EVO.MO_Indicators
             Line3 = monitor1.Diag.getSeriesLine("Durchschnittliche Entwicklung über " + historylength + " Generationen", "Green");
             Line3.CustomHorizAxis = monitor1.Diag.Axes.Top;
             Line3.CustomVertAxis = monitor1.Diag.Axes.Right;
+            Line3.Color = System.Drawing.Color.LimeGreen;
             Line3.Pointer.Visible = true;
             Line3.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle;
-            Line3.Pointer.Brush.Color = System.Drawing.Color.Green;
+            //Line3.Pointer.Brush.Color = System.Drawing.Color.LimeGreen;
             Line3.Pointer.HorizSize = 2;
             Line3.Pointer.VertSize = 2;
             Line3.Pointer.Pen.Visible = false;
@@ -173,10 +161,10 @@ namespace IHWB.EVO.MO_Indicators
             Line4 = monitor1.Diag.getSeriesLine("Entwicklung Grenze", "Yellow");
             Line4.CustomHorizAxis = monitor1.Diag.Axes.Top;
             Line4.CustomVertAxis = monitor1.Diag.Axes.Right;
-            Line4.Color = System.Drawing.Color.SpringGreen;
+            Line4.Color = System.Drawing.Color.Green;
             Line4.Pointer.Visible = true;
             Line4.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle;
-            Line4.Pointer.Brush.Color = System.Drawing.Color.SpringGreen;
+            //Line4.Pointer.Brush.Color = System.Drawing.Color.Green;
             Line4.Pointer.HorizSize = 2;
             Line4.Pointer.VertSize = 2;
             Line4.Pointer.Pen.Visible = false;
@@ -187,9 +175,6 @@ namespace IHWB.EVO.MO_Indicators
             switch (type)
             {
                 case "Diversität":
-                    Line1.Add(this.settings.MetaEvo.CurrentGeneration, value);
-                    break;
-                case "Diversität Grenze":
                     Line2.Add(this.settings.MetaEvo.CurrentGeneration, value);
                     break;
                 case "Entwicklung":
@@ -207,9 +192,9 @@ namespace IHWB.EVO.MO_Indicators
 
             for (int i = 0; i < eins.Length; i++)
             {
-                abstand += Math.Sqrt(eins[i] * eins[i] + zwei[i] * zwei[i]);
+                abstand += Math.Pow(eins[i]-zwei[i],2);
             }
-            return abstand;
+            return Math.Sqrt(abstand);
         }
 
         private double durchschnittliche_distanz(ref EVO.Common.Individuum_MetaEvo[] generation, double[] basepoint)
