@@ -31,9 +31,7 @@ namespace IHWB.EVO.MetaEvo
         EVO.Diagramm.Monitor monitor1;
         EVO.Common.EVO_Settings settings;
 
-        string[,] result;
-
-        public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.Monitor monitor_input, ref string[,] result_input)
+        public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.Monitor monitor_input)
         {
             individuum_id = individuum_id_input;
             monitor1 = monitor_input;
@@ -41,8 +39,6 @@ namespace IHWB.EVO.MetaEvo
             populationsize = settings_input.MetaEvo.PopulationSize;
             HJ_minimumstepsize = settings_input.MetaEvo.HJStepsize;
             settings = settings_input;
-
-            this.result = result_input;
         }
 
         //Legt fest welche Algorithmen genutzt werden sollen
@@ -73,10 +69,8 @@ namespace IHWB.EVO.MetaEvo
             //Initialisierung der Algorithmen
             for (int i = 0; i < tmp.Length; i++)
             {
-                this.result[1, i] = individuumsperalgo[i].ToString();
                 algofeedbackarray[i] = new Algofeedback(tmp[i].Trim(), individuumsperalgo[i]);  
             }
-            this.result[1, tmp.Length] = (tmp.Length * 10).ToString();
             this.monitor1.LogAppend("Algos: Using Algos: " + algos2use_input);
         }
 
@@ -103,19 +97,6 @@ namespace IHWB.EVO.MetaEvo
             int numberpenalties = genpool_input[0].PrimObjectives.Length;
             int new_individuums_counter = 0;
             Random rand = new Random();
-
-            ////Sicherung gegen Rundungsfehler bei der Platzvergabe für die Algos
-            //if (startindex + numberindividuums >= new_generation_input.Length)
-            //{
-            //    numberindividuums = new_generation_input.Length - startindex;
-            //    algofeedbackarray[algo_id].number_individuals_for_nextGen = numberindividuums;
-            //}
-            ////Letzter Algo bekommt automatisch restliche Plätze
-            //if (algo_id == algofeedbackarray.Length - 1)
-            //{
-            //    numberindividuums = new_generation_input.Length - startindex;
-            //    algofeedbackarray[algo_id].number_individuals_for_nextGen = numberindividuums;
-            //}
 
             switch (algofeedbackarray[algo_id].name)
             {
