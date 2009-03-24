@@ -29,8 +29,6 @@ namespace IHWB.EVO.MetaEvo
         int individuumnumber;
         string role;
 
-        private string[,] result;
-
         private bool stopped;
 
         //Objekte für den Client (Ursache: Multithreading)
@@ -55,9 +53,6 @@ namespace IHWB.EVO.MetaEvo
             this.hauptdiagramm1 = hauptdiagramm_input;
 
             this.monitor1 = EVO.Diagramm.Monitor.getInstance();
-
-            //Result initialisieren
-            this.result = new string[this.settings.MetaEvo.NumberGenerations + 2, 9];
         }
 
         /// <summary>
@@ -121,10 +116,10 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref this.result);
+                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber);
 
                     //### Hauptprogramm ###
-                    if (settings.General.useMultithreading) start_network_client_multithreading();
+                    if (settings.General.useMultithreading) start_single_pc_multithreading();
                     else start_single_pc();
                     break;
 
@@ -140,7 +135,7 @@ namespace IHWB.EVO.MetaEvo
                     }
 
                     //Algomanager starten
-                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber, ref this.result);
+                    algomanager = new Algomanager(ref prob, ref settings, individuumnumber);
 
                     //### Hauptprogramm ###
                     networkmanager = new Networkmanager(ref this.generation[0], ref this.settings, ref prob);
@@ -302,7 +297,7 @@ namespace IHWB.EVO.MetaEvo
                             settings.MetaEvo.OpMode = "Local Optimizer";
 
                             algomanager.set_calculationmode_local(ref generation);
-                            settings.MetaEvo.CurrentGeneration--;
+                            //settings.MetaEvo.CurrentGeneration--;
 
                             progress1.Initialize(1, 1, (short)settings.MetaEvo.NumberGenerations, (short)(settings.MetaEvo.NumberResults));
                             progress1.iGen = (short)settings.MetaEvo.CurrentGeneration;
@@ -339,15 +334,8 @@ namespace IHWB.EVO.MetaEvo
                 #endregion
             }
 
-            //Zusatzresulte der lokalen Optimierung speichern
-            if (settings.MetaEvo.OpMode == "Local Optimizer")
-            {
-                this.result[progress1.iGen + 1, 0] = algomanager.localausgabe;
-                this.result[progress1.iGen + 1, algomanager.algos.algofeedbackarray.Length] = algomanager.localausgabe2;
-            }
             progress1.iGen = progress1.NGen;
             this.monitor1.LogAppend("Controller: Calculation Finished");
-            this.appendResultToLog();
             this.monitor1.savelog();
             return true;
         }
@@ -459,7 +447,7 @@ namespace IHWB.EVO.MetaEvo
                             settings.MetaEvo.OpMode = "Local Optimizer";
 
                             algomanager.set_calculationmode_local(ref generation);
-                            settings.MetaEvo.CurrentGeneration--;
+                            //settings.MetaEvo.CurrentGeneration--;
 
                             progress1.Initialize(1, 1, (short)settings.MetaEvo.NumberGenerations, (short)(settings.MetaEvo.NumberResults));
                             progress1.iGen = (short)settings.MetaEvo.CurrentGeneration;
@@ -496,15 +484,8 @@ namespace IHWB.EVO.MetaEvo
                 #endregion     
             }
 
-            //Zusatzergebnisse der lokalen Optimierung speichern
-            if (settings.MetaEvo.OpMode == "Local Optimizer")
-            {
-                this.result[progress1.iGen + 1, 0] = algomanager.localausgabe;
-                this.result[progress1.iGen + 1, algomanager.algos.algofeedbackarray.Length] = algomanager.localausgabe2;
-            }
             progress1.iGen = progress1.NGen;
             this.monitor1.LogAppend("Controller: Calculation Finished");
-            this.appendResultToLog();
             this.monitor1.savelog();
             return true;
         }
@@ -663,7 +644,7 @@ namespace IHWB.EVO.MetaEvo
                             settings.MetaEvo.OpMode = "Local Optimizer";
 
                             algomanager.set_calculationmode_local(ref generation);
-                            settings.MetaEvo.CurrentGeneration--;
+                            //settings.MetaEvo.CurrentGeneration--;
 
                             progress1.Initialize(1, 1, (short)settings.MetaEvo.NumberGenerations, (short)(settings.MetaEvo.NumberResults));
                             progress1.iGen = (short)settings.MetaEvo.CurrentGeneration;
@@ -700,16 +681,8 @@ namespace IHWB.EVO.MetaEvo
                 #endregion  
             }
 
-            //Zusatzresulte der lokalen Optimierung speichern
-            if (settings.MetaEvo.OpMode == "Local Optimizer")
-            {
-                this.result[progress1.iGen + 1, 0] = algomanager.localausgabe;
-                this.result[progress1.iGen + 1, algomanager.algos.algofeedbackarray.Length] = algomanager.localausgabe2;
-            }
-
             progress1.iGen = progress1.NGen;
             this.monitor1.LogAppend("Controller: Calculation Finished");
-            this.appendResultToLog();
             this.monitor1.savelog();
             return true;
         }
@@ -983,27 +956,6 @@ namespace IHWB.EVO.MetaEvo
             //SekPop zeichnen
             this.hauptdiagramm1.ZeichneSekPopulation(sekpop);
             System.Windows.Forms.Application.DoEvents();
-        }
-
-        /// <summary>
-        /// Hängt das Result an den Log an
-        /// </summary>
-        private void appendResultToLog()
-        {
-            string tmp;
-            int i, j;
-
-            tmp = "";
-            for (i = 0; i <= 8; i++)
-            {
-                for (j = 0; j <= this.result.GetUpperBound(0); j++)
-                {
-                    tmp = tmp + this.result[j, i] + "\t";
-                }
-                tmp = tmp + EVO.Common.Constants.eol;
-            }
-            //Result an Log anhängen
-            this.monitor1.LogAppend("Result:" + EVO.Common.Constants.eol + tmp);
         }
     }
 }
