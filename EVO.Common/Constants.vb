@@ -14,6 +14,9 @@ Public Module Constants
     '*******************************************************************************
     '*******************************************************************************
 
+    'URL zur Hilfe
+    Public Const HelpURL As String = "http://130.83.196.154/BlueM/wiki/index.php/BlueM.Opt"
+
     'Verschiedenes
     Public Const eol As String = Chr(13) & Chr(10)             'Zeilenumbruch
 
