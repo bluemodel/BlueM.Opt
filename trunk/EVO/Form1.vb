@@ -189,15 +189,15 @@ Partial Class Form1
 
     'About Dialog anzeigen
     '*********************
-    Private Sub MenuItem_About_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_About.Click
-        Dim AboutDialog As New AboutDialog()
-        Call AboutDialog.ShowDialog()
+    Private Sub About(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_About.Click
+        Dim about As New AboutBox()
+        Call about.ShowDialog(Me)
     End Sub
 
     'Wiki aufrufen
     '*************
-    Private Sub MenuItem_Wiki_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_Wiki.Click
-        Call Process.Start("http://130.83.196.154/BlueM/wiki/index.php/BlueM.Opt")
+    Private Sub Help(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_Help.Click
+        Call Process.Start(HelpUrl)
     End Sub
 
     'Einstellungen-Button hat selbst keine funktionalität -> nur DropDown
