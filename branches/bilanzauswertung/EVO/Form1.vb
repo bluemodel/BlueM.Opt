@@ -1478,13 +1478,18 @@ Partial Class Form1
 
                         'Referenzreihe in Wave laden
                         '---------------------------
-                        If (.Typ = "Reihe" Or .Typ = "IHA") Then
-                            'Referenzreihen nur jeweils ein Mal zeichnen
-                            If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
-                                RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
-                                'Referenzreihe in Wave laden
-                                Wave1.Display_Series(.RefReihe)
-                            End If
+                        'TODO: IHA
+                        'If (.Typ = "Reihe" Or .Typ = "IHA") Then
+                        If (objective.GetObjType = Common.Objectivefunktion.ObjectiveType.Reihe) Then
+                           'Dim Objective_Series As Common.ObjectiveFunction_Series = CType(objective, Common.ObjectiveFunction_Series)
+                           'Referenzreihen nur jeweils ein Mal zeichnen
+                           With CType(objective, Common.ObjectiveFunction_Series)
+                              If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
+                                   RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
+                                   'Referenzreihe in Wave laden
+                                   Wave1.Display_Series(.RefReihe)
+                               End If
+                           End With
                         End If
 
                         'Simulationsergebnis in Wave laden

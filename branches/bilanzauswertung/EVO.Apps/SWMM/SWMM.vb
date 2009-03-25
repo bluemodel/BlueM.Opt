@@ -351,12 +351,12 @@ Public Class SWMM
                 Do
                     Zeile = StrRead.ReadLine.ToString
                     If (Zeile.StartsWith("  S112")) Then
-                        FFreqEast = Trim(Zeile.Substring(24, 5))
-                        AvgFEast = Trim(Zeile.Substring(33, 6))
+                        FFreqEast = Trim(Zeile.Substring(23, 6))
+                        AvgFEast = Trim(Zeile.Substring(33, 7))
                         Zeile = StrRead.ReadLine.ToString
                         Zeile = StrRead.ReadLine.ToString
-                        FFreqWest = Trim(Zeile.Substring(24, 5))
-                        AvgFWest = Trim(Zeile.Substring(33, 6))
+                        FFreqWest = Trim(Zeile.Substring(23, 6))
+                        AvgFWest = Trim(Zeile.Substring(33, 7))
                         Exit Do
                     End If
                 Loop Until StrRead.Peek() = -1

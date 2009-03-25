@@ -421,7 +421,8 @@ Public Class BlueM
     'Simulationsergebnis verarbeiten
     '-------------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
-
+    'hier nur die Reihen einlesen, die auvh für objfunction gebraucht werden
+        
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
 
@@ -473,29 +474,31 @@ Public Class BlueM
     Public Overrides Function CalculateObjective(ByVal objective As Common.Objectivefunktion) As Double
 
         CalculateObjective = 0
+        Select objective.GetObjType
+          Case Common.Objectivefunktion.ObjectiveType.Reihe Or Common.Objectivefunktion.ObjectiveType.Reihenwert
 
-        'Fallunterscheidung Ergebnisdatei
-        '--------------------------------
-        Select Case objective.Datei
+              'Fallunterscheidung Ergebnisdatei
+              '--------------------------------
+              Select Case objective.Datei
 
-            Case "WEL", "KWL"
-                'QWert aus WEL- oder KWL-Datei
-                CalculateObjective = CalculateObjective_WEL(objective)
+                  Case "WEL", "KWL"
+                      'QWert aus WEL- oder KWL-Datei
+                      CalculateObjective = CalculateObjective_WEL(objective)
 
-            Case "PRB"
-                'QWert aus PRB-Datei
-                'BUG 220: PRB geht nicht, weil keine Zeitreihe
-                Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
-                'CalculateObjective = CalculateObjective_PRB(OptZiel)
+                  Case "PRB"
+                      'QWert aus PRB-Datei
+                      'BUG 220: PRB geht nicht, weil keine Zeitreihe
+                      Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
+                      'CalculateObjective = CalculateObjective_PRB(OptZiel)
 
-            Case Else
-                Throw New Exception("Der Wert '" & objective.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht unterstützt!")
+                  Case Else
+                      Throw New Exception("Der Wert '" & objective.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht unterstützt!")
 
-        End Select
+              End Select
 
-        'Zielrichtung berücksichtigen
-        CalculateObjective *= objective.Richtung
-
+              'Zielrichtung berücksichtigen
+              CalculateObjective *= objective.Richtung
+         End Select
     End Function
 
     'Qualitätswert aus WEL-Datei

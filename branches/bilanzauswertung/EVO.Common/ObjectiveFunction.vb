@@ -1,7 +1,14 @@
 ''' <summary>
 ''' Klasse für die Definition von Objective Funktionen
 ''' </summary>
-Public Class Objectivefunktion
+Public MustInherit Class Objectivefunktion
+
+Public Enum ObjectiveType As Integer
+   Reihe = 1
+   Wert = 2
+   Reihenwert = 3
+   Unknown = 4
+End Enum
 
     ''' <summary>
     ''' Gibt an ob es sich um eine PrimaryObjective Function handelt
@@ -52,46 +59,6 @@ Public Class Objectivefunktion
     Public Funktion As String
 
     ''' <summary>
-    ''' Gibt an wie der Wert, der mit dem Referenzwert verglichen werden soll, aus dem Simulationsergebnis berechnet werden soll.
-    ''' </summary>
-    ''' <remarks>Nur bei Typ = "Wert". Erlaubte Werte: "MaxWert", "MinWert", "Average", "AnfWert", "EndWert". Siehe auch Wiki</remarks>
-    Public WertFunktion As String
-
-    ''' <summary>
-    ''' Der zu vergleichende Referenzwert
-    ''' </summary>
-    ''' <remarks>Nur bei Typ = "Wert"</remarks>
-    Public RefWert As Double
-
-    ''' <summary>
-    ''' Der Dateiname der Referenzreihe
-    ''' </summary>
-    ''' <remarks>Nur bei Typ = "Reihe". Pfadangabe relativ zum Datensatz</remarks>
-    Public RefReiheDatei As String
-
-    ''' <summary>
-    ''' Zu verwendender Spaltenname falls Referenzreihe eine .WEL Datei ist
-    ''' </summary>
-    ''' <remarks>Nur bei Typ = "Reihe"</remarks>
-    Public RefGr As String
-
-    ''' <summary>
-    ''' Die Referenzreihe
-    ''' </summary>
-    ''' <remarks>Nur bei Typ = "Reihe"</remarks>
-    Public RefReihe As Wave.Zeitreihe
-
-    ''' <summary>
-    ''' Start des Evaluierungszeitraums
-    ''' </summary>
-    Public EvalStart As DateTime
-
-    ''' <summary>
-    ''' Ende des Evaluierungszeitraums
-    ''' </summary>
-    Public EvalEnde As DateTime
-
-    ''' <summary>
     ''' Gibt an, ob die Objective Function einen IstWert besitzt
     ''' </summary>
     Public hasIstWert As Boolean
@@ -132,5 +99,22 @@ Public Class Objectivefunktion
             Return True
         End Get
     End Property
+
+   Public ReadOnly Property GetObjType() As ObjectiveType
+      Get
+         If (TypeOf (Me) Is ObjectiveFunction_Series) Then
+            Return ObjectiveType.Reihe
+         ElseIf (TypeOf (Me) Is Objectivefunction_Value) Then
+            Return ObjectiveType.Wert
+         ElseIf (TypeOf (Me) Is ObjectiveFunction_SeriesValue) Then
+            Return ObjectiveType.Reihenwert
+         Else
+            Return ObjectiveType.Unknown
+         End If
+      End Get
+
+   End Property
+      
+   
 
 End Class

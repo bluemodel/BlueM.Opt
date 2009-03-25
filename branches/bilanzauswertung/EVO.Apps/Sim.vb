@@ -843,7 +843,7 @@ Handler:
     'Objectivewert berechnen: Feature Typ = Reihe
     '******************************************
     'BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
-    Protected Function CalculateObjective_Reihe(ByVal objective As Common.Objectivefunktion, ByVal SimReihe As Wave.Zeitreihe) As Double
+    Protected Function CalculateObjective_Reihe(ByVal objective As Common.ObjectiveFunction_Series, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i As Integer

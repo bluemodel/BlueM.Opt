@@ -249,7 +249,8 @@ Public Class Testprobleme
         'Das Problem mit Pseudo-Werten füllen
         ReDim Me.mProblem.List_ObjectiveFunctions(Me.mAnzZiele - 1)
         For i = 0 To Me.mProblem.NumObjectives - 1
-            Me.mProblem.List_ObjectiveFunctions(i) = New Common.Objectivefunktion()
+            'Check_SH: 
+            Me.mProblem.List_ObjectiveFunctions(i) = New Common.Objectivefunction_Value()
             Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective = True
         Next
         ReDim Me.mProblem.List_Constraintfunctions(Me.mAnzConstraints - 1)

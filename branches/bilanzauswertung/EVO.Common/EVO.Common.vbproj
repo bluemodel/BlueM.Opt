@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -60,6 +60,9 @@
     <Compile Include="Individuum_PES.vb" />
     <Compile Include="Locations.vb" />
     <Compile Include="Modellparameter.vb" />
+    <Compile Include="ObjectiveFunction_Series.vb" />
+    <Compile Include="ObjectiveFunction_SeriesValue.vb" />
+    <Compile Include="Objectivefunction_Value.vb" />
     <Compile Include="Problem.vb" />
     <Compile Include="OptParameter.vb" />
     <Compile Include="Progress.vb" />
