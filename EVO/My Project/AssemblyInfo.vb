@@ -21,7 +21,7 @@ Imports IHWB.EVO.Common.Constants
                                & "Diese Software benutzt TeeChart: http://www.steema.com/products/teechart/")> 
 <Assembly: AssemblyCompany("TU Darmstadt - ihwb")> 
 <Assembly: AssemblyProduct("BlueM.Opt")> 
-<Assembly: AssemblyCopyright("Copyright © IHWB 2009")> 
+<Assembly: AssemblyCopyright("Copyright © ihwb 2009")> 
 <Assembly: AssemblyTrademark("")>
 <Assembly: AssemblyCulture("")>
 
