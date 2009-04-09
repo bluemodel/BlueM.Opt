@@ -117,6 +117,12 @@
     <None Include="SMUSI\IHWB.SMUSI.DllAdapter.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="BlueM\libguide40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="BlueM\libifcoremd.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="SMUSI\smusi.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
