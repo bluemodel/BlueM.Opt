@@ -443,83 +443,94 @@ Public Class Problem
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
+        Dim FiStr As FileStream
+        Dim StrRead As StreamReader
 
         ReDim Me.List_ObjectiveFunctions(-1)
 
-        'Einlesen aller Ziele und Speichern im Manager
-        '#############################################
-        Dim FiStr As FileStream = New FileStream(ZIE_Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Try
 
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            'Einlesen aller Ziele und Speichern im Manager
+            '#############################################
+            FiStr = New FileStream(ZIE_Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+            StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-        i = 0
-        Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False And Zeile.Contains("|")) Then
-                WerteArray = Zeile.Split("|")
-                'Kontrolle
-                If (WerteArray.GetUpperBound(0) <> AnzSpalten + 1) Then
-                    Throw New Exception("Die ZIE-Datei hat die falsche Anzahl Spalten!")
+            i = 0
+            Do
+                Zeile = StrRead.ReadLine.ToString()
+                If (Zeile.StartsWith("*") = False And Zeile.Contains("|")) Then
+                    WerteArray = Zeile.Split("|")
+                    'Kontrolle
+                    If (WerteArray.GetUpperBound(0) <> AnzSpalten + 1) Then
+                        Throw New Exception("Die ZIE-Datei hat die falsche Anzahl Spalten!")
+                    End If
+                    'Neue Feature-Function anlegen
+                    ReDim Preserve Me.List_ObjectiveFunctions(i)
+                    Me.List_ObjectiveFunctions(i) = New Common.Objectivefunktion()
+                    'Werte einlesen
+                    With Me.List_ObjectiveFunctions(i)
+                        If (WerteArray(1).Trim().ToUpper() = "P") Then
+                            .isPrimObjective = True
+                        Else
+                            .isPrimObjective = False
+                        End If
+                        .Bezeichnung = WerteArray(2).Trim()
+                        .Gruppe = WerteArray(3).Trim()
+                        If (WerteArray(4).Trim() = "+") Then
+                            .Richtung = Common.EVO_RICHTUNG.Maximierung
+                        Else
+                            .Richtung = Common.EVO_RICHTUNG.Minimierung
+                        End If
+
+                        If (WerteArray(5).Trim() = "+") Then
+                            .OpFact = 1
+                        ElseIf (WerteArray(5).Trim() = "-") Then
+                            .OpFact = -1
+                        ElseIf Not (WerteArray(5).Trim() = "") Then
+                            .OpFact = Convert.ToDouble(WerteArray(5).Trim())
+                        End If
+
+                        .Typ = WerteArray(6).Trim()
+                        .Datei = WerteArray(7).Trim()
+                        .SimGr = WerteArray(8).Trim()
+                        .Funktion = WerteArray(9).Trim()
+                        If (WerteArray(10).Trim() <> "") Then
+                            .EvalStart = WerteArray(10).Trim()
+                        Else
+                            .EvalStart = SimStart
+                        End If
+                        If WerteArray(11).Trim() <> "" Then
+                            .EvalEnde = WerteArray(11).Trim()
+                        Else
+                            .EvalEnde = SimEnde
+                        End If
+                        .WertFunktion = WerteArray(12).Trim()
+                        If (WerteArray(13).Trim() <> "") Then
+                            .RefWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
+                        End If
+                        .RefGr = WerteArray(14).Trim()
+                        .RefReiheDatei = WerteArray(15).Trim()
+                        If (WerteArray(16).Trim() <> "") Then
+                            .hasIstWert = True
+                            .IstWert = Convert.ToDouble(WerteArray(16).Trim(), Common.Provider.FortranProvider)
+                        Else
+                            .hasIstWert = False
+                        End If
+                    End With
+                    i += 1
                 End If
-                'Neue Feature-Function anlegen
-                ReDim Preserve Me.List_ObjectiveFunctions(i)
-                Me.List_ObjectiveFunctions(i) = New Common.Objectivefunktion()
-                'Werte einlesen
-                With Me.List_ObjectiveFunctions(i)
-                    If (WerteArray(1).Trim().ToUpper() = "P") Then
-                        .isPrimObjective = True
-                    Else
-                        .isPrimObjective = False
-                    End If
-                    .Bezeichnung = WerteArray(2).Trim()
-                    .Gruppe =  WerteArray(3).Trim()
-                    If (WerteArray(4).Trim() = "+") Then
-                        .Richtung = Common.EVO_RICHTUNG.Maximierung
-                    Else
-                        .Richtung = Common.EVO_RICHTUNG.Minimierung
-                    End If
+            Loop Until StrRead.Peek() = -1
 
-                    If (WerteArray(5).Trim() = "+") Then
-                        .OpFact = 1
-                    ElseIf (WerteArray(5).Trim() = "-") Then
-                        .OpFact = -1
-                    ElseIf Not (WerteArray(5).Trim() = "") Then
-                        .OpFact = Convert.ToDouble(WerteArray(5).Trim())
-                    End If
+        Catch ex As Exception
 
-                    .Typ = WerteArray(6).Trim()
-                    .Datei = WerteArray(7).Trim()
-                    .SimGr = WerteArray(8).Trim()
-                    .Funktion = WerteArray(9).Trim()
-                    If (WerteArray(10).Trim() <> "") Then
-                        .EvalStart = WerteArray(10).Trim()
-                    Else
-                        .EvalStart = SimStart
-                    End If
-                    If WerteArray(11).Trim() <> "" Then
-                        .EvalEnde = WerteArray(11).Trim()
-                    Else
-                        .EvalEnde = SimEnde
-                    End If
-                    .WertFunktion = WerteArray(12).Trim()
-                    If (WerteArray(13).Trim() <> "") Then
-                        .RefWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
-                    End If
-                    .RefGr = WerteArray(14).Trim()
-                    .RefReiheDatei = WerteArray(15).Trim()
-                    If (WerteArray(16).Trim() <> "") Then
-                        .hasIstWert = True
-                        .IstWert = Convert.ToDouble(WerteArray(16).Trim(), Common.Provider.FortranProvider)
-                    Else
-                        .hasIstWert = False
-                    End If
-                End With
-                i += 1
-            End If
-        Loop Until StrRead.Peek() = -1
+            Throw ex
 
-        StrRead.Close()
-        FiStr.Close()
+        Finally
+
+            StrRead.Close()
+            FiStr.Close()
+
+        End Try
 
         'Referenzreihen einlesen
         '#######################

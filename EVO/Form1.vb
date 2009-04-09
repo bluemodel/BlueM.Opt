@@ -593,128 +593,137 @@ Partial Class Form1
 
         Else
 
-            'Mauszeiger busy
-            Cursor = Cursors.WaitCursor
+            Try
 
-            'Problem initialisieren
-            '======================
-            Call Me.INI_Problem(Me.ComboBox_Methode.SelectedItem)
+                'Mauszeiger busy
+                Cursor = Cursors.WaitCursor
 
-            'Methodenspezifische Vorbereitungen
-            '(zunächst alles deaktivieren, danach je nach Methode aktivieren)
-            '================================================================
+                'Problem initialisieren
+                '======================
+                Call Me.INI_Problem(Me.ComboBox_Methode.SelectedItem)
 
-            'Diagramm zurücksetzen
-            Me.Hauptdiagramm1.Reset()
+                'Methodenspezifische Vorbereitungen
+                '(zunächst alles deaktivieren, danach je nach Methode aktivieren)
+                '================================================================
 
-            'Start Button deaktivieren
-            Me.Button_Start.Enabled = False
+                'Diagramm zurücksetzen
+                Me.Hauptdiagramm1.Reset()
 
-            'Toolbar-Buttons deaktivieren
-            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
-            Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
-            Me.ToolStripButton_Scatterplot.Enabled = False
+                'Start Button deaktivieren
+                Me.Button_Start.Enabled = False
 
-            Select Case Me.mProblem.Method
+                'Toolbar-Buttons deaktivieren
+                Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
+                Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
+                Me.ToolStripButton_Scatterplot.Enabled = False
 
-                Case METH_SENSIPLOT 'Methode SensiPlot
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                Select Case Me.mProblem.Method
 
-                    'Monitor deaktivieren
-                    Me.ToolStripButton_Monitor.Checked = False
+                    Case METH_SENSIPLOT 'Methode SensiPlot
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'TODO: Progress initialisieren
+                        'Monitor deaktivieren
+                        Me.ToolStripButton_Monitor.Checked = False
 
-
-                Case METH_PES 'Methode PES
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Ergebnis-Buttons
-                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
-
-                    'TODO: Progress mit Standardwerten initialisieren
+                        'TODO: Progress initialisieren
 
 
-                Case METH_HOOKJEEVES
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Case METH_PES 'Methode PES
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Kontrolle: Nur SO möglich!
-                    If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
-                        Throw New Exception("Methode von Hook und Jeeves erlaubt nur Single-Objective Optimierung!")
-                    End If
+                        'Ergebnis-Buttons
+                        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
-                    'Ergebnis-Buttons
-                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
-
-                    'TODO: Progress mit Standardwerten initialisieren
-
-                Case METH_DDS
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Kontrolle: Nur SO möglich!
-                    If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
-                        Throw New Exception("Methode DDS erlaubt nur Single-Objective Optimierung!")
-                    End If
-
-                    'Ergebnis-Buttons
-                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
-
-                    'TODO: Progress mit Standardwerten initialisieren
+                        'TODO: Progress mit Standardwerten initialisieren
 
 
-                Case METH_CES, METH_HYBRID 'Methode CES und HYBRID
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Case METH_HOOKJEEVES
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Funktioniert nur bei BlueM!
-                    If (Not Anwendung = ANW_BLUEM) Then
-                        Throw New Exception("CES/HYBRID funktioniert bisher nur mit BlueM!")
-                    End If
+                        'Kontrolle: Nur SO möglich!
+                        If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
+                            Throw New Exception("Methode von Hook und Jeeves erlaubt nur Single-Objective Optimierung!")
+                        End If
 
-                    'Ergebnis-Buttons
-                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+                        'Ergebnis-Buttons
+                        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
-                    If (Me.mProblem.Method = METH_HYBRID) Then
+                        'TODO: Progress mit Standardwerten initialisieren
 
-                        'Original ModellParameter schreiben
-                        Call Sim1.Write_ModellParameter()
+                    Case METH_DDS
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                        'Original Transportstrecken einlesen
-                        Call CType(Me.Sim1, EVO.Apps.BlueM).SKos1.Read_TRS_Orig_Daten(Sim1.WorkDir_Original)
+                        'Kontrolle: Nur SO möglich!
+                        If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
+                            Throw New Exception("Methode DDS erlaubt nur Single-Objective Optimierung!")
+                        End If
 
-                    End If
+                        'Ergebnis-Buttons
+                        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
-                    'ggf. EVO_Einstellungen Testmodus einrichten
-                    '-------------------------------------------
-                    'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
-                    If Not (Me.mProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
-                        Call EVO_Einstellungen1.setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
-                    End If
+                        'TODO: Progress mit Standardwerten initialisieren
 
-                    'TODO: Progress mit Standardwerten initialisieren
 
-                Case METH_MetaEvo
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Case METH_CES, METH_HYBRID 'Methode CES und HYBRID
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Ergebnis-Buttons
-                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+                        'Funktioniert nur bei BlueM!
+                        If (Not Anwendung = ANW_BLUEM) Then
+                            Throw New Exception("CES/HYBRID funktioniert bisher nur mit BlueM!")
+                        End If
 
-                    'Progress mit Standardwerten initialisieren
-                    Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
+                        'Ergebnis-Buttons
+                        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
-            End Select
+                        If (Me.mProblem.Method = METH_HYBRID) Then
 
-            'Toolbar-Buttons aktivieren
-            Me.ToolStripSplitButton_Diagramm.Enabled = True
-            Me.ToolStripSplitButton_ErgebnisDB.Enabled = True
-            Me.ToolStripSplitButton_Settings.Enabled = True
+                            'Original ModellParameter schreiben
+                            Call Sim1.Write_ModellParameter()
 
-            'IniMethod OK -> Start Button aktivieren
-            Me.Button_Start.Enabled = True
+                            'Original Transportstrecken einlesen
+                            Call CType(Me.Sim1, EVO.Apps.BlueM).SKos1.Read_TRS_Orig_Daten(Sim1.WorkDir_Original)
 
-            If (Me.Anwendung <> ANW_TESTPROBLEME) Then
-                'Datensatz-Reset aktivieren
-                Me.MenuItem_DatensatzZurücksetzen.Enabled = True
-            End If
+                        End If
+
+                        'ggf. EVO_Einstellungen Testmodus einrichten
+                        '-------------------------------------------
+                        'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
+                        If Not (Me.mProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
+                            Call EVO_Einstellungen1.setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
+                        End If
+
+                        'TODO: Progress mit Standardwerten initialisieren
+
+                    Case METH_MetaEvo
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                        'Ergebnis-Buttons
+                        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+
+                        'Progress mit Standardwerten initialisieren
+                        Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
+
+                End Select
+
+                'Toolbar-Buttons aktivieren
+                Me.ToolStripSplitButton_Diagramm.Enabled = True
+                Me.ToolStripSplitButton_ErgebnisDB.Enabled = True
+                Me.ToolStripSplitButton_Settings.Enabled = True
+
+                'IniMethod OK -> Start Button aktivieren
+                Me.Button_Start.Enabled = True
+
+                If (Me.Anwendung <> ANW_TESTPROBLEME) Then
+                    'Datensatz-Reset aktivieren
+                    Me.MenuItem_DatensatzZurücksetzen.Enabled = True
+                End If
+
+            Catch ex As Exception
+
+                MsgBox("Fehler beim Setzen der Methode:" & eol & ex.Message, MsgBoxStyle.Critical)
+                Me.ComboBox_Methode.SelectedIndex = 0
+
+            End Try
 
             'Mauszeiger wieder normal
             Cursor = Cursors.Default
