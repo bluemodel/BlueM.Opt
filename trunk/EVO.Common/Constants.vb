@@ -26,6 +26,14 @@ Public Module Constants
         Testprobleme = 2
     End Enum
 
+    'Anwendungen
+    Public Const ANW_BLUEM As String = "BlueM.Sim"
+    Public Const ANW_SMUSI As String = "SMUSI"
+    Public Const ANW_SCAN As String = "S:CAN"
+    Public Const ANW_SWMM As String = "SWMM"
+    Public Const ANW_TESTPROBLEME As String = "Testprobleme"
+    Public Const ANW_TSP As String = "Traveling Salesman"
+
     'Optimierungsmethoden
     Public Const METH_PES As String = "PES"
     Public Const METH_CES As String = "CES"
