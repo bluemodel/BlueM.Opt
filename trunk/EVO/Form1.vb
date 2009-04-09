@@ -268,115 +268,124 @@ Partial Class Form1
 
         Else
 
-            'Diagramm zurücksetzen
-            Call Me.Hauptdiagramm1.Reset()
+            Try
 
-            'Alles deaktivieren, danach je nach Anwendung aktivieren
-            '-------------------------------------------------------
+                'Diagramm zurücksetzen
+                Call Me.Hauptdiagramm1.Reset()
 
-            'Sim1 zerstören
-            Me.Sim1 = Nothing
+                'Alles deaktivieren, danach je nach Anwendung aktivieren
+                '-------------------------------------------------------
 
-            'Start Button deaktivieren
-            Me.Button_Start.Enabled = False
+                'Sim1 zerstören
+                Me.Sim1 = Nothing
 
-            'Datensatz-Reset deaktivieren
-            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
+                'Start Button deaktivieren
+                Me.Button_Start.Enabled = False
 
-            'Methodenauswahl deaktivieren
-            Me.Label_Methode.Enabled = False
-            Me.ComboBox_Methode.Enabled = False
+                'Datensatz-Reset deaktivieren
+                Me.MenuItem_DatensatzZurücksetzen.Enabled = False
 
-            'Toolbar-Buttons
-            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
-            Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
-            Me.ToolStripButton_Scatterplot.Enabled = False
-            Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
+                'Methodenauswahl deaktivieren
+                Me.Label_Methode.Enabled = False
+                Me.ComboBox_Methode.Enabled = False
 
-            'EVO_Settings zurücksetzen
-            Me.EVO_Einstellungen1.isSaved = False
+                'Toolbar-Buttons
+                Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
+                Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
+                Me.ToolStripButton_Scatterplot.Enabled = False
+                Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
 
-            'Multithreading standardmäßig verbieten
-            Me.EVO_Einstellungen1.MultithreadingAllowed = False
+                'EVO_Settings zurücksetzen
+                Me.EVO_Einstellungen1.isSaved = False
 
-            'Mauszeiger busy
-            Cursor = Cursors.WaitCursor
+                'Multithreading standardmäßig verbieten
+                Me.EVO_Einstellungen1.MultithreadingAllowed = False
 
-            Me.Anwendung = ComboBox_Anwendung.SelectedItem
+                'Mauszeiger busy
+                Cursor = Cursors.WaitCursor
 
-            Select Case Me.Anwendung
+                Me.Anwendung = ComboBox_Anwendung.SelectedItem
 
-                Case "" 'Keine Anwendung ausgewählt
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                Select Case Me.Anwendung
 
-                    'nix
+                    Case "" 'Keine Anwendung ausgewählt
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                Case ANW_BLUEM 'Anwendung BlueM
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                        'nix
 
-                    'Objekt der Klasse BlueM initialisieren
-                    Sim1 = New EVO.Apps.BlueM()
+                    Case ANW_BLUEM 'Anwendung BlueM
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-
-                Case ANW_SMUSI 'Anwendung Smusi
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Objekt der Klasse Smusi initialisieren
-                    Sim1 = New EVO.Apps.Smusi()
+                        'Objekt der Klasse BlueM initialisieren
+                        Sim1 = New EVO.Apps.BlueM()
 
 
-                Case ANW_SCAN 'Anwendung S:CAN
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Case ANW_SMUSI 'Anwendung Smusi
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Objekt der Klasse Scan initialisieren
-                    Sim1 = New EVO.Apps.Scan()
-
-
-                Case ANW_SWMM   'Anwendung SWMM
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Objekt der Klasse SWMM initialisieren
-                    Sim1 = New EVO.Apps.SWMM()
+                        'Objekt der Klasse Smusi initialisieren
+                        Sim1 = New EVO.Apps.Smusi()
 
 
-                Case ANW_TESTPROBLEME 'Anwendung Testprobleme
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Case ANW_SCAN 'Anwendung S:CAN
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Testprobleme instanzieren
-                    Testprobleme1 = New EVO.Apps.Testprobleme()
-
-                    'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
-                    Me.IsInitializing = True
-                    Call Me.ComboBox_Methode.Items.Clear()
-                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_MetaEvo, METH_HOOKJEEVES, METH_DDS})
-                    Me.IsInitializing = False
+                        'Objekt der Klasse Scan initialisieren
+                        Sim1 = New EVO.Apps.Scan()
 
 
-                Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Case ANW_SWMM   'Anwendung SWMM
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    TSP1 = New EVO.Apps.TSP()
+                        'Objekt der Klasse SWMM initialisieren
+                        Sim1 = New EVO.Apps.SWMM()
 
-                    Call TSP1.TSP_Initialize(Me.Hauptdiagramm1)
 
-                    'Start-Button aktivieren (keine Methodenauswahl erforderlich)
-                    Button_Start.Enabled = True
+                    Case ANW_TESTPROBLEME 'Anwendung Testprobleme
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-            End Select
+                        'Testprobleme instanzieren
+                        Testprobleme1 = New EVO.Apps.Testprobleme()
 
-            'Bei Sim-Anwendungen Multithreading vorbereiten
-            If (Not IsNothing(Me.Sim1)) Then
-                If (Me.Sim1.MultithreadingSupported) Then
-                    Me.EVO_Einstellungen1.MultithreadingAllowed = True
-                    Call Me.Sim1.prepareThreads(Me.n_Threads)
+                        'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
+                        Me.IsInitializing = True
+                        Call Me.ComboBox_Methode.Items.Clear()
+                        Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_MetaEvo, METH_HOOKJEEVES, METH_DDS})
+                        Me.IsInitializing = False
+
+
+                    Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                        TSP1 = New EVO.Apps.TSP()
+
+                        Call TSP1.TSP_Initialize(Me.Hauptdiagramm1)
+
+                        'Start-Button aktivieren (keine Methodenauswahl erforderlich)
+                        Button_Start.Enabled = True
+
+                End Select
+
+                'Bei Sim-Anwendungen Multithreading vorbereiten
+                If (Not IsNothing(Me.Sim1)) Then
+                    If (Me.Sim1.MultithreadingSupported) Then
+                        Me.EVO_Einstellungen1.MultithreadingAllowed = True
+                        Call Me.Sim1.prepareThreads(Me.n_Threads)
+                    End If
                 End If
-            End If
 
-            'Datensatz UI aktivieren
-            Call Me.Datensatz_initUI()
+                'Datensatz UI aktivieren
+                Call Me.Datensatz_initUI()
 
-            'Progress zurücksetzen
-            Call Me.mProgress.Initialize()
+                'Progress zurücksetzen
+                Call Me.mProgress.Initialize()
+
+            Catch ex As Exception
+
+                MsgBox("Fehler beim Initialisieren der Anwendung:" & eol & ex.Message, MsgBoxStyle.Critical)
+                Me.ComboBox_Anwendung.SelectedIndex = 0
+
+            End Try
 
             'Mauszeiger wieder normal
             Cursor = Cursors.Default
