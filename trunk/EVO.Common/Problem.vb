@@ -1158,18 +1158,18 @@ Public Class Problem
     Public Function getIndividuumStart() As EVO.Common.Individuum
 
         Dim startind As EVO.Common.Individuum
-        Dim IndCES As New EVO.Common.Individuum_CES("start", 1)
 
         Dim i As Integer
 
         Select Case Me.Method
             Case METH_CES
-                startind = New EVO.Common.Individuum_CES("start", 1)
+                Dim IndCES As EVO.Common.Individuum_CES
+                IndCES = New EVO.Common.Individuum_CES("start", 1)
                 'Startpfad setzen
                 For i = 0 To IndCES.Path.GetUpperBound(0)
                     IndCES.Path(i) = 0
                 Next
-                ''ToDO:
+                'TODO:
                 'For i = 0 To Me.List_Locations.GetUpperBound(0)
                 '    For j = 0 To Me.List_Locations(i).List_Massnahmen.GetUpperBound(0)
                 '        If Not Me.List_Locations(i).List_Massnahmen(j).TestModus = 0 Then
