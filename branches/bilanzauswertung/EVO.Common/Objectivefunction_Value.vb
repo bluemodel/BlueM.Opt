@@ -1,13 +1,11 @@
 ﻿Public Class Objectivefunction_Value
-Inherits Objectivefunktion
+    Inherits ObjectiveFunction
 
     ''' <summary>
     ''' Der zu vergleichende Referenzwert
     ''' </summary>
     ''' <remarks>siehe Wiki</remarks>
     Public RefWert As Double
-
-    
 
     ''' <summary>
     ''' Gibt den Block an, in der die Zielfunktionswerte stehen

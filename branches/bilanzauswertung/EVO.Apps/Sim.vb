@@ -836,14 +836,88 @@ Handler:
     'Phänotypberechnung
     '##################
 
-    'Berechnung der Objective Funktionen
-    '***********************************
-    Public MustOverride Function CalculateObjective(ByVal objective As Common.Objectivefunktion) As Double
+    ''' <summary>
+    ''' Calculates the objective value for an objective function
+    ''' </summary>
+    ''' <param name="objective">die auszuwertende ObjectiveFunction</param>
+    ''' <returns>Objective Value</returns>
+    ''' <remarks></remarks>
+    Public Function CalculateObjective(ByVal objective As Common.ObjectiveFunction) As Double
+
+        Dim QWert As Double
+        Dim SimReihe As Wave.Zeitreihe
+        Dim SimWert As Double
+
+        QWert = Double.MaxValue
+
+        Select Case objective.GetObjType
+
+            Case Common.ObjectiveFunction.ObjectiveType.Series
+
+                'Reihenvergleich
+                '---------------
+
+                'SimReihe aus SimErgebnis rausholen
+                SimReihe = Me.SimErgebnis(objective.SimGr).Clone()
+
+                QWert = Me.CalculateObjective_Series(objective, SimReihe)
+
+            Case Common.ObjectiveFunction.ObjectiveType.ValueFromSeries
+
+                'ReihenWerteVergleich
+                '--------------------
+
+                With CType(objective, Common.ObjectiveFunction_ValueFromSeries)
+
+                    'SimReihe aus SimErgebnis rausholen
+                    SimReihe = Me.SimErgebnis(.SimGr).Clone()
+
+                    'SimReihe auf Evaluierungszeitraum kürzen
+                    Call SimReihe.Cut(.EvalStart, .EvalEnde)
+
+                    'SimReihe zu SimWert konvertieren
+                    SimWert = SimReihe.getWert(.WertFunktion)
+
+                    QWert = Me.CalculateObjective_Value(objective, SimWert)
+
+                End With
+
+            Case Common.ObjectiveFunction.ObjectiveType.Value
+
+                'Wertevergleich
+                '--------------
+
+                'SimWert aus SimErgebnis rausholen
+                SimWert = Me.SimErgebnis(objective.SimGr)
+
+                QWert = Me.CalculateObjective_Value(objective, SimWert)
+
+            Case Else
+
+                'TODO: Sonderfälle
+                '-----------
+
+                'Case "Kosten"
+                '    QWert = Me.SKos1.Calculate_Costs(Me.WorkDir_Current)
+
+                'Case "IHA"
+                '    QWert = Me.IHAProc.CalculateObjective_IHA(objective, Me.IHASys.RVAResult)
+
+                Throw New Exception("Sonderfall in Objectivefunction noch nicht implementiert!")
+
+        End Select
+
+        'Zielrichtung berücksichtigen
+        QWert *= objective.Richtung
+
+        Return QWert
+
+    End Function
 
     'Objectivewert berechnen: Feature Typ = Reihe
     '******************************************
     'BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
-    Protected Function CalculateObjective_Reihe(ByVal objective As Common.ObjectiveFunction_Series, ByVal SimReihe As Wave.Zeitreihe) As Double
+    Protected Function CalculateObjective_Series(ByVal objective As Common.ObjectiveFunction_Series, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i As Integer
@@ -865,7 +939,7 @@ Handler:
                 '------------------------
                 QWert = 0
                 For i = 0 To SimReihe.Length - 1
-                    QWert += (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i))
+                    QWert += (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i)) ^ 2
                 Next
 
             Case "Diff"
@@ -974,7 +1048,7 @@ Handler:
                 QWert = kovar ^ 2 / (var_x * var_y)
 
             Case Else
-                Throw New Exception("Die Zielfunktion '" & objective.Funktion & "' wird nicht unterstützt!")
+                Throw New Exception("Die Zielfunktion '" & objective.Funktion & "' wird für Reihenvergleiche nicht unterstützt!")
 
         End Select
 
@@ -984,17 +1058,9 @@ Handler:
 
     'Qualitätswert berechnen: Objective Typ = Wert
     '*********************************************
-    Protected Function CalculateObjective_Wert(ByVal objective As Common.Objectivefunktion, ByVal SimReihe As Wave.Zeitreihe) As Double
+    Protected Function CalculateObjective_Value(ByVal objective As Common.Objectivefunction_Value, ByVal SimWert As Double) As Double
 
         Dim QWert As Double
-        Dim i As Integer
-
-        'Simulationsreihe auf Evaluierungszeitraum kürzen
-        Call SimReihe.Cut(objective.EvalStart, objective.EvalEnde)
-
-        'Simulationswert aus Simulationsergebnis berechnen
-        Dim SimWert As Double
-        SimWert = SimReihe.getWert(objective.WertFunktion)
 
         'QWert berechnen
         '---------------
@@ -1002,61 +1068,17 @@ Handler:
         Select Case objective.Funktion
 
             Case "AbQuad"
-                'Summe der Fehlerquadrate
-                '------------------------
-                QWert = (objective.RefWert - SimWert) * (objective.RefWert - SimWert)
+                'quadratische Abweichung
+                '-----------------------
+                QWert = (objective.RefWert - SimWert) ^ 2
 
             Case "Diff"
-                'Summe der Fehler
-                '----------------
+                'absolute Abweichung
+                '-------------------
                 QWert = Math.Abs(objective.RefWert - SimWert)
 
-            Case "nUnter"
-                'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
-                '-------------------------------------------------------------------
-                Dim nUnter As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < objective.RefWert) Then
-                        nUnter += 1
-                    End If
-                Next
-                QWert = nUnter / SimReihe.Length * 100
-
-            Case "nÜber"
-                'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
-                '------------------------------------------------------------------
-                Dim nUeber As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > objective.RefWert) Then
-                        nUeber += 1
-                    End If
-                Next
-                QWert = nUeber / SimReihe.Length * 100
-
-            Case "sUnter"
-                'Summe der Unterschreitungen
-                '---------------------------
-                Dim sUnter As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < objective.RefWert) Then
-                        sUnter += objective.RefWert - SimReihe.YWerte(i)
-                    End If
-                Next
-                QWert = sUnter
-
-            Case "sÜber"
-                'Summe der Überschreitungen
-                '--------------------------
-                Dim sUeber As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > objective.RefWert) Then
-                        sUeber += SimReihe.YWerte(i) - objective.RefWert
-                    End If
-                Next
-                QWert = sUeber
-
             Case Else
-                Throw New Exception("Die Zielfunktion '" & objective.Funktion & "' wird für Werte nicht unterstützt!")
+                Throw New Exception("Die Zielfunktion '" & objective.Funktion & "' wird für Wertevergleiche nicht unterstützt!")
 
         End Select
 
@@ -1121,76 +1143,6 @@ Handler:
     End Function
 
 #End Region 'Constraintberechnung
-
-#Region "SimErgebnisse lesen"
-
-    'SimErgebnisse lesen
-    '###################
-
-    'Ein Ergebnis aus einer PRB-Datei einlesen
-    '*****************************************
-    Public Shared Function Read_PRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
-
-        Dim ZeileStart As Integer = 0
-        Dim AnzZeil As Integer = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
-        Dim j As Integer = 0
-        Dim Zeile As String
-        Read_PRB = True
-
-        Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
-
-        'Array redimensionieren
-        ReDim PRB(AnzZeil - 1, 1)
-
-        'Anfangszeile suchen
-        Do
-            Zeile = StrRead.ReadLine.ToString
-            If (Zeile.Contains("+ Wahrscheinlichkeitskeitsverteilung: " & ZielGr)) Then
-                Exit Do
-            End If
-        Loop Until StrRead.Peek() = -1
-
-        'Zeile mit Spaltenüberschriften überspringen
-        Zeile = StrRead.ReadLine.ToString
-
-        For j = 0 To AnzZeil - 1
-            Zeile = StrRead.ReadLine.ToString()
-            PRB(j, 0) = Convert.ToDouble(Zeile.Substring(2, 10))        'X-Wert
-            PRB(j, 1) = Convert.ToDouble(Zeile.Substring(13, 8))        'P(Jahr)
-        Next
-        StrReadSync.Close()
-        StrRead.Close()
-        FiStr.Close()
-
-        'Überflüssige Stützstellen (P) entfernen
-        '---------------------------------------
-        'Anzahl Stützstellen bestimmen
-        Dim stuetz As Integer = 0
-        Dim P_vorher As Double = -99
-        For j = 0 To PRB.GetUpperBound(0)
-            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
-                stuetz += 1
-                P_vorher = PRB(j, 1)
-            End If
-        Next
-        'Werte in neues Array schreiben
-        Dim PRBtmp(stuetz - 1, 1) As Object
-        stuetz = 0
-        For j = 0 To PRB.GetUpperBound(0)
-            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
-                PRBtmp(stuetz, 0) = PRB(j, 0)
-                PRBtmp(stuetz, 1) = PRB(j, 1)
-                P_vorher = PRB(j, 1)
-                stuetz += 1
-            End If
-        Next
-        PRB = PRBtmp
-
-    End Function
-
-#End Region 'SimErgebnisse lesen
 
 #Region "Multithreading"
 

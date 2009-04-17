@@ -291,48 +291,13 @@ Public Class SWMM
 
     End Function
 
-    'Simulationsergebnis verarbeiten
-    '-------------------------------
-    'Simulationsergebnis verarbeiten
-    '-------------------------------
+    'Simulationsergebnis einlesen
+    '----------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
-    End Sub
+        'BUG 414: TODO: Objectives durchgehen und erforderliche Werte
+        'in SimErgebnis speichern
 
-    'Berechnung des Qualitätswerts (Zielwert)
-    '****************************************
-    Public Overrides Function CalculateObjective(ByVal feature As Common.Objectivefunktion) As Double
-
-        CalculateObjective = 0
-
-        Dim IsOK As Boolean
-
-        'Fallunterscheidung Ergebnisdatei
-        '--------------------------------
-        Select Case feature.Datei
-
-            Case "RPT"
-                'SWMM-Ergebnisse aus RPT-Datei auslesen
-                CalculateObjective = CalculateFeature_RPT(feature)
-
-            Case Else
-                'es wurde eine nicht unterstützte Ergebnisdatei angegeben
-                IsOK = False
-
-        End Select
-
-        If (IsOK = False) Then
-            'TODO: Fehlerbehandlung
-        End If
-
-        'Zielrichtung berücksichtigen
-        CalculateObjective *= feature.Richtung
-
-    End Function
-
-    Public Function CalculateFeature_RPT(ByVal feature As Common.Objectivefunktion) As Double
-
-        Dim QWert As Double
         Dim FFreqEast As Double, FFreqGath As Double, FFreqWest As Double
         Dim AvgFEast As Double, AvgFGath As Double, AvgFWest As Double
         Dim DateiPfad As String
@@ -360,16 +325,16 @@ Public Class SWMM
                         Exit Do
                     End If
                 Loop Until StrRead.Peek() = -1
-                QWert = (FFreqEast * AvgFEast) + (FFreqWest * AvgFWest)
+                'QWert = (FFreqEast * AvgFEast) + (FFreqWest * AvgFWest)
                 Exit Do
             End If
         Loop Until StrRead.Peek() = -1
 
         StrRead.Close()
         FiStr.Close()
-        Return QWert
 
-    End Function
+    End Sub
+
 #Region "Kombinatorik"
 
     'Kombinatorik

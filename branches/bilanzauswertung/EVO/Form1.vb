@@ -1472,24 +1472,23 @@ Partial Class Form1
 
             'zu zeichnenden Reihen aus Liste der Ziele raussuchen
             '----------------------------------------------------
-            For Each objective As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
+            For Each objective As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
                 If Not objective.isGroupLeader Then
                     With objective
 
                         'Referenzreihe in Wave laden
                         '---------------------------
-                        'TODO: IHA
-                        'If (.Typ = "Reihe" Or .Typ = "IHA") Then
-                        If (objective.GetObjType = Common.Objectivefunktion.ObjectiveType.Reihe) Then
-                           'Dim Objective_Series As Common.ObjectiveFunction_Series = CType(objective, Common.ObjectiveFunction_Series)
-                           'Referenzreihen nur jeweils ein Mal zeichnen
-                           With CType(objective, Common.ObjectiveFunction_Series)
-                              If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
-                                   RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
-                                   'Referenzreihe in Wave laden
-                                   Wave1.Display_Series(.RefReihe)
-                               End If
-                           End With
+                        'BUG 414: TODO: IHA
+                        If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Series) Then
+                            'Dim Objective_Series As Common.ObjectiveFunction_Series = CType(objective, Common.ObjectiveFunction_Series)
+                            'Referenzreihen nur jeweils ein Mal zeichnen
+                            With CType(objective, Common.ObjectiveFunction_Series)
+                                If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
+                                    RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
+                                    'Referenzreihe in Wave laden
+                                    Wave1.Display_Series(.RefReihe)
+                                End If
+                            End With
                         End If
 
                         'Simulationsergebnis in Wave laden

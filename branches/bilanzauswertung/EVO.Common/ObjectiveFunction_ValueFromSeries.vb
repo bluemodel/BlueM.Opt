@@ -1,7 +1,7 @@
-﻿Public Class ObjectiveFunction_SeriesValue
-Inherits Objectivefunktion
+﻿Public Class ObjectiveFunction_ValueFromSeries
+    Inherits ObjectiveFunction
 
- ''' <summary>
+    ''' <summary>
     ''' Start des Evaluierungszeitraums
     ''' </summary>
     Public EvalStart As DateTime

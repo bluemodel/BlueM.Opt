@@ -61,7 +61,8 @@
     <Compile Include="Locations.vb" />
     <Compile Include="Modellparameter.vb" />
     <Compile Include="ObjectiveFunction_Series.vb" />
-    <Compile Include="ObjectiveFunction_SeriesValue.vb" />
+    <Compile Include="ObjectiveFunction_Special.vb" />
+    <Compile Include="ObjectiveFunction_ValueFromSeries.vb" />
     <Compile Include="Objectivefunction_Value.vb" />
     <Compile Include="Problem.vb" />
     <Compile Include="OptParameter.vb" />

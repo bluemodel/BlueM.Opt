@@ -142,7 +142,7 @@ Public Class BlueM
 
         'BlueM-spezifische Weiterverarbeitung von ZielReihen:
         '====================================================
-        Dim objective As Common.Objectivefunktion
+        Dim objective As Common.ObjectiveFunction
 
         'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
         '------------------------------------------------------------------
@@ -164,13 +164,18 @@ Public Class BlueM
         'HACK: es wird immer nur das erste IHA-Ziel verwendet!
         '------------------------------
         For Each objective In Me.mProblem.List_ObjectiveFunctions
-            If (objective.Typ = "IHA") Then
-                'IHA-Berechnung einschalten
-                Me.isIHA = True
-                IHAZielReihe = objective.RefReihe
-                IHAStart = objective.EvalStart
-                IHAEnde = objective.EvalEnde
-                Exit For
+            If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Special) Then
+                With CType(objective, Common.ObjectiveFunction_Special)
+                    If (.FunctionName = "IHA") Then
+                        'IHA-Berechnung einschalten
+                        Me.isIHA = True
+                        'BUG 414: TODO: IHA
+                        'IHAZielReihe = .RefReihe
+                        'IHAStart = .EvalStart
+                        'IHAEnde = .EvalEnde
+                        Exit For
+                    End If
+                End With
             End If
         Next
 
@@ -421,8 +426,8 @@ Public Class BlueM
     'Simulationsergebnis verarbeiten
     '-------------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
-    'hier nur die Reihen einlesen, die auvh für objfunction gebraucht werden
-        
+        'hier nur die Reihen einlesen, die auvh für objfunction gebraucht werden
+
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
 
@@ -455,10 +460,12 @@ Public Class BlueM
         If (Me.isIHA) Then
             'IHA-Ziel raussuchen und Simulationsreihe übergeben
             'HACK: es wird immer das erste IHA-Ziel verwendet!
-            For Each objective As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
-                If (objective.Typ = "IHA") Then
-                    Call Me.IHASys.calculate_IHA(Me.SimErgebnis(objective.SimGr))
-                    Exit For
+            For Each objective As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+                If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Special) Then
+                    If (CType(objective, Common.ObjectiveFunction_Special).FunctionName = "IHA") Then
+                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(objective.SimGr))
+                        Exit For
+                    End If
                 End If
             Next
         End If
@@ -469,75 +476,11 @@ Public Class BlueM
 
 #Region "Qualitätswertberechnung"
 
-    'Berechnung des Qualitätswerts (Zielwert)
-    '****************************************
-    Public Overrides Function CalculateObjective(ByVal objective As Common.Objectivefunktion) As Double
-
-        CalculateObjective = 0
-        Select objective.GetObjType
-          Case Common.Objectivefunktion.ObjectiveType.Reihe Or Common.Objectivefunktion.ObjectiveType.Reihenwert
-
-              'Fallunterscheidung Ergebnisdatei
-              '--------------------------------
-              Select Case objective.Datei
-
-                  Case "WEL", "KWL"
-                      'QWert aus WEL- oder KWL-Datei
-                      CalculateObjective = CalculateObjective_WEL(objective)
-
-                  Case "PRB"
-                      'QWert aus PRB-Datei
-                      'BUG 220: PRB geht nicht, weil keine Zeitreihe
-                      Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
-                      'CalculateObjective = CalculateObjective_PRB(OptZiel)
-
-                  Case Else
-                      Throw New Exception("Der Wert '" & objective.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht unterstützt!")
-
-              End Select
-
-              'Zielrichtung berücksichtigen
-              CalculateObjective *= objective.Richtung
-         End Select
-    End Function
-
-    'Qualitätswert aus WEL-Datei
-    '***************************
-    Private Function CalculateObjective_WEL(ByVal objective As Common.Objectivefunktion) As Double
-
-        Dim objectivevalue As Double
-        Dim SimReihe As Wave.Zeitreihe
-
-        'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(objective.SimGr).Clone()
-
-        'Fallunterscheidung Zieltyp
-        '--------------------------
-        Select Case objective.Typ
-
-            Case "Wert"
-                objectivevalue = MyBase.CalculateObjective_Wert(objective, SimReihe)
-
-            Case "Reihe"
-                objectivevalue = MyBase.CalculateObjective_Reihe(objective, SimReihe)
-
-            Case "Kosten"
-                objectivevalue = Me.SKos1.Calculate_Costs(Me.WorkDir_Current)
-
-            Case "IHA"
-                objectivevalue = Me.IHAProc.CalculateObjective_IHA(objective, Me.IHASys.RVAResult)
-
-        End Select
-
-        Return objectivevalue
-
-    End Function
-
     'Qualitätswert aus PRB-Datei
-    '***************************
-    Private Function CalculateObjective_PRB(ByVal objective As Common.Objectivefunktion) As Double
+    'BUG 220: PRB geht nicht
+    '***********************
+    Private Function CalculateObjective_PRB(ByVal objective As Common.ObjectiveFunction) As Double
 
-        'BUG 220: PRB geht nicht, weil keine Zeitreihe
         'Dim i As Integer
         'Dim IsOK As Boolean
         'Dim QWert As Double
@@ -594,6 +537,69 @@ Public Class BlueM
         'Next
 
         'Return QWert
+
+    End Function
+
+    'Ein Ergebnis aus einer PRB-Datei einlesen
+    '*****************************************
+    Private Function Read_PRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
+
+    Dim ZeileStart As Integer = 0
+    Dim AnzZeil As Integer = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
+    Dim j As Integer = 0
+    Dim Zeile As String
+        Read_PRB = True
+
+    Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+    Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+    Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+
+    'Array redimensionieren
+        ReDim PRB(AnzZeil - 1, 1)
+
+    'Anfangszeile suchen
+        Do
+            Zeile = StrRead.ReadLine.ToString
+            If (Zeile.Contains("+ Wahrscheinlichkeitskeitsverteilung: " & ZielGr)) Then
+                Exit Do
+            End If
+        Loop Until StrRead.Peek() = -1
+
+    'Zeile mit Spaltenüberschriften überspringen
+        Zeile = StrRead.ReadLine.ToString
+
+        For j = 0 To AnzZeil - 1
+            Zeile = StrRead.ReadLine.ToString()
+            PRB(j, 0) = Convert.ToDouble(Zeile.Substring(2, 10))        'X-Wert
+            PRB(j, 1) = Convert.ToDouble(Zeile.Substring(13, 8))        'P(Jahr)
+        Next
+        StrReadSync.Close()
+        StrRead.Close()
+        FiStr.Close()
+
+    'Überflüssige Stützstellen (P) entfernen
+    '---------------------------------------
+    'Anzahl Stützstellen bestimmen
+    Dim stuetz As Integer = 0
+    Dim P_vorher As Double = -99
+        For j = 0 To PRB.GetUpperBound(0)
+            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
+                stuetz += 1
+                P_vorher = PRB(j, 1)
+            End If
+        Next
+    'Werte in neues Array schreiben
+    Dim PRBtmp(stuetz - 1, 1) As Object
+        stuetz = 0
+        For j = 0 To PRB.GetUpperBound(0)
+            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
+                PRBtmp(stuetz, 0) = PRB(j, 0)
+                PRBtmp(stuetz, 1) = PRB(j, 1)
+                P_vorher = PRB(j, 1)
+                stuetz += 1
+            End If
+        Next
+        PRB = PRBtmp
 
     End Function
 

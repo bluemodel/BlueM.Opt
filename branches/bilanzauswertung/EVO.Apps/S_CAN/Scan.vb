@@ -5,6 +5,9 @@ Public Class Scan
 
     Private input As Wave.WEL
 
+    Private Parameter As Collection
+    Private stoffe As String()
+
     ''' <summary>
     ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
     ''' </summary>
@@ -13,7 +16,7 @@ Public Class Scan
         Get
             Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
 
-            exts.AddRange(New String() {"ALL", "WEL"})
+            exts.AddRange(New String() {"ALL", "WEL", "PAR"})
 
             'TODO: Dateiendungen für SCAN-Datensatz
 
@@ -40,15 +43,19 @@ Public Class Scan
 
     End Sub
 
+    ''' <summary>
+    ''' Simulieren
+    ''' </summary>
     Public Overrides Function launchSim() As Boolean
 
-        Dim i, j, k, AnzZeil As Integer
-        Dim parameterdatei, Zeile, ZeilenArray(), stoffe(), tmp() As String
+        Dim i, j, AnzZeil As Integer
+        Dim parameterdatei, Zeile, ZeilenArray(), tmp() As String
         Dim FiStr As FileStream
         Dim StrRead As StreamReader
         Dim StrReadSync As TextReader
-        Dim Parameter As Collection
 
+        'TODO: gehört folgendes zur Simulation oder eher zum Ergebnis Einlesen?
+        'ggf. nach SIM_Ergebnis_Lesen() verschieben
 
         'Parameter einlesen
         parameterdatei = Me.WorkDir_Current & Me.Datensatz & ".PAR"
@@ -95,12 +102,32 @@ Public Class Scan
             End If
         Next
 
+        Return True
+
+    End Function
+
+    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+        Return Me.launchSim()
+    End Function
+
+    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+        Return True
+    End Function
+
+    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+        Return True
+    End Function
+
+    'Simulationsergebnis einlesen
+    '----------------------------
+    Protected Overrides Sub SIM_Ergebnis_Lesen()
+
         'Berechnung
         '----------
         Me.SimErgebnis.Clear()
 
         'Schleife über Stoffe
-        For k = 1 To stoffe.GetUpperBound(0)
+        For k = 1 To Me.stoffe.GetUpperBound(0)
 
             Dim zre As New Wave.Zeitreihe(stoffe(k))
 
@@ -125,38 +152,7 @@ Public Class Scan
 
         Next
 
-        Return True
-
-    End Function
-
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
-
-        Return Me.launchSim()
-
-    End Function
-
-    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
-
-    End Function
-
-    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
-
-    End Function
-
-    'Simulationsergebnis verarbeiten
-    '-------------------------------
-    Protected Overrides Sub SIM_Ergebnis_Lesen()
-
     End Sub
-
-    Public Overrides Function CalculateObjective(ByVal feature As Common.Objectivefunktion) As Double
-
-        CalculateObjective = CalculateObjective_Reihe(feature, Me.SimErgebnis(feature.SimGr))
-
-        'Zielrichtung berücksichtigen
-        CalculateObjective *= feature.Richtung
-
-    End Function
 
     Protected Overrides Sub Read_SimParameter()
 
@@ -168,6 +164,7 @@ Public Class Scan
         Me.SimStart = Me.input.Zeitreihen(0).Anfangsdatum
         Me.SimEnde = Me.input.Zeitreihen(0).Enddatum
         'Me.SimDT
+
     End Sub
 
     Protected Overrides Sub Read_Verzweigungen()
@@ -177,4 +174,5 @@ Public Class Scan
     Protected Overrides Sub Write_Verzweigungen()
         'nix
     End Sub
+
 End Class

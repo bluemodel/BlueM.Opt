@@ -1,5 +1,5 @@
 ﻿Public Class ObjectiveFunction_Series
-Inherits Objectivefunktion
+    Inherits ObjectiveFunction
 
 
     ''' <summary>
