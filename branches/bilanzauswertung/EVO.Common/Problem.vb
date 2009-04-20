@@ -475,8 +475,8 @@ Public Class Problem
                 currentObjectiveType = ObjectiveFunction.ObjectiveType.Special
             End If
 
-            'Skip comment lines
-            If (Zeile.StartsWith("*")) Then
+            'Skip comment and empty lines
+            If (Zeile.StartsWith("*") Or Not Zeile.Contains("|")) Then
                 Continue Do
             End If
 
