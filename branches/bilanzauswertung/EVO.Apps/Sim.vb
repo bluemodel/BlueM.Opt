@@ -833,15 +833,11 @@ Handler:
 
 #Region "Qualitätswertberechnung"
 
-    'Phänotypberechnung
-    '##################
-
     ''' <summary>
     ''' Calculates the objective value for an objective function
     ''' </summary>
     ''' <param name="objective">die auszuwertende ObjectiveFunction</param>
-    ''' <returns>Objective Value</returns>
-    ''' <remarks></remarks>
+    ''' <returns>objective function value</returns>
     Public Function CalculateObjective(ByVal objective As Common.ObjectiveFunction) As Double
 
         Dim QWert As Double
@@ -867,20 +863,10 @@ Handler:
                 'ReihenWerteVergleich
                 '--------------------
 
-                With CType(objective, Common.ObjectiveFunction_ValueFromSeries)
+                'SimReihe aus SimErgebnis rausholen
+                SimReihe = Me.SimErgebnis(objective.SimGr).Clone()
 
-                    'SimReihe aus SimErgebnis rausholen
-                    SimReihe = Me.SimErgebnis(.SimGr).Clone()
-
-                    'SimReihe auf Evaluierungszeitraum kürzen
-                    Call SimReihe.Cut(.EvalStart, .EvalEnde)
-
-                    'SimReihe zu SimWert konvertieren
-                    SimWert = SimReihe.getWert(.WertFunktion)
-
-                    QWert = Me.CalculateObjective_Value(objective, SimWert)
-
-                End With
+                QWert = Me.CalculateObjective_ValueFromSeries(objective, SimReihe)
 
             Case Common.ObjectiveFunction.ObjectiveType.Value
 
@@ -914,10 +900,14 @@ Handler:
 
     End Function
 
-    'Objectivewert berechnen: Feature Typ = Reihe
-    '******************************************
-    'BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
-    Protected Function CalculateObjective_Series(ByVal objective As Common.ObjectiveFunction_Series, ByVal SimReihe As Wave.Zeitreihe) As Double
+    ''' <summary>
+    ''' Calculate ObjectiveFunction value using time series comparison
+    ''' </summary>
+    ''' <param name="objective">the objective to be evaluated</param>
+    ''' <param name="SimReihe">the simulation time series</param>
+    ''' <returns>objective function value</returns>
+    ''' <remarks>BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!</remarks>
+    Private Function CalculateObjective_Series(ByVal objective As Common.ObjectiveFunction_Series, ByVal SimReihe As Wave.Zeitreihe) As Double
 
         Dim QWert As Double
         Dim i As Integer
@@ -1056,29 +1046,74 @@ Handler:
 
     End Function
 
-    'Qualitätswert berechnen: Objective Typ = Wert
-    '*********************************************
-    Protected Function CalculateObjective_Value(ByVal objective As Common.Objectivefunction_Value, ByVal SimWert As Double) As Double
+    ''' <summary>
+    ''' Calculate ObjectiveFunction value using value comparison
+    ''' </summary>
+    ''' <param name="objective">the objective to be evaluated</param>
+    ''' <param name="SimWert">the simulation value</param>
+    ''' <returns>objective function value</returns>
+    Private Overloads Function CalculateObjective_Value(ByVal objective As Common.Objectivefunction_Value, ByVal SimWert As Double) As Double
+
+        Dim QWert As Double
+
+        QWert = Me.CalculateObjective_Value(objective.Funktion, SimWert, objective.RefWert)
+
+        Return QWert
+
+    End Function
+
+    ''' <summary>
+    ''' Calculate ObjectiveFunction value using value comparison, 
+    ''' where the simulation value is determined from a simulation time series
+    ''' </summary>
+    ''' <param name="objective">the objective to be evaluated</param>
+    ''' <param name="SimReihe">the simulation time series</param>
+    ''' <returns>objective function value</returns>
+    Private Function CalculateObjective_ValueFromSeries(ByVal objective As Common.ObjectiveFunction_ValueFromSeries, ByVal SimReihe As Wave.Zeitreihe) As Double
+
+        Dim SimWert As Double
+        Dim QWert As Double
+
+        'SimReihe auf Evaluierungszeitraum kürzen
+        Call SimReihe.Cut(objective.EvalStart, objective.EvalEnde)
+
+        'SimReihe zu SimWert konvertieren
+        SimWert = SimReihe.getWert(objective.WertFunktion)
+
+        QWert = Me.CalculateObjective_Value(objective.Funktion, SimWert, objective.RefWert)
+
+        Return QWert
+
+    End Function
+
+    ''' <summary>
+    ''' Calculate ObjectiveFunction value using value comparison
+    ''' </summary>
+    ''' <param name="Funktion">objective function, e.g. "AbQuad"</param>
+    ''' <param name="SimWert">simulation value</param>
+    ''' <param name="RefWert">reference value</param>
+    ''' <returns>objective function value</returns>
+    Private Overloads Function CalculateObjective_Value(ByVal Funktion As String, ByVal SimWert As Double, ByVal RefWert As Double)
 
         Dim QWert As Double
 
         'QWert berechnen
         '---------------
         'Fallunterscheidung Zielfunktion
-        Select Case objective.Funktion
+        Select Case Funktion
 
             Case "AbQuad"
                 'quadratische Abweichung
                 '-----------------------
-                QWert = (objective.RefWert - SimWert) ^ 2
+                QWert = (RefWert - SimWert) ^ 2
 
             Case "Diff"
                 'absolute Abweichung
                 '-------------------
-                QWert = Math.Abs(objective.RefWert - SimWert)
+                QWert = Math.Abs(RefWert - SimWert)
 
             Case Else
-                Throw New Exception("Die Zielfunktion '" & objective.Funktion & "' wird für Wertevergleiche nicht unterstützt!")
+                Throw New Exception("Die Zielfunktion '" & Funktion & "' wird für Wertevergleiche nicht unterstützt!")
 
         End Select
 
