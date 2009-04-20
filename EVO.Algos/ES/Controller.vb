@@ -212,7 +212,7 @@ Public Class Controller
             For i_Child As Integer = 0 To CES1.Childs.Length - 1
 
                 If (Not isOK(i_Child)) Then
-                    'TODO: Fehlgeschlagene Evaluierungen behandeln
+                    Throw New Exception("Der Nachfahre mit der ID.: " & i_Child & " wurde nicht richtig Evaluiert! Die Simulation wurde mit Fehlern abgebrochen")
                 End If
 
                 'erfolgreich evaluierte Individuen wurden bereits über Event verarbeitet
