@@ -469,6 +469,7 @@ Public Class Problem
                 Zeile = StrRead.ReadLine.ToString()
 
                 'Determine the current block / objective type
+                '--------------------------------------------
                 If Zeile.StartsWith("*Reihenvergleich") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.Series
                 ElseIf Zeile.StartsWith("*Wertevergleich") Then
@@ -480,51 +481,34 @@ Public Class Problem
                 End If
 
                 'Skip comment and empty lines
+                '----------------------------
                 If (Zeile.StartsWith("*") Or Not Zeile.Contains("|")) Then
                     Continue Do
                 End If
 
-                Select Case currentObjectiveType
+                WerteArray = Zeile.Split("|")
 
-                    'BUG 414: TODO: Die ersten paar Spalten sind immer gleich 
-                    'und könnten gemeinsam eingelesen werden
+                'Fallunterscheidung je nach aktuellem Block
+                Select Case currentObjectiveType
 
                     Case ObjectiveFunction.ObjectiveType.Series
 
                         'Reihenvergleich
                         '===============
-                        WerteArray = Zeile.Split("|")
+
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFSeries + 1) Then
                             Throw New Exception("Block Reihenvergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
                         End If
+
                         'ObjectiveFunction instanzieren
                         Dim Objective_Series As New Common.ObjectiveFunction_Series()
-                        'Werte einlesen
-                        With Objective_Series
-                            If (WerteArray(1).Trim().ToUpper() = "P") Then
-                                .isPrimObjective = True
-                            Else
-                                .isPrimObjective = False
-                            End If
-                            .Bezeichnung = WerteArray(2).Trim()
-                            .Gruppe = WerteArray(3).Trim()
-                            If (WerteArray(4).Trim() = "+") Then
-                                .Richtung = Common.EVO_RICHTUNG.Maximierung
-                            Else
-                                .Richtung = Common.EVO_RICHTUNG.Minimierung
-                            End If
 
-                            If (WerteArray(5).Trim() = "+") Then
-                                .OpFact = 1
-                            ElseIf (WerteArray(5).Trim() = "-") Then
-                                .OpFact = -1
-                            ElseIf Not (WerteArray(5).Trim() = "") Then
-                                .OpFact = Convert.ToDouble(WerteArray(5).Trim())
-                            End If
-                            .Datei = WerteArray(6).Trim()
-                            .SimGr = WerteArray(7).Trim()
-                            .Funktion = WerteArray(8).Trim()
+                        'Gemeinsame Spalten einlesen
+                        Call Me.Read_ZIE_CommonColumns(Objective_Series, Zeile)
+
+                        'Restliche Spalten einlesen
+                        With Objective_Series
                             If (WerteArray(9).Trim() <> "") Then
                                 .EvalStart = WerteArray(9).Trim()
                             Else
@@ -595,37 +579,20 @@ Public Class Problem
 
                         'Wertevergleich
                         '==============
-                        WerteArray = Zeile.Split("|")
+
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValue + 1) Then
                             Throw New Exception("Block Wertevergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
                         End If
+
                         'ObjectiveFunction instanzieren
                         Dim Objective_Value As New Common.Objectivefunction_Value()
-                        'Werte einlesen
+
+                        'Gemeinsame Spalten einlesen
+                        Call Me.Read_ZIE_CommonColumns(Objective_Value, Zeile)
+
+                        'Restliche Spalten einlesen
                         With Objective_Value
-                            If (WerteArray(1).Trim().ToUpper() = "P") Then
-                                .isPrimObjective = True
-                            Else
-                                .isPrimObjective = False
-                            End If
-                            .Bezeichnung = WerteArray(2).Trim()
-                            .Gruppe = WerteArray(3).Trim()
-                            If (WerteArray(4).Trim() = "+") Then
-                                .Richtung = Common.EVO_RICHTUNG.Maximierung
-                            Else
-                                .Richtung = Common.EVO_RICHTUNG.Minimierung
-                            End If
-                            If (WerteArray(5).Trim() = "+") Then
-                                .OpFact = 1
-                            ElseIf (WerteArray(5).Trim() = "-") Then
-                                .OpFact = -1
-                            ElseIf Not (WerteArray(5).Trim() = "") Then
-                                .OpFact = Convert.ToDouble(WerteArray(5).Trim())
-                            End If
-                            .Datei = WerteArray(6).Trim()
-                            .SimGr = WerteArray(7).Trim()
-                            .Funktion = WerteArray(8).Trim()
                             .Block = WerteArray(9).Trim()
                             .Spalte = WerteArray(10).Trim()
                             If (WerteArray(11).Trim() <> "") Then
@@ -648,38 +615,20 @@ Public Class Problem
 
                         'ReihenWertevergleich
                         '====================
-                        WerteArray = Zeile.Split("|")
+
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValueFromSeries + 1) Then
                             Throw New Exception("Block ReihenWertevergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
                         End If
+
                         'ObjectiveFunction instanzieren
                         Dim Objective_ValueFromSeries As New Common.ObjectiveFunction_ValueFromSeries()
-                        'Werte einlesen
-                        With Objective_ValueFromSeries
-                            If (WerteArray(1).Trim().ToUpper() = "P") Then
-                                .isPrimObjective = True
-                            Else
-                                .isPrimObjective = False
-                            End If
-                            .Bezeichnung = WerteArray(2).Trim()
-                            .Gruppe = WerteArray(3).Trim()
-                            If (WerteArray(4).Trim() = "+") Then
-                                .Richtung = Common.EVO_RICHTUNG.Maximierung
-                            Else
-                                .Richtung = Common.EVO_RICHTUNG.Minimierung
-                            End If
 
-                            If (WerteArray(5).Trim() = "+") Then
-                                .OpFact = 1
-                            ElseIf (WerteArray(5).Trim() = "-") Then
-                                .OpFact = -1
-                            ElseIf Not (WerteArray(5).Trim() = "") Then
-                                .OpFact = Convert.ToDouble(WerteArray(5).Trim())
-                            End If
-                            .Datei = WerteArray(6).Trim()
-                            .SimGr = WerteArray(7).Trim()
-                            .Funktion = WerteArray(8).Trim()
+                        'Gemeinsame Spalten einlesen
+                        Call Me.Read_ZIE_CommonColumns(Objective_ValueFromSeries, Zeile)
+
+                        'Restliche Spalten einlesen
+                        With Objective_ValueFromSeries
                             If (WerteArray(9).Trim() <> "") Then
                                 .EvalStart = WerteArray(9).Trim()
                             Else
@@ -732,6 +681,46 @@ Public Class Problem
         End Try
 
         'Call Validate_Objectives()
+
+    End Sub
+
+    ''' <summary>
+    ''' Liest die Spalten 1 bis 8 der ZIE-Datei ein
+    ''' </summary>
+    ''' <param name="objective">objective function in der die Werte abgelegt werden sollen</param>
+    ''' <param name="zeile">Zeile der ZIE-Datei</param>
+    ''' <remarks></remarks>
+    Private Sub Read_ZIE_CommonColumns(ByRef objective As EVO.Common.ObjectiveFunction, ByVal zeile As String)
+
+        Dim WerteArray() As String
+
+        WerteArray = zeile.Split("|")
+
+        With objective
+            If (WerteArray(1).Trim().ToUpper() = "P") Then
+                .isPrimObjective = True
+            Else
+                .isPrimObjective = False
+            End If
+            .Bezeichnung = WerteArray(2).Trim()
+            .Gruppe = WerteArray(3).Trim()
+            If (WerteArray(4).Trim() = "+") Then
+                .Richtung = Common.EVO_RICHTUNG.Maximierung
+            Else
+                .Richtung = Common.EVO_RICHTUNG.Minimierung
+            End If
+
+            If (WerteArray(5).Trim() = "+") Then
+                .OpFact = 1
+            ElseIf (WerteArray(5).Trim() = "-") Then
+                .OpFact = -1
+            ElseIf Not (WerteArray(5).Trim() = "") Then
+                .OpFact = Convert.ToDouble(WerteArray(5).Trim())
+            End If
+            .Datei = WerteArray(6).Trim()
+            .SimGr = WerteArray(7).Trim()
+            .Funktion = WerteArray(8).Trim()
+        End With
 
     End Sub
 
