@@ -27,8 +27,7 @@ Partial Class Form1
         Me.components = New System.ComponentModel.Container
         Dim MenuStrip1 As System.Windows.Forms.MenuStrip
         Dim MenuItem_Tools As System.Windows.Forms.ToolStripMenuItem
-        Dim MenuItem_Hilfe As System.Windows.Forms.ToolStripMenuItem
-        Dim ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
+        Dim MenuItem_Info As System.Windows.Forms.ToolStripMenuItem
         Dim ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
         Dim ToolStripSeparator3 As System.Windows.Forms.ToolStripSeparator
         Dim ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
@@ -37,8 +36,8 @@ Partial Class Form1
         Dim ToolStripSeparator7 As System.Windows.Forms.ToolStripSeparator
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem
-        Me.MenuItem_Wiki = New System.Windows.Forms.ToolStripMenuItem
-        Me.MenuItem_About = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripMenuItem_Help = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripMenuItem_About = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button
         Me.Button_Stop = New System.Windows.Forms.Button
@@ -74,8 +73,7 @@ Partial Class Form1
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
-        MenuItem_Hilfe = New System.Windows.Forms.ToolStripMenuItem
-        ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
+        MenuItem_Info = New System.Windows.Forms.ToolStripMenuItem
         ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator
         ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator
         ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
@@ -89,7 +87,7 @@ Partial Class Form1
         '
         'MenuStrip1
         '
-        MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {MenuItem_Tools, MenuItem_Hilfe})
+        MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {MenuItem_Tools, MenuItem_Info})
         MenuStrip1.Location = New System.Drawing.Point(0, 0)
         MenuStrip1.Name = "MenuStrip1"
         MenuStrip1.RightToLeft = System.Windows.Forms.RightToLeft.No
@@ -111,29 +109,24 @@ Partial Class Form1
         Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(200, 22)
         Me.MenuItem_DatensatzZurücksetzen.Text = "Datensatz zurücksetzen"
         '
-        'MenuItem_Hilfe
+        'MenuItem_Info
         '
-        MenuItem_Hilfe.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_Wiki, ToolStripSeparator2, Me.MenuItem_About})
-        MenuItem_Hilfe.Name = "MenuItem_Hilfe"
-        MenuItem_Hilfe.Size = New System.Drawing.Size(40, 20)
-        MenuItem_Hilfe.Text = "Hilfe"
+        MenuItem_Info.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_Help, Me.ToolStripMenuItem_About})
+        MenuItem_Info.Name = "MenuItem_Info"
+        MenuItem_Info.Size = New System.Drawing.Size(24, 20)
+        MenuItem_Info.Text = "?"
         '
-        'MenuItem_Wiki
+        'ToolStripMenuItem_Help
         '
-        Me.MenuItem_Wiki.Name = "MenuItem_Wiki"
-        Me.MenuItem_Wiki.Size = New System.Drawing.Size(172, 22)
-        Me.MenuItem_Wiki.Text = "Wiki"
+        Me.ToolStripMenuItem_Help.Name = "ToolStripMenuItem_Help"
+        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(152, 22)
+        Me.ToolStripMenuItem_Help.Text = "Hilfe"
         '
-        'ToolStripSeparator2
+        'ToolStripMenuItem_About
         '
-        ToolStripSeparator2.Name = "ToolStripSeparator2"
-        ToolStripSeparator2.Size = New System.Drawing.Size(169, 6)
-        '
-        'MenuItem_About
-        '
-        Me.MenuItem_About.Name = "MenuItem_About"
-        Me.MenuItem_About.Size = New System.Drawing.Size(172, 22)
-        Me.MenuItem_About.Text = "About EVO.NET..."
+        Me.ToolStripMenuItem_About.Name = "ToolStripMenuItem_About"
+        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(152, 22)
+        Me.ToolStripMenuItem_About.Text = "About"
         '
         'ToolStripSeparator4
         '
@@ -516,8 +509,8 @@ Partial Class Form1
     Friend WithEvents Button_BrowseDatensatz As System.Windows.Forms.Button
     Friend WithEvents ComboBox_Datensatz As System.Windows.Forms.ComboBox
     Private WithEvents MenuItem_DatensatzZurücksetzen As System.Windows.Forms.ToolStripMenuItem
-    Private WithEvents MenuItem_About As System.Windows.Forms.ToolStripMenuItem
-    Private WithEvents MenuItem_Wiki As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents ToolStripMenuItem_About As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents ToolStripMenuItem_Help As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
     Friend WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip
     Private WithEvents ToolStripSplitButton_Diagramm As System.Windows.Forms.ToolStripSplitButton

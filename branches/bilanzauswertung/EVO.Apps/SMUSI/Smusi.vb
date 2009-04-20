@@ -22,8 +22,11 @@ Public Class Smusi
     'Eigenschaften
     '#############
 
+    Private Const useSmusiExe As Boolean = False 'true = EXE, false = DLL
+
     'SMUSI DLL
     '---------
+    Private dll_path As String
     Private smusi_dll As SMUSI_EngineDotNetAccess
 
 #End Region 'Eigenschaften
@@ -60,7 +63,6 @@ Public Class Smusi
         End Get
     End Property
 
-
 #End Region 'Properties
 
 #Region "Methoden"
@@ -73,6 +75,19 @@ Public Class Smusi
     Public Sub New()
 
         Call MyBase.New()
+
+        If (Not useSmusiExe) Then
+
+            'SMUSI DLL instanzieren
+            '----------------------
+            Me.dll_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI\smusi.dll"
+
+            If (File.Exists(Me.dll_path)) Then
+                Me.smusi_dll = New SMUSI_EngineDotNetAccess(Me.dll_path)
+            Else
+                Throw New Exception("SMUSI.dll nicht gefunden!")
+            End If
+        End If
 
     End Sub
 
@@ -125,11 +140,11 @@ Public Class Smusi
 
         Dim simOK As Boolean
         Dim SimCurrent, SimStart, SimEnde As DateTime
-        Dim EXE_DLL As Boolean 'true = EXE, false = DLL
 
-        EXE_DLL = False
+        If (useSmusiExe) Then
 
-        If EXE_DLL Then
+            'verwende SMUSI.Win.exe
+            '----------------------
             Dim exe_path As String
             Dim String1 As String
             Dim String3 As String
@@ -162,24 +177,21 @@ Public Class Smusi
             Else
                 simOK = False
             End If
+
         Else
 
-            'SMUSI DLL instanzieren
-            '----------------------
-            Dim dll_path As String
-            dll_path = System.Windows.Forms.Application.StartupPath() & "\SMUSI\SMUSI.dll"
+            'verwende SMUSI.dll und SMUSI.DllAdapter.dll
+            '-------------------------------------------
 
-            smusi_dll = Nothing
+            'SMUSI DLL neu instanzieren (muss das sein?)
+            '-------------------------------------------
+            Me.smusi_dll = Nothing
 
-            If (File.Exists(dll_path)) Then
-                smusi_dll = New SMUSI_EngineDotNetAccess(dll_path)
-            Else
-                Throw New Exception("SMUSI.dll nicht gefunden!")
-            End If
+            Me.smusi_dll = New SMUSI_EngineDotNetAccess(dll_path)
 
             'Falls vorher schon initialisiert wurde
-            Call smusi_dll.Finish()
-            Call smusi_dll.Dispose()
+            Call Me.smusi_dll.Finish()
+            Call Me.smusi_dll.Dispose()
 
             Try
 
@@ -222,12 +234,12 @@ Public Class Smusi
 
             Finally
 
-                Call smusi_dll.Finish()
-                Call smusi_dll.Dispose()
+                Call Me.smusi_dll.Finish()
+                Call Me.smusi_dll.Dispose()
 
             End Try
 
-            smusi_dll = Nothing
+            Me.smusi_dll = Nothing
 
         End If
 

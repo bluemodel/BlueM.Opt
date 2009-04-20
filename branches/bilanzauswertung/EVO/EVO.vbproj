@@ -95,7 +95,7 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <Reference Include="TeeChart, Version=3.5.3330.21114, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
+    <Reference Include="TeeChart, Version=3.5.3371.26406, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\EVO.Diagramm\Resources\TeeChart.dll</HintPath>
     </Reference>
@@ -161,10 +161,10 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutDialog.Designer.vb">
-      <DependentUpon>AboutDialog.vb</DependentUpon>
+    <Compile Include="AboutBox.Designer.vb">
+      <DependentUpon>AboutBox.vb</DependentUpon>
     </Compile>
-    <Compile Include="AboutDialog.vb">
+    <Compile Include="AboutBox.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SolutionDialog.Designer.vb">
@@ -173,7 +173,6 @@
     <Compile Include="SolutionDialog.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EVOMOD.vb" />
     <Compile Include="EVO_Einstellungen.Designer.vb">
       <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
     </Compile>
@@ -238,8 +237,8 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="Resources\icon_png.png" />
-    <EmbeddedResource Include="AboutDialog.resx">
-      <DependentUpon>AboutDialog.vb</DependentUpon>
+    <EmbeddedResource Include="AboutBox.resx">
+      <DependentUpon>AboutBox.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\licenses.licx" />
@@ -254,6 +253,7 @@
     <Content Include="BLUEM.OPT_RELEASE-NOTES.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\BlueM.png" />
     <Content Include="Resources\page_white.png" />
     <None Include="Resources\page_white_put.png" />
     <None Include="Resources\page_white_get.png" />

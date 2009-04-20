@@ -445,279 +445,291 @@ Public Class Problem
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
+        Dim FiStr As FileStream
+        Dim StrRead As StreamReader
         Dim ZielStart As Date
         Dim ZielEnde As Date
         Dim ext As String
 
         ReDim Me.List_ObjectiveFunctions(-1)
 
-        Dim ZIE_Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_ZIE
+        Try
 
-        Dim currentObjectiveType As Common.ObjectiveFunction.ObjectiveType
+            Dim ZIE_Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_ZIE
 
-        'Open the file
-        Dim FiStr As FileStream = New FileStream(ZIE_Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim currentObjectiveType As Common.ObjectiveFunction.ObjectiveType
 
-        'Read the file
-        i = 0
-        Do
-            Zeile = StrRead.ReadLine.ToString()
+            'Open the file
+            FiStr = New FileStream(ZIE_Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+            StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
-            'Determine the current block / objective type
-            If Zeile.StartsWith("*Reihenvergleich") Then
-                currentObjectiveType = ObjectiveFunction.ObjectiveType.Series
-            ElseIf Zeile.StartsWith("*Wertevergleich") Then
-                currentObjectiveType = ObjectiveFunction.ObjectiveType.Value
-            ElseIf Zeile.StartsWith("*Reihenwertevergleich") Then
-                currentObjectiveType = ObjectiveFunction.ObjectiveType.ValueFromSeries
-            ElseIf Zeile.StartsWith("*Sonderfälle") Then
-                currentObjectiveType = ObjectiveFunction.ObjectiveType.Special
-            End If
+            'Read the file
+            i = 0
+            Do
+                Zeile = StrRead.ReadLine.ToString()
 
-            'Skip comment and empty lines
-            If (Zeile.StartsWith("*") Or Not Zeile.Contains("|")) Then
-                Continue Do
-            End If
+                'Determine the current block / objective type
+                If Zeile.StartsWith("*Reihenvergleich") Then
+                    currentObjectiveType = ObjectiveFunction.ObjectiveType.Series
+                ElseIf Zeile.StartsWith("*Wertevergleich") Then
+                    currentObjectiveType = ObjectiveFunction.ObjectiveType.Value
+                ElseIf Zeile.StartsWith("*Reihenwertevergleich") Then
+                    currentObjectiveType = ObjectiveFunction.ObjectiveType.ValueFromSeries
+                ElseIf Zeile.StartsWith("*Sonderfälle") Then
+                    currentObjectiveType = ObjectiveFunction.ObjectiveType.Special
+                End If
 
-            Select Case currentObjectiveType
+                'Skip comment and empty lines
+                If (Zeile.StartsWith("*") Or Not Zeile.Contains("|")) Then
+                    Continue Do
+                End If
 
-                'BUG 414: TODO: Die ersten paar Spalten sind immer gleich 
-                'und könnten gemeinsam eingelesen werden
+                Select Case currentObjectiveType
 
-                Case ObjectiveFunction.ObjectiveType.Series
+                    'BUG 414: TODO: Die ersten paar Spalten sind immer gleich 
+                    'und könnten gemeinsam eingelesen werden
 
-                    'Reihenvergleich
-                    '===============
-                    WerteArray = Zeile.Split("|")
-                    'Kontrolle
-                    If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFSeries + 1) Then
-                        Throw New Exception("Block Reihenvergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
-                    End If
-                    'ObjectiveFunction instanzieren
-                    Dim Objective_Series As New Common.ObjectiveFunction_Series()
-                    'Werte einlesen
-                    With Objective_Series
-                        If (WerteArray(1).Trim().ToUpper() = "P") Then
-                            .isPrimObjective = True
-                        Else
-                            .isPrimObjective = False
+                    Case ObjectiveFunction.ObjectiveType.Series
+
+                        'Reihenvergleich
+                        '===============
+                        WerteArray = Zeile.Split("|")
+                        'Kontrolle
+                        If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFSeries + 1) Then
+                            Throw New Exception("Block Reihenvergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
                         End If
-                        .Bezeichnung = WerteArray(2).Trim()
-                        .Gruppe = WerteArray(3).Trim()
-                        If (WerteArray(4).Trim() = "+") Then
-                            .Richtung = Common.EVO_RICHTUNG.Maximierung
-                        Else
-                            .Richtung = Common.EVO_RICHTUNG.Minimierung
-                        End If
-
-                        If (WerteArray(5).Trim() = "+") Then
-                            .OpFact = 1
-                        ElseIf (WerteArray(5).Trim() = "-") Then
-                            .OpFact = -1
-                        ElseIf Not (WerteArray(5).Trim() = "") Then
-                            .OpFact = Convert.ToDouble(WerteArray(5).Trim())
-                        End If
-                        .Datei = WerteArray(6).Trim()
-                        .SimGr = WerteArray(7).Trim()
-                        .Funktion = WerteArray(8).Trim()
-                        If (WerteArray(9).Trim() <> "") Then
-                            .EvalStart = WerteArray(9).Trim()
-                        Else
-                            .EvalStart = SimStart
-                        End If
-                        If WerteArray(10).Trim() <> "" Then
-                            .EvalEnde = WerteArray(10).Trim()
-                        Else
-                            .EvalEnde = SimEnde
-                        End If
-                        .RefGr = WerteArray(11).Trim()
-                        .RefReiheDatei = WerteArray(12).Trim()
-                        If (WerteArray(13).Trim() <> "") Then
-                            .hasIstWert = True
-                            .IstWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
-                        Else
-                            .hasIstWert = False
-                        End If
-
-                        'Referenzreihe einlesen
-                        '----------------------
-                        'Dateiendung der Referenzreihendatei bestimmen und Reihe einlesen
-                        ext = System.IO.Path.GetExtension(.RefReiheDatei)
-                        Select Case (ext.ToUpper)
-                            Case ".WEL"
-                                Dim WEL As New Wave.WEL(Me.mWorkDir & .RefReiheDatei)
-                                .RefReihe = WEL.getReihe(.RefGr)
-                            Case ".ASC"
-                                Dim ASC As New Wave.ASC(Me.mWorkDir & .RefReiheDatei)
-                                .RefReihe = ASC.getReihe(.RefGr)
-                            Case ".ZRE"
-                                Dim ZRE As New Wave.ZRE(Me.mWorkDir & .RefReiheDatei)
-                                .RefReihe = ZRE.getReihe(0)
-                                'Case ".PRB"
-                                'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
-                                'IsOK = Read_PRB(Me.WorkDir & .RefReiheDatei, .RefGr, .RefReihe)
-                            Case Else
-                                Throw New Exception("Das Format der Referenzreihe '" & .RefReiheDatei & "' wird nicht unterstützt!")
-                        End Select
-
-                        'Zeitraum der Referenzreihe überprüfen (nur bei WEL und ZRE)
-                        '-----------------------------------------------------------
-                        If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE" Or ext.ToUpper = ".ASC") Then
-
-                            ZielStart = .RefReihe.XWerte(0)
-                            ZielEnde = .RefReihe.XWerte(.RefReihe.Length - 1)
-
-                            If (ZielStart > .EvalStart Or ZielEnde < .EvalEnde) Then
-                                'Referenzreihe deckt Evaluierungszeitraum nicht ab
-                                Throw New Exception("Die Referenzreihe '" & .RefReiheDatei & "' deckt den Evaluierungszeitraum nicht ab!")
+                        'ObjectiveFunction instanzieren
+                        Dim Objective_Series As New Common.ObjectiveFunction_Series()
+                        'Werte einlesen
+                        With Objective_Series
+                            If (WerteArray(1).Trim().ToUpper() = "P") Then
+                                .isPrimObjective = True
                             Else
-                                'Referenzreihe auf Evaluierungszeitraum kürzen
-                                Call .RefReihe.Cut(.EvalStart, .EvalEnde)
+                                .isPrimObjective = False
+                            End If
+                            .Bezeichnung = WerteArray(2).Trim()
+                            .Gruppe = WerteArray(3).Trim()
+                            If (WerteArray(4).Trim() = "+") Then
+                                .Richtung = Common.EVO_RICHTUNG.Maximierung
+                            Else
+                                .Richtung = Common.EVO_RICHTUNG.Minimierung
                             End If
 
+                            If (WerteArray(5).Trim() = "+") Then
+                                .OpFact = 1
+                            ElseIf (WerteArray(5).Trim() = "-") Then
+                                .OpFact = -1
+                            ElseIf Not (WerteArray(5).Trim() = "") Then
+                                .OpFact = Convert.ToDouble(WerteArray(5).Trim())
+                            End If
+                            .Datei = WerteArray(6).Trim()
+                            .SimGr = WerteArray(7).Trim()
+                            .Funktion = WerteArray(8).Trim()
+                            If (WerteArray(9).Trim() <> "") Then
+                                .EvalStart = WerteArray(9).Trim()
+                            Else
+                                .EvalStart = SimStart
+                            End If
+                            If WerteArray(10).Trim() <> "" Then
+                                .EvalEnde = WerteArray(10).Trim()
+                            Else
+                                .EvalEnde = SimEnde
+                            End If
+                            .RefGr = WerteArray(11).Trim()
+                            .RefReiheDatei = WerteArray(12).Trim()
+                            If (WerteArray(13).Trim() <> "") Then
+                                .hasIstWert = True
+                                .IstWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
+                            Else
+                                .hasIstWert = False
+                            End If
+
+                            'Referenzreihe einlesen
+                            '----------------------
+                            'Dateiendung der Referenzreihendatei bestimmen und Reihe einlesen
+                            ext = System.IO.Path.GetExtension(.RefReiheDatei)
+                            Select Case (ext.ToUpper)
+                                Case ".WEL"
+                                    Dim WEL As New Wave.WEL(Me.mWorkDir & .RefReiheDatei)
+                                    .RefReihe = WEL.getReihe(.RefGr)
+                                Case ".ASC"
+                                    Dim ASC As New Wave.ASC(Me.mWorkDir & .RefReiheDatei)
+                                    .RefReihe = ASC.getReihe(.RefGr)
+                                Case ".ZRE"
+                                    Dim ZRE As New Wave.ZRE(Me.mWorkDir & .RefReiheDatei)
+                                    .RefReihe = ZRE.getReihe(0)
+                                    'Case ".PRB"
+                                    'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
+                                    'IsOK = Read_PRB(Me.WorkDir & .RefReiheDatei, .RefGr, .RefReihe)
+                                Case Else
+                                    Throw New Exception("Das Format der Referenzreihe '" & .RefReiheDatei & "' wird nicht unterstützt!")
+                            End Select
+
+                            'Zeitraum der Referenzreihe überprüfen (nur bei WEL und ZRE)
+                            '-----------------------------------------------------------
+                            If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE" Or ext.ToUpper = ".ASC") Then
+
+                                ZielStart = .RefReihe.XWerte(0)
+                                ZielEnde = .RefReihe.XWerte(.RefReihe.Length - 1)
+
+                                If (ZielStart > .EvalStart Or ZielEnde < .EvalEnde) Then
+                                    'Referenzreihe deckt Evaluierungszeitraum nicht ab
+                                    Throw New Exception("Die Referenzreihe '" & .RefReiheDatei & "' deckt den Evaluierungszeitraum nicht ab!")
+                                Else
+                                    'Referenzreihe auf Evaluierungszeitraum kürzen
+                                    Call .RefReihe.Cut(.EvalStart, .EvalEnde)
+                                End If
+
+                            End If
+
+                            'Referenzreihe umbenennen
+                            .RefReihe.Title += " (Referenz)"
+                        End With
+
+                        'Neue ObjectiveFunction abspeichern
+                        ReDim Preserve Me.List_ObjectiveFunctions(i)
+                        Me.List_ObjectiveFunctions(i) = Objective_Series
+                        i += 1
+
+                    Case ObjectiveFunction.ObjectiveType.Value
+
+                        'Wertevergleich
+                        '==============
+                        WerteArray = Zeile.Split("|")
+                        'Kontrolle
+                        If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValue + 1) Then
+                            Throw New Exception("Block Wertevergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
                         End If
+                        'ObjectiveFunction instanzieren
+                        Dim Objective_Value As New Common.Objectivefunction_Value()
+                        'Werte einlesen
+                        With Objective_Value
+                            If (WerteArray(1).Trim().ToUpper() = "P") Then
+                                .isPrimObjective = True
+                            Else
+                                .isPrimObjective = False
+                            End If
+                            .Bezeichnung = WerteArray(2).Trim()
+                            .Gruppe = WerteArray(3).Trim()
+                            If (WerteArray(4).Trim() = "+") Then
+                                .Richtung = Common.EVO_RICHTUNG.Maximierung
+                            Else
+                                .Richtung = Common.EVO_RICHTUNG.Minimierung
+                            End If
+                            If (WerteArray(5).Trim() = "+") Then
+                                .OpFact = 1
+                            ElseIf (WerteArray(5).Trim() = "-") Then
+                                .OpFact = -1
+                            ElseIf Not (WerteArray(5).Trim() = "") Then
+                                .OpFact = Convert.ToDouble(WerteArray(5).Trim())
+                            End If
+                            .Datei = WerteArray(6).Trim()
+                            .SimGr = WerteArray(7).Trim()
+                            .Funktion = WerteArray(8).Trim()
+                            .Block = WerteArray(9).Trim()
+                            .Spalte = WerteArray(10).Trim()
+                            If (WerteArray(11).Trim() <> "") Then
+                                .RefWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
+                            End If
+                            If (WerteArray(12).Trim() <> "") Then
+                                .hasIstWert = True
+                                .IstWert = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
+                            Else
+                                .hasIstWert = False
+                            End If
+                        End With
 
-                        'Referenzreihe umbenennen
-                        .RefReihe.Title += " (Referenz)"
-                    End With
+                        'Neue ObjectiveFunction abspeichern
+                        ReDim Preserve Me.List_ObjectiveFunctions(i)
+                        Me.List_ObjectiveFunctions(i) = Objective_Value
+                        i += 1
 
-                    'Neue ObjectiveFunction abspeichern
-                    ReDim Preserve Me.List_ObjectiveFunctions(i)
-                    Me.List_ObjectiveFunctions(i) = Objective_Series
-                    i += 1
+                    Case ObjectiveFunction.ObjectiveType.ValueFromSeries
 
-                Case ObjectiveFunction.ObjectiveType.Value
-
-                    'Wertevergleich
-                    '==============
-                    WerteArray = Zeile.Split("|")
-                    'Kontrolle
-                    If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValue + 1) Then
-                        Throw New Exception("Block Wertevergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
-                    End If
-                    'ObjectiveFunction instanzieren
-                    Dim Objective_Value As New Common.Objectivefunction_Value()
-                    'Werte einlesen
-                    With Objective_Value
-                        If (WerteArray(1).Trim().ToUpper() = "P") Then
-                            .isPrimObjective = True
-                        Else
-                            .isPrimObjective = False
+                        'ReihenWertevergleich
+                        '====================
+                        WerteArray = Zeile.Split("|")
+                        'Kontrolle
+                        If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValueFromSeries + 1) Then
+                            Throw New Exception("Block ReihenWertevergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
                         End If
-                        .Bezeichnung = WerteArray(2).Trim()
-                        .Gruppe = WerteArray(3).Trim()
-                        If (WerteArray(4).Trim() = "+") Then
-                            .Richtung = Common.EVO_RICHTUNG.Maximierung
-                        Else
-                            .Richtung = Common.EVO_RICHTUNG.Minimierung
-                        End If
-                        If (WerteArray(5).Trim() = "+") Then
-                            .OpFact = 1
-                        ElseIf (WerteArray(5).Trim() = "-") Then
-                            .OpFact = -1
-                        ElseIf Not (WerteArray(5).Trim() = "") Then
-                            .OpFact = Convert.ToDouble(WerteArray(5).Trim())
-                        End If
-                        .Datei = WerteArray(6).Trim()
-                        .SimGr = WerteArray(7).Trim()
-                        .Funktion = WerteArray(8).Trim()
-                        .Block = WerteArray(9).Trim()
-                        .Spalte = WerteArray(10).Trim()
-                        If (WerteArray(11).Trim() <> "") Then
-                            .RefWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
-                        End If
-                        If (WerteArray(12).Trim() <> "") Then
-                            .hasIstWert = True
-                            .IstWert = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
-                        Else
-                            .hasIstWert = False
-                        End If
-                    End With
+                        'ObjectiveFunction instanzieren
+                        Dim Objective_ValueFromSeries As New Common.ObjectiveFunction_ValueFromSeries()
+                        'Werte einlesen
+                        With Objective_ValueFromSeries
+                            If (WerteArray(1).Trim().ToUpper() = "P") Then
+                                .isPrimObjective = True
+                            Else
+                                .isPrimObjective = False
+                            End If
+                            .Bezeichnung = WerteArray(2).Trim()
+                            .Gruppe = WerteArray(3).Trim()
+                            If (WerteArray(4).Trim() = "+") Then
+                                .Richtung = Common.EVO_RICHTUNG.Maximierung
+                            Else
+                                .Richtung = Common.EVO_RICHTUNG.Minimierung
+                            End If
 
-                    'Neue ObjectiveFunction abspeichern
-                    ReDim Preserve Me.List_ObjectiveFunctions(i)
-                    Me.List_ObjectiveFunctions(i) = Objective_Value
-                    i += 1
+                            If (WerteArray(5).Trim() = "+") Then
+                                .OpFact = 1
+                            ElseIf (WerteArray(5).Trim() = "-") Then
+                                .OpFact = -1
+                            ElseIf Not (WerteArray(5).Trim() = "") Then
+                                .OpFact = Convert.ToDouble(WerteArray(5).Trim())
+                            End If
+                            .Datei = WerteArray(6).Trim()
+                            .SimGr = WerteArray(7).Trim()
+                            .Funktion = WerteArray(8).Trim()
+                            If (WerteArray(9).Trim() <> "") Then
+                                .EvalStart = WerteArray(9).Trim()
+                            Else
+                                .EvalStart = SimStart
+                            End If
+                            If WerteArray(10).Trim() <> "" Then
+                                .EvalEnde = WerteArray(10).Trim()
+                            Else
+                                .EvalEnde = SimEnde
+                            End If
+                            .WertFunktion = WerteArray(11).Trim()
+                            If (WerteArray(12).Trim() <> "") Then
+                                .RefWert = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
+                            End If
+                            If (WerteArray(13).Trim() <> "") Then
+                                .hasIstWert = True
+                                .IstWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
+                            Else
+                                .hasIstWert = False
+                            End If
+                        End With
 
-                Case ObjectiveFunction.ObjectiveType.ValueFromSeries
+                        'Neue ObjectiveFunction abspeichern
+                        ReDim Preserve Me.List_ObjectiveFunctions(i)
+                        Me.List_ObjectiveFunctions(i) = Objective_ValueFromSeries
+                        i += 1
 
-                    'ReihenWertevergleich
-                    '====================
-                    WerteArray = Zeile.Split("|")
-                    'Kontrolle
-                    If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValueFromSeries + 1) Then
-                        Throw New Exception("Block ReihenWertevergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
-                    End If
-                    'ObjectiveFunction instanzieren
-                    Dim Objective_ValueFromSeries As New Common.ObjectiveFunction_ValueFromSeries()
-                    'Werte einlesen
-                    With Objective_ValueFromSeries
-                        If (WerteArray(1).Trim().ToUpper() = "P") Then
-                            .isPrimObjective = True
-                        Else
-                            .isPrimObjective = False
-                        End If
-                        .Bezeichnung = WerteArray(2).Trim()
-                        .Gruppe = WerteArray(3).Trim()
-                        If (WerteArray(4).Trim() = "+") Then
-                            .Richtung = Common.EVO_RICHTUNG.Maximierung
-                        Else
-                            .Richtung = Common.EVO_RICHTUNG.Minimierung
-                        End If
+                    Case ObjectiveFunction.ObjectiveType.Special
 
-                        If (WerteArray(5).Trim() = "+") Then
-                            .OpFact = 1
-                        ElseIf (WerteArray(5).Trim() = "-") Then
-                            .OpFact = -1
-                        ElseIf Not (WerteArray(5).Trim() = "") Then
-                            .OpFact = Convert.ToDouble(WerteArray(5).Trim())
-                        End If
-                        .Datei = WerteArray(6).Trim()
-                        .SimGr = WerteArray(7).Trim()
-                        .Funktion = WerteArray(8).Trim()
-                        If (WerteArray(9).Trim() <> "") Then
-                            .EvalStart = WerteArray(9).Trim()
-                        Else
-                            .EvalStart = SimStart
-                        End If
-                        If WerteArray(10).Trim() <> "" Then
-                            .EvalEnde = WerteArray(10).Trim()
-                        Else
-                            .EvalEnde = SimEnde
-                        End If
-                        .WertFunktion = WerteArray(11).Trim()
-                        If (WerteArray(12).Trim() <> "") Then
-                            .RefWert = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
-                        End If
-                        If (WerteArray(13).Trim() <> "") Then
-                            .hasIstWert = True
-                            .IstWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
-                        Else
-                            .hasIstWert = False
-                        End If
-                    End With
+                        'Sonderfall
+                        '==========
+                        'BUG 414: TODO: ObjectiveFunction Sonderfälle einlesen
 
-                    'Neue ObjectiveFunction abspeichern
-                    ReDim Preserve Me.List_ObjectiveFunctions(i)
-                    Me.List_ObjectiveFunctions(i) = Objective_ValueFromSeries
-                    i += 1
-
-                Case ObjectiveFunction.ObjectiveType.Special
-
-                    'Sonderfall
-                    '==========
-                    'BUG 414: TODO: ObjectiveFunction Sonderfälle einlesen
-
-                Case Else
+                    Case Else
 
 
-            End Select
+                End Select
 
-        Loop Until StrRead.Peek() = -1
+            Loop Until StrRead.Peek() = -1
 
-        StrRead.Close()
-        FiStr.Close()
+        Catch ex As Exception
+
+            Throw ex
+
+        Finally
+
+            StrRead.Close()
+            FiStr.Close()
+
+        End Try
 
         'Call Validate_Objectives()
 
@@ -1291,18 +1303,18 @@ Public Class Problem
     Public Function getIndividuumStart() As EVO.Common.Individuum
 
         Dim startind As EVO.Common.Individuum
-        Dim IndCES As New EVO.Common.Individuum_CES("start", 1)
 
         Dim i As Integer
 
         Select Case Me.Method
             Case METH_CES
-                startind = New EVO.Common.Individuum_CES("start", 1)
+                Dim IndCES As EVO.Common.Individuum_CES
+                IndCES = New EVO.Common.Individuum_CES("start", 1)
                 'Startpfad setzen
                 For i = 0 To IndCES.Path.GetUpperBound(0)
                     IndCES.Path(i) = 0
                 Next
-                ''ToDO:
+                'TODO:
                 'For i = 0 To Me.List_Locations.GetUpperBound(0)
                 '    For j = 0 To Me.List_Locations(i).List_Massnahmen.GetUpperBound(0)
                 '        If Not Me.List_Locations(i).List_Massnahmen(j).TestModus = 0 Then

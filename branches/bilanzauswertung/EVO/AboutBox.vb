@@ -1,6 +1,6 @@
-﻿Public NotInheritable Class AboutDialog
+﻿Public NotInheritable Class AboutBox
 
-    Private Sub AboutDialog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Private Sub AboutBox_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ' Set the title of the form.
         Dim ApplicationTitle As String
         If My.Application.Info.Title <> "" Then
@@ -19,8 +19,11 @@
         Me.TextBoxDescription.Text = My.Application.Info.Description
     End Sub
 
-    Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
+    Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Me.Close()
     End Sub
 
+    Private Sub LinkLabel1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LinkLabel1.Click
+        Process.Start(Me.LinkLabel1.Text)
+    End Sub
 End Class
