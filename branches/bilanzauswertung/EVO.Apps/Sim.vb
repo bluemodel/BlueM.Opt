@@ -636,34 +636,54 @@ Public MustInherit Class Sim
     ''' <remarks>Die Simulation muss bereits erfolgt sein</remarks>
     Public Sub SIM_Ergebnis_auswerten(ByRef ind As Common.Individuum, Optional ByVal storeInDB As Boolean = True)
 
-        Dim i, j As Short
+        Dim i, j, k As Short
+        Dim aggroziel As EVO.Common.ObjectiveFunction_Aggregate
+        Dim aggregateIndices As New Collections.Generic.List(Of Integer)
 
-        'Lesen der Relevanten Parameter aus der wel Datei
+        'Simulationsergebnis einlesen
         Call SIM_Ergebnis_Lesen()
 
-        'Qualitätswerte berechnen
+        'ObjectiveFunctions berechnen
         For i = 0 To Me.mProblem.NumObjectives - 1
 
-            'Es wird immer evaluiert außer bei GroupLeadern
-            If Not Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective Or Not Me.mProblem.List_ObjectiveFunctions(i).isGroupLeader Then
-                ind.Objectives(i) = Me.mProblem.List_ObjectiveFunctions(i).calculateObjective(Me.SimErgebnis)
-            Else
-                'Bei GroupLeadern wird der ZielfunktionswertWert auf Null gesetzt
-                ind.Objectives(i) = 0
-            End If
+            With Me.mProblem.List_ObjectiveFunctions(i)
 
-            'Falls es GroupMember gibt werden sie zum GruppLeader agregiert
-            If Not Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective And Me.mProblem.List_ObjectiveFunctions(i).isGroupMember Then
-                ind.Objectives(i) = Me.mProblem.List_ObjectiveFunctions(i).calculateObjective(Me.SimErgebnis)
-                j = -1
-                Do
-                    j += 1
-                    If Me.mProblem.List_ObjectiveFunctions(i).Gruppe = Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung Then
-                        ind.Objectives(j) = ind.Objectives(j) + ind.Objectives(i) * Me.mProblem.List_ObjectiveFunctions(i).OpFact
+                If (.isGroupLeader) Then
+                    'Aggregierte Ziele für später aufheben
+                    aggregateIndices.Add(i)
+                Else
+                    'andere Ziele auswerten
+                    ind.Objectives(i) = .calculateObjective(Me.SimErgebnis)
+                End If
+
+            End With
+        Next
+
+        'Aggregierte Ziele berechnen
+        For Each j In aggregateIndices
+
+            aggroziel = Me.mProblem.List_ObjectiveFunctions(j)
+
+            'Zunächst zu Null setzen
+            ind.Objectives(j) = 0
+
+            'Alle Gruppenmitglieder suchen
+            For k = 0 To Me.mProblem.NumObjectives - 1
+
+                With Me.mProblem.List_ObjectiveFunctions(k)
+
+                    If (Not .isGroupLeader _
+                        And .Gruppe = aggroziel.Gruppe) Then
+
+                        'gefundenes Gruppenmitglied hinzuaddieren
+                        ind.Objectives(j) += ind.Objectives(k) * .OpFact
                     End If
-                Loop Until (Me.mProblem.List_ObjectiveFunctions(i).Gruppe = Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung)
-            End If
 
+                End With
+            Next
+
+            'Zielrichtung berücksichtigen
+            ind.Objectives(j) *= aggroziel.Richtung
         Next
 
         'Constraints berechnen

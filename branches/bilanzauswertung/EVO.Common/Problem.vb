@@ -441,6 +441,7 @@ Public Class Problem
         Const AnzSpalten_ObjFValue As Integer = 12                  'Anzahl Spalten Wertevergleich in der ZIE-Datei
         Const AnzSpalten_ObjFValueFromSeries As Integer = 13        'Anzahl Spalten Reihenwertevergleich in der ZIE-Datei
         Const AnzSpalten_ObjFIHA As Integer = 11                    'Anzahl Spalten IHA-Analyse in der ZIE-Datei
+        Const AnzSpalten_ObjFAggregate As Integer = 4               'Anzahl Spalten Aggregierte Ziele in der ZIE-Datei
 
         Dim i As Integer
         Dim Zeile As String
@@ -475,6 +476,8 @@ Public Class Problem
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.ValueFromSeries
                 ElseIf Zeile.StartsWith("*IHA-Analyse") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.IHA
+                ElseIf Zeile.StartsWith("*Aggregierte Ziele") Then
+                    currentObjectiveType = ObjectiveFunction.ObjectiveType.Aggregate
                 End If
 
                 'Skip comment and empty lines
@@ -654,6 +657,40 @@ Public Class Problem
                         'Neue ObjectiveFunction abspeichern
                         ReDim Preserve Me.List_ObjectiveFunctions(i)
                         Me.List_ObjectiveFunctions(i) = objective_IHA
+                        i += 1
+
+                    Case ObjectiveFunction.ObjectiveType.Aggregate
+
+                        'Agrregierte Ziele
+                        '=================
+
+                        'Kontrolle
+                        If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFAggregate + 1) Then
+                            Throw New Exception("Block 'Aggregierte Ziele' in der ZIE-Datei hat die falsche Anzahl Spalten!")
+                        End If
+
+                        'ObjectiveFunction instanzieren
+                        Dim Objective_Aggregate As New Common.ObjectiveFunction_Aggregate()
+
+                        'Spalten einlesen
+                        With Objective_Aggregate
+                            If (WerteArray(1).Trim().ToUpper() = "P") Then
+                                .isPrimObjective = True
+                            Else
+                                .isPrimObjective = False
+                            End If
+                            .Bezeichnung = WerteArray(2).Trim()
+                            .Gruppe = WerteArray(3).Trim()
+                            If (WerteArray(4).Trim() = "+") Then
+                                .Richtung = Common.EVO_RICHTUNG.Maximierung
+                            Else
+                                .Richtung = Common.EVO_RICHTUNG.Minimierung
+                            End If
+                        End With
+
+                        'Neue ObjectiveFunction abspeichern
+                        ReDim Preserve Me.List_ObjectiveFunctions(i)
+                        Me.List_ObjectiveFunctions(i) = Objective_Aggregate
                         i += 1
 
                     Case Else

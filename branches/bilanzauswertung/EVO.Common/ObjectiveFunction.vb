@@ -8,6 +8,7 @@ Public MustInherit Class ObjectiveFunction
         Value = 2
         ValueFromSeries = 3
         IHA = 4
+        Aggregate = 5
     End Enum
 
     ''' <summary>
@@ -75,22 +76,10 @@ Public MustInherit Class ObjectiveFunction
     ''' </summary>
     Public ReadOnly Property isGroupLeader() As Boolean
         Get
-            If Me.Bezeichnung = Me.Gruppe Then
+            If (Me.GetObjType = ObjectiveType.Aggregate) Then
                 Return True
             End If
             Return False
-        End Get
-    End Property
-
-    ''' <summary>
-    ''' Gibt an, ob es ein Gruppenmitglied ist
-    ''' </summary>
-    Public ReadOnly Property isGroupMember() As Boolean
-        Get
-            If Me.Gruppe = "" Then
-                Return False
-            End If
-            Return True
         End Get
     End Property
 
@@ -107,6 +96,8 @@ Public MustInherit Class ObjectiveFunction
                 Return ObjectiveType.ValueFromSeries
             ElseIf (TypeOf (Me) Is ObjectiveFunction_IHA) Then
                 Return ObjectiveType.IHA
+            ElseIf (TypeOf (Me) Is ObjectiveFunction_Aggregate) Then
+                Return ObjectiveType.Aggregate
             Else
                 Throw New Exception("Unable to determine type of ObjectiveFunction")
             End If

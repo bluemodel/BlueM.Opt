@@ -60,6 +60,7 @@
     <Compile Include="Individuum_PES.vb" />
     <Compile Include="Locations.vb" />
     <Compile Include="Modellparameter.vb" />
+    <Compile Include="ObjectiveFunction_Aggregate.vb" />
     <Compile Include="ObjectiveFunction_IHA.vb" />
     <Compile Include="ObjectiveFunction_Series.vb" />
     <Compile Include="ObjectiveFunction_ValueFromSeries.vb" />
