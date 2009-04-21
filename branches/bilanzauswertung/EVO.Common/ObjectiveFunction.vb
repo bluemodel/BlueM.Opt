@@ -7,7 +7,7 @@ Public MustInherit Class ObjectiveFunction
         Series = 1
         Value = 2
         ValueFromSeries = 3
-        Special = 4
+        IHA = 4
     End Enum
 
     ''' <summary>
@@ -103,8 +103,8 @@ Public MustInherit Class ObjectiveFunction
                 Return ObjectiveType.Value
             ElseIf (TypeOf (Me) Is ObjectiveFunction_ValueFromSeries) Then
                 Return ObjectiveType.ValueFromSeries
-            ElseIf (TypeOf (Me) Is ObjectiveFunction_Special) Then
-                Return ObjectiveType.Special
+            ElseIf (TypeOf (Me) Is ObjectiveFunction_IHA) Then
+                Return ObjectiveType.IHA
             Else
                 Throw New Exception("Unable to determine type of ObjectiveFunction")
             End If

@@ -32,12 +32,6 @@ Public Class BlueM
     '----
     Private useKWL As Boolean       'gibt an, ob die KWL-Datei benutzt wird
 
-    'IHA
-    '---
-    Public isIHA As Boolean
-    Public IHASys As IHWB.IHA.IHAAnalysis
-    Public IHAProc As IHAProcessor
-
     'SKos
     '----
     Public SKos1 As SKos
@@ -94,7 +88,6 @@ Public Class BlueM
         'Daten belegen
         '-------------
         Me.useKWL = False
-        Me.isIHA = False
 
         'Pfad zu BlueM.DLL bestimmen
         '---------------------------
@@ -152,54 +145,6 @@ Public Class BlueM
                 Exit For
             End If
         Next
-
-        'IHA
-        '---
-        Dim IHAZielReihe As Wave.Zeitreihe
-        Dim IHAStart, IHAEnde As DateTime
-
-        IHAZielReihe = New Wave.Zeitreihe("new")
-
-        'Gibt es eine IHA-Zielfunktion?
-        'HACK: es wird immer nur das erste IHA-Ziel verwendet!
-        '------------------------------
-        For Each objective In Me.mProblem.List_ObjectiveFunctions
-            If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Special) Then
-                With CType(objective, Common.ObjectiveFunction_Special)
-                    If (.FunctionName = "IHA") Then
-                        'IHA-Berechnung einschalten
-                        Me.isIHA = True
-                        'BUG 414: TODO: IHA
-                        'IHAZielReihe = .RefReihe
-                        'IHAStart = .EvalStart
-                        'IHAEnde = .EvalEnde
-                        Exit For
-                    End If
-                End With
-            End If
-        Next
-
-        'IHA-Berechnung vorbereiten
-        '--------------------------
-        If (Me.isIHA) Then
-            'IHAAnalyse-Objekt instanzieren
-            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir_Original & "IHA\", IHAZielReihe, IHAStart, IHAEnde)
-
-            'IHAProcessor-Objekt instanzieren
-            Me.IHAProc = New IHAProcessor()
-
-            'IHA-Vergleichsmodus?
-            '--------------------
-            Dim reffile As String = Me.WorkDir_Original & Me.Datensatz & ".rva"
-            If (File.Exists(reffile)) Then
-
-                Dim RVABase As New Wave.RVA(reffile, True)
-
-                'Vergleichsmodus aktivieren
-                Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
-            End If
-
-        End If
 
     End Sub
 
@@ -426,7 +371,8 @@ Public Class BlueM
     'Simulationsergebnis verarbeiten
     '-------------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
-        'hier nur die Reihen einlesen, die auvh für objfunction gebraucht werden
+
+        'TODO: hier nur die Reihen einlesen, die auch für objfunctions gebraucht werden
 
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
@@ -453,21 +399,6 @@ Public Class BlueM
                 Me.SimErgebnis.Add(zre, zre.ToString())
             Next
 
-        End If
-
-        'Bei IHA-Berechnung jetzt IHA-Software ausführen
-        '-----------------------------------------------
-        If (Me.isIHA) Then
-            'IHA-Ziel raussuchen und Simulationsreihe übergeben
-            'HACK: es wird immer das erste IHA-Ziel verwendet!
-            For Each objective As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-                If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Special) Then
-                    If (CType(objective, Common.ObjectiveFunction_Special).FunctionName = "IHA") Then
-                        Call Me.IHASys.calculate_IHA(Me.SimErgebnis(objective.SimGr))
-                        Exit For
-                    End If
-                End If
-            Next
         End If
 
     End Sub

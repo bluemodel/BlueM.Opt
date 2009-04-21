@@ -440,16 +440,13 @@ Public Class Problem
         Const AnzSpalten_ObjFSeries As Integer = 13                 'Anzahl Spalten Reihenvergleich in der ZIE-Datei
         Const AnzSpalten_ObjFValue As Integer = 12                  'Anzahl Spalten Wertevergleich in der ZIE-Datei
         Const AnzSpalten_ObjFValueFromSeries As Integer = 13        'Anzahl Spalten Reihenwertevergleich in der ZIE-Datei
-        Const AnzSpalten_ObjFSpecial As Integer = 13 '???           'Anzahl Spalten Sonderfall in der ZIE-Datei
+        Const AnzSpalten_ObjFIHA As Integer = 11                    'Anzahl Spalten IHA-Analyse in der ZIE-Datei
 
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
         Dim FiStr As FileStream
         Dim StrRead As StreamReader
-        Dim ZielStart As Date
-        Dim ZielEnde As Date
-        Dim ext As String
 
         ReDim Me.List_ObjectiveFunctions(-1)
 
@@ -476,8 +473,8 @@ Public Class Problem
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.Value
                 ElseIf Zeile.StartsWith("*Reihenwertevergleich") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.ValueFromSeries
-                ElseIf Zeile.StartsWith("*Sonderfälle") Then
-                    currentObjectiveType = ObjectiveFunction.ObjectiveType.Special
+                ElseIf Zeile.StartsWith("*IHA-Analyse") Then
+                    currentObjectiveType = ObjectiveFunction.ObjectiveType.IHA
                 End If
 
                 'Skip comment and empty lines
@@ -529,45 +526,8 @@ Public Class Problem
                             End If
 
                             'Referenzreihe einlesen
-                            '----------------------
-                            'Dateiendung der Referenzreihendatei bestimmen und Reihe einlesen
-                            ext = System.IO.Path.GetExtension(.RefReiheDatei)
-                            Select Case (ext.ToUpper)
-                                Case ".WEL"
-                                    Dim WEL As New Wave.WEL(Me.mWorkDir & .RefReiheDatei)
-                                    .RefReihe = WEL.getReihe(.RefGr)
-                                Case ".ASC"
-                                    Dim ASC As New Wave.ASC(Me.mWorkDir & .RefReiheDatei)
-                                    .RefReihe = ASC.getReihe(.RefGr)
-                                Case ".ZRE"
-                                    Dim ZRE As New Wave.ZRE(Me.mWorkDir & .RefReiheDatei)
-                                    .RefReihe = ZRE.getReihe(0)
-                                    'Case ".PRB"
-                                    'BUG 183: geht nicht mehr, weil PRB-Dateien keine Zeitreihen sind!
-                                    'IsOK = Read_PRB(Me.WorkDir & .RefReiheDatei, .RefGr, .RefReihe)
-                                Case Else
-                                    Throw New Exception("Das Format der Referenzreihe '" & .RefReiheDatei & "' wird nicht unterstützt!")
-                            End Select
+                            .RefReihe = Me.Read_ZIE_RefReihe(Me.mWorkDir & .RefReiheDatei, .RefGr, .EvalStart, .EvalEnde)
 
-                            'Zeitraum der Referenzreihe überprüfen (nur bei WEL und ZRE)
-                            '-----------------------------------------------------------
-                            If (ext.ToUpper = ".WEL" Or ext.ToUpper = ".ZRE" Or ext.ToUpper = ".ASC") Then
-
-                                ZielStart = .RefReihe.XWerte(0)
-                                ZielEnde = .RefReihe.XWerte(.RefReihe.Length - 1)
-
-                                If (ZielStart > .EvalStart Or ZielEnde < .EvalEnde) Then
-                                    'Referenzreihe deckt Evaluierungszeitraum nicht ab
-                                    Throw New Exception("Die Referenzreihe '" & .RefReiheDatei & "' deckt den Evaluierungszeitraum nicht ab!")
-                                Else
-                                    'Referenzreihe auf Evaluierungszeitraum kürzen
-                                    Call .RefReihe.Cut(.EvalStart, .EvalEnde)
-                                End If
-
-                            End If
-
-                            'Referenzreihe umbenennen
-                            .RefReihe.Title += " (Referenz)"
                         End With
 
                         'Neue ObjectiveFunction abspeichern
@@ -656,14 +616,49 @@ Public Class Problem
                         Me.List_ObjectiveFunctions(i) = Objective_ValueFromSeries
                         i += 1
 
-                    Case ObjectiveFunction.ObjectiveType.Special
+                    Case ObjectiveFunction.ObjectiveType.IHA
 
-                        'Sonderfall
-                        '==========
-                        'BUG 414: TODO: ObjectiveFunction Sonderfälle einlesen
+                        'IHA-Analyse
+                        '===========
+
+                        'Kontrolle
+                        If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFIHA + 1) Then
+                            Throw New Exception("Block Reihenvergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
+                        End If
+
+                        'ObjectiveFunction instanzieren
+                        Dim objective_IHA As New EVO.Common.ObjectiveFunction_IHA()
+
+                        'Gemeinsame Spalten einlesen
+                        Call Me.Read_ZIE_CommonColumns(objective_IHA, Zeile)
+
+                        'Restliche Spalten einlesen
+                        With Objective_IHA
+                            .RefGr = WerteArray(9).Trim()
+                            .RefReiheDatei = WerteArray(10).Trim()
+                            If (WerteArray(11).Trim() <> "") Then
+                                .hasIstWert = True
+                                .IstWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
+                            Else
+                                .hasIstWert = False
+                            End If
+
+                            'Referenzreihe einlesen
+                            .RefReihe = Me.Read_ZIE_RefReihe(Me.mWorkDir & .RefReiheDatei, .RefGr, SimStart, SimEnde)
+
+                        End With
+
+                        'IHA-Analyse initialisieren
+                        objective_IHA.initialize(Me.WorkDir, Me.Datensatz, SimStart, SimEnde)
+
+                        'Neue ObjectiveFunction abspeichern
+                        ReDim Preserve Me.List_ObjectiveFunctions(i)
+                        Me.List_ObjectiveFunctions(i) = objective_IHA
+                        i += 1
 
                     Case Else
 
+                        Throw New Exception("Oops!")
 
                 End Select
 
@@ -723,6 +718,38 @@ Public Class Problem
         End With
 
     End Sub
+
+    ''' <summary>
+    ''' Referenzreihe aus Datei einlesen und zuschneiden
+    ''' </summary>
+    ''' <param name="dateipfad">Pfad zur Zeitreihendatei</param>
+    ''' <param name="refgroesse">Name der einzulesenden Reihe</param>
+    ''' <param name="EvalStart">Startpunkt der Evaluierung</param>
+    ''' <param name="EvalEnde">Endpunkt der Evaluierung</param>
+    ''' <returns>Zeitreihe</returns>
+    Private Function Read_ZIE_RefReihe(ByVal dateipfad As String, ByVal refgroesse As String, ByVal EvalStart As DateTime, ByVal EvalEnde As DateTime) As Wave.Zeitreihe
+
+        Dim RefReihe As Wave.Zeitreihe
+
+        'Referenzreihe aus Datei einlesen
+        Dim dateiobjekt As Wave.Dateiformat = Wave.Dateifactory.getDateiInstanz(dateipfad)
+        RefReihe = dateiobjekt.getReihe(refgroesse)
+
+        'Zeitraum der Referenzreihe überprüfen
+        If (RefReihe.Anfangsdatum > EvalStart Or RefReihe.Enddatum < EvalEnde) Then
+            'Referenzreihe deckt Evaluierungszeitraum nicht ab
+            Throw New Exception("Die Referenzreihe '" & dateipfad & "' deckt den Evaluierungszeitraum nicht ab!")
+        Else
+            'Referenzreihe auf Evaluierungszeitraum kürzen
+            Call RefReihe.Cut(EvalStart, EvalEnde)
+        End If
+
+        'Referenzreihe umbenennen
+        RefReihe.Title += " (Referenz)"
+
+        Return RefReihe
+
+    End Function
 
     ''' <summary>
     ''' Constraint Functions (*.CON) einlesen

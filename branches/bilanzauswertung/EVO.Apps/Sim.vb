@@ -878,18 +878,16 @@ Handler:
 
                 QWert = Me.CalculateObjective_Value(objective, SimWert)
 
+            Case Common.ObjectiveFunction.ObjectiveType.IHA
+
+                'SimReihe aus SimErgebnis rausholen
+                SimReihe = Me.SimErgebnis(objective.SimGr)
+
+                QWert = CType(objective, EVO.Common.ObjectiveFunction_IHA).calculateObjective(SimReihe)
+
             Case Else
 
-                'TODO: Sonderfälle
-                '-----------
-
-                'Case "Kosten"
-                '    QWert = Me.SKos1.Calculate_Costs(Me.WorkDir_Current)
-
-                'Case "IHA"
-                '    QWert = Me.IHAProc.CalculateObjective_IHA(objective, Me.IHASys.RVAResult)
-
-                Throw New Exception("Sonderfall in Objectivefunction noch nicht implementiert!")
+                Throw New Exception("Objectivefunction noch nicht implementiert!")
 
         End Select
 
