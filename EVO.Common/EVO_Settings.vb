@@ -279,6 +279,17 @@ Public Class EVO_Settings
 
     End Structure
 
+    Public Structure MPC_Settings
+
+        Public Problempfad As String        'In welchem Ordner sich die Eingabedateien befinden
+        Public Ausgabepfad As String        'In welchem Ordner die Ausgaben erzeugt werden sollen
+        Public Schrittweite As Integer      'In welchen Abständen die Eingaben betrachtet werden sollen (Minuten)
+        Public Vorhersage As Integer        'Welcher Zeitraum zur Vorhersage herangezogen werden soll (Stunden)
+        Public Start As DateTime            'Wann die Berechnung der Steuerung gestartet werden soll
+        Public Ende As DateTime             'Wann die Berechnung der Steuerung enden soll
+
+    End Structure
+
     Public Structure MetaEvo_Settings
 
         Public Role As String                       'Was stellt dieser PC da: Single PC, Network Server, Network Client
