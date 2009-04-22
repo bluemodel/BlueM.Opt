@@ -61,14 +61,6 @@ Public Class EVO_Einstellungen
 
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        'Settings instanzieren
-        Me.msettings = New Common.EVO_Settings()
-
-        'Comboboxen füllen
-        Call Me.InitComboboxes()
-
-        Call Me.setStandard_All()
-
         Me.isInitializing = False
 
     End Sub
@@ -89,6 +81,20 @@ Public Class EVO_Einstellungen
         Me.isInitializing = False
 
     End Sub
+
+    Public Sub setSettings(ByRef settings As EVO.Common.EVO_Settings)
+
+        Me.isInitializing = True
+
+        Me.msettings = settings
+
+        'Comboboxen füllen
+        Call Me.InitComboboxes()
+
+        Me.isInitializing = False
+
+    End Sub
+
 
     ''' <summary>
     ''' UI zurücksetzen
@@ -133,7 +139,7 @@ Public Class EVO_Einstellungen
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_PES)
 
-                'Standardeinstellungen setzen
+                'TODO: Nur Modifikation der Parameter falls der Modus geändert wurde
                 Call Me.setStandard_PES(Me.mProblem.Modus)
 
             Case METH_HOOKJEEVES
@@ -141,16 +147,10 @@ Public Class EVO_Einstellungen
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_HookeJeeves)
 
-                'Standardeinstellungen setzen
-                Call Me.setStandard_HJ()
-
             Case METH_DDS
 
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_DDS)
-
-                'Standardeinstellungen setzen
-                Call Me.setStandard_DDS()
 
             Case METH_CES
 
@@ -160,17 +160,13 @@ Public Class EVO_Einstellungen
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_CES)
 
-                'Standardeinstellungen setzen
-                Call Me.setStandard_CES()
-
             Case METH_HYBRID
 
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_PES)
                 Me.TabControl1.TabPages.Add(Me.TabPage_CES)
 
-                'Standardeinstellungen setzen
-                Call Me.setStandard_CES()
+                'TODO: Nur Modifikation der Parameter falls der Modus geändert wurde
                 Call Me.setStandard_PES(Me.mProblem.Modus)
 
             Case METH_MetaEvo
@@ -178,18 +174,15 @@ Public Class EVO_Einstellungen
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_MetaEvo)
 
-                'Standardeinstellungen setzen
-                Call Me.setStandard_MetaEvo()
-
             Case METH_SENSIPLOT
 
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_SensiPlot)
 
-                'Standardeinstellungen setzen
-                Call Me.setStandard_SensiPlot()
-
         End Select
+
+        'Werte in Form1 schreiben
+        Call Me.writeForm()
 
         'Alle TabPages aktivieren
         For Each page As TabPage In Me.TabControl1.TabPages
@@ -778,42 +771,36 @@ Public Class EVO_Einstellungen
     '**********************************
     Private Sub setStandard_PES(ByVal modus As EVO_MODUS)
         Call Me.msettings.PES.setStandard(modus)
-        Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen (CES)
     '**********************************
     Private Sub setStandard_CES()
         Call Me.msettings.CES.setStandard(Me.mProblem.Method)
-        Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für HJ
     '***********************************
     Private Sub setStandard_HJ()
         Call Me.msettings.HookJeeves.setStandard()
-        Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für MetaEVO
     '****************************************
     Private Sub setStandard_MetaEvo()
         Call Me.msettings.MetaEvo.setStandard()
-        Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für DDS
     '************************************
     Private Sub setStandard_DDS()
         Call Me.msettings.DDS.setStandard()
-        Call Me.writeForm()
     End Sub
 
     'Standardeinstellungen setzen für SensiPlot
     '******************************************
     Private Sub setStandard_SensiPlot()
         Call Me.msettings.SensiPlot.setStandard()
-        Call Me.writeForm()
     End Sub
 
     'Speichern der EVO_Settings in einer XML-Datei
@@ -953,11 +940,11 @@ Public Class EVO_Einstellungen
             If (allow) Then
                 Me.CheckBox_useMultithreading.Enabled = True
                 Me.CheckBox_useMultithreading.Checked = True
-                Me.mSettings.General.useMultithreading = True
+                Me.msettings.General.useMultithreading = True
             Else
                 Me.CheckBox_useMultithreading.Checked = False
                 Me.CheckBox_useMultithreading.Enabled = False
-                Me.mSettings.General.useMultithreading = False
+                Me.msettings.General.useMultithreading = False
             End If
         End Set
     End Property
