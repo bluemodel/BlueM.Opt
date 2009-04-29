@@ -872,8 +872,10 @@ Partial Class Form1
                     'Settings an Sim1 übergeben
                     Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
 
-                    'Startwert evaluieren
-                    Call Me.evaluateStartwerte()
+                    'Startwerte evaluieren
+                    If (Me.mProblem.Method <> METH_SENSIPLOT) Then
+                        Call Me.evaluateStartwerte()
+                    End If
 
                     Select Case Me.mProblem.Method
 
