@@ -446,20 +446,16 @@ Public Class Problem
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
-        Dim FiStr As FileStream
-        Dim StrRead As StreamReader
+
+        'Open the file
+        Dim ZIE_Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_ZIE
+        Dim FiStr As New FileStream(ZIE_Datei, FileMode.Open, IO.FileAccess.Read)
+        Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         ReDim Me.List_ObjectiveFunctions(-1)
+        Dim currentObjectiveType As Common.ObjectiveFunction.ObjectiveType
 
         Try
-
-            Dim ZIE_Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_ZIE
-
-            Dim currentObjectiveType As Common.ObjectiveFunction.ObjectiveType
-
-            'Open the file
-            FiStr = New FileStream(ZIE_Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-            StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
             'Read the file
             i = 0
@@ -636,7 +632,7 @@ Public Class Problem
                         Call Me.Read_ZIE_CommonColumns(objective_IHA, Zeile)
 
                         'Restliche Spalten einlesen
-                        With Objective_IHA
+                        With objective_IHA
                             .RefGr = WerteArray(9).Trim()
                             .RefReiheDatei = WerteArray(10).Trim()
                             If (WerteArray(11).Trim() <> "") Then
