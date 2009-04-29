@@ -582,154 +582,170 @@ Public Class EVO_Einstellungen
             Me.CheckBox_drawOnlyCurrentGen.Checked = .drawOnlyCurrentGeneration
         End With
 
-        'PES
-        '---
-        With Me.msettings.PES
+        
+        Select Case Me.msettings.General.Method
 
-            Call OptModus_Change_ActDeact_PES()
+            Case "METH_PES", "METH_HYBRID"
+                'PES
+                '---
+                With Me.msettings.PES
 
-            Me.ComboOptStrategie.SelectedItem = .OptStrategie
-            Me.ComboOptStartparameter.SelectedItem = .OptStartparameter
-            'Schrittweite
-            Me.TextDeltaStart.Value = .Schrittweite.DnStart
-            Me.ComboOptDnMutation.SelectedItem = .Schrittweite.OptDnMutation
-            Me.CheckisDnVektor.Checked = .Schrittweite.is_DnVektor
-            'Generationen
-            Me.TextAnzGen.Value = .n_Gen
-            Me.TextAnzEltern.Value = .n_Eltern
-            Me.TextAnzNachf.Value = .n_Nachf
-            'SekPop
-            If (Me.msettings.PES.SekPop.is_Interact) Then
-                Me.TextInteract.Value = .SekPop.n_Interact
-            Else
-                Me.TextInteract.Value = 0
-            End If
-            Me.CheckBox_isSekPopBegrenzung.Checked = .SekPop.is_Begrenzung
-            Me.TextMaxMemberSekPop.Value = .SekPop.n_MaxMembers
-            'Eltern
-            Me.ComboOptEltern.SelectedItem = .OptEltern
-            Me.TextRekombxy.Value = .n_RekombXY
-            Me.CheckisTournamentSelection.Checked = .is_DiversityTournament
-            'Populationen
-            Me.CheckisPopul.Checked = .Pop.is_POPUL
-            Me.ComboOptPopStrategie.SelectedItem = .Pop.OptPopStrategie
-            Me.ComboOptPopPenalty.SelectedItem = .Pop.OptPopPenalty
-            Me.ComboOptPopEltern.SelectedItem = .Pop.OptPopEltern
-            Me.TextAnzRunden.Value = .Pop.n_Runden
-            Me.TextAnzPop.Value = .Pop.n_Popul
-            Me.TextAnzPopEltern.Value = .Pop.n_PopEltern
+                    Call OptModus_Change_ActDeact_PES()
 
-        End With
+                    Me.ComboOptStrategie.SelectedItem = .OptStrategie
+                    Me.ComboOptStartparameter.SelectedItem = .OptStartparameter
+                    'Schrittweite
+                    Me.TextDeltaStart.Value = .Schrittweite.DnStart
+                    Me.ComboOptDnMutation.SelectedItem = .Schrittweite.OptDnMutation
+                    Me.CheckisDnVektor.Checked = .Schrittweite.is_DnVektor
+                    'Generationen
+                    Me.TextAnzGen.Value = .n_Gen
+                    Me.TextAnzEltern.Value = .n_Eltern
+                    Me.TextAnzNachf.Value = .n_Nachf
+                    'SekPop
+                    If (Me.msettings.PES.SekPop.is_Interact) Then
+                        Me.TextInteract.Value = .SekPop.n_Interact
+                    Else
+                        Me.TextInteract.Value = 0
+                    End If
+                    Me.CheckBox_isSekPopBegrenzung.Checked = .SekPop.is_Begrenzung
+                    Me.TextMaxMemberSekPop.Value = .SekPop.n_MaxMembers
+                    'Eltern
+                    Me.ComboOptEltern.SelectedItem = .OptEltern
+                    Me.TextRekombxy.Value = .n_RekombXY
+                    Me.CheckisTournamentSelection.Checked = .is_DiversityTournament
+                    'Populationen
+                    Me.CheckisPopul.Checked = .Pop.is_POPUL
+                    Me.ComboOptPopStrategie.SelectedItem = .Pop.OptPopStrategie
+                    Me.ComboOptPopPenalty.SelectedItem = .Pop.OptPopPenalty
+                    Me.ComboOptPopEltern.SelectedItem = .Pop.OptPopEltern
+                    Me.TextAnzRunden.Value = .Pop.n_Runden
+                    Me.TextAnzPop.Value = .Pop.n_Popul
+                    Me.TextAnzPopEltern.Value = .Pop.n_PopEltern
 
-        'PES
-        '---
-        With Me.msettings.CES
+                End With
 
-            Call OptModus_Change_ActDeact_CES()
 
-            'me.Combo_CES_IniValues.SelectedItem = .
-            Me.Numeric_CES_n_Generations.Value = .n_Generations
-            Me.Numeric_CES_n_Parents.Value = .n_Parents
-            Me.Numeric_CES_n_childs.Value = .n_Childs
-            Me.Combo_CES_Selection.SelectedItem = .OptStrategie
-            Me.Combo_CES_Reproduction.SelectedItem = .OptReprodOp
-            Me.Combo_CES_Mutation.SelectedItem = .OptMutOperator
-            Me.Numeric_CES_MutRate.Value = .pr_MutRate
-            Me.CheckBox_CES_UseSecPop_CES.Checked = .is_SecPop
-            Me.Numeric_CES_n_exchange_SecPop.Value = .n_Interact
-            Me.CheckBox_CES_isSecPopRestriction.Checked = .is_SecPopRestriction
-            Me.Numeric_CES_n_member_SecPop.Value = .n_MemberSecondPop
+                
+            Case "METH_CES", "METH_HYBRID"
+                'CES
+                '---
+                With Me.msettings.CES
 
-            'HYBRID hängt von der Methode ab
-            Me.CheckBox_CES_RealOptimisation.Checked = .is_RealOpt
-            Me.Combo_CES_HybridType.SelectedItem = .ty_Hybrid
-            Me.Combo_CES_MemStrategy.SelectedItem = .Mem_Strategy
-            Me.Numeric_CES_n_MemSize.Value = .n_PES_MemSize
-            Me.CheckBox_CES_StartPESPop.Checked = .is_PopMutStart
-            Me.CheckBox_CES_UseSecPop_PES.Checked = .is_PES_SecPop
-            Me.Numeric_CES_NExchange_SecPop_PES.Value = .n_PES_Interact
-            Me.Numeric_CES_n_member_SecPop_PES.Value = .n_PES_MemSecPop
+                    Call OptModus_Change_ActDeact_CES()
 
-        End With
+                    'me.Combo_CES_IniValues.SelectedItem = .
+                    Me.Numeric_CES_n_Generations.Value = .n_Generations
+                    Me.Numeric_CES_n_Parents.Value = .n_Parents
+                    Me.Numeric_CES_n_childs.Value = .n_Childs
+                    Me.Combo_CES_Selection.SelectedItem = .OptStrategie
+                    Me.Combo_CES_Reproduction.SelectedItem = .OptReprodOp
+                    Me.Combo_CES_Mutation.SelectedItem = .OptMutOperator
+                    Me.Numeric_CES_MutRate.Value = .pr_MutRate
+                    Me.CheckBox_CES_UseSecPop_CES.Checked = .is_SecPop
+                    Me.Numeric_CES_n_exchange_SecPop.Value = .n_Interact
+                    Me.CheckBox_CES_isSecPopRestriction.Checked = .is_SecPopRestriction
+                    Me.Numeric_CES_n_member_SecPop.Value = .n_MemberSecondPop
 
-        'Hook and Jeeves
-        '---------------
-        With Me.msettings.HookJeeves
+                    'HYBRID hängt von der Methode ab
+                    Me.CheckBox_CES_RealOptimisation.Checked = .is_RealOpt
+                    Me.Combo_CES_HybridType.SelectedItem = .ty_Hybrid
+                    Me.Combo_CES_MemStrategy.SelectedItem = .Mem_Strategy
+                    Me.Numeric_CES_n_MemSize.Value = .n_PES_MemSize
+                    Me.CheckBox_CES_StartPESPop.Checked = .is_PopMutStart
+                    Me.CheckBox_CES_UseSecPop_PES.Checked = .is_PES_SecPop
+                    Me.Numeric_CES_NExchange_SecPop_PES.Value = .n_PES_Interact
+                    Me.Numeric_CES_n_member_SecPop_PES.Value = .n_PES_MemSecPop
 
-            Me.Numeric_HJ_DeltaStart.Value = .DnStart
-            Me.Numeric_HJ_DeltaFinish.Value = .DnFinish
-            Me.CheckBox_HJ_DNVektor.Checked = .is_DnVektor
+                End With
 
-        End With
+                
+            Case "HookJeeves"
+                'Hook and Jeeves
+                '---------------
+                With Me.msettings.HookJeeves
 
-        'MetaEvo
-        '---------------
-        With Me.msettings.MetaEvo
+                    Me.Numeric_HJ_DeltaStart.Value = .DnStart
+                    Me.Numeric_HJ_DeltaFinish.Value = .DnFinish
+                    Me.CheckBox_HJ_DNVektor.Checked = .is_DnVektor
 
-            Me.Combo_MetaEvo_Role.SelectedItem = .Role
-            Me.Combo_MetaEvo_OpMode.SelectedItem = .OpMode
-            Me.Numeric_MetaEvo_PopulationSize.Value = .PopulationSize
-            Me.Numeric_MetaEvo_Numbergenerations.Value = .NumberGenerations
-            Me.Numeric_MetaEvo_NumberResults.Value = .NumberResults
-            Me.Numeric_MetaEvo_HJStepsize.Value = .HJStepsize
-            Me.TextBox_MetaEvo_MySQL_Host.Text = .MySQL_Host
-            Me.TextBox_MetaEvo_MySQL_DB.Text = .MySQL_Database
-            Me.TextBox_MetaEvo_MySQL_User.Text = .MySQL_User
-            Me.TextBox_MetaEvo_MySQL_Password.Text = .MySQL_Password
+                End With
 
-        End With
+                
+            Case "METH_MetaEvo"
+                'MetaEvo
+                '---------------
+                With Me.msettings.MetaEvo
 
-        'DDS
-        '---------------
-        With Me.msettings.DDS
+                    Me.Combo_MetaEvo_Role.SelectedItem = .Role
+                    Me.Combo_MetaEvo_OpMode.SelectedItem = .OpMode
+                    Me.Numeric_MetaEvo_PopulationSize.Value = .PopulationSize
+                    Me.Numeric_MetaEvo_Numbergenerations.Value = .NumberGenerations
+                    Me.Numeric_MetaEvo_NumberResults.Value = .NumberResults
+                    Me.Numeric_MetaEvo_HJStepsize.Value = .HJStepsize
+                    Me.TextBox_MetaEvo_MySQL_Host.Text = .MySQL_Host
+                    Me.TextBox_MetaEvo_MySQL_DB.Text = .MySQL_Database
+                    Me.TextBox_MetaEvo_MySQL_User.Text = .MySQL_User
+                    Me.TextBox_MetaEvo_MySQL_Password.Text = .MySQL_Password
 
-            Me.Numeric_DDS_maxiter.Value = .maxiter
-            Me.Numeric_DDS_r_val.Value = .r_val
-            Me.CheckBox_DDS_ini.Checked = .optStartparameter
+                End With
 
-        End With
+                
+            Case "METH_HOOKJEEVES"
+                'DDS
+                '---------------
+                With Me.msettings.DDS
 
-        'SensiPlot
-        '--------------
-        With Me.msettings.SensiPlot
+                    Me.Numeric_DDS_maxiter.Value = .maxiter
+                    Me.Numeric_DDS_r_val.Value = .r_val
+                    Me.CheckBox_DDS_ini.Checked = .optStartparameter
 
-            'Listboxen zurücksetzen
-            Call Me.SensiPlot_ListBox_OptParameter.Items.Clear()
-            Call Me.SensiPlot_ListBox_Objectives.Items.Clear()
+                End With
 
-            'Listboxen füllen
-            For Each optpara As Common.OptParameter In Me.mProblem.List_OptParameter
-                Call Me.SensiPlot_ListBox_OptParameter.Items.Add(optpara)
-            Next
-            For Each objective As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
-                Call Me.SensiPlot_ListBox_Objectives.Items.Add(objective)
-            Next
+                
+            Case "METH_SENSIPLOT"
+                'SensiPlot
+                '--------------
+                With Me.msettings.SensiPlot
 
-            'OptParameter
-            ReDim .Selected_OptParameters(Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count - 1)
-            For Each selectedIndex As Integer In .Selected_OptParameters
-                Me.SensiPlot_ListBox_OptParameter.SetSelected(selectedIndex, True)
-            Next
+                    'Listboxen zurücksetzen
+                    Call Me.SensiPlot_ListBox_OptParameter.Items.Clear()
+                    Call Me.SensiPlot_ListBox_Objectives.Items.Clear()
 
-            'Objective
-            If (.Selected_Objective <> -1) Then
-                Me.SensiPlot_ListBox_Objectives.SetSelected(.Selected_Objective, True)
-            End If
+                    'Listboxen füllen
+                    For Each optpara As Common.OptParameter In Me.mProblem.List_OptParameter
+                        Call Me.SensiPlot_ListBox_OptParameter.Items.Add(optpara)
+                    Next
+                    For Each objective As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
+                        Call Me.SensiPlot_ListBox_Objectives.Items.Add(objective)
+                    Next
 
-            'Modus
-            If (.Selected_SensiType = Common.EVO_Settings.SensiPlot_Settings.SensiType.discrete) Then
-                Me.SensiPlot_RadioButton_Discrete.Checked = True
-            Else
-                Me.SensiPlot_RadioButton_NormalDistribution.Checked = True
-            End If
+                    'OptParameter
+                    ReDim .Selected_OptParameters(Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count - 1)
+                    For Each selectedIndex As Integer In .Selected_OptParameters
+                        Me.SensiPlot_ListBox_OptParameter.SetSelected(selectedIndex, True)
+                    Next
 
-            'Anzahl Schritte
-            Me.SensiPlot_NumericUpDown_NumSteps.Value = .Num_Steps
+                    'Objective
+                    If (.Selected_Objective <> -1) Then
+                        Me.SensiPlot_ListBox_Objectives.SetSelected(.Selected_Objective, True)
+                    End If
 
-            'Wave anzeigen
-            Me.SensiPlot_CheckBox_wave.Checked = .show_Wave
+                    'Modus
+                    If (.Selected_SensiType = Common.EVO_Settings.SensiPlot_Settings.SensiType.discrete) Then
+                        Me.SensiPlot_RadioButton_Discrete.Checked = True
+                    Else
+                        Me.SensiPlot_RadioButton_NormalDistribution.Checked = True
+                    End If
 
-        End With
+                    'Anzahl Schritte
+                    Me.SensiPlot_NumericUpDown_NumSteps.Value = .Num_Steps
+
+                    'Wave anzeigen
+                    Me.SensiPlot_CheckBox_wave.Checked = .show_Wave
+
+                End With
+        End Select
 
         Call Application.DoEvents()
 

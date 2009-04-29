@@ -77,6 +77,7 @@ Public Class SWMM
 
         'Pfad zu SWMM5.DLL bestimmen
         '---------------------------
+
         dll_path = System.Windows.Forms.Application.StartupPath() & "\SWMM\SWMM5.dll"
 
         If (Not File.Exists(dll_path)) Then
