@@ -499,7 +499,7 @@ Partial Class Form1
 
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
-    Private WithEvents EVO_Einstellungen1 As IHWB.EVO.EVO_Einstellungen
+    Public WithEvents EVO_Einstellungen1 As IHWB.EVO.EVO_Einstellungen
     Private WithEvents Label_Datensatz As System.Windows.Forms.Label
     Private WithEvents GroupBox_Anwendung As System.Windows.Forms.GroupBox
     Private WithEvents ComboBox_Anwendung As System.Windows.Forms.ComboBox
