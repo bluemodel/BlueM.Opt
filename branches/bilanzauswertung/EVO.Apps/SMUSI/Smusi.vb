@@ -136,7 +136,7 @@ Public Class Smusi
 
     'SMUSI ausführen (simulieren)
     '****************************
-    Public Overrides Function launchSim() As Boolean
+    Protected Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
         Dim SimCurrent, SimStart, SimEnde As DateTime
@@ -249,15 +249,15 @@ Public Class Smusi
 
 	'TODO: SMUSI Thread-Funktionen
 	'#############################
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
         Return Me.launchSim()
     End Function
 
-    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+    Protected Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
         Return True
     End Function
 
-    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         Return True
     End Function
 

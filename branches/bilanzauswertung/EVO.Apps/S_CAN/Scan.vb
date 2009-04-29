@@ -46,7 +46,7 @@ Public Class Scan
     ''' <summary>
     ''' Simulieren
     ''' </summary>
-    Public Overrides Function launchSim() As Boolean
+    Protected Overrides Function launchSim() As Boolean
 
         Dim i, j, AnzZeil As Integer
         Dim parameterdatei, Zeile, ZeilenArray(), tmp() As String
@@ -106,15 +106,15 @@ Public Class Scan
 
     End Function
 
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
         Return Me.launchSim()
     End Function
 
-    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+    Protected Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
         Return True
     End Function
 
-    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         Return True
     End Function
 

@@ -271,7 +271,7 @@ Public Class BlueM
 
     'Gibt zurück ob ein beliebiger Thread beendet ist und ibt die ID diesen freien Threads zurück
     '********************************************************************************************
-    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+    Protected Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
         ThreadFree = False
 
         For Each Thr_C As BlueMThread In MyBlueMThreads
@@ -287,7 +287,7 @@ Public Class BlueM
     'BlauesModell ausführen (simulieren)
     'Startet einen neuen Thread und übergibt ihm die Child ID
     '********************************************************
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
         launchSim = False
         Dim Folder As String
@@ -305,7 +305,7 @@ Public Class BlueM
 
     'BlueM ohne Thread ausführen
     '***************************
-    Public Overrides Function launchSim() As Boolean
+    Protected Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
 
@@ -352,7 +352,7 @@ Public Class BlueM
     'Prüft ob des aktuelle Child mit der ID die oben übergeben wurde fertig ist
     'Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
     '********************************************************************************
-    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         ThreadReady = False
 
         For Each Thr_C As BlueMThread In MyBlueMThreads

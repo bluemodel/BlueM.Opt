@@ -613,7 +613,7 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Sub PREPARE_Evaluation_PES(ByVal OptParams() As EVO.Common.OptParameter)
+    Private Sub PREPARE_Evaluation_PES(ByVal OptParams() As EVO.Common.OptParameter)
 
         Dim i As Integer
 
@@ -637,7 +637,7 @@ Public MustInherit Class Sim
     ''' <param name="ind">das zu evaluierende Individuum</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <remarks>Die Simulation muss bereits erfolgt sein</remarks>
-    Public Sub SIM_Ergebnis_auswerten(ByRef ind As Common.Individuum, Optional ByVal storeInDB As Boolean = True)
+    Private Sub SIM_Ergebnis_auswerten(ByRef ind As Common.Individuum, Optional ByVal storeInDB As Boolean = True)
 
         Dim i, j, k As Short
         Dim aggroziel As EVO.Common.ObjectiveFunction_Aggregate
@@ -835,12 +835,11 @@ Handler:
 
     'SimModell ausführen (simulieren)
     '********************************
-    Public MustOverride Overloads Function launchSim() As Boolean
+    Protected MustOverride Overloads Function launchSim() As Boolean
     'mit Threads:
-    Public MustOverride Overloads Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
-    Public MustOverride Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
-    Public MustOverride Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
-
+    Protected MustOverride Overloads Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Protected MustOverride Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+    Protected MustOverride Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
 
     'Simulationsergebnis einlesen
     '----------------------------
@@ -852,7 +851,7 @@ Handler:
 
     'Constraint berechnen (Constraint < 0 ist Grenzverletzung)
     '*********************************************************
-    Public Function CalculateConstraint(ByVal constr As Common.Constraintfunction) As Double
+    Private Function CalculateConstraint(ByVal constr As Common.Constraintfunction) As Double
 
         Dim i As Integer
 
