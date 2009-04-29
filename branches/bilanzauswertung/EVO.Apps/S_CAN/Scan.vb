@@ -148,7 +148,7 @@ Public Class Scan
 
             Next
 
-            Me.SimErgebnis.Add(zre, zre.Title)
+            Me.SimErgebnis.Reihen.Add(zre.Title, zre)
 
         Next
 

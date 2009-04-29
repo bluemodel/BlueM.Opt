@@ -3,6 +3,27 @@
 ''' </summary>
 Public MustInherit Class ObjectiveFunction
 
+    ''' <summary>
+    ''' Struktur für Simulationsergebnisse
+    ''' </summary>
+    Public Structure SimErgebnis_Structure
+        ''' <summary>
+        ''' Ergebniswerte (Key ist ObjectiveFunction Name)
+        ''' </summary>
+        Public Werte As Dictionary(Of String, Double)
+        ''' <summary>
+        ''' Ergebnisreihen (Key ist ObjectiveFunction Name)
+        ''' </summary>
+        Public Reihen As Dictionary(Of String, Wave.Zeitreihe)
+        ''' <summary>
+        ''' Löscht alle vorhandenen Ergebnisse
+        ''' </summary>
+        Public Sub Clear()
+            Me.Werte = New Dictionary(Of String, Double)
+            Me.Reihen = New Dictionary(Of String, Wave.Zeitreihe)
+        End Sub
+    End Structure
+
     Public Enum ObjectiveType As Integer
         Series = 1
         Value = 2
@@ -109,7 +130,7 @@ Public MustInherit Class ObjectiveFunction
     ''' </summary>
     ''' <param name="SimErgebnis">collection of simulation results</param>
     ''' <returns>objective function value</returns>
-    Public MustOverride Function calculateObjective(ByVal SimErgebnis As Collection) As Double
+    Public MustOverride Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
 
     ''' <summary>
     ''' compare two values using a function

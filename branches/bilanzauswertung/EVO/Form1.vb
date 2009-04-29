@@ -1516,7 +1516,7 @@ Partial Class Form1
                         'Simulationsreihen nur jeweils ein Mal zeichnen
                         If (Not SimSeries.Contains(.SimGr)) Then
                             Call SimSeries.Add(.SimGr, .SimGr)
-                            zre = Sim1.SimErgebnis(.SimGr).Clone()
+                            zre = Sim1.SimErgebnis.Reihen(.SimGr).Clone()
                             'Lösungsnummer an Titel anhängen
                             zre.Title &= " (Lösung " & ind.ID.ToString() & ")"
                             'Simreihe in Wave laden

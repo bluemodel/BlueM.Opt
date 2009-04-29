@@ -383,7 +383,7 @@ Public Class BlueM
 
         'Reihen zu Simulationsergebnis hinzufügen
         For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
-            Me.SimErgebnis.Add(zre, zre.ToString())
+            Me.SimErgebnis.Reihen.Add(zre.Title, zre)
         Next
 
         'ggf. KWL-Datei einlesen
@@ -396,7 +396,7 @@ Public Class BlueM
 
             'Reihen zu Simulationsergebnis hinzufügen
             For Each zre As Wave.Zeitreihe In KWLtmp.Zeitreihen
-                Me.SimErgebnis.Add(zre, zre.ToString())
+                Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
 
         End If

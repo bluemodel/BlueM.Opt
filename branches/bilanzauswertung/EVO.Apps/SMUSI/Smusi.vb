@@ -286,7 +286,7 @@ Public Class Smusi
             ASCtmp = New Wave.ASC(Me.WorkDir_Current & datei, True)
             'Simulationsergebnis abspeichern
             For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
-                Me.SimErgebnis.Add(zre, elem & "_" & zre.ToString())
+                Me.SimErgebnis.Reihen.Add(elem & "_" & zre.Title, zre)
             Next
             ASCtmp = Nothing
         Next

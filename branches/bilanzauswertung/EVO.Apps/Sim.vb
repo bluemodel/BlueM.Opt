@@ -50,7 +50,10 @@ Public MustInherit Class Sim
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
 
-    Public SimErgebnis As Collection                     'Simulationsergebnis als Collection von Wave.Zeitreihe Objekten
+    ''' <summary>
+    ''' Das Simulationsergebnis
+    ''' </summary>
+    Public SimErgebnis As EVO.Common.ObjectiveFunction.SimErgebnis_Structure
 
     'Das Problem
     '-----------
@@ -153,7 +156,7 @@ Public MustInherit Class Sim
     Public Sub New()
 
         'Simulationsergebnis instanzieren
-        Me.SimErgebnis = New Collection()
+        Me.SimErgebnis.Clear()
 
         'Standardmässig OptResult verwenden
         Me.mStoreIndividuals = True
@@ -855,7 +858,7 @@ Handler:
 
         'Simulationsergebnis auslesen
         Dim SimReihe As Wave.Zeitreihe
-        SimReihe = Me.SimErgebnis(constr.SimGr)
+        SimReihe = Me.SimErgebnis.Reihen(constr.SimGr)
 
         'Fallunterscheidung GrenzTyp (Wert/Reihe)
         Select Case constr.Typ

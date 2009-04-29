@@ -95,7 +95,7 @@ Public Class ObjectiveFunction_IHA
 
     'QWert aus IHA-Ergebnissen berechnen
     '***********************************
-    Public Overrides Function calculateObjective(ByVal SimErgebnis As Collection) As Double
+    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
 
         Dim featurevalue As Double
         Dim SimReihe As Wave.Zeitreihe
@@ -104,7 +104,7 @@ Public Class ObjectiveFunction_IHA
         Dim RVAResult As Wave.RVA.Struct_RVAValues
 
         'SimReihe aus SimErgebnis rausholen
-        SimReihe = SimErgebnis(Me.SimGr).Clone()
+        SimReihe = SimErgebnis.Reihen(Me.SimGr).Clone()
 
         'RVA-Berechnung durchführen
         Call Me.IHASys.calculate_IHA(SimReihe)

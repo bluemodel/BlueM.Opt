@@ -187,7 +187,7 @@ Public Class Controller
                     'Simulationsergebnis in Wave laden
                     If (Me.mySettings.SensiPlot.show_Wave) Then
                         'SimReihe auslesen
-                        SimReihe = Sim1.SimErgebnis(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
+                        SimReihe = Sim1.SimErgebnis.Reihen(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
                         'Lösungs-ID an Titel anhängen
                         SimReihe.Title += " (Lösung " & n.ToString() & ")"
                         'SimReihe zu Collection hinzufügen

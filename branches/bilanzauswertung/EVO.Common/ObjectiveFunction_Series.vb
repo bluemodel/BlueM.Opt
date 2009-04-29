@@ -32,13 +32,13 @@
     ''' </summary>
     ''' <param name="SimErgebnis">collection of simulation results</param>
     ''' <returns>objective function value</returns>
-    Public Overrides Function calculateObjective(ByVal SimErgebnis As Collection) As Double
+    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
 
         Dim QWert As Double
         Dim SimReihe As Wave.Zeitreihe
 
         'SimReihe aus SimErgebnis rausholen
-        SimReihe = SimErgebnis(Me.SimGr).Clone()
+        SimReihe = SimErgebnis.Reihen(Me.SimGr).Clone()
 
         'Simulationszeitreihe auf Evaluierungszeitraum zuschneiden
         Call SimReihe.Cut(Me.EvalStart, Me.EvalEnde)
