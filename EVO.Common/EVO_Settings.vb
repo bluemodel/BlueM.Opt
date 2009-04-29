@@ -23,11 +23,19 @@ Public Class EVO_Settings
     Public Structure General_Settings
         <System.ComponentModel.DefaultValueAttribute(True)> _
         Public useMultithreading As Boolean
+        Public useMPC As Boolean
+        Public Application As String
+        Public Dataset As String
+        Public Method As String
         <System.ComponentModel.DefaultValueAttribute(False)> _
         Public drawOnlyCurrentGeneration As Boolean
         Public Sub setStandard()
             Me.useMultithreading = True
             Me.drawOnlyCurrentGeneration = True
+            Me.useMPC = False
+            Me.Application = ""
+            Me.Dataset = ""
+            Me.Method = ""
         End Sub
     End Structure
 
@@ -280,10 +288,9 @@ Public Class EVO_Settings
     End Structure
 
     Public Structure MPC_Settings
-
-        Public Problempfad As String        'In welchem Ordner sich die Eingabedateien befinden
         Public Ausgabepfad As String        'In welchem Ordner die Ausgaben erzeugt werden sollen
         Public Schrittweite As Integer      'In welchen Abständen die Eingaben betrachtet werden sollen (Minuten)
+        Public MPC_Round As Integer         'Wie oft MPC schon gelaufen ist
         Public Vorhersage As Integer        'Welcher Zeitraum zur Vorhersage herangezogen werden soll (Stunden)
         Public Start As DateTime            'Wann die Berechnung der Steuerung gestartet werden soll
         Public Ende As DateTime             'Wann die Berechnung der Steuerung enden soll
@@ -367,6 +374,7 @@ Public Class EVO_Settings
     Public CES As CES_Settings
     Public HookJeeves As HookJeeves_Settings
     Public MetaEvo As MetaEvo_Settings
+    Public MPC As MPC_Settings
     Public DDS As DDS_Settings
     Public SensiPlot As SensiPlot_Settings
 

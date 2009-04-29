@@ -30,7 +30,6 @@ Partial Public Class Form1
     Public mSettings As EVO.Common.EVO_Settings
 
     'MPC-Options
-    Public MPC_run As Integer  'Falls > 0 wird MPC genutzt
     Public Event Startbuttonpressed()
 
     Private IsInitializing As Boolean
@@ -77,9 +76,6 @@ Partial Public Class Form1
     '***********
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
 
-        'MPC
-        Me.MPC_run = 0
-
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
 
@@ -103,7 +99,7 @@ Partial Public Class Form1
     ''' <summary>
     ''' Formular zurücksetzen
     ''' </summary>
-    Private Sub INI()
+    Public Sub INI()
 
         Me.IsInitializing = True
 
@@ -173,7 +169,7 @@ Partial Public Class Form1
     ''' <summary>
     ''' Button New geklickt
     ''' </summary>
-    Private Sub Button_New_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_New.Click
+    Public Sub Button_New_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_New.Click
         'Controller stoppen
         If (Me.StopOptimization()) Then
             'Formular zurücksetzen
@@ -272,7 +268,14 @@ Partial Public Class Form1
 
     'Anwendung wurde ausgewählt
     '**************************
-    Private Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
+    Public Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
+        Try
+            Me.mSettings.General.Application = ComboBox_Anwendung.SelectedItem
+            INI_App_ohneEvent()
+        Catch
+        End Try
+    End Sub
+    Public Sub INI_App_ohneEvent()
 
         If (Me.IsInitializing = True) Then
 
@@ -316,7 +319,7 @@ Partial Public Class Form1
                 'Mauszeiger busy
                 Cursor = Cursors.WaitCursor
 
-                Me.Anwendung = ComboBox_Anwendung.SelectedItem
+                Me.Anwendung = Me.mSettings.General.Application
 
                 Select Case Me.Anwendung
 
@@ -442,7 +445,7 @@ Partial Public Class Form1
             If (Me.ComboBox_Datensatz.Items.Count > 0) Then
                 'obersten (zuletzt genutzten) Datensatz auswählen
                 pfad = Me.ComboBox_Datensatz.Items(0)
-                Me.ComboBox_Datensatz.SelectedItem = pfad
+                Me.mSettings.General.Dataset = pfad
                 'Datensatz setzen
                 Cursor = Cursors.WaitCursor
                 Call Sim1.setDatensatz(pfad)
@@ -514,6 +517,7 @@ Partial Public Class Form1
         If (DiagResult = Windows.Forms.DialogResult.OK) Then
 
             pfad = OpenFileDialog1.FileName
+            Me.mSettings.General.Dataset = pfad
 
             'Datensatz setzen
             Call Sim1.setDatensatz(pfad)
@@ -529,11 +533,11 @@ Partial Public Class Form1
 
             'Datensatzanzeige aktualisieren
             Call Me.Datensatz_populateCombo()
-            Me.ComboBox_Datensatz.SelectedItem = pfad
+            Me.mSettings.General.Dataset = pfad
 
             'Methodenauswahl wieder zurücksetzen 
             '(Der Benutzer muss zuerst Ini neu ausführen!)
-            Me.ComboBox_Methode.SelectedItem = ""
+            Me.mSettings.General.Method = ""
 
         End If
 
@@ -553,6 +557,14 @@ Partial Public Class Form1
     'Datensatz wurde ausgewählt
     '**************************
     Private Sub INI_Datensatz(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Datensatz.SelectedIndexChanged
+        Try
+            Me.mSettings.General.Dataset = Me.ComboBox_Datensatz.SelectedItem
+            INI_Datensatz_ohneEvent()
+        Catch
+        End Try
+    End Sub
+
+    Public Sub INI_Datensatz_ohneEvent()
 
         If (Me.IsInitializing = True) Then
 
@@ -576,7 +588,7 @@ Partial Public Class Form1
                 Case ANW_TESTPROBLEME
 
                     'Testproblem setzen
-                    Testprobleme1.setTestproblem(Me.ComboBox_Datensatz.SelectedItem)
+                    Testprobleme1.setTestproblem(Me.mSettings.General.Dataset)
 
                     'Tooltip anzeigen
                     Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
@@ -584,10 +596,10 @@ Partial Public Class Form1
                 Case Else '(Alle Sim-Anwendungen)
 
                     'Datensatz setzen
-                    Call Sim1.setDatensatz(Me.ComboBox_Datensatz.SelectedItem)
+                    Call Sim1.setDatensatz(Me.mSettings.General.Dataset)
 
                     'Tooltip anzeigen
-                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Me.ComboBox_Datensatz.SelectedItem)
+                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Me.mSettings.General.Dataset)
 
             End Select
 
@@ -595,7 +607,7 @@ Partial Public Class Form1
             '-------------------------------------------
             Me.Label_Methode.Enabled = True
             Me.ComboBox_Methode.Enabled = True
-            Me.ComboBox_Methode.SelectedItem = ""
+            Me.mSettings.General.Method = ""
 
             'Progress zurücksetzen
             Call Me.mProgress.Initialize()
@@ -607,8 +619,16 @@ Partial Public Class Form1
     'Methode wurde ausgewählt
     '************************
     Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Methode.SelectedIndexChanged
+        Try
+            Me.mSettings.General.Method = Me.ComboBox_Methode.SelectedItem
+            INI_Method_ohneEvent()
+        Catch
+        End Try
+    End Sub
 
-        If (Me.IsInitializing = True Or Me.ComboBox_Methode.SelectedItem = "") Then
+    Public Sub INI_Method_ohneEvent()
+
+        If (Me.IsInitializing = True Or Me.mSettings.General.Method = "") Then
 
             Exit Sub
 
@@ -621,7 +641,7 @@ Partial Public Class Form1
 
                 'Problem initialisieren
                 '======================
-                Call Me.INI_Problem(Me.ComboBox_Methode.SelectedItem)
+                Call Me.INI_Problem(Me.mSettings.General.Method)
 
                 'Methodenspezifische Vorbereitungen
                 '(zunächst alles deaktivieren, danach je nach Methode aktivieren)
@@ -805,6 +825,11 @@ Partial Public Class Form1
     'XXXXXXXXXXXXXXXXXXXXXXXXXX
 
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
+        STARTEN_Button_Click_ohneEvent()
+    End Sub
+
+
+    Public Sub STARTEN_Button_Click_ohneEvent()
 
         'Event für MPC auslösen
         RaiseEvent Startbuttonpressed()
