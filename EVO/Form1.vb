@@ -29,6 +29,10 @@ Partial Public Class Form1
 
     Public mSettings As EVO.Common.EVO_Settings
 
+    'MPC-Options
+    Public MPC_run As Integer  'Falls > 0 wird MPC genutzt
+    Public Event Startbuttonpressed()
+
     Private IsInitializing As Boolean
 
     'Anwendung
@@ -72,6 +76,9 @@ Partial Public Class Form1
     'Form1 laden
     '***********
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
+
+        'MPC
+        Me.MPC_run = 0
 
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
@@ -798,6 +805,9 @@ Partial Public Class Form1
     'XXXXXXXXXXXXXXXXXXXXXXXXXX
 
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
+
+        'Event für MPC auslösen
+        RaiseEvent Startbuttonpressed()
 
         'Stoppuhr
         Dim OptTime As New Stopwatch
