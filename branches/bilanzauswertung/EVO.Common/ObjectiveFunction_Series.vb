@@ -2,6 +2,15 @@
     Inherits ObjectiveFunction
 
     ''' <summary>
+    ''' Returns the type of the ObjectiveFunction
+    ''' </summary>
+    Public Overrides ReadOnly Property GetObjType() As ObjectiveType
+        Get
+            Return ObjectiveType.Series
+        End Get
+    End Property
+
+    ''' <summary>
     ''' Der Dateiname der Referenzreihe
     ''' </summary>
     ''' <remarks>Pfadangabe relativ zum Datensatz</remarks>

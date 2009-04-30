@@ -50,6 +50,19 @@ Public Class ObjectiveFunction_IHA
 
 #End Region 'Eigenschaften
 
+#Region "Properties"
+
+    ''' <summary>
+    ''' Returns the type of the ObjectiveFunction
+    ''' </summary>
+    Public Overrides ReadOnly Property GetObjType() As ObjectiveType
+        Get
+            Return ObjectiveType.IHA
+        End Get
+    End Property
+
+#End Region 'Properties
+
 #Region "Methoden"
 
     'Methoden

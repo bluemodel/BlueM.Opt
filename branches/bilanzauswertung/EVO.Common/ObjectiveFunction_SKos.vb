@@ -18,6 +18,15 @@ Imports System.IO
 Public Class ObjectiveFunction_SKos
     Inherits ObjectiveFunction
 
+    ''' <summary>
+    ''' Returns the type of the ObjectiveFunction
+    ''' </summary>
+    Public Overrides ReadOnly Property GetObjType() As ObjectiveType
+        Get
+            Return ObjectiveType.SKos
+        End Get
+    End Property
+
     'Das Problem
     Private mProblem As EVO.Common.Problem
 

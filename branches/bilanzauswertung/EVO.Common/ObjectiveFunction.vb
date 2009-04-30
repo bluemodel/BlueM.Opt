@@ -108,25 +108,7 @@ Public MustInherit Class ObjectiveFunction
     ''' <summary>
     ''' Returns the type of the ObjectiveFunction
     ''' </summary>
-    Public ReadOnly Property GetObjType() As ObjectiveType
-        Get
-            If (TypeOf (Me) Is ObjectiveFunction_Series) Then
-                Return ObjectiveType.Series
-            ElseIf (TypeOf (Me) Is Objectivefunction_Value) Then
-                Return ObjectiveType.Value
-            ElseIf (TypeOf (Me) Is ObjectiveFunction_ValueFromSeries) Then
-                Return ObjectiveType.ValueFromSeries
-            ElseIf (TypeOf (Me) Is ObjectiveFunction_IHA) Then
-                Return ObjectiveType.IHA
-            ElseIf (TypeOf (Me) Is ObjectiveFunction_Aggregate) Then
-                Return ObjectiveType.Aggregate
-            ElseIf (TypeOf (Me) Is ObjectiveFunction_SKos) Then
-                Return ObjectiveType.SKos
-            Else
-                Throw New Exception("Unable to determine type of ObjectiveFunction")
-            End If
-        End Get
-    End Property
+    Public MustOverride ReadOnly Property GetObjType() As ObjectiveType
 
     ''' <summary>
     ''' Calculate the objective function value

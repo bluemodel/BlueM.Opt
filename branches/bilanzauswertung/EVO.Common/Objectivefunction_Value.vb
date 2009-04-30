@@ -2,6 +2,15 @@
     Inherits ObjectiveFunction
 
     ''' <summary>
+    ''' Returns the type of the ObjectiveFunction
+    ''' </summary>
+    Public Overrides ReadOnly Property GetObjType() As ObjectiveType
+        Get
+            Return ObjectiveType.Value
+        End Get
+    End Property
+
+    ''' <summary>
     ''' Der zu vergleichende Referenzwert
     ''' </summary>
     ''' <remarks>siehe Wiki</remarks>

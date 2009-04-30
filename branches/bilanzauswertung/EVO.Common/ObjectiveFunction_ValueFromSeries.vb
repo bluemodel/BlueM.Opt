@@ -2,6 +2,15 @@
     Inherits ObjectiveFunction
 
     ''' <summary>
+    ''' Returns the type of the ObjectiveFunction
+    ''' </summary>
+    Public Overrides ReadOnly Property GetObjType() As ObjectiveType
+        Get
+            Return ObjectiveType.ValueFromSeries
+        End Get
+    End Property
+
+    ''' <summary>
     ''' Start des Evaluierungszeitraums
     ''' </summary>
     Public EvalStart As DateTime
