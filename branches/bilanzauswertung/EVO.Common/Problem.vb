@@ -442,6 +442,7 @@ Public Class Problem
         Const AnzSpalten_ObjFValueFromSeries As Integer = 13        'Anzahl Spalten Reihenwertevergleich in der ZIE-Datei
         Const AnzSpalten_ObjFIHA As Integer = 11                    'Anzahl Spalten IHA-Analyse in der ZIE-Datei
         Const AnzSpalten_ObjFAggregate As Integer = 4               'Anzahl Spalten Aggregierte Ziele in der ZIE-Datei
+        Const AnzSpalten_ObjFSKos As Integer = 5                    'Anzahl Spalten SKos in der ZIE-Datei
 
         Dim i As Integer
         Dim Zeile As String
@@ -472,6 +473,8 @@ Public Class Problem
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.ValueFromSeries
                 ElseIf Zeile.StartsWith("*IHA-Analyse") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.IHA
+                ElseIf Zeile.StartsWith("*SKos") Then
+                    currentObjectiveType = ObjectiveFunction.ObjectiveType.SKos
                 ElseIf Zeile.StartsWith("*Aggregierte Ziele") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.Aggregate
                 End If
@@ -655,9 +658,53 @@ Public Class Problem
                         Me.List_ObjectiveFunctions(i) = objective_IHA
                         i += 1
 
+                    Case ObjectiveFunction.ObjectiveType.SKos
+
+                        'SKos
+                        '=================
+
+                        Dim Objective_SKos As New Common.ObjectiveFunction_SKos()
+
+                        'Kontrolle
+                        If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFSKos + 1) Then
+                            Throw New Exception("Block 'SKos' in der ZIE-Datei hat die falsche Anzahl Spalten!")
+                        End If
+
+                        'Spalten einlesen
+                        With Objective_SKos
+                            If (WerteArray(1).Trim().ToUpper() = "P") Then
+                                .isPrimObjective = True
+                            Else
+                                .isPrimObjective = False
+                            End If
+                            .Bezeichnung = WerteArray(2).Trim()
+                            .Gruppe = WerteArray(3).Trim()
+                            If (WerteArray(4).Trim() = "+") Then
+                                .Richtung = Common.EVO_RICHTUNG.Maximierung
+                            Else
+                                .Richtung = Common.EVO_RICHTUNG.Minimierung
+                            End If
+                            If (WerteArray(5).Trim() = "+") Then
+                                .OpFact = 1
+                            ElseIf (WerteArray(5).Trim() = "-") Then
+                                .OpFact = -1
+                            ElseIf Not (WerteArray(5).Trim() = "") Then
+                                .OpFact = Convert.ToDouble(WerteArray(5).Trim())
+                            End If
+                        End With
+
+                        'SKos initialisieren
+                        Objective_SKos.initialize(Me)
+
+                        'Neue ObjectiveFunction abspeichern
+                        ReDim Preserve Me.List_ObjectiveFunctions(i)
+                        Me.List_ObjectiveFunctions(i) = Objective_SKos
+                        i += 1
+
+
                     Case ObjectiveFunction.ObjectiveType.Aggregate
 
-                        'Agrregierte Ziele
+                        'Aggregierte Ziele
                         '=================
 
                         'Kontrolle
@@ -1356,7 +1403,10 @@ Public Class Problem
         Dim i As Integer
 
         Select Case Me.Method
-            Case METH_CES
+            Case METH_CES, METH_HYBRID
+
+                'CES und HYBRID
+                '==============
                 Dim IndCES As EVO.Common.Individuum_CES
                 IndCES = New EVO.Common.Individuum_CES("start", 1)
                 'Startpfad setzen
@@ -1371,8 +1421,12 @@ Public Class Problem
                 '        End If
                 '    Next
                 'Next
+                'TODO: Startparameter für HYBRID?
                 startind = IndCES
+
             Case Else
+				'Alle anderen Methoden
+				'=====================
                 startind = New EVO.Common.Individuum_PES("start", 1)
                 'Startwerte der OptParameter setzen
                 For i = 0 To Me.NumParams - 1

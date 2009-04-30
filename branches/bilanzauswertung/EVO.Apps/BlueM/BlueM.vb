@@ -32,10 +32,6 @@ Public Class BlueM
     '----
     Private useKWL As Boolean       'gibt an, ob die KWL-Datei benutzt wird
 
-    'SKos
-    '----
-    Public SKos1 As SKos
-
     '**** Multithreading ****
     Dim MyBlueMThreads() As BlueMThread
     Dim MyThreads() As Thread
@@ -129,9 +125,6 @@ Public Class BlueM
     Public Overrides Sub setProblem(ByRef prob As EVO.Common.Problem)
 
         Call MyBase.setProblem(prob)
-
-        'SKos instanzieren
-        Me.SKos1 = New SKos(prob)
 
         'BlueM-spezifische Weiterverarbeitung von ZielReihen:
         '====================================================

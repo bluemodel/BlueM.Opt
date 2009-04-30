@@ -373,9 +373,6 @@ Public MustInherit Class Sim
         ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
         ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
 
-        'Die elemente werden an die Kostenkalkulation übergeben
-        CType(Me, BlueM).SKos1.Akt_Elemente = ind.Get_All_Loc_Elem
-
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
 
@@ -665,6 +662,18 @@ Public MustInherit Class Sim
 
         'Simulationsergebnis einlesen
         Call SIM_Ergebnis_Lesen()
+
+        'HACK: SKos: Die Elemente werden an die Kostenkalkulation übergeben
+        ' und das aktuelle WorkDir wird gesetzt
+        For Each obj As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+            If (obj.GetObjType = Common.ObjectiveFunction.ObjectiveType.SKos) Then
+                With CType(obj, Common.ObjectiveFunction_SKos)
+                    .Akt_Elemente = CType(ind, Common.Individuum_CES).Get_All_Loc_Elem
+                    .WorkDir_Current = Me.WorkDir_Current
+                End With
+                Exit For
+            End If
+        Next
 
         'ObjectiveFunctions berechnen
         For i = 0 To Me.mProblem.NumObjectives - 1

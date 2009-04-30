@@ -61,7 +61,6 @@
   <ItemGroup>
     <Compile Include="BlueM\BlueM.vb" />
     <Compile Include="BlueM\BlueMThread.vb" />
-    <Compile Include="BlueM\SKos.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

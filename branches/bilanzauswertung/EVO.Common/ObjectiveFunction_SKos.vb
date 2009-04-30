@@ -1,31 +1,34 @@
+'*******************************************************************************
+'*******************************************************************************
+'**** Klasse SKos zur Ermittlung der Schäden und Kosten im HW Fall          ****
+'****                                                                       ****
+'**** Christoph Hübner                                                      ****
+'****                                                                       ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
+'**** TU Darmstadt                                                          ****
+'****                                                                       ****
+'**** Februar 2007                                                          ****
+'****                                                                       ****
+'**** Letzte Änderung: April 2007                                           ****
+'*******************************************************************************
+'*******************************************************************************
+
 Imports System.IO
 
-Public Class SKos
-
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse SKos zur Ermittlung der Schäden und Kosten im HW Fall          ****
-    '****                                                                       ****
-    '**** Christoph Hübner                                                      ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** Februar 2007                                                          ****
-    '****                                                                       ****
-    '**** Letzte Änderung: April 2007                                           ****
-    '*******************************************************************************
-    '*******************************************************************************
+Public Class ObjectiveFunction_SKos
+    Inherits ObjectiveFunction
 
     'Das Problem
     Private mProblem As EVO.Common.Problem
 
+    'Aktuelles Working Directory (wichtig bei Multithreading)
+    Public WorkDir_Current As String
+
     Public Akt_Elemente() As String
 
-    'Struktur welche Informationen der Transportstrecken entält
-    '**********************************************************
-    Public Structure TRS
+    'Struktur welche Informationen der Transportstrecken enthält
+    '***********************************************************
+    Private Structure TRS
 
         Dim Name As String
         Dim Laenge As Double
@@ -54,17 +57,36 @@ Public Class SKos
     Dim TRS_Orig(-1) As TRS
     Dim TRS_Akt(-1) As TRS
 
-    Public Sub New(ByRef prob As EVO.Common.Problem)
+    ''' <summary>
+    ''' SKos initialisieren
+    ''' </summary>
+    ''' <param name="prob">Das Problem</param>
+    Public Sub initialize(ByRef prob As EVO.Common.Problem)
 
-        'Problem speichern
+        'Referenz zu Problem speichern
         Me.mProblem = prob
+
+        'Original Transportstrecken einlesen
+        Call Me.Read_TRS_Orig_Daten()
 
     End Sub
 
+    ''' <summary>
+    ''' Calculate the objective function value
+    ''' </summary>
+    ''' <param name="SimErgebnis">collection of simulation results</param>
+    ''' <returns>objective function value</returns>
+    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
+
+        'SimErgebnis wird nicht genutzt
+        Return Me.Calculate_Costs()
+
+    End Function
 
     'Funktion für die Kalkulation der Kosten
     '***************************************
-    Public Function Calculate_Costs(ByRef WorkDir As String) As Double
+    Private Function Calculate_Costs() As Double
+
         Dim costs As Double = 0
         Dim Elementliste(0, 1) As Object
         Dim TRS_Array(,) As Object = {}
@@ -74,8 +96,8 @@ Public Class SKos
         Call create_Elementliste(Elementliste)
 
         'Ermitteln der massgeblichen Größen aus den Dateien
-        Call Read_TAL(TAL_Array, WorkDir)
-        Call Read_TRS_Daten(TRS_Akt, WorkDir)
+        Call Read_TAL(TAL_Array, Me.WorkDir_Current)
+        Call Read_TRS_Daten(TRS_Akt, Me.WorkDir_Current)
 
         'Berechnen der Volumen Differenzen aus der Original TRS und der Aktuellen TRS
         Call Calc_Volume(TRS_Orig, TRS_Akt)
@@ -144,11 +166,11 @@ Public Class SKos
         System.Array.Resize(Array, x)
     End Sub
 
-    'Inforationen der Original Transportstrecken einlesen
-    '****************************************************
-    Public Sub Read_TRS_Orig_Daten(ByRef WorkDir As String)
+    'Informationen der Original Transportstrecken einlesen
+    '*****************************************************
+    Private Sub Read_TRS_Orig_Daten()
 
-        Call Read_TRS_Daten(TRS_Orig, WorkDir)
+        Call Read_TRS_Daten(TRS_Orig, Me.mProblem.WorkDir)
 
     End Sub
 
@@ -156,7 +178,7 @@ Public Class SKos
     'Inforationen der Transportstrecken einlesen
     'Hier werden nur die Informationen einer Seite eingelesenund Symerie angenommen (könnte mann leicht erweitern)
     '*************************************************************************************************************
-    Public Sub Read_TRS_Daten(ByRef TRS_Array() As TRS, ByRef WorkDir As String)
+    Private Sub Read_TRS_Daten(ByRef TRS_Array() As TRS, ByRef WorkDir As String)
 
         ReDim TRS_Array(-1)
 

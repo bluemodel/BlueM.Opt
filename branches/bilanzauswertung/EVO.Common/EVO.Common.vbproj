@@ -63,6 +63,7 @@
     <Compile Include="ObjectiveFunction_Aggregate.vb" />
     <Compile Include="ObjectiveFunction_IHA.vb" />
     <Compile Include="ObjectiveFunction_Series.vb" />
+    <Compile Include="ObjectiveFunction_SKos.vb" />
     <Compile Include="ObjectiveFunction_ValueFromSeries.vb" />
     <Compile Include="Objectivefunction_Value.vb" />
     <Compile Include="Problem.vb" />

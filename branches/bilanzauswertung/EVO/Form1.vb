@@ -689,9 +689,6 @@ Partial Class Form1
                             'Original ModellParameter schreiben
                             Call Sim1.Write_ModellParameter()
 
-                            'Original Transportstrecken einlesen
-                            Call CType(Me.Sim1, EVO.Apps.BlueM).SKos1.Read_TRS_Orig_Daten(Sim1.WorkDir_Original)
-
                         End If
 
                         'ggf. EVO_Einstellungen Testmodus einrichten

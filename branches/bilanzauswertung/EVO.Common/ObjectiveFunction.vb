@@ -30,6 +30,7 @@ Public MustInherit Class ObjectiveFunction
         ValueFromSeries = 3
         IHA = 4
         Aggregate = 5
+        SKos = 6
     End Enum
 
     ''' <summary>
@@ -119,6 +120,8 @@ Public MustInherit Class ObjectiveFunction
                 Return ObjectiveType.IHA
             ElseIf (TypeOf (Me) Is ObjectiveFunction_Aggregate) Then
                 Return ObjectiveType.Aggregate
+            ElseIf (TypeOf (Me) Is ObjectiveFunction_SKos) Then
+                Return ObjectiveType.SKos
             Else
                 Throw New Exception("Unable to determine type of ObjectiveFunction")
             End If
