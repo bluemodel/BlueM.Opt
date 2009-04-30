@@ -92,11 +92,12 @@ Public MustInherit Class Sim
 #Region "Events"
 
     ''' <summary>
-    ''' Wird ausgelöst, wenn ein Individuum mit Multithreading fertig evaluiert wurde
+    ''' Wird ausgelöst, wenn ein Individuum,
+	''' das in einem Array an die Evaluate() Methode übergeben wurde,
+	''' erfolgreich evaluiert wurde
     ''' </summary>
     ''' <param name="ind">das evaluierte Individuum</param>
     ''' <param name="i_Nachf">0-basierte Nachfahren-Nummer</param>
-    ''' <remarks></remarks>
     Public Event IndividuumEvaluated(ByRef ind As EVO.Common.Individuum, ByVal i_Nachf As Integer)
 
 #End Region
@@ -471,13 +472,14 @@ Public MustInherit Class Sim
     End Function
 
     ''' <summary>
-    ''' Evaluiert ein Array von Individuen in multiplen Threads. 
+    ''' Evaluiert ein Array von Individuen 
     ''' Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Objectives.
     ''' Erfolgreich evaluierte Individuen werden mit dem Event IndividuumEvaluated zurückgegeben.
     ''' </summary>
     ''' <param name="inds">Ein Array von zu evaluierenden Individuen</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <returns>True/False für jedes Individuum</returns>
+    ''' <remarks>je nach Einstellung läuft die Evaluierung in multiplen Threads oder single-threaded ab</remarks>
     Public Overloads Function Evaluate(ByRef inds() As EVO.Common.Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean()
 
         Dim isOK() As Boolean
@@ -495,117 +497,135 @@ Public MustInherit Class Sim
 
         ReDim isOK(n_individuals - 1)
 
-        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+        If (Me.mSettings.General.useMultithreading) Then
 
-        Do
-            'Stoppen?
-            If (Me.isStopped) Then Return isOK
+            'Mit Multithreading
+            '==================
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
-            If (Me.ThreadFree(ThreadID_Free) _
-                And (n_ind_Run < n_individuals) _
-                And (n_ind_Ready + Me.n_Threads > n_ind_Run) _
-                And Me.isPause = False) Then
-                'Falls eine Simulation frei, verarbeitet und nicht Pause
-                '-------------------------------------------------------
+            Do
+                'Stoppen?
+                If (Me.isStopped) Then Return isOK
 
-                Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Free)
+                If (Me.ThreadFree(ThreadID_Free) _
+                    And (n_ind_Run < n_individuals) _
+                    And (n_ind_Ready + Me.n_Threads > n_ind_Run) _
+                    And Me.isPause = False) Then
+                    'Falls eine Simulation frei, verarbeitet und nicht Pause
+                    '-------------------------------------------------------
 
-                'Simulation vorbereiten
-                '----------------------
-                Select Case Me.mProblem.Method
+                    Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Free)
 
-                    Case METH_CES, METH_HYBRID
-                        'Methoden CES und HYBRID
-                        '-----------------------
+                    'Simulation vorbereiten
+                    '----------------------
+                    Select Case Me.mProblem.Method
 
-                        'Bereitet das Sim für die Kombinatorik vor
-                        Call Me.PREPARE_Evaluation_CES(inds(n_ind_Run))
+                        Case METH_CES, METH_HYBRID
+                            'Methoden CES und HYBRID
+                            '-----------------------
 
-                        'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                        'TODO: Christoph: Dies ist die einzige Stelle im Sim, an der die EVO_Settings benötigt werden. Kann man das nicht umgehen?
-                        If (Me.mProblem.Method = METH_HYBRID _
-                            And Me.mSettings.CES.ty_Hybrid = HYBRID_TYPE.Mixed_Integer) Then
-                            If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(inds(n_ind_Run), EVO.Common.Individuum_CES).Get_All_Loc_Elem)) Then
-                                Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
+                            'Bereitet das Sim für die Kombinatorik vor
+                            Call Me.PREPARE_Evaluation_CES(inds(n_ind_Run))
+
+                            'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
+                            'TODO: Christoph: Dies ist die einzige Stelle im Sim, an der die EVO_Settings benötigt werden. Kann man das nicht umgehen?
+                            If (Me.mProblem.Method = METH_HYBRID _
+                                And Me.mSettings.CES.ty_Hybrid = HYBRID_TYPE.Mixed_Integer) Then
+                                If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(inds(n_ind_Run), EVO.Common.Individuum_CES).Get_All_Loc_Elem)) Then
+                                    Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
+                                End If
                             End If
-                        End If
 
-                    Case Else
-                        'Alle anderen Methoden
-                        '---------------------
+                        Case Else
+                            'Alle anderen Methoden
+                            '---------------------
 
-                        'Bereitet das Sim für Parameteroptimierung vor
-                        Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
+                            'Bereitet das Sim für Parameteroptimierung vor
+                            Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
 
 
-                End Select
+                    End Select
 
-                'Simulation ausführen
-                '--------------------
-                SIM_Eval_is_OK = Me.launchSim(ThreadID_Free, n_ind_Run)
+                    'Simulation ausführen
+                    '--------------------
+                    SIM_Eval_is_OK = Me.launchSim(ThreadID_Free, n_ind_Run)
 
-                n_ind_Run += 1
+                    n_ind_Run += 1
 
-            ElseIf (Me.ThreadReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = True _
-                    And SIM_Eval_is_OK) Then
-                'Falls Simulation fertig und erfolgreich
-                '---------------------------------------
+                ElseIf (Me.ThreadReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = True _
+                        And SIM_Eval_is_OK) Then
+                    'Falls Simulation fertig und erfolgreich
+                    '---------------------------------------
 
-                Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Ready)
+                    Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Ready)
 
-                'HACK: Individuum für Auswertung temporär kopieren um ArrayMismatchException zu umgehen
-                tmpind = inds(n_ind_Ready)
+                    'HACK: Individuum für Auswertung temporär kopieren um ArrayMismatchException zu umgehen
+                    tmpind = inds(n_ind_Ready)
 
-                'Individuum auswerten
-                Me.SIM_Ergebnis_auswerten(tmpind, storeInDB)
+                    'Individuum auswerten
+                    Me.SIM_Ergebnis_auswerten(tmpind, storeInDB)
 
-                'Individuum per Event zurückgeben
-                RaiseEvent IndividuumEvaluated(tmpind, n_ind_Ready)
+                    'Individuum per Event zurückgeben
+                    RaiseEvent IndividuumEvaluated(tmpind, n_ind_Ready)
 
-                'HACK: zurückkopieren (nötig?)
-                inds(n_ind_Ready) = tmpind
+                    'HACK: zurückkopieren (nötig?)
+                    inds(n_ind_Ready) = tmpind
 
-                isOK(n_ind_Ready) = True
+                    isOK(n_ind_Ready) = True
 
-                'Prüfen, ob alle Individuen fertig
-                If (n_ind_Ready = n_individuals - 1) Then
-                    Ready = True
-                End If
+                    'Prüfen, ob alle Individuen fertig
+                    If (n_ind_Ready = n_individuals - 1) Then
+                        Ready = True
+                    End If
 
-                n_ind_Ready += 1
+                    n_ind_Ready += 1
 
-            ElseIf (Me.ThreadReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = False _
-                    And SIM_Eval_is_OK = False) Then
-                'Falls Simulation fertig aber nicht erfolgreich
-                '----------------------------------------------
+                ElseIf (Me.ThreadReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = False _
+                        And SIM_Eval_is_OK = False) Then
+                    'Falls Simulation fertig aber nicht erfolgreich
+                    '----------------------------------------------
 
-                isOK(n_ind_Ready) = False
+                    isOK(n_ind_Ready) = False
 
-                If (n_ind_Ready = n_individuals - 1) Then
-                    Ready = True
-                End If
+                    If (n_ind_Ready = n_individuals - 1) Then
+                        Ready = True
+                    End If
 
-                n_ind_Ready += 1
+                    n_ind_Ready += 1
 
-            ElseIf (n_ind_Ready = n_ind_Run _
-                    And Me.isPause = True) Then
-                'Falls Pause und alle simulierten auch verarbeitet
-                '-------------------------------------------------
+                ElseIf (n_ind_Ready = n_ind_Run _
+                        And Me.isPause = True) Then
+                    'Falls Pause und alle simulierten auch verarbeitet
+                    '-------------------------------------------------
 
-                Do While (Me.isPause)
-                    System.Threading.Thread.Sleep(20)
+                    Do While (Me.isPause)
+                        System.Threading.Thread.Sleep(20)
+                        Application.DoEvents()
+                    Loop
+
+                Else
+                    'Falls total im Stress
+                    '---------------------
+                    System.Threading.Thread.Sleep(400)
                     Application.DoEvents()
-                Loop
 
-            Else
-                'Falls total im Stress
-                '---------------------
-                System.Threading.Thread.Sleep(400)
-                Application.DoEvents()
+                End If
 
-            End If
+            Loop While (Ready = False)
 
-        Loop While (Ready = False)
+        Else
+            'Ohne Multithreading
+            '===================
+            For i = 0 To inds.Length - 1
+                'Evaluieren
+                isOK(i) = Me.Evaluate(inds(i), storeInDB)
+                If (isOK(i)) Then
+                    'erfolgreich evaluiertes Individuum per Event zurückgeben
+                    RaiseEvent IndividuumEvaluated(inds(i), i)
+                End If
+            Next
+
+        End If
 
         Return isOK
 
