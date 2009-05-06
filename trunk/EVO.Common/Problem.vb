@@ -428,14 +428,8 @@ Public Class Problem
     ''' </summary>
     ''' <param name="SimStart">Startzeitpunkt der Simulation</param>
     ''' <param name="SimEnde">Endzeitpunkt der Simulation</param>
-    ''' <remarks>http://130.83.196.154/BlueM/wiki/index.php/ZIE-Datei</remarks>
+    ''' <remarks>http://130.83.196.220/bluem/wiki/index.php/ZIE-Datei</remarks>
     Private Sub Read_ZIE(ByVal SimStart As DateTime, ByVal SimEnde As DateTime)
-
-        'Format:
-        '*|-----|-------------|---|---------|-------|----------|---------|--------------|-------------------|--------------------|---------|
-        '*| Opt | Bezeichnung | R | ZielTyp | Datei | SimGröße | ZielFkt | EvalZeitraum |    Referenzwert  ODER    Referenzreihe | IstWert |
-        '*|     |             |   |         |       |          |         | Start | Ende | WertTyp | RefWert | RefGröße | Datei   |         |
-        '*|-----|-------------|---|---------|-------|----------|---------|-------|------|---------|---------|----------|---------|---------|
 
         Const AnzSpalten_ObjFSeries As Integer = 13                 'Anzahl Spalten Reihenvergleich in der ZIE-Datei
         Const AnzSpalten_ObjFValue As Integer = 12                  'Anzahl Spalten Wertevergleich in der ZIE-Datei
@@ -465,17 +459,17 @@ Public Class Problem
 
                 'Determine the current block / objective type
                 '--------------------------------------------
-                If Zeile.StartsWith("*Reihenvergleich") Then
+                If Zeile.StartsWith("*Series") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.Series
-                ElseIf Zeile.StartsWith("*Wertevergleich") Then
+                ElseIf Zeile.StartsWith("*Values") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.Value
-                ElseIf Zeile.StartsWith("*Reihenwertevergleich") Then
+                ElseIf Zeile.StartsWith("*ValueFromSeries") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.ValueFromSeries
-                ElseIf Zeile.StartsWith("*IHA-Analyse") Then
+                ElseIf Zeile.StartsWith("*IHA-Analysis") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.IHA
                 ElseIf Zeile.StartsWith("*SKos") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.SKos
-                ElseIf Zeile.StartsWith("*Aggregierte Ziele") Then
+                ElseIf Zeile.StartsWith("*Aggregate") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.Aggregate
                 End If
 
