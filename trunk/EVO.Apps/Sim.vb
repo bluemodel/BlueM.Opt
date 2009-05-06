@@ -233,11 +233,11 @@ Public MustInherit Class Sim
         End Select
 
         'Aktuelle Parameterlisten dimensionieren
-        ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        ReDim Me.Akt.OptPara(Me.mProblem.NumOptParams - 1)
         ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
 
         'Startwerte der OptParameter setzen
-        For i = 0 To Me.mProblem.NumParams - 1
+        For i = 0 To Me.mProblem.NumOptParams - 1
             Me.Akt.OptPara(i) = Me.mProblem.List_OptParameter(i).StartWert
         Next
 
@@ -370,7 +370,7 @@ Public MustInherit Class Sim
         Akt.Path = ind.Path
 
         'Aktuelle Parameterlisten neu dimensionieren
-        ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        ReDim Me.Akt.OptPara(Me.mProblem.NumOptParams - 1)
         ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
 
         'Ermittelt das aktuelle_ON_OFF array
@@ -635,11 +635,11 @@ Public MustInherit Class Sim
         Dim i As Integer
 
         'Aktuelle Parameterlisten neu dimensionieren (wegen HYBRID)
-        ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
+        ReDim Me.Akt.OptPara(Me.mProblem.NumOptParams - 1)
         ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
 
         'Aktuelle Parameter speichern
-        For i = 0 To Me.mProblem.NumParams - 1
+        For i = 0 To Me.mProblem.NumOptParams - 1
             Me.Akt.OptPara(i) = OptParams(i).RWert
         Next
 
