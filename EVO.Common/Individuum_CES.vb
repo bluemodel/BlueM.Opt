@@ -35,10 +35,10 @@
             Dim found As Boolean
             Dim tmp() As OptParameter
 
-            ReDim tmp(Individuum.mProblem.NumParams - 1)
+            ReDim tmp(Individuum.mProblem.NumOptParams - 1)
 
             'Alle OptParameter durchlaufen
-            For i = 0 To Individuum.mProblem.NumParams - 1
+            For i = 0 To Individuum.mProblem.NumOptParams - 1
 
                 found = False
 
@@ -65,7 +65,7 @@
         Set(ByVal value() As OptParameter)
 
             'Prüfung: Anzahl Parameter
-            If (value.Length <> Individuum.mProblem.NumParams) Then
+            If (value.Length <> Individuum.mProblem.NumOptParams) Then
                 Throw New Exception("Falsche Anzahl Parameter übergeben!")
             End If
 
@@ -73,7 +73,7 @@
             Dim found As Boolean
 
             'Alle OptParameter durchlaufen
-            For i = 0 To Individuum.mProblem.NumParams - 1
+            For i = 0 To Individuum.mProblem.NumOptParams - 1
 
                 found = False
 

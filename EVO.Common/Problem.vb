@@ -122,21 +122,20 @@ Public Class Problem
     End Property
 
     ''' <summary>
-    ''' Anzahl Optparameter
+    ''' Number of model parameters
     ''' </summary>
-    Public ReadOnly Property NumParams() As Integer
+    Public ReadOnly Property NumModelParams() As Integer
         Get
-            Return Me.List_OptParameter.Length
+            Return Me.List_ModellParameter.Length
         End Get
     End Property
 
     ''' <summary>
-    ''' Anzahl Objective Functions
+    ''' Anzahl Optparameter
     ''' </summary>
-    ''' <remarks>Inklusive PrimaryObjective Functions!</remarks>
-    Public ReadOnly Property NumObjectives() As Integer
+    Public ReadOnly Property NumOptParams() As Integer
         Get
-            Return Me.List_ObjectiveFunctions.Length
+            Return Me.List_OptParameter.Length
         End Get
     End Property
 
@@ -154,6 +153,25 @@ Public Class Problem
                 Case Else
                     Throw New Exception("Es sind keine PrimaryObjective-Functions definiert!")
             End Select
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Gesamtanzahl Objective Functions
+    ''' </summary>
+    ''' <remarks>Inklusive PrimaryObjective Functions!</remarks>
+    Public ReadOnly Property NumObjectives() As Integer
+        Get
+            Return Me.List_ObjectiveFunctions.Length
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Number of secondary objective functions
+    ''' </summary>
+    Public ReadOnly Property NumSecObjectives() As Integer
+        Get
+            Return Me.NumObjectives - Me.NumPrimObjective
         End Get
     End Property
 
@@ -224,6 +242,33 @@ Public Class Problem
             Next
 
             n_PathDimension = tmpArray.Clone
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Gets a text description of the problem, listing all objectives, parameters, etc.
+    ''' </summary>
+    Public ReadOnly Property Description() As String
+        Get
+            Dim msg As String
+            msg = "Objective Functions (" & Me.NumPrimObjective & " primary, " & Me.NumSecObjectives & " secondary):" & eol
+            For Each obj As ObjectiveFunction In Me.List_ObjectiveFunctions
+                msg &= "* " & obj.Bezeichnung & eol
+            Next
+            msg &= "Optimization parameters (" & Me.NumOptParams & "):" & eol
+            For Each optparam As OptParameter In Me.List_OptParameter
+                msg &= "* " & optparam.Bezeichnung & eol
+            Next
+            msg &= "Model parameters (" & Me.NumModelParams & "):" & eol
+            For Each modparam As Struct_ModellParameter In Me.List_ModellParameter
+                msg &= "* " & modparam.Bezeichnung & eol
+            Next
+            msg &= "Constraints (" & Me.NumConstraints & "):" & eol
+            For Each constraint As Constraintfunction In Me.List_Constraintfunctions
+                msg &= "* " & constraint.Bezeichnung
+            Next
+            'TODO: Problem description for CES
+            Return msg
         End Get
     End Property
 
@@ -732,7 +777,7 @@ Public Class Problem
 
                     Case Else
 
-                        Throw New Exception("Oops!")
+                        Throw New Exception("Could not read the ZIE file! Please check the file format.")
 
                 End Select
 
@@ -1419,11 +1464,11 @@ Public Class Problem
                 startind = IndCES
 
             Case Else
-				'Alle anderen Methoden
-				'=====================
+                'Alle anderen Methoden
+                '=====================
                 startind = New EVO.Common.Individuum_PES("start", 1)
                 'Startwerte der OptParameter setzen
-                For i = 0 To Me.NumParams - 1
+                For i = 0 To Me.NumOptParams - 1
                     startind.OptParameter(i) = Me.List_OptParameter(i).Clone()
                     startind.OptParameter(i).RWert = Me.List_OptParameter(i).StartWert
                 Next

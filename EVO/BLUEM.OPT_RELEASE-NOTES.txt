@@ -11,6 +11,7 @@ Version 1.4
 NEW:
 * New format of the ZIE-file (Objective Functions) (bug 414)
   - Possibility of using simulation result values for objective functions
+* The problem description is displayed in the log after loading
 
 Version 1.3
 -----------

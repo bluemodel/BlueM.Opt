@@ -780,6 +780,16 @@ Partial Class Form1
         '--------------------------------------------
         Call EVO.Common.Individuum.Initialise(Me.mProblem)
 
+        'Problembeschreibung in Log schreiben
+        '------------------------------------
+        Dim msg As String
+        msg = eol & "Optimization problem loaded:" & eol
+        msg &= "----------------------------" & eol
+        msg &= Me.mProblem.Description()
+        Me.Monitor1.LogAppend(msg)
+        Me.Monitor1.SelectTabLog()
+        Me.Monitor1.Show()
+
     End Sub
 
 #End Region 'Initialisierung der Anwendungen

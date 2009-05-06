@@ -67,7 +67,7 @@ Public Class Controller
         Dim ind As Common.Individuum
         Dim QNBest() As Double
         Dim QBest() As Double
-        Dim aktuellePara(Me.myProblem.NumParams - 1) As Double
+        Dim aktuellePara(Me.myProblem.NumOptParams - 1) As Double
         Dim SIM_Eval_is_OK As Boolean
         Dim durchlauf As Long
         Dim Iterationen As Long
@@ -77,7 +77,7 @@ Public Class Controller
         Dim Rueckschritte As Long
         Dim serie As Steema.TeeChart.Styles.Series
 
-        Dim HookJeeves As New EVO.HookeAndJeeves.HookeAndJeeves(Me.myProblem.NumParams, Me.mySettings.HookJeeves.DnStart, Me.mySettings.HookJeeves.DnFinish)
+        Dim HookJeeves As New EVO.HookeAndJeeves.HookeAndJeeves(Me.myProblem.NumOptParams, Me.mySettings.HookJeeves.DnStart, Me.mySettings.HookJeeves.DnFinish)
 
         Me.stopped = False
 
@@ -100,7 +100,7 @@ Public Class Controller
         Call HookJeeves.Initialize(Me.myProblem.List_OptParameter)
 
         'Initialisierungssimulation
-        For i = 0 To Me.myProblem.NumParams - 1
+        For i = 0 To Me.myProblem.NumOptParams - 1
             aktuellePara(i) = Me.myProblem.List_OptParameter(i).Xn
         Next
         QNBest(0) = 1.79E+308
