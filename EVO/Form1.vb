@@ -31,8 +31,9 @@ Partial Public Class Form1
 
     'MPC-Options
     Public Event Startbuttonpressed()
+    Public Event OptimisationReady()
 
-    Private IsInitializing As Boolean
+    Private IsInitializing As Boolean  'Gibt an, ob das Formular bereits fertig geladen wurde(beim Laden werden sämtliche Events ausgelöst)
 
     'Anwendung
     Private Anwendung As String
@@ -132,7 +133,7 @@ Partial Public Class Form1
         'Einstellungen
         Me.mSettings = New EVO.Common.EVO_Settings()
         Me.EVO_Einstellungen1.setSettings(Me.mSettings)
-        Me.EVO_Einstellungen1.setStandard_All()
+        Me.EVO_Einstellungen1.setStandard_All()    '#MPC#
         Me.EVO_Einstellungen1.ResetUI()
 
         'Monitor zurücksetzen
@@ -269,11 +270,10 @@ Partial Public Class Form1
     'Anwendung wurde ausgewählt
     '**************************
     Public Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
-        Try
+        If (Not Me.IsInitializing) Then
             Me.mSettings.General.Application = ComboBox_Anwendung.SelectedItem
             INI_App_ohneEvent()
-        Catch
-        End Try
+        End If
     End Sub
     Public Sub INI_App_ohneEvent()
 
@@ -557,11 +557,10 @@ Partial Public Class Form1
     'Datensatz wurde ausgewählt
     '**************************
     Private Sub INI_Datensatz(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Datensatz.SelectedIndexChanged
-        Try
+        If (Not Me.IsInitializing) Then
             Me.mSettings.General.Dataset = Me.ComboBox_Datensatz.SelectedItem
             INI_Datensatz_ohneEvent()
-        Catch
-        End Try
+        End If
     End Sub
 
     Public Sub INI_Datensatz_ohneEvent()
@@ -607,7 +606,7 @@ Partial Public Class Form1
             '-------------------------------------------
             Me.Label_Methode.Enabled = True
             Me.ComboBox_Methode.Enabled = True
-            Me.mSettings.General.Method = ""
+            Me.mSettings.General.Method = "" 'Fehler für MPC ??
 
             'Progress zurücksetzen
             Call Me.mProgress.Initialize()
@@ -619,11 +618,10 @@ Partial Public Class Form1
     'Methode wurde ausgewählt
     '************************
     Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Methode.SelectedIndexChanged
-        Try
+        If (Not Me.IsInitializing) Then
             Me.mSettings.General.Method = Me.ComboBox_Methode.SelectedItem
             INI_Method_ohneEvent()
-        Catch
-        End Try
+        End If
     End Sub
 
     Public Sub INI_Method_ohneEvent()
@@ -642,6 +640,7 @@ Partial Public Class Form1
                 'Problem initialisieren
                 '======================
                 Call Me.INI_Problem(Me.mSettings.General.Method)
+                Call Me.EVO_Einstellungen1.Initialise(Me.mProblem)
 
                 'Methodenspezifische Vorbereitungen
                 '(zunächst alles deaktivieren, danach je nach Methode aktivieren)
@@ -809,7 +808,7 @@ Partial Public Class Form1
 
         'Problem an EVO_Einstellungen übergeben
         '--------------------------------------
-        Call Me.EVO_Einstellungen1.Initialise(Me.mProblem)
+        'Call Me.EVO_Einstellungen1.Initialise(Me.mProblem) #MPC#
 
         'Individuumsklasse mit Problem initialisieren
         '--------------------------------------------
@@ -894,7 +893,12 @@ Partial Public Class Form1
             'EVO_Settings in temp-Verzeichnis speichern
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
-            Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
+
+            If ((Not Me.mSettings.General.useMPC) Or (Me.mSettings.MPC.MPC_Round = 0)) Then
+                Call Me.EVO_Einstellungen1.readForm()
+                'Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml") #MPC#
+            End If
+            
 
             'EVO_Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()
@@ -990,9 +994,14 @@ Partial Public Class Form1
             Me.Button_Start.Enabled = False
             Me.Button_Stop.Enabled = False
 
-            'Ausgabe der Optimierungszeit
-            OptTime.Stop()
-            MsgBox("Die Optimierung dauerte:   " & OptTime.Elapsed.Hours & "h  " & OptTime.Elapsed.Minutes & "m  " & OptTime.Elapsed.Seconds & "s     " & OptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
+            If (Me.mSettings.General.useMPC) Then
+                'Event für MPC auslösen 
+                RaiseEvent OptimisationReady()
+            Else
+                'Ausgabe der Optimierungszeit
+                OptTime.Stop()
+                MsgBox("Die Optimierung dauerte:   " & OptTime.Elapsed.Hours & "h  " & OptTime.Elapsed.Minutes & "m  " & OptTime.Elapsed.Seconds & "s     " & OptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
+            End If
 
         End If
 
