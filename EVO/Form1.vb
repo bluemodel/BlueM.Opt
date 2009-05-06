@@ -689,9 +689,6 @@ Partial Class Form1
                             'Original ModellParameter schreiben
                             Call Sim1.Write_ModellParameter()
 
-                            'Original Transportstrecken einlesen
-                            Call CType(Me.Sim1, EVO.Apps.BlueM).SKos1.Read_TRS_Orig_Daten(Sim1.WorkDir_Original)
-
                         End If
 
                         'ggf. EVO_Einstellungen Testmodus einrichten
@@ -872,8 +869,10 @@ Partial Class Form1
                     'Settings an Sim1 übergeben
                     Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
 
-                    'Startwert evaluieren
-                    Call Me.evaluateStartwerte()
+                    'Startwerte evaluieren
+                    If (Me.mProblem.Method <> METH_SENSIPLOT) Then
+                        Call Me.evaluateStartwerte()
+                    End If
 
                     Select Case Me.mProblem.Method
 
@@ -1420,6 +1419,7 @@ Partial Class Form1
 
         Dim isOK As Boolean
         Dim isIHA As Boolean
+        Dim objective_IHA As EVO.Common.ObjectiveFunction_IHA
         Dim isSWMM As Boolean
         Dim WorkDir_Prev As String
 
@@ -1438,21 +1438,23 @@ Partial Class Form1
         'Wave instanzieren
         Dim Wave1 As New Wave.Wave()
 
-        'Sonderfall BlueM mit IHA-Berechnung 
+        'Sonderfall bei ObjectiveFunction_IHA: 
         'ein 2. Wave für RVA-Diagramme instanzieren
         Dim Wave2 As Wave.Wave = Nothing
-        If (TypeOf Me.Sim1 Is EVO.Apps.BlueM) Then
-            If (CType(Me.Sim1, EVO.Apps.BlueM).isIHA) Then
+        For Each objective As EVO.Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+            If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.IHA) Then
                 isIHA = True
+                objective_IHA = objective '1. IHA-objective verwenden
                 Wave2 = New Wave.Wave()
                 Call Wave2.PrepareChart_RVA()
                 'IHA-Vergleichsmodus?
-                If (CType(Me.Sim1, EVO.Apps.BlueM).IHAProc.isComparison) Then
+                If (objective_IHA.isComparison) Then
                     'Referenz-RVAErgebnis in Wave2 laden
-                    Call Wave2.Display_RVA(CType(Me.Sim1, EVO.Apps.BlueM).IHAProc.RVABase)
+                    Call Wave2.Display_RVA(objective_IHA.RVABase)
                 End If
+                Exit For
             End If
-        End If
+        Next
 
         'Alle ausgewählten Lösungen durchlaufen
         '======================================
@@ -1479,7 +1481,7 @@ Partial Class Form1
             If (isIHA) Then
                 'RVA-Ergebnis in Wave2 laden
                 Dim RVAResult As Wave.RVA.Struct_RVAValues
-                RVAResult = CType(Me.Sim1, EVO.Apps.BlueM).IHASys.RVAResult
+                RVAResult = objective_IHA.IHASys.RVAResult
                 'Lösungsnummer an Titel anhängen
                 RVAResult.Title = "Lösung " & ind.ID.ToString()
                 Call Wave2.Display_RVA(RVAResult)
@@ -1490,19 +1492,22 @@ Partial Class Form1
 
             'zu zeichnenden Reihen aus Liste der Ziele raussuchen
             '----------------------------------------------------
-            For Each objective As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
+            For Each objective As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
                 If Not objective.isGroupLeader Then
                     With objective
 
                         'Referenzreihe in Wave laden
+                        'TODO: IHA-Referenzreihe auch laden?
                         '---------------------------
-                        If (.Typ = "Reihe" Or .Typ = "IHA") Then
-                            'Referenzreihen nur jeweils ein Mal zeichnen
-                            If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
-                                RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
-                                'Referenzreihe in Wave laden
-                                Wave1.Display_Series(.RefReihe)
-                            End If
+                        If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Series) Then
+                            With CType(objective, Common.ObjectiveFunction_Series)
+                                'Referenzreihen nur jeweils ein Mal zeichnen
+                                If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
+                                    RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
+                                    'Referenzreihe in Wave laden
+                                    Wave1.Display_Series(.RefReihe)
+                                End If
+                            End With
                         End If
 
                         'Simulationsergebnis in Wave laden
@@ -1510,7 +1515,7 @@ Partial Class Form1
                         'Simulationsreihen nur jeweils ein Mal zeichnen
                         If (Not SimSeries.Contains(.SimGr)) Then
                             Call SimSeries.Add(.SimGr, .SimGr)
-                            zre = Sim1.SimErgebnis(.SimGr).Clone()
+                            zre = Sim1.SimErgebnis.Reihen(.SimGr).Clone()
                             'Lösungsnummer an Titel anhängen
                             zre.Title &= " (Lösung " & ind.ID.ToString() & ")"
                             'Simreihe in Wave laden

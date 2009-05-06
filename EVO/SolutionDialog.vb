@@ -64,7 +64,7 @@ Partial Public Class SolutionDialog
 
         'Ziele
         '--------
-        For Each feature As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
+        For Each feature As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             column = New DataGridViewTextBoxColumn()
             If (feature.isPrimObjective) Then
                 cellstyle.BackColor = Color.LightGreen

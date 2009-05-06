@@ -50,7 +50,10 @@ Public MustInherit Class Sim
     Public SimEnde As DateTime                           'Enddatum der Simulation
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
 
-    Public SimErgebnis As Collection                     'Simulationsergebnis als Collection von Wave.Zeitreihe Objekten
+    ''' <summary>
+    ''' Das Simulationsergebnis
+    ''' </summary>
+    Public SimErgebnis As EVO.Common.ObjectiveFunction.SimErgebnis_Structure
 
     'Das Problem
     '-----------
@@ -89,11 +92,12 @@ Public MustInherit Class Sim
 #Region "Events"
 
     ''' <summary>
-    ''' Wird ausgelöst, wenn ein Individuum mit Multithreading fertig evaluiert wurde
+    ''' Wird ausgelöst, wenn ein Individuum,
+	''' das in einem Array an die Evaluate() Methode übergeben wurde,
+	''' erfolgreich evaluiert wurde
     ''' </summary>
     ''' <param name="ind">das evaluierte Individuum</param>
     ''' <param name="i_Nachf">0-basierte Nachfahren-Nummer</param>
-    ''' <remarks></remarks>
     Public Event IndividuumEvaluated(ByRef ind As EVO.Common.Individuum, ByVal i_Nachf As Integer)
 
 #End Region
@@ -153,7 +157,7 @@ Public MustInherit Class Sim
     Public Sub New()
 
         'Simulationsergebnis instanzieren
-        Me.SimErgebnis = New Collection()
+        Me.SimErgebnis.Clear()
 
         'Standardmässig OptResult verwenden
         Me.mStoreIndividuals = True
@@ -369,9 +373,6 @@ Public MustInherit Class Sim
         ReDim Me.Akt.OptPara(Me.mProblem.NumParams - 1)
         ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
 
-        'Die elemente werden an die Kostenkalkulation übergeben
-        CType(Me, BlueM).SKos1.Akt_Elemente = ind.Get_All_Loc_Elem
-
         'Ermittelt das aktuelle_ON_OFF array
         Call Prepare_Verzweigung_ON_OFF()
 
@@ -468,13 +469,14 @@ Public MustInherit Class Sim
     End Function
 
     ''' <summary>
-    ''' Evaluiert ein Array von Individuen in multiplen Threads. 
+    ''' Evaluiert ein Array von Individuen 
     ''' Durchläuft alle Schritte vom Schreiben der Modellparameter bis zum Berechnen der Objectives.
     ''' Erfolgreich evaluierte Individuen werden mit dem Event IndividuumEvaluated zurückgegeben.
     ''' </summary>
     ''' <param name="inds">Ein Array von zu evaluierenden Individuen</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <returns>True/False für jedes Individuum</returns>
+    ''' <remarks>je nach Einstellung läuft die Evaluierung in multiplen Threads oder single-threaded ab</remarks>
     Public Overloads Function Evaluate(ByRef inds() As EVO.Common.Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean()
 
         Dim isOK() As Boolean
@@ -492,117 +494,135 @@ Public MustInherit Class Sim
 
         ReDim isOK(n_individuals - 1)
 
-        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+        If (Me.mSettings.General.useMultithreading) Then
 
-        Do
-            'Stoppen?
-            If (Me.isStopped) Then Return isOK
+            'Mit Multithreading
+            '==================
+            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
-            If (Me.ThreadFree(ThreadID_Free) _
-                And (n_ind_Run < n_individuals) _
-                And (n_ind_Ready + Me.n_Threads > n_ind_Run) _
-                And Me.isPause = False) Then
-                'Falls eine Simulation frei, verarbeitet und nicht Pause
-                '-------------------------------------------------------
+            Do
+                'Stoppen?
+                If (Me.isStopped) Then Return isOK
 
-                Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Free)
+                If (Me.ThreadFree(ThreadID_Free) _
+                    And (n_ind_Run < n_individuals) _
+                    And (n_ind_Ready + Me.n_Threads > n_ind_Run) _
+                    And Me.isPause = False) Then
+                    'Falls eine Simulation frei, verarbeitet und nicht Pause
+                    '-------------------------------------------------------
 
-                'Simulation vorbereiten
-                '----------------------
-                Select Case Me.mProblem.Method
+                    Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Free)
 
-                    Case METH_CES, METH_HYBRID
-                        'Methoden CES und HYBRID
-                        '-----------------------
+                    'Simulation vorbereiten
+                    '----------------------
+                    Select Case Me.mProblem.Method
 
-                        'Bereitet das Sim für die Kombinatorik vor
-                        Call Me.PREPARE_Evaluation_CES(inds(n_ind_Run))
+                        Case METH_CES, METH_HYBRID
+                            'Methoden CES und HYBRID
+                            '-----------------------
 
-                        'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                        'TODO: Christoph: Dies ist die einzige Stelle im Sim, an der die EVO_Settings benötigt werden. Kann man das nicht umgehen?
-                        If (Me.mProblem.Method = METH_HYBRID _
-                            And Me.mSettings.CES.ty_Hybrid = HYBRID_TYPE.Mixed_Integer) Then
-                            If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(inds(n_ind_Run), EVO.Common.Individuum_CES).Get_All_Loc_Elem)) Then
-                                Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
+                            'Bereitet das Sim für die Kombinatorik vor
+                            Call Me.PREPARE_Evaluation_CES(inds(n_ind_Run))
+
+                            'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
+                            'TODO: Christoph: Dies ist die einzige Stelle im Sim, an der die EVO_Settings benötigt werden. Kann man das nicht umgehen?
+                            If (Me.mProblem.Method = METH_HYBRID _
+                                And Me.mSettings.CES.ty_Hybrid = HYBRID_TYPE.Mixed_Integer) Then
+                                If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(inds(n_ind_Run), EVO.Common.Individuum_CES).Get_All_Loc_Elem)) Then
+                                    Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
+                                End If
                             End If
-                        End If
 
-                    Case Else
-                        'Alle anderen Methoden
-                        '---------------------
+                        Case Else
+                            'Alle anderen Methoden
+                            '---------------------
 
-                        'Bereitet das Sim für Parameteroptimierung vor
-                        Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
+                            'Bereitet das Sim für Parameteroptimierung vor
+                            Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
 
 
-                End Select
+                    End Select
 
-                'Simulation ausführen
-                '--------------------
-                SIM_Eval_is_OK = Me.launchSim(ThreadID_Free, n_ind_Run)
+                    'Simulation ausführen
+                    '--------------------
+                    SIM_Eval_is_OK = Me.launchSim(ThreadID_Free, n_ind_Run)
 
-                n_ind_Run += 1
+                    n_ind_Run += 1
 
-            ElseIf (Me.ThreadReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = True _
-                    And SIM_Eval_is_OK) Then
-                'Falls Simulation fertig und erfolgreich
-                '---------------------------------------
+                ElseIf (Me.ThreadReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = True _
+                        And SIM_Eval_is_OK) Then
+                    'Falls Simulation fertig und erfolgreich
+                    '---------------------------------------
 
-                Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Ready)
+                    Me.WorkDir_Current = Me.getThreadWorkDir(ThreadID_Ready)
 
-                'HACK: Individuum für Auswertung temporär kopieren um ArrayMismatchException zu umgehen
-                tmpind = inds(n_ind_Ready)
+                    'HACK: Individuum für Auswertung temporär kopieren um ArrayMismatchException zu umgehen
+                    tmpind = inds(n_ind_Ready)
 
-                'Individuum auswerten
-                Me.SIM_Ergebnis_auswerten(tmpind, storeInDB)
+                    'Individuum auswerten
+                    Me.SIM_Ergebnis_auswerten(tmpind, storeInDB)
 
-                'Individuum per Event zurückgeben
-                RaiseEvent IndividuumEvaluated(tmpind, n_ind_Ready)
+                    'Individuum per Event zurückgeben
+                    RaiseEvent IndividuumEvaluated(tmpind, n_ind_Ready)
 
-                'HACK: zurückkopieren (nötig?)
-                inds(n_ind_Ready) = tmpind
+                    'HACK: zurückkopieren (nötig?)
+                    inds(n_ind_Ready) = tmpind
 
-                isOK(n_ind_Ready) = True
+                    isOK(n_ind_Ready) = True
 
-                'Prüfen, ob alle Individuen fertig
-                If (n_ind_Ready = n_individuals - 1) Then
-                    Ready = True
-                End If
+                    'Prüfen, ob alle Individuen fertig
+                    If (n_ind_Ready = n_individuals - 1) Then
+                        Ready = True
+                    End If
 
-                n_ind_Ready += 1
+                    n_ind_Ready += 1
 
-            ElseIf (Me.ThreadReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = False _
-                    And SIM_Eval_is_OK = False) Then
-                'Falls Simulation fertig aber nicht erfolgreich
-                '----------------------------------------------
+                ElseIf (Me.ThreadReady(ThreadID_Ready, SIM_Eval_is_OK, n_ind_Ready) = False _
+                        And SIM_Eval_is_OK = False) Then
+                    'Falls Simulation fertig aber nicht erfolgreich
+                    '----------------------------------------------
 
-                isOK(n_ind_Ready) = False
+                    isOK(n_ind_Ready) = False
 
-                If (n_ind_Ready = n_individuals - 1) Then
-                    Ready = True
-                End If
+                    If (n_ind_Ready = n_individuals - 1) Then
+                        Ready = True
+                    End If
 
-                n_ind_Ready += 1
+                    n_ind_Ready += 1
 
-            ElseIf (n_ind_Ready = n_ind_Run _
-                    And Me.isPause = True) Then
-                'Falls Pause und alle simulierten auch verarbeitet
-                '-------------------------------------------------
+                ElseIf (n_ind_Ready = n_ind_Run _
+                        And Me.isPause = True) Then
+                    'Falls Pause und alle simulierten auch verarbeitet
+                    '-------------------------------------------------
 
-                Do While (Me.isPause)
-                    System.Threading.Thread.Sleep(20)
+                    Do While (Me.isPause)
+                        System.Threading.Thread.Sleep(20)
+                        Application.DoEvents()
+                    Loop
+
+                Else
+                    'Falls total im Stress
+                    '---------------------
+                    System.Threading.Thread.Sleep(400)
                     Application.DoEvents()
-                Loop
 
-            Else
-                'Falls total im Stress
-                '---------------------
-                System.Threading.Thread.Sleep(400)
-                Application.DoEvents()
+                End If
 
-            End If
+            Loop While (Ready = False)
 
-        Loop While (Ready = False)
+        Else
+            'Ohne Multithreading
+            '===================
+            For i = 0 To inds.Length - 1
+                'Evaluieren
+                isOK(i) = Me.Evaluate(inds(i), storeInDB)
+                If (isOK(i)) Then
+                    'erfolgreich evaluiertes Individuum per Event zurückgeben
+                    RaiseEvent IndividuumEvaluated(inds(i), i)
+                End If
+            Next
+
+        End If
 
         Return isOK
 
@@ -610,7 +630,7 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Public Sub PREPARE_Evaluation_PES(ByVal OptParams() As EVO.Common.OptParameter)
+    Private Sub PREPARE_Evaluation_PES(ByVal OptParams() As EVO.Common.OptParameter)
 
         Dim i As Integer
 
@@ -634,36 +654,68 @@ Public MustInherit Class Sim
     ''' <param name="ind">das zu evaluierende Individuum</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <remarks>Die Simulation muss bereits erfolgt sein</remarks>
-    Public Sub SIM_Ergebnis_auswerten(ByRef ind As Common.Individuum, Optional ByVal storeInDB As Boolean = True)
+    Private Sub SIM_Ergebnis_auswerten(ByRef ind As Common.Individuum, Optional ByVal storeInDB As Boolean = True)
 
-        Dim i, j As Short
+        Dim i, j, k As Short
+        Dim aggroziel As EVO.Common.ObjectiveFunction_Aggregate
+        Dim aggregateIndices As New Collections.Generic.List(Of Integer)
 
-        'Lesen der Relevanten Parameter aus der wel Datei
+        'Simulationsergebnis einlesen
         Call SIM_Ergebnis_Lesen()
 
-        'Qualitätswerte berechnen
+        'HACK: SKos: Die Elemente werden an die Kostenkalkulation übergeben
+        ' und das aktuelle WorkDir wird gesetzt
+        For Each obj As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+            If (obj.GetObjType = Common.ObjectiveFunction.ObjectiveType.SKos) Then
+                With CType(obj, Common.ObjectiveFunction_SKos)
+                    .Akt_Elemente = CType(ind, Common.Individuum_CES).Get_All_Loc_Elem
+                    .WorkDir_Current = Me.WorkDir_Current
+                End With
+                Exit For
+            End If
+        Next
+
+        'ObjectiveFunctions berechnen
         For i = 0 To Me.mProblem.NumObjectives - 1
 
-            'Es wird immer evaluiert außer bei GroupLeadern
-            If Not Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective Or Not Me.mProblem.List_ObjectiveFunctions(i).isGroupLeader Then
-                ind.Objectives(i) = CalculateObjective(Me.mProblem.List_ObjectiveFunctions(i))
-            Else
-                'Bei GroupLeadern wird der ZielfunktionswertWert auf Null gesetzt
-                ind.Objectives(i) = 0
-            End If
+            With Me.mProblem.List_ObjectiveFunctions(i)
 
-            'Falls es GroupMember gibt werden sie zum GruppLeader agregiert
-            If Not Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective And Me.mProblem.List_ObjectiveFunctions(i).isGroupMember Then
-                ind.Objectives(i) = CalculateObjective(Me.mProblem.List_ObjectiveFunctions(i))
-                j = -1
-                Do
-                    j += 1
-                    If Me.mProblem.List_ObjectiveFunctions(i).Gruppe = Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung Then
-                        ind.Objectives(j) = ind.Objectives(j) + ind.Objectives(i) * Me.mProblem.List_ObjectiveFunctions(i).OpFact
+                If (.isGroupLeader) Then
+                    'Aggregierte Ziele für später aufheben
+                    aggregateIndices.Add(i)
+                Else
+                    'andere Ziele auswerten
+                    ind.Objectives(i) = .calculateObjective(Me.SimErgebnis)
+                End If
+
+            End With
+        Next
+
+        'Aggregierte Ziele berechnen
+        For Each j In aggregateIndices
+
+            aggroziel = Me.mProblem.List_ObjectiveFunctions(j)
+
+            'Zunächst zu Null setzen
+            ind.Objectives(j) = 0
+
+            'Alle Gruppenmitglieder suchen
+            For k = 0 To Me.mProblem.NumObjectives - 1
+
+                With Me.mProblem.List_ObjectiveFunctions(k)
+
+                    If (Not .isGroupLeader _
+                        And .Gruppe = aggroziel.Gruppe) Then
+
+                        'gefundenes Gruppenmitglied hinzuaddieren
+                        ind.Objectives(j) += ind.Objectives(k) * .OpFact
                     End If
-                Loop Until (Me.mProblem.List_ObjectiveFunctions(i).Gruppe = Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung)
-            End If
 
+                End With
+            Next
+
+            'Zielrichtung berücksichtigen
+            ind.Objectives(j) *= aggroziel.Richtung
         Next
 
         'Constraints berechnen
@@ -775,12 +827,6 @@ Handler:
             ElseIf (WertStr.Length < AnzZeichen - 1) Then
                 'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
                 WertStr = Convert.ToString(Math.Round(Me.Akt.ModPara(i), AnzZeichen - WertStr.Length - 1), Common.Provider.FortranProvider)
-                'TODO: wozu der Punkt im Folgenden?
-                'If (Not WertStr.Contains(".")) Then
-                '    WertStr += "."
-                'End If
-
-
             Else
                 'Ganzzahligen Wert benutzen
             End If
@@ -818,12 +864,11 @@ Handler:
 
     'SimModell ausführen (simulieren)
     '********************************
-    Public MustOverride Overloads Function launchSim() As Boolean
+    Protected MustOverride Overloads Function launchSim() As Boolean
     'mit Threads:
-    Public MustOverride Overloads Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
-    Public MustOverride Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
-    Public MustOverride Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
-
+    Protected MustOverride Overloads Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Protected MustOverride Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+    Protected MustOverride Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
 
     'Simulationsergebnis einlesen
     '----------------------------
@@ -831,252 +876,17 @@ Handler:
 
 #End Region 'Evaluierung
 
-#Region "Qualitätswertberechnung"
-
-    'Phänotypberechnung
-    '##################
-
-    'Berechnung der Objective Funktionen
-    '***********************************
-    Public MustOverride Function CalculateObjective(ByVal objective As Common.Objectivefunktion) As Double
-
-    'Objectivewert berechnen: Feature Typ = Reihe
-    '******************************************
-    'BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!
-    Protected Function CalculateObjective_Reihe(ByVal objective As Common.Objectivefunktion, ByVal SimReihe As Wave.Zeitreihe) As Double
-
-        Dim QWert As Double
-        Dim i As Integer
-
-        'Simulationszeitreihe auf Evaluierungszeitraum zuschneiden
-        Call SimReihe.Cut(objective.EvalStart, objective.EvalEnde)
-
-        'BUG 218: Kontrolle
-        If (objective.RefReihe.Length <> SimReihe.Length) Then
-            Throw New Exception("Ziel '" & objective.Bezeichnung & "': Simulations- und Referenzzeitreihe sind nicht kompatibel! (Länge/Zeitschritt?) Siehe Bug 218")
-        End If
-
-        'Fallunterscheidung Zielfunktion
-        '-------------------------------
-        Select Case objective.Funktion
-
-            Case "AbQuad"
-                'Summe der Fehlerquadrate
-                '------------------------
-                QWert = 0
-                For i = 0 To SimReihe.Length - 1
-                    QWert += (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i))
-                Next
-
-            Case "Diff"
-                'Summe der Fehler
-                '----------------
-                QWert = 0
-                For i = 0 To SimReihe.Length - 1
-                    QWert += Math.Abs(objective.RefReihe.YWerte(i) - SimReihe.YWerte(i))
-                Next
-
-            Case "Volf"
-                'Volumenfehler
-                '-------------
-                Dim VolSim As Double = 0
-                Dim VolZiel As Double = 0
-                For i = 0 To SimReihe.Length - 1
-                    VolSim += SimReihe.YWerte(i)
-                    VolZiel += objective.RefReihe.YWerte(i)
-                Next
-                'Differenz bilden und auf ZielVolumen beziehen
-                QWert = Math.Abs(VolZiel - VolSim) / VolZiel * 100
-
-            Case "nUnter"
-                'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
-                '-------------------------------------------------------------------
-                Dim nUnter As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < objective.RefReihe.YWerte(i)) Then
-                        nUnter += 1
-                    End If
-                Next
-                QWert = nUnter / SimReihe.Length * 100
-
-            Case "sUnter"
-                'Summe der Unterschreitungen
-                '---------------------------
-                Dim sUnter As Double = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < objective.RefReihe.YWerte(i)) Then
-                        sUnter += objective.RefReihe.YWerte(i) - SimReihe.YWerte(i)
-                    End If
-                Next
-                QWert = sUnter
-
-            Case "nÜber"
-                'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
-                '------------------------------------------------------------------
-                Dim nUeber As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > objective.RefReihe.YWerte(i)) Then
-                        nUeber += 1
-                    End If
-                Next
-                QWert = nUeber / SimReihe.Length * 100
-
-            Case "sÜber"
-                'Summe der Überschreitungen
-                '--------------------------
-                Dim sUeber As Double = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > objective.RefReihe.YWerte(i)) Then
-                        sUeber += SimReihe.YWerte(i) - objective.RefReihe.YWerte(i)
-                    End If
-                Next
-                QWert = sUeber
-
-            Case "NashSutt"
-                'Nash Sutcliffe
-                '--------------
-                'Mittelwert bilden
-                Dim Qobs_quer, zaehler, nenner As Double
-                For i = 0 To SimReihe.Length - 1
-                    Qobs_quer += objective.RefReihe.YWerte(i)
-                Next
-                Qobs_quer = Qobs_quer / (SimReihe.Length)
-                For i = 0 To SimReihe.Length - 1
-                    zaehler += (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (objective.RefReihe.YWerte(i) - SimReihe.YWerte(i))
-                    nenner += (objective.RefReihe.YWerte(i) - Qobs_quer) * (objective.RefReihe.YWerte(i) - Qobs_quer)
-                Next
-                'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
-                QWert = zaehler / nenner
-
-            Case "Korr"
-                'Korrelationskoeffizient (lineare Regression)
-                'Es wird das Bestimmtheitsmaß r^2 zurückgegeben [0-1]
-                '----------------------------------------------------
-                Dim kovar, var_x, var_y, avg_x, avg_y As Double
-                'Mittelwerte
-                avg_x = SimReihe.getWert("Average")
-                avg_y = objective.RefReihe.getWert("Average")
-                'r^2 = sxy^2 / (sx^2 * sy^2)
-                'Standardabweichung: var_x = sx^2 = 1 / (n-1) * SUMME[(x_i - x_avg)^2]
-                'Kovarianz: kovar= sxy = 1 / (n-1) * SUMME[(x_i - x_avg) * (y_i - y_avg)]
-                kovar = 0
-                var_x = 0
-                var_y = 0
-                For i = 0 To SimReihe.Length - 1
-                    kovar += (SimReihe.YWerte(i) - avg_x) * (objective.RefReihe.YWerte(i) - avg_y)
-                    var_x += (SimReihe.YWerte(i) - avg_x) ^ 2
-                    var_y += (objective.RefReihe.YWerte(i) - avg_y) ^ 2
-                Next
-                var_x = 1 / (SimReihe.Length - 1) * var_x
-                var_y = 1 / (SimReihe.Length - 1) * var_y
-                kovar = 1 / (SimReihe.Length - 1) * kovar
-                'Bestimmtheitsmaß = Korrelationskoeffizient^2
-                QWert = kovar ^ 2 / (var_x * var_y)
-
-            Case Else
-                Throw New Exception("Die Zielfunktion '" & objective.Funktion & "' wird nicht unterstützt!")
-
-        End Select
-
-        Return QWert
-
-    End Function
-
-    'Qualitätswert berechnen: Objective Typ = Wert
-    '*********************************************
-    Protected Function CalculateObjective_Wert(ByVal objective As Common.Objectivefunktion, ByVal SimReihe As Wave.Zeitreihe) As Double
-
-        Dim QWert As Double
-        Dim i As Integer
-
-        'Simulationsreihe auf Evaluierungszeitraum kürzen
-        Call SimReihe.Cut(objective.EvalStart, objective.EvalEnde)
-
-        'Simulationswert aus Simulationsergebnis berechnen
-        Dim SimWert As Double
-        SimWert = SimReihe.getWert(objective.WertFunktion)
-
-        'QWert berechnen
-        '---------------
-        'Fallunterscheidung Zielfunktion
-        Select Case objective.Funktion
-
-            Case "AbQuad"
-                'Summe der Fehlerquadrate
-                '------------------------
-                QWert = (objective.RefWert - SimWert) * (objective.RefWert - SimWert)
-
-            Case "Diff"
-                'Summe der Fehler
-                '----------------
-                QWert = Math.Abs(objective.RefWert - SimWert)
-
-            Case "nUnter"
-                'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
-                '-------------------------------------------------------------------
-                Dim nUnter As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < objective.RefWert) Then
-                        nUnter += 1
-                    End If
-                Next
-                QWert = nUnter / SimReihe.Length * 100
-
-            Case "nÜber"
-                'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
-                '------------------------------------------------------------------
-                Dim nUeber As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > objective.RefWert) Then
-                        nUeber += 1
-                    End If
-                Next
-                QWert = nUeber / SimReihe.Length * 100
-
-            Case "sUnter"
-                'Summe der Unterschreitungen
-                '---------------------------
-                Dim sUnter As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < objective.RefWert) Then
-                        sUnter += objective.RefWert - SimReihe.YWerte(i)
-                    End If
-                Next
-                QWert = sUnter
-
-            Case "sÜber"
-                'Summe der Überschreitungen
-                '--------------------------
-                Dim sUeber As Integer = 0
-                For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > objective.RefWert) Then
-                        sUeber += SimReihe.YWerte(i) - objective.RefWert
-                    End If
-                Next
-                QWert = sUeber
-
-            Case Else
-                Throw New Exception("Die Zielfunktion '" & objective.Funktion & "' wird für Werte nicht unterstützt!")
-
-        End Select
-
-        Return QWert
-
-    End Function
-
-#End Region 'Qualitätswertberechnung
-
 #Region "Constraintberechnung"
 
     'Constraint berechnen (Constraint < 0 ist Grenzverletzung)
     '*********************************************************
-    Public Function CalculateConstraint(ByVal constr As Common.Constraintfunction) As Double
+    Private Function CalculateConstraint(ByVal constr As Common.Constraintfunction) As Double
 
         Dim i As Integer
 
         'Simulationsergebnis auslesen
         Dim SimReihe As Wave.Zeitreihe
-        SimReihe = Me.SimErgebnis(constr.SimGr)
+        SimReihe = Me.SimErgebnis.Reihen(constr.SimGr)
 
         'Fallunterscheidung GrenzTyp (Wert/Reihe)
         Select Case constr.Typ
@@ -1121,76 +931,6 @@ Handler:
     End Function
 
 #End Region 'Constraintberechnung
-
-#Region "SimErgebnisse lesen"
-
-    'SimErgebnisse lesen
-    '###################
-
-    'Ein Ergebnis aus einer PRB-Datei einlesen
-    '*****************************************
-    Public Shared Function Read_PRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
-
-        Dim ZeileStart As Integer = 0
-        Dim AnzZeil As Integer = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
-        Dim j As Integer = 0
-        Dim Zeile As String
-        Read_PRB = True
-
-        Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
-
-        'Array redimensionieren
-        ReDim PRB(AnzZeil - 1, 1)
-
-        'Anfangszeile suchen
-        Do
-            Zeile = StrRead.ReadLine.ToString
-            If (Zeile.Contains("+ Wahrscheinlichkeitskeitsverteilung: " & ZielGr)) Then
-                Exit Do
-            End If
-        Loop Until StrRead.Peek() = -1
-
-        'Zeile mit Spaltenüberschriften überspringen
-        Zeile = StrRead.ReadLine.ToString
-
-        For j = 0 To AnzZeil - 1
-            Zeile = StrRead.ReadLine.ToString()
-            PRB(j, 0) = Convert.ToDouble(Zeile.Substring(2, 10))        'X-Wert
-            PRB(j, 1) = Convert.ToDouble(Zeile.Substring(13, 8))        'P(Jahr)
-        Next
-        StrReadSync.Close()
-        StrRead.Close()
-        FiStr.Close()
-
-        'Überflüssige Stützstellen (P) entfernen
-        '---------------------------------------
-        'Anzahl Stützstellen bestimmen
-        Dim stuetz As Integer = 0
-        Dim P_vorher As Double = -99
-        For j = 0 To PRB.GetUpperBound(0)
-            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
-                stuetz += 1
-                P_vorher = PRB(j, 1)
-            End If
-        Next
-        'Werte in neues Array schreiben
-        Dim PRBtmp(stuetz - 1, 1) As Object
-        stuetz = 0
-        For j = 0 To PRB.GetUpperBound(0)
-            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
-                PRBtmp(stuetz, 0) = PRB(j, 0)
-                PRBtmp(stuetz, 1) = PRB(j, 1)
-                P_vorher = PRB(j, 1)
-                stuetz += 1
-            End If
-        Next
-        PRB = PRBtmp
-
-    End Function
-
-#End Region 'SimErgebnisse lesen
 
 #Region "Multithreading"
 

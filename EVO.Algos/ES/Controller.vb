@@ -586,7 +586,7 @@ Public Class Controller
                             Call Testprobleme1.Evaluate(inds(i_Nachf), PES1.PES_iAkt.iAktPop, Me.myHauptDiagramm)
 
                             'Evaluierung verarbeiten
-                            Call processIndividuum_PES(inds(i_Nachf), i_Nachf)
+                            Call Me.processIndividuum_PES(inds(i_Nachf), i_Nachf)
 
                         ElseIf (Not Me.mySettings.General.useMultithreading) Then
 
