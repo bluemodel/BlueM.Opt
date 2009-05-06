@@ -136,7 +136,7 @@ Public Class Smusi
 
     'SMUSI ausführen (simulieren)
     '****************************
-    Public Overrides Function launchSim() As Boolean
+    Protected Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
         Dim SimCurrent, SimStart, SimEnde As DateTime
@@ -249,15 +249,15 @@ Public Class Smusi
 
 	'TODO: SMUSI Thread-Funktionen
 	'#############################
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
         Return Me.launchSim()
     End Function
 
-    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+    Protected Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
         Return True
     End Function
 
-    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         Return True
     End Function
 
@@ -270,7 +270,7 @@ Public Class Smusi
         Dim elemente As New Collection()
 
         'Einzulesende Dateien zusammenstellen
-        For Each feature As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
+        For Each feature As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             element = feature.SimGr.Substring(0, 4)
             If (Not elemente.Contains(element)) Then
                 elemente.Add(element, element)
@@ -286,7 +286,7 @@ Public Class Smusi
             ASCtmp = New Wave.ASC(Me.WorkDir_Current & datei, True)
             'Simulationsergebnis abspeichern
             For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
-                Me.SimErgebnis.Add(zre, elem & "_" & zre.ToString())
+                Me.SimErgebnis.Reihen.Add(elem & "_" & zre.Title, zre)
             Next
             ASCtmp = Nothing
         Next
@@ -294,57 +294,6 @@ Public Class Smusi
         elemente = Nothing
 
     End Sub
-
-    'Berechnung des Qualitätswerts (Zielwert)
-    '****************************************
-    Public Overrides Function CalculateObjective(ByVal feature As Common.Objectivefunktion) As Double
-
-        CalculateObjective = 0
-
-        'Fallunterscheidung Ergebnisdatei
-        '--------------------------------
-        Select Case feature.Datei
-
-            Case "ASC"
-                'QWert aus ASC-Datei
-                CalculateObjective = QWert_ASC(feature)
-
-            Case Else
-                Throw New Exception("Der Wert '" & feature.Datei & "' für die Datei wird bei Optimierungszielen für SMUSI nicht akzeptiert!")
-
-        End Select
-
-        'Zielrichtung berücksichtigen
-        CalculateObjective *= feature.Richtung
-
-    End Function
-
-    'Qualitätswert aus ASC-Datei
-    '***************************
-    Private Function QWert_ASC(ByVal feature As Common.Objectivefunktion) As Double
-
-        Dim QWert As Double
-        Dim SimReihe As Wave.Zeitreihe
-
-        'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(feature.SimGr)
-
-        'Fallunterscheidung Zieltyp
-        '--------------------------
-        Select Case feature.Typ
-
-            Case "Wert"
-                QWert = MyBase.CalculateObjective_Wert(feature, SimReihe)
-
-            Case "Reihe"
-                QWert = MyBase.CalculateObjective_Reihe(feature, SimReihe)
-
-        End Select
-
-        Return QWert
-
-    End Function
-
 
 #Region "Kombinatorik"
 

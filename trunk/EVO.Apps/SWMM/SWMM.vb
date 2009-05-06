@@ -170,10 +170,10 @@ Public Class SWMM
 
     End Sub
 
-    'BlauesModell ausführen (simulieren)
+    'SWMM ausführen (simulieren)
     'Startet einen neuen Thread und übergibt ihm die Child ID
     '********************************************************
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
         launchSim = False
         Dim Folder As String
@@ -191,7 +191,7 @@ Public Class SWMM
 
     'SWMM ohne Thread ausführen (simulieren)
     '****************************
-    Public Overrides Function launchSim() As Boolean
+    Protected Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
 
@@ -259,7 +259,7 @@ Public Class SWMM
 
     'Gibt zurück ob ein beliebiger Thread beendet ist und ibt die ID diesen freien Threads zurück
     '********************************************************************************************
-    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+    Protected Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
         ThreadFree = False
 
         For Each Thr_C As SWMMThread In MySWMMThreads
@@ -275,7 +275,7 @@ Public Class SWMM
     'Prüft ob des aktuelle Child mit der ID die oben übergeben wurde fertig ist
     'Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
     '********************************************************************************
-    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         ThreadReady = False
 
         For Each Thr_C As SWMMThread In MySWMMThreads
@@ -291,48 +291,13 @@ Public Class SWMM
 
     End Function
 
-    'Simulationsergebnis verarbeiten
-    '-------------------------------
-    'Simulationsergebnis verarbeiten
-    '-------------------------------
+    'Simulationsergebnis einlesen
+    '----------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
-    End Sub
+        'BUG 414: TODO: Objectives durchgehen und erforderliche Werte
+        'in SimErgebnis speichern
 
-    'Berechnung des Qualitätswerts (Zielwert)
-    '****************************************
-    Public Overrides Function CalculateObjective(ByVal feature As Common.Objectivefunktion) As Double
-
-        CalculateObjective = 0
-
-        Dim IsOK As Boolean
-
-        'Fallunterscheidung Ergebnisdatei
-        '--------------------------------
-        Select Case feature.Datei
-
-            Case "RPT"
-                'SWMM-Ergebnisse aus RPT-Datei auslesen
-                CalculateObjective = CalculateFeature_RPT(feature)
-
-            Case Else
-                'es wurde eine nicht unterstützte Ergebnisdatei angegeben
-                IsOK = False
-
-        End Select
-
-        If (IsOK = False) Then
-            'TODO: Fehlerbehandlung
-        End If
-
-        'Zielrichtung berücksichtigen
-        CalculateObjective *= feature.Richtung
-
-    End Function
-
-    Public Function CalculateFeature_RPT(ByVal feature As Common.Objectivefunktion) As Double
-
-        Dim QWert As Double
         Dim FFreqEast As Double, FFreqGath As Double, FFreqWest As Double
         Dim AvgFEast As Double, AvgFGath As Double, AvgFWest As Double
         Dim DateiPfad As String
@@ -351,25 +316,25 @@ Public Class SWMM
                 Do
                     Zeile = StrRead.ReadLine.ToString
                     If (Zeile.StartsWith("  S112")) Then
-                        FFreqEast = Trim(Zeile.Substring(24, 5))
-                        AvgFEast = Trim(Zeile.Substring(33, 6))
+                        FFreqEast = Trim(Zeile.Substring(23, 6))
+                        AvgFEast = Trim(Zeile.Substring(33, 7))
                         Zeile = StrRead.ReadLine.ToString
                         Zeile = StrRead.ReadLine.ToString
-                        FFreqWest = Trim(Zeile.Substring(24, 5))
-                        AvgFWest = Trim(Zeile.Substring(33, 6))
+                        FFreqWest = Trim(Zeile.Substring(23, 6))
+                        AvgFWest = Trim(Zeile.Substring(33, 7))
                         Exit Do
                     End If
                 Loop Until StrRead.Peek() = -1
-                QWert = (FFreqEast * AvgFEast) + (FFreqWest * AvgFWest)
+                'QWert = (FFreqEast * AvgFEast) + (FFreqWest * AvgFWest)
                 Exit Do
             End If
         Loop Until StrRead.Peek() = -1
 
         StrRead.Close()
         FiStr.Close()
-        Return QWert
 
-    End Function
+    End Sub
+
 #Region "Kombinatorik"
 
     'Kombinatorik

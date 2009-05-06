@@ -61,8 +61,6 @@
   <ItemGroup>
     <Compile Include="BlueM\BlueM.vb" />
     <Compile Include="BlueM\BlueMThread.vb" />
-    <Compile Include="BlueM\IHAProcessor.vb" />
-    <Compile Include="BlueM\SKos.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -132,10 +130,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\IHA.Win\IHA.Win.vbproj">
-      <Project>{7A7828C7-812B-45C0-AC5A-AE2DB74B7CD8}</Project>
-      <Name>IHA.Win</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
