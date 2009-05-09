@@ -1943,12 +1943,8 @@ Partial Class Form1
 
         If n_CPU = 1 Then
             n_Threads = 4
-        ElseIf n_CPU = 2 Then
-            n_Threads = 5
-        ElseIf n_CPU = 4 Then
-            n_Threads = 9
-        ElseIf n_CPU = 8 Then
-            n_Threads = 17
+        Else
+            n_Threads = (2 * n_CPU) + 1
         End If
 
         'n_Threads = 6
