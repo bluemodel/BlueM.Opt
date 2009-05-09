@@ -488,6 +488,7 @@ Public MustInherit Class Sim
         Dim n_ind_Ready As Integer = 0
         Dim Ready As Boolean = False
         Dim SIM_Eval_is_OK As Boolean
+        Dim OptTimePara As New Stopwatch
 
         'Anzahl Individuen
         n_individuals = inds.Length
@@ -499,6 +500,7 @@ Public MustInherit Class Sim
             'Mit Multithreading
             '==================
             System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+            OptTimePara.Start
 
             Do
                 'Stoppen?
@@ -623,6 +625,9 @@ Public MustInherit Class Sim
             Next
 
         End If
+
+        OptTimePara.Stop()
+        'EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation dauerte:   " & OptTimePara.Elapsed.Hours & "h  " & OptTimePara.Elapsed.Minutes & "m  " & OptTimePara.Elapsed.Seconds & "s     " & OptTimePara.Elapsed.Seconds & "ms")
 
         Return isOK
 
