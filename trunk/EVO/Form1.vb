@@ -1931,19 +1931,24 @@ Partial Class Form1
     ''' <remarks></remarks>
     Private Function determineNoOfThreads() As Integer
 
-        Dim LogCPU As Integer = 0
-        Dim PhysCPU As Integer = 0
+        Dim n_CPU As Integer
+        'Dim LogCPU As Integer = 0
+        'Dim PhysCPU As Integer = 0
         Dim n_Threads As Integer
 
-        LogCPU = Environment.ProcessorCount
-        PhysCPU = Environment.ProcessorCount
+        'Gibt wahrscheinlich die Anzahl virtueller und physikalischer Prozessoren zurück
+        n_CPU = Environment.ProcessorCount
+        'LogCPU = Environment.ProcessorCount
+        'PhysCPU = Environment.ProcessorCount
 
-        If LogCPU = 1 Then
+        If n_CPU = 1 Then
             n_Threads = 4
-        ElseIf LogCPU = 2 Then
+        ElseIf n_CPU = 2 Then
             n_Threads = 5
-        ElseIf LogCPU = 4 Then
+        ElseIf n_CPU = 4 Then
             n_Threads = 9
+        ElseIf n_CPU = 8 Then
+            n_Threads = 17
         End If
 
         'n_Threads = 6
