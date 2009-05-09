@@ -17,6 +17,8 @@ Option Strict Off 'allows permissive type semantics. explicit narrowing conversi
 
 Imports System.IO
 Imports IHWB.EVO.Common.Constants
+'Imports System.management
+
 
 ''' <summary>
 ''' Main Window
@@ -802,8 +804,8 @@ Partial Class Form1
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
 
         'Stoppuhr
-        Dim OptTime As New Stopwatch
-        OptTime.Start()
+        Dim AllOptTime As New Stopwatch
+        AllOptTime.Start()
 
         If (Me.isrun And Not Me.ispause) Then
             'Optimierung pausieren
@@ -960,9 +962,9 @@ Partial Class Form1
             Me.Button_Stop.Enabled = False
 
             'Ausgabe der Optimierungszeit
-            OptTime.Stop()
-            MsgBox("Die Optimierung dauerte:   " & OptTime.Elapsed.Hours & "h  " & OptTime.Elapsed.Minutes & "m  " & OptTime.Elapsed.Seconds & "s     " & OptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
-
+            AllOptTime.Stop()
+            'MsgBox("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
+            EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms")
         End If
 
     End Sub
@@ -1930,8 +1932,11 @@ Partial Class Form1
     Private Function determineNoOfThreads() As Integer
 
         Dim LogCPU As Integer = 0
+        Dim PhysCPU As Integer = 0
         Dim n_Threads As Integer
+
         LogCPU = Environment.ProcessorCount
+        PhysCPU = Environment.ProcessorCount
 
         If LogCPU = 1 Then
             n_Threads = 4
@@ -1940,6 +1945,8 @@ Partial Class Form1
         ElseIf LogCPU = 4 Then
             n_Threads = 9
         End If
+
+        'n_Threads = 6
 
         Return n_Threads
 

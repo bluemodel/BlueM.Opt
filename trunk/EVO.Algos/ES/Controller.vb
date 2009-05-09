@@ -133,8 +133,8 @@ Public Class Controller
 
         Dim durchlauf_all As Integer
         Dim isOK() As Boolean
-        Dim Time() As TimeSpan
-        Dim Stoppuhr As New Stopwatch()
+        Dim TimePerGeneration() As TimeSpan
+        Dim OptTimeParaPerGen As New Stopwatch()
 
         'Hypervolumen instanzieren
         Dim Hypervolume As EVO.MO_Indicators.Indicators
@@ -187,14 +187,11 @@ Public Class Controller
         'xxxx Optimierung xxxxxx
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
-        ReDim Time(CES1.mSettings.CES.n_Generations - 1)
+        ReDim TimePerGeneration(CES1.mSettings.CES.n_Generations)
 
         durchlauf_all = 0
 
         For Me.CES_i_gen = 0 To CES1.mSettings.CES.n_Generations - 1
-
-            Stoppuhr.Reset()
-            Stoppuhr.Start()
 
             'HACK: IDs an Individuen vergeben
             For Each ind As EVO.Common.Individuum_CES In CES1.Childs
@@ -202,8 +199,16 @@ Public Class Controller
                 ind.ID = durchlauf_all + 1
             Next
 
+            OptTimeParaPerGen.Reset()
+            OptTimeParaPerGen.Start()
+
             'Individuen mit Multithreading evaluieren
             isOK = Sim1.Evaluate(CES1.Childs, True)
+
+            OptTimeParaPerGen.Stop()
+            EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation " & Me.CES_i_gen & " dauerte:   " & OptTimeParaPerGen.Elapsed.Hours & "h  " & OptTimeParaPerGen.Elapsed.Minutes & "m  " & OptTimeParaPerGen.Elapsed.Seconds & "s     " & OptTimeParaPerGen.Elapsed.Seconds & "ms")
+            TimePerGeneration(Me.CES_i_gen + 1) = OptTimeParaPerGen.Elapsed
+            TimePerGeneration(0) += OptTimeParaPerGen.Elapsed
 
             'Stop?
             If (Me.stopped) Then Exit Sub
@@ -214,11 +219,7 @@ Public Class Controller
                 If (Not isOK(i_Child)) Then
                     Throw New Exception("Der Nachfahre mit der ID.: " & i_Child & " wurde nicht richtig Evaluiert! Die Simulation wurde mit Fehlern abgebrochen")
                 End If
-
                 'erfolgreich evaluierte Individuen wurden bereits über Event verarbeitet
-
-                Stoppuhr.Stop()
-                Time(Me.CES_i_gen) = Stoppuhr.Elapsed
 
             Next
             '^ ENDE der Child Schleife
@@ -302,6 +303,8 @@ Public Class Controller
             End If
         Next
         'Ende der Generationsschleife CES
+
+        EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung aller Generationen dauerte:   " & TimePerGeneration(0).Hours.ToString & "h  " & TimePerGeneration(0).Minutes.ToString & "m  " & TimePerGeneration(0).Seconds.ToString & "s     " & TimePerGeneration(0).Milliseconds.ToString & "ms")
 
         'Falls jetzt noch PES ausgeführt werden soll
         'Starten der PES mit der Front von CES
