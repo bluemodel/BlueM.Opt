@@ -1505,7 +1505,11 @@ Partial Class Form1
             'zu zeichnenden Reihen aus Liste der Ziele raussuchen
             '----------------------------------------------------
             For Each objective As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-                If Not objective.isGroupLeader Then
+
+                If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Series _
+                    Or objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.ValueFromSeries _
+                    Or objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.IHA) Then
+
                     With objective
 
                         'Referenzreihe in Wave laden
