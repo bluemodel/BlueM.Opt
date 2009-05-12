@@ -27,73 +27,87 @@
     End Structure
 
     ''' <summary>
-    ''' Die OptParameter des aktuellen Pfads, sortiert nach der List_OptParameter
+    ''' Die OptParameter des aktuellen Pfads, sortiert nach der List_OptParameter_Save
     ''' </summary>
     Public Overrides Property OptParameter() As OptParameter()
         Get
-            Dim i, j, k As Integer
+            Dim i, j, k, n As Integer
             Dim found As Boolean
-            Dim tmp() As OptParameter
+            Dim params() As OptParameter
 
-            ReDim tmp(Individuum.mProblem.NumOptParams - 1)
+            ReDim params(-1)
+            n = 0
 
-            'Alle OptParameter durchlaufen
-            For i = 0 To Individuum.mProblem.NumOptParams - 1
+            'Alle definierten OptParameter durchlaufen
+            For i = 0 To Individuum.mProblem.List_OptParameter_Save.Length - 1
 
                 found = False
 
-                'Zugehörige Location finden
-                For j = 0 To Individuum.mProblem.NumLocations - 1
+                'Alle aktuellen Locations durchlaufen
+                For j = 0 To Me.Loc.Length - 1
 
-                    'Zugehörigen OptParameter finden
-                    For k = 0 To Me.Loc(j).PES_OptPara.GetUpperBound(0)
+                    'OptParameter der Locations durchlaufen
+                    For k = 0 To Me.Loc(j).PES_OptPara.Length - 1
 
-                        If (Me.Loc(j).PES_OptPara(k).Bezeichnung = Individuum.mProblem.List_OptParameter(i).Bezeichnung) Then
-                            tmp(i) = Loc(j).PES_OptPara(k)
+                        If (Me.Loc(j).PES_OptPara(k).Bezeichnung = Individuum.mProblem.List_OptParameter_Save(i).Bezeichnung) Then
+                            'gefundenen OptParameter zuweisen
+                            ReDim Preserve params(n)
+                            params(n) = Me.Loc(j).PES_OptPara(k)
+                            n += 1
                             found = True
                         End If
                         If (found) Then Exit For
+
                     Next k
                     If (found) Then Exit For
+
                 Next j
+
             Next i
 
-            Return tmp
+            Return params
 
         End Get
 
-        Set(ByVal value() As OptParameter)
+        Set(ByVal params() As OptParameter)
 
             'Prüfung: Anzahl Parameter
-            If (value.Length <> Individuum.mProblem.NumOptParams) Then
+            'TODO: Bei Multithreading sollte nicht auf diese statische Variable zugegriffen werden, sie ändert sich ständig!
+            If (params.Length <> Individuum.mProblem.NumOptParams) Then
                 Throw New Exception("Falsche Anzahl Parameter übergeben!")
             End If
 
             Dim i, j, k As Integer
             Dim found As Boolean
 
-            'Alle OptParameter durchlaufen
-            For i = 0 To Individuum.mProblem.NumOptParams - 1
+            'Übergebene Parameter durchlaufen
+            For i = 0 To params.Length - 1
 
                 found = False
 
-                'Zugehörige Location finden
-                For j = 0 To Individuum.mProblem.NumLocations - 1
+                'Alle aktuellen Locations durchlaufen
+                For j = 0 To Me.Loc.Length - 1
 
-                    'Zugehörigen OptParameter finden
-                    For k = 0 To Me.Loc(j).PES_OptPara.GetUpperBound(0)
+                    'OptParameter der Locations durchlaufen
+                    For k = 0 To Me.Loc(j).PES_OptPara.Length - 1
 
-                        If (Me.Loc(j).PES_OptPara(k).Bezeichnung = Individuum.mProblem.List_OptParameter(i).Bezeichnung) Then
-                            Loc(j).PES_OptPara(k) = value(i)
+                        If (Me.Loc(j).PES_OptPara(k).Bezeichnung = params(i).Bezeichnung) Then
+                            'gefundenen Parameter zuweisen
+                            Me.Loc(j).PES_OptPara(k) = params(i)
                             found = True
                         End If
                         If (found) Then Exit For
+
                     Next k
                     If (found) Then Exit For
+
                 Next j
+                If (Not found) Then Throw New Exception("Konnte Parameter '" & params(i).Bezeichnung & "' nicht in den Locations finden!")
+
             Next i
 
         End Set
+
     End Property
 
     'Gibt ein Array mit den DNs aller Locations zurück
@@ -102,16 +116,16 @@
     Public ReadOnly Property Get_All_Loc_PES_Dn() As Double()
         Get
             Dim i, j, x As Integer
-            Dim tmparray(-1) As Double
+            Dim Dn(-1) As Double
             x = 0
             For i = 0 To Loc.GetUpperBound(0)
                 For j = 0 To Loc(i).PES_OptPara.GetUpperBound(0)
-                    ReDim Preserve tmparray(x)
-                    tmparray(x) = Loc(i).PES_OptPara(j).Dn
+                    ReDim Preserve Dn(x)
+                    Dn(x) = Loc(i).PES_OptPara(j).Dn
                     x += 1
                 Next
             Next
-            Return tmparray
+            Return Dn
         End Get
 
     End Property
