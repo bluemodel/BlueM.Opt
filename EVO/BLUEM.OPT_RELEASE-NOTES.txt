@@ -12,6 +12,7 @@ NEW:
 * New format of the ZIE-file (Objective Functions) (bug 414)
   - Possibility of using simulation result values for objective functions
 * The problem description is displayed in the log after loading
+* For PES-problems that have 'Schrittweitenvektor' switched on, the Monitor now displays the step size of each parameter separately (bug 374)
 
 Version 1.3
 -----------
