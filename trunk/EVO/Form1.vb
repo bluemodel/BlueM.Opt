@@ -1521,7 +1521,7 @@ Partial Class Form1
                                 If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
                                     RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
                                     'Referenzreihe in Wave laden
-                                    Wave1.Display_Series(.RefReihe)
+                                    Wave1.Import_Series(.RefReihe)
                                 End If
                             End With
                         End If
@@ -1535,7 +1535,7 @@ Partial Class Form1
                             'Lösungsnummer an Titel anhängen
                             zre.Title &= " (Lösung " & ind.ID.ToString() & ")"
                             'Simreihe in Wave laden
-                            Call Wave1.Display_Series(zre)
+                            Call Wave1.Import_Series(zre)
                         End If
 
                     End With

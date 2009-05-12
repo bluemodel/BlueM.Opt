@@ -207,7 +207,7 @@ Public Class Controller
         If (Me.mySettings.SensiPlot.show_Wave) Then
             Wave1 = New Wave.Wave()
             For Each zre As Wave.Zeitreihe In SimReihen
-                Wave1.Display_Series(zre)
+                Wave1.Import_Series(zre)
             Next
             Call Wave1.Show()
         End If
