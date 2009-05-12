@@ -249,7 +249,8 @@ Public Class Testprobleme
         'Das Problem mit Pseudo-Werten füllen
         ReDim Me.mProblem.List_ObjectiveFunctions(Me.mAnzZiele - 1)
         For i = 0 To Me.mProblem.NumObjectives - 1
-            Me.mProblem.List_ObjectiveFunctions(i) = New Common.Objectivefunktion()
+            'Check_SH: 
+            Me.mProblem.List_ObjectiveFunctions(i) = New Common.Objectivefunction_Value()
             Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective = True
         Next
         ReDim Me.mProblem.List_Constraintfunctions(Me.mAnzConstraints - 1)
@@ -258,7 +259,7 @@ Public Class Testprobleme
         Next
         ReDim Me.mProblem.List_OptParameter(Me.mAnzParameter - 1)
         ReDim Me.mProblem.List_OptParameter_Save(Me.mAnzParameter - 1)
-        For i = 0 To Me.mProblem.NumParams - 1
+        For i = 0 To Me.mProblem.NumOptParams - 1
             Me.mProblem.List_OptParameter(i) = Me.mOptPara(i)
             Me.mProblem.List_OptParameter_Save(i) = Me.mOptPara(i)
         Next
@@ -889,7 +890,7 @@ Public Class Testprobleme
         Dim X() As Double
         Dim f1, f2 As Double
         Dim g1, g2 As Double
-        Dim globalAnzPar As Integer = Me.mProblem.NumParams
+        Dim globalAnzPar As Integer = Me.mProblem.NumOptParams
         Dim serie As Steema.TeeChart.Styles.Series
 
         Select Case Me.selectedTestproblem

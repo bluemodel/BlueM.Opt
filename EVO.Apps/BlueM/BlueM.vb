@@ -32,16 +32,6 @@ Public Class BlueM
     '----
     Private useKWL As Boolean       'gibt an, ob die KWL-Datei benutzt wird
 
-    'IHA
-    '---
-    Public isIHA As Boolean
-    Public IHASys As IHWB.IHA.IHAAnalysis
-    Public IHAProc As IHAProcessor
-
-    'SKos
-    '----
-    Public SKos1 As SKos
-
     '**** Multithreading ****
     Dim MyBlueMThreads() As BlueMThread
     Dim MyThreads() As Thread
@@ -94,7 +84,6 @@ Public Class BlueM
         'Daten belegen
         '-------------
         Me.useKWL = False
-        Me.isIHA = False
 
         'Pfad zu BlueM.DLL bestimmen
         '---------------------------
@@ -137,12 +126,9 @@ Public Class BlueM
 
         Call MyBase.setProblem(prob)
 
-        'SKos instanzieren
-        Me.SKos1 = New SKos(prob)
-
         'BlueM-spezifische Weiterverarbeitung von ZielReihen:
         '====================================================
-        Dim objective As Common.Objectivefunktion
+        Dim objective As Common.ObjectiveFunction
 
         'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
         '------------------------------------------------------------------
@@ -152,49 +138,6 @@ Public Class BlueM
                 Exit For
             End If
         Next
-
-        'IHA
-        '---
-        Dim IHAZielReihe As Wave.Zeitreihe
-        Dim IHAStart, IHAEnde As DateTime
-
-        IHAZielReihe = New Wave.Zeitreihe("new")
-
-        'Gibt es eine IHA-Zielfunktion?
-        'HACK: es wird immer nur das erste IHA-Ziel verwendet!
-        '------------------------------
-        For Each objective In Me.mProblem.List_ObjectiveFunctions
-            If (objective.Typ = "IHA") Then
-                'IHA-Berechnung einschalten
-                Me.isIHA = True
-                IHAZielReihe = objective.RefReihe
-                IHAStart = objective.EvalStart
-                IHAEnde = objective.EvalEnde
-                Exit For
-            End If
-        Next
-
-        'IHA-Berechnung vorbereiten
-        '--------------------------
-        If (Me.isIHA) Then
-            'IHAAnalyse-Objekt instanzieren
-            Me.IHASys = New IHWB.IHA.IHAAnalysis(Me.WorkDir_Original & "IHA\", IHAZielReihe, IHAStart, IHAEnde)
-
-            'IHAProcessor-Objekt instanzieren
-            Me.IHAProc = New IHAProcessor()
-
-            'IHA-Vergleichsmodus?
-            '--------------------
-            Dim reffile As String = Me.WorkDir_Original & Me.Datensatz & ".rva"
-            If (File.Exists(reffile)) Then
-
-                Dim RVABase As New Wave.RVA(reffile, True)
-
-                'Vergleichsmodus aktivieren
-                Call Me.IHAProc.setComparisonMode(RVABase.RVAValues)
-            End If
-
-        End If
 
     End Sub
 
@@ -321,7 +264,7 @@ Public Class BlueM
 
     'Gibt zurück ob ein beliebiger Thread beendet ist und ibt die ID diesen freien Threads zurück
     '********************************************************************************************
-    Public Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
+    Protected Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
         ThreadFree = False
 
         For Each Thr_C As BlueMThread In MyBlueMThreads
@@ -337,7 +280,7 @@ Public Class BlueM
     'BlauesModell ausführen (simulieren)
     'Startet einen neuen Thread und übergibt ihm die Child ID
     '********************************************************
-    Public Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
         launchSim = False
         Dim Folder As String
@@ -355,7 +298,7 @@ Public Class BlueM
 
     'BlueM ohne Thread ausführen
     '***************************
-    Public Overrides Function launchSim() As Boolean
+    Protected Overrides Function launchSim() As Boolean
 
         Dim simOK As Boolean
 
@@ -402,7 +345,7 @@ Public Class BlueM
     'Prüft ob des aktuelle Child mit der ID die oben übergeben wurde fertig ist
     'Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
     '********************************************************************************
-    Public Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
+    Protected Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         ThreadReady = False
 
         For Each Thr_C As BlueMThread In MyBlueMThreads
@@ -422,6 +365,8 @@ Public Class BlueM
     '-------------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
+        'TODO: hier nur die Reihen einlesen, die auch für objfunctions gebraucht werden
+
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
 
@@ -431,7 +376,7 @@ Public Class BlueM
 
         'Reihen zu Simulationsergebnis hinzufügen
         For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
-            Me.SimErgebnis.Add(zre, zre.ToString())
+            Me.SimErgebnis.Reihen.Add(zre.Title, zre)
         Next
 
         'ggf. KWL-Datei einlesen
@@ -444,22 +389,9 @@ Public Class BlueM
 
             'Reihen zu Simulationsergebnis hinzufügen
             For Each zre As Wave.Zeitreihe In KWLtmp.Zeitreihen
-                Me.SimErgebnis.Add(zre, zre.ToString())
+                Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
 
-        End If
-
-        'Bei IHA-Berechnung jetzt IHA-Software ausführen
-        '-----------------------------------------------
-        If (Me.isIHA) Then
-            'IHA-Ziel raussuchen und Simulationsreihe übergeben
-            'HACK: es wird immer das erste IHA-Ziel verwendet!
-            For Each objective As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
-                If (objective.Typ = "IHA") Then
-                    Call Me.IHASys.calculate_IHA(Me.SimErgebnis(objective.SimGr))
-                    Exit For
-                End If
-            Next
         End If
 
     End Sub
@@ -468,73 +400,11 @@ Public Class BlueM
 
 #Region "Qualitätswertberechnung"
 
-    'Berechnung des Qualitätswerts (Zielwert)
-    '****************************************
-    Public Overrides Function CalculateObjective(ByVal objective As Common.Objectivefunktion) As Double
-
-        CalculateObjective = 0
-
-        'Fallunterscheidung Ergebnisdatei
-        '--------------------------------
-        Select Case objective.Datei
-
-            Case "WEL", "KWL"
-                'QWert aus WEL- oder KWL-Datei
-                CalculateObjective = CalculateObjective_WEL(objective)
-
-            Case "PRB"
-                'QWert aus PRB-Datei
-                'BUG 220: PRB geht nicht, weil keine Zeitreihe
-                Throw New Exception("PRB als OptZiel geht z.Zt. nicht (siehe Bug 138)")
-                'CalculateObjective = CalculateObjective_PRB(OptZiel)
-
-            Case Else
-                Throw New Exception("Der Wert '" & objective.Datei & "' für die Datei wird bei Optimierungszielen für BlueM nicht unterstützt!")
-
-        End Select
-
-        'Zielrichtung berücksichtigen
-        CalculateObjective *= objective.Richtung
-
-    End Function
-
-    'Qualitätswert aus WEL-Datei
-    '***************************
-    Private Function CalculateObjective_WEL(ByVal objective As Common.Objectivefunktion) As Double
-
-        Dim objectivevalue As Double
-        Dim SimReihe As Wave.Zeitreihe
-
-        'Simulationsergebnis auslesen
-        SimReihe = Me.SimErgebnis(objective.SimGr).Clone()
-
-        'Fallunterscheidung Zieltyp
-        '--------------------------
-        Select Case objective.Typ
-
-            Case "Wert"
-                objectivevalue = MyBase.CalculateObjective_Wert(objective, SimReihe)
-
-            Case "Reihe"
-                objectivevalue = MyBase.CalculateObjective_Reihe(objective, SimReihe)
-
-            Case "Kosten"
-                objectivevalue = Me.SKos1.Calculate_Costs(Me.WorkDir_Current)
-
-            Case "IHA"
-                objectivevalue = Me.IHAProc.CalculateObjective_IHA(objective, Me.IHASys.RVAResult)
-
-        End Select
-
-        Return objectivevalue
-
-    End Function
-
     'Qualitätswert aus PRB-Datei
-    '***************************
-    Private Function CalculateObjective_PRB(ByVal objective As Common.Objectivefunktion) As Double
+    'BUG 220: PRB geht nicht
+    '***********************
+    Private Function CalculateObjective_PRB(ByVal objective As Common.ObjectiveFunction) As Double
 
-        'BUG 220: PRB geht nicht, weil keine Zeitreihe
         'Dim i As Integer
         'Dim IsOK As Boolean
         'Dim QWert As Double
@@ -591,6 +461,69 @@ Public Class BlueM
         'Next
 
         'Return QWert
+
+    End Function
+
+    'Ein Ergebnis aus einer PRB-Datei einlesen
+    '*****************************************
+    Private Function Read_PRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
+
+    Dim ZeileStart As Integer = 0
+    Dim AnzZeil As Integer = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
+    Dim j As Integer = 0
+    Dim Zeile As String
+        Read_PRB = True
+
+    Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+    Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+    Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+
+    'Array redimensionieren
+        ReDim PRB(AnzZeil - 1, 1)
+
+    'Anfangszeile suchen
+        Do
+            Zeile = StrRead.ReadLine.ToString
+            If (Zeile.Contains("+ Wahrscheinlichkeitskeitsverteilung: " & ZielGr)) Then
+                Exit Do
+            End If
+        Loop Until StrRead.Peek() = -1
+
+    'Zeile mit Spaltenüberschriften überspringen
+        Zeile = StrRead.ReadLine.ToString
+
+        For j = 0 To AnzZeil - 1
+            Zeile = StrRead.ReadLine.ToString()
+            PRB(j, 0) = Convert.ToDouble(Zeile.Substring(2, 10))        'X-Wert
+            PRB(j, 1) = Convert.ToDouble(Zeile.Substring(13, 8))        'P(Jahr)
+        Next
+        StrReadSync.Close()
+        StrRead.Close()
+        FiStr.Close()
+
+    'Überflüssige Stützstellen (P) entfernen
+    '---------------------------------------
+    'Anzahl Stützstellen bestimmen
+    Dim stuetz As Integer = 0
+    Dim P_vorher As Double = -99
+        For j = 0 To PRB.GetUpperBound(0)
+            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
+                stuetz += 1
+                P_vorher = PRB(j, 1)
+            End If
+        Next
+    'Werte in neues Array schreiben
+    Dim PRBtmp(stuetz - 1, 1) As Object
+        stuetz = 0
+        For j = 0 To PRB.GetUpperBound(0)
+            If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
+                PRBtmp(stuetz, 0) = PRB(j, 0)
+                PRBtmp(stuetz, 1) = PRB(j, 1)
+                P_vorher = PRB(j, 1)
+                stuetz += 1
+            End If
+        Next
+        PRB = PRBtmp
 
     End Function
 

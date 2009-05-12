@@ -33,7 +33,7 @@ Public Class Controller
     Private MI_Thread_OK As Boolean = False
 
     'Serien für Monitor
-    Private Line_Dn As Steema.TeeChart.Styles.Line
+    Private Line_Dn() As Steema.TeeChart.Styles.Line
     Private Line_Hypervolume As Steema.TeeChart.Styles.Line
 
 #Region "Methoden"
@@ -133,8 +133,8 @@ Public Class Controller
 
         Dim durchlauf_all As Integer
         Dim isOK() As Boolean
-        Dim Time() As TimeSpan
-        Dim Stoppuhr As New Stopwatch()
+        Dim TimePerGeneration() As TimeSpan
+        Dim OptTimeParaPerGen As New Stopwatch()
 
         'Hypervolumen instanzieren
         Dim Hypervolume As EVO.MO_Indicators.Indicators
@@ -187,14 +187,11 @@ Public Class Controller
         'xxxx Optimierung xxxxxx
         'Generationsschleife CES
         'xxxxxxxxxxxxxxxxxxxxxxx
-        ReDim Time(CES1.mSettings.CES.n_Generations - 1)
+        ReDim TimePerGeneration(CES1.mSettings.CES.n_Generations)
 
         durchlauf_all = 0
 
         For Me.CES_i_gen = 0 To CES1.mSettings.CES.n_Generations - 1
-
-            Stoppuhr.Reset()
-            Stoppuhr.Start()
 
             'HACK: IDs an Individuen vergeben
             For Each ind As EVO.Common.Individuum_CES In CES1.Childs
@@ -202,8 +199,16 @@ Public Class Controller
                 ind.ID = durchlauf_all + 1
             Next
 
+            OptTimeParaPerGen.Reset()
+            OptTimeParaPerGen.Start()
+
             'Individuen mit Multithreading evaluieren
             isOK = Sim1.Evaluate(CES1.Childs, True)
+
+            OptTimeParaPerGen.Stop()
+            EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation " & Me.CES_i_gen & " dauerte:   " & OptTimeParaPerGen.Elapsed.Hours & "h  " & OptTimeParaPerGen.Elapsed.Minutes & "m  " & OptTimeParaPerGen.Elapsed.Seconds & "s     " & OptTimeParaPerGen.Elapsed.Seconds & "ms")
+            TimePerGeneration(Me.CES_i_gen + 1) = OptTimeParaPerGen.Elapsed
+            TimePerGeneration(0) += OptTimeParaPerGen.Elapsed
 
             'Stop?
             If (Me.stopped) Then Exit Sub
@@ -214,11 +219,7 @@ Public Class Controller
                 If (Not isOK(i_Child)) Then
                     Throw New Exception("Der Nachfahre mit der ID.: " & i_Child & " wurde nicht richtig Evaluiert! Die Simulation wurde mit Fehlern abgebrochen")
                 End If
-
                 'erfolgreich evaluierte Individuen wurden bereits über Event verarbeitet
-
-                Stoppuhr.Stop()
-                Time(Me.CES_i_gen) = Stoppuhr.Elapsed
 
             Next
             '^ ENDE der Child Schleife
@@ -302,6 +303,8 @@ Public Class Controller
             End If
         Next
         'Ende der Generationsschleife CES
+
+        EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung aller Generationen dauerte:   " & TimePerGeneration(0).Hours.ToString & "h  " & TimePerGeneration(0).Minutes.ToString & "m  " & TimePerGeneration(0).Seconds.ToString & "s     " & TimePerGeneration(0).Milliseconds.ToString & "ms")
 
         'Falls jetzt noch PES ausgeführt werden soll
         'Starten der PES mit der Front von CES
@@ -482,17 +485,14 @@ Public Class Controller
             Call CES1.Memory_Store(i_Child, Me.CES_i_gen)
         End If
 
-        'Lösung im TeeChart einzeichnen und mittleres Dn ausgeben
-        '========================================================
+        'Lösung im TeeChart einzeichnen und Dn zeichnen
+        '==============================================
         If myProblem.CES_T_Modus = CES_T_MODUS.No_Test Then
             Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Childs(i_Child)))
         Else
             Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, Color.Orange)
         End If
-        'TODO: Me.Label_Dn_Wert.Text = Math.Round(CES1.Childs(i_Child).Get_mean_PES_Dn, 6).ToString
-        If Not CES1.Childs(i_Child).Get_mean_PES_Dn = -1 Then
-            Me.Zeichne_Dn(CES1.Childs(i_Child).ID, CES1.Childs(i_Child).Get_mean_PES_Dn)
-        End If
+        Me.Zeichne_Dn(CES1.Childs(i_Child).ID, CES1.Childs(i_Child))
 
         'Verlauf aktualisieren
         Me.myProgress.iNachf = i_Child + 1
@@ -586,7 +586,7 @@ Public Class Controller
                             Call Testprobleme1.Evaluate(inds(i_Nachf), PES1.PES_iAkt.iAktPop, Me.myHauptDiagramm)
 
                             'Evaluierung verarbeiten
-                            Call processIndividuum_PES(inds(i_Nachf), i_Nachf)
+                            Call Me.processIndividuum_PES(inds(i_Nachf), i_Nachf)
 
                         ElseIf (Not Me.mySettings.General.useMultithreading) Then
 
@@ -705,7 +705,7 @@ Public Class Controller
                         '-----------------------------------
                         Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(PES1.SekundärQb))
                         Call Me.ZeichneNadirpunkt(Hypervolume.nadir)
-                        Call Me.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen, Math.Abs(Hypervolume.calc_indicator()))
+                        Call Me.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen + 1, Math.Abs(Hypervolume.calc_indicator()))
 
                     End If
 
@@ -784,7 +784,7 @@ Public Class Controller
         End If
 
         'Dn in Monitor zeichnen
-        Me.Zeichne_Dn((PES1.PES_iAkt.iAktGen + 1) * Me.mySettings.PES.n_Nachf + iNachfahre + 1, ind.OptParameter(0).Dn)
+        Me.Zeichne_Dn(PES1.PES_iAkt.iAktGen * Me.mySettings.PES.n_Nachf + iNachfahre + 1, ind)
 
         'SELEKTIONSPROZESS Schritt 1
         'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
@@ -808,55 +808,78 @@ Public Class Controller
     ''' </summary>
     Private Sub InitMonitor()
 
-        With Me.myMonitor.Diag
+        'Schrittweite(n)
+        '---------------
+        If (Me.myProblem.Method <> METH_CES) Then
 
-            'Achsen
-            '------
-            'Durchlaufachse
-            .Axes.Bottom.Title.Caption = "Durchlauf"
+            With Me.myMonitor.Diag
 
-            'Schrittweitenachse
-            .Axes.Left.Title.Caption = "Schrittweite"
+                'Durchlaufachse (unten)
+                .Axes.Bottom.Title.Caption = "Durchlauf"
 
-            'Generationsachse (oben)
-            .Axes.Top.Visible = True
-            .Axes.Top.Title.Caption = "Generation"
-            .Axes.Top.Horizontal = True
-            .Axes.Top.Automatic = True
-            .Axes.Top.Grid.Visible = False
+                'Schrittweitenachse (links)
+                .Axes.Left.Title.Caption = "Schrittweite"
 
-            'Hypervolumenachse (rechts)
-            .Axes.Right.Visible = True
-            .Axes.Right.Title.Caption = "Hypervolumen"
-            .Axes.Right.Title.Angle = 90
-            .Axes.Right.Automatic = True
-            .Axes.Right.Grid.Visible = False
+            End With
 
-        End With
+            If (Me.mySettings.PES.Schrittweite.is_DnVektor) Then
 
-        'Linien/Serien
-        '-------------
-        'Dn Verlauf initialisieren
-        Me.Line_Dn = Me.myMonitor.Diag.getSeriesLine("Schrittweite", "Blue")
-        Me.Line_Dn.Pointer.Visible = True
-        Me.Line_Dn.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-        Me.Line_Dn.Pointer.Brush.Color = System.Drawing.Color.Blue
-        Me.Line_Dn.Pointer.HorizSize = 2
-        Me.Line_Dn.Pointer.VertSize = 2
-        Me.Line_Dn.Pointer.Pen.Visible = False
+                'Bei PES-Schrittweitenvektor eine Linie für jeden Parameter
+                ReDim Me.Line_Dn(Me.myProblem.List_OptParameter_Save.Length - 1)
+                For i As Integer = 0 To Me.myProblem.List_OptParameter_Save.Length - 1
+                    Me.Line_Dn(i) = Me.myMonitor.Diag.getSeriesLine("Schrittweite " & Me.myProblem.List_OptParameter_Save(i).Bezeichnung)
+                Next
+            Else
+                'Ansonsten nur eine Linie
+                ReDim Me.Line_Dn(0)
+                Me.Line_Dn(0) = Me.myMonitor.Diag.getSeriesLine("Schrittweite", "Blue")
+            End If
 
-        'Hypervolume-Linie initialisieren
-        Me.Line_Hypervolume = Me.myMonitor.Diag.getSeriesLine("Hypervolumen", "Red")
-        Me.Line_Hypervolume.CustomHorizAxis = Me.myMonitor.Diag.Axes.Top
-        Me.Line_Hypervolume.CustomVertAxis = Me.myMonitor.Diag.Axes.Right
-        Me.Line_Hypervolume.Color = System.Drawing.Color.Red
-        Me.Line_Hypervolume.Pointer.Visible = True
-        Me.Line_Hypervolume.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-        Me.Line_Hypervolume.Pointer.Brush.Color = System.Drawing.Color.Red
-        Me.Line_Hypervolume.Pointer.HorizSize = 2
-        Me.Line_Hypervolume.Pointer.VertSize = 2
-        Me.Line_Hypervolume.Pointer.Pen.Visible = False
+            'Linien formatieren
+            For Each line As Steema.TeeChart.Styles.Line In Me.Line_Dn
+                line.Pointer.Visible = True
+                line.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+                line.Pointer.HorizSize = 2
+                line.Pointer.VertSize = 2
+                line.Pointer.Pen.Visible = False
+            Next
 
+        End if
+
+        'Hypervolumen
+        '------------
+        If (Me.myProblem.NumPrimObjective > 1) Then
+            With Me.myMonitor.Diag
+
+                'Generationsachse (oben)
+                .Axes.Top.Visible = True
+                .Axes.Top.Title.Caption = "Generation"
+                .Axes.Top.Horizontal = True
+                .Axes.Top.Automatic = True
+                .Axes.Top.Grid.Visible = False
+
+                'Hypervolumenachse (rechts)
+                .Axes.Right.Visible = True
+                .Axes.Right.Title.Caption = "Hypervolumen"
+                .Axes.Right.Title.Angle = 90
+                .Axes.Right.Automatic = True
+                .Axes.Right.Grid.Visible = False
+
+            End With
+
+            'Linie
+            Me.Line_Hypervolume = Me.myMonitor.Diag.getSeriesLine("Hypervolumen", "Red")
+            Me.Line_Hypervolume.CustomHorizAxis = Me.myMonitor.Diag.Axes.Top
+            Me.Line_Hypervolume.CustomVertAxis = Me.myMonitor.Diag.Axes.Right
+            Me.Line_Hypervolume.Color = System.Drawing.Color.Red
+            Me.Line_Hypervolume.Pointer.Visible = True
+            Me.Line_Hypervolume.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
+            Me.Line_Hypervolume.Pointer.Brush.Color = System.Drawing.Color.Red
+            Me.Line_Hypervolume.Pointer.HorizSize = 2
+            Me.Line_Hypervolume.Pointer.VertSize = 2
+            Me.Line_Hypervolume.Pointer.Pen.Visible = False
+
+        End If
     End Sub
 
     ''' <summary>
@@ -869,12 +892,53 @@ Public Class Controller
     End Sub
 
     ''' <summary>
-    ''' Schrittweitenwert in Monitordiagramm eintragen
+    ''' Schrittweite(n) in Monitordiagramm eintragen
     ''' </summary>
-    ''' <param name="durchlauf">Durchlaufummer</param>
-    ''' <param name="Dn">Schrittweitenwert</param>
-    Private Sub Zeichne_Dn(ByVal durchlauf As Integer, ByVal Dn As Double)
-        Me.Line_Dn.Add(durchlauf, Dn, durchlauf.ToString())
+    ''' <param name="durchlauf">Durchlaufnummer (für X-Achse)</param>
+    ''' <param name="ind">Individuum, dessen Schrittweite(n) gezeichnet werden sollen</param>
+    Private Sub Zeichne_Dn(ByVal durchlauf As Integer, ByVal ind As Common.Individuum)
+
+        Dim i, j As Integer
+
+        Select Case Me.myProblem.Method
+            Case METH_CES
+                'CES: keine Schrittweite
+                '-----------------------
+
+            Case METH_HYBRID
+                'HYBRID:
+                '-------
+                If (Me.mySettings.PES.Schrittweite.is_DnVektor) Then
+                    'Bei Schrittweitenvektor mehrere Linien
+                    For i = 0 To ind.OptParameter.Length - 1
+                        'Parameter zuordnen
+                        For j = 0 To Me.myProblem.List_OptParameter_Save.Length - 1
+                            If (ind.OptParameter(i).Bezeichnung = Me.myProblem.List_OptParameter_Save(j).Bezeichnung) Then
+                                Me.Line_Dn(j).Add(durchlauf, ind.OptParameter(i).Dn, durchlauf.ToString)
+                                Exit For
+                            End If
+                        Next
+                    Next
+                Else
+                    'Ansonsten nur eine Schrittweite
+                    Me.Line_Dn(0).Add(durchlauf, ind.OptParameter(0).Dn, durchlauf.ToString)
+                End If
+
+            Case METH_PES
+                'PES
+                '---
+                If (Me.mySettings.PES.Schrittweite.is_DnVektor) Then
+                    'Bei Schrittweitenvektor mehrere Linien
+                    For i = 0 To ind.OptParameter.Length - 1
+                        Me.Line_Dn(i).Add(durchlauf, ind.OptParameter(i).Dn, durchlauf.ToString)
+                    Next
+                Else
+                    'Ansonsten nur eine Schrittweite
+                    Me.Line_Dn(0).Add(durchlauf, ind.OptParameter(0).Dn, durchlauf.ToString)
+                End If
+
+        End Select
+
     End Sub
 
     ''' <summary>

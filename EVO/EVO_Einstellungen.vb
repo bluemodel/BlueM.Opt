@@ -725,7 +725,7 @@ Public Class EVO_Einstellungen
                     For Each optpara As Common.OptParameter In Me.mProblem.List_OptParameter
                         Call Me.SensiPlot_ListBox_OptParameter.Items.Add(optpara)
                     Next
-                    For Each objective As Common.Objectivefunktion In Me.mProblem.List_ObjectiveFunctions
+                    For Each objective As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
                         Call Me.SensiPlot_ListBox_Objectives.Items.Add(objective)
                     Next
 

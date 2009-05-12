@@ -83,7 +83,7 @@ namespace modelEAU.DDS
             //Initialize
             //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-            Current_Parameter = new double[this.mProblem.NumParams];
+            Current_Parameter = new double[this.mProblem.NumOptParams];
             DDS = new modelEAU.DDS.DDS();
 
             if (this.mProblem.List_ObjectiveFunctions[0].Richtung == IHWB.EVO.Common.Constants.EVO_RICHTUNG.Maximierung)
@@ -95,9 +95,9 @@ namespace modelEAU.DDS
                 DDS.to_max = 1.0;
             }
 
-            Ini_Parameter = new double[this.mProblem.NumParams];
+            Ini_Parameter = new double[this.mProblem.NumOptParams];
 
-            for (i = 0; i < this.mProblem.NumParams; i++)
+            for (i = 0; i < this.mProblem.NumOptParams; i++)
             {
                 if (this.mProblem.List_OptParameter[i].Xn < 0 | this.mProblem.List_OptParameter[i].Xn > 1)
                 {
@@ -109,12 +109,12 @@ namespace modelEAU.DDS
             if (this.mSettings.DDS.optStartparameter)
             {
                 //Zufällige Startparameter
-                DDS.initialize(this.mSettings.DDS.r_val, this.mSettings.DDS.maxiter, this.mProblem.NumParams);
+                DDS.initialize(this.mSettings.DDS.r_val, this.mSettings.DDS.maxiter, this.mProblem.NumOptParams);
             }
             else
             {
                 //Vorgegebene Startparameter
-                DDS.initialize(this.mSettings.DDS.r_val, this.mSettings.DDS.maxiter, this.mProblem.NumParams, Ini_Parameter);
+                DDS.initialize(this.mSettings.DDS.r_val, this.mSettings.DDS.maxiter, this.mProblem.NumOptParams, Ini_Parameter);
             }
 
             //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
