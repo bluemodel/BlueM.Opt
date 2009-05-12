@@ -738,7 +738,7 @@ Public Class OptResult
 
                 'OptParameter
                 '------------
-                For j = 0 To Me.mProblem.NumParams - 1
+                For j = 0 To Me.mProblem.NumOptParams - 1
                     .OptParameter(j) = Me.mProblem.List_OptParameter_Save(j).Clone()
                     .OptParameter(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
                 Next

@@ -68,9 +68,9 @@ Public MustInherit Class Individuum
             Dim i As Integer
             Dim Xn() As Double
 
-            ReDim Xn(Individuum.mProblem.NumParams - 1)
+            ReDim Xn(Individuum.mProblem.NumOptParams - 1)
 
-            For i = 0 To Individuum.mProblem.NumParams - 1
+            For i = 0 To Individuum.mProblem.NumOptParams - 1
                 Xn(i) = Me.OptParameter(i).Xn
             Next
 
@@ -80,7 +80,7 @@ Public MustInherit Class Individuum
         Set(ByVal values As Double())
 
             'Prüfung: Anzahl Parameter
-            If (values.Length <> Individuum.mProblem.NumParams) Then
+            If (values.Length <> Individuum.mProblem.NumOptParams) Then
                 Throw New Exception("Falsche Anzahl Parameter übergeben!")
             End If
 
@@ -93,7 +93,7 @@ Public MustInherit Class Individuum
 
             Dim i As Integer
 
-            For i = 0 To Individuum.mProblem.NumParams - 1
+            For i = 0 To Individuum.mProblem.NumOptParams - 1
                 Me.OptParameter(i).Xn = values(i)
             Next
 
@@ -108,9 +108,9 @@ Public MustInherit Class Individuum
             Dim i As Integer
             Dim RWerte() As Double
 
-            ReDim RWerte(Individuum.mProblem.NumParams - 1)
+            ReDim RWerte(Individuum.mProblem.NumOptParams - 1)
 
-            For i = 0 To Individuum.mProblem.NumParams - 1
+            For i = 0 To Individuum.mProblem.NumOptParams - 1
                 RWerte(i) = Me.OptParameter(i).RWert
             Next
 
@@ -120,13 +120,13 @@ Public MustInherit Class Individuum
         Set(ByVal values As Double())
 
             'Prüfung: Anzahl Parameter
-            If (values.Length <> Individuum.mProblem.NumParams) Then
+            If (values.Length <> Individuum.mProblem.NumOptParams) Then
                 Throw New Exception("Falsche Anzahl Parameter übergeben!")
             End If
 
             Dim i As Integer
 
-            For i = 0 To Individuum.mProblem.NumParams - 1
+            For i = 0 To Individuum.mProblem.NumOptParams - 1
                 Me.OptParameter(i).RWert = values(i)
             Next
 

@@ -28,7 +28,7 @@ Public Class BlueMThread
         Me.launchReady = False
 
         'Priority
-        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.BelowNormal
+        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
         Try
             'Datensatz übergeben und initialisieren

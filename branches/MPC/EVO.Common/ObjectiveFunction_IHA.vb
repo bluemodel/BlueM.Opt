@@ -1,31 +1,67 @@
-Public Class IHAProcessor
+ï»¿'***************************************************************************************
+'***************************************************************************************
+'**** Klasse IHAProcessor zur Verarbeitung von Ergebnissen von IHA-Analysen         ****
+'****                                                                               ****
+'**** Autoren: Felix Froehlich                                                      ****
+'****                                                                               ****
+'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung                      ****
+'**** TU Darmstadt                                                                  ****
+'***************************************************************************************
+'***************************************************************************************
+Imports System.IO
 
-    '***************************************************************************************
-    '***************************************************************************************
-    '**** Klasse IHAProcessor zur Verarbeitung von Ergebnissen von IHA-Analysen         ****
-    '****                                                                               ****
-    '**** Autoren: Felix Froehlich                                                      ****
-    '****                                                                               ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung                      ****
-    '**** TU Darmstadt                                                                  ****
-    '***************************************************************************************
-    '***************************************************************************************
+Public Class ObjectiveFunction_IHA
+    Inherits ObjectiveFunction
 
 #Region "Eigenschaften"
 
     'Eigenschaften
     '#############
 
+    ''' <summary>
+    ''' Der Dateiname der Referenzreihe
+    ''' </summary>
+    ''' <remarks>Pfadangabe relativ zum Datensatz</remarks>
+    Public RefReiheDatei As String
+
+    ''' <summary>
+    ''' Zu verwendender Spaltenname falls Referenzreihe eine .WEL Datei ist
+    ''' </summary>
+    Public RefGr As String
+
+    ''' <summary>
+    ''' Die Referenzreihe
+    ''' </summary>
+    Public RefReihe As Wave.Zeitreihe
+
     Public Structure Struct_RVAfx                       'Structure zum Speichern der fx Werte eines RVA-Ergebnisses
         Dim All_Avg_fx As Double
         Dim PGroup_Avg_fx() As Double
     End Structure
 
+    'Vergleichsmodus
     Public isComparison As Boolean                      'Vergleich von IHA-Ergebnissen?
-    Public RVABase As Wave.RVA.Struct_RVAValues         'RVA-Basiswerte für den Vergleich
-    Private RVAfxBase As Struct_RVAfx                   'fx-Basiswerte für den Vergleich
+    Public RVABase As Wave.RVA.Struct_RVAValues         'RVA-Basiswerte fÃ¼r den Vergleich
+    Private RVAfxBase As Struct_RVAfx                   'fx-Basiswerte fÃ¼r den Vergleich
+
+    'IHA
+    '---
+    Public IHASys As IHWB.IHA.IHAAnalysis
 
 #End Region 'Eigenschaften
+
+#Region "Properties"
+
+    ''' <summary>
+    ''' Returns the type of the ObjectiveFunction
+    ''' </summary>
+    Public Overrides ReadOnly Property GetObjType() As ObjectiveType
+        Get
+            Return ObjectiveType.IHA
+        End Get
+    End Property
+
+#End Region 'Properties
 
 #Region "Methoden"
 
@@ -40,9 +76,27 @@ Public Class IHAProcessor
 
     End Sub
 
+    Public Sub initialize(ByVal workdir As String, ByVal datensatz As String, ByVal start As DateTime, ByVal ende As DateTime)
+
+        'IHAAnalyse-Objekt instanzieren
+        Me.IHASys = New IHWB.IHA.IHAAnalysis(workdir & "IHA\", Me.RefReihe, start, ende)
+
+        'IHA-Vergleichsmodus?
+        '--------------------
+        Dim reffile As String = workdir & datensatz & ".rva"
+        If (File.Exists(reffile)) Then
+
+            Dim RVABase As New Wave.RVA(reffile, True)
+
+            'Vergleichsmodus aktivieren
+            Call Me.setComparisonMode(RVABase.RVAValues)
+        End If
+
+    End Sub
+
     'IHA-Processor Modus auf Vergleich von IHA-Analysen setzen
     '*********************************************************
-    Public Sub setComparisonMode(ByVal RVAResultBase As Wave.RVA.Struct_RVAValues)
+    Private Sub setComparisonMode(ByVal RVAResultBase As Wave.RVA.Struct_RVAValues)
 
         Me.isComparison = True
 
@@ -54,11 +108,20 @@ Public Class IHAProcessor
 
     'QWert aus IHA-Ergebnissen berechnen
     '***********************************
-    Public Function CalculateObjective_IHA(ByVal OptZiel As Common.Objectivefunktion, ByVal RVAResult As Wave.RVA.Struct_RVAValues) As Double
+    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
 
         Dim featurevalue As Double
+        Dim SimReihe As Wave.Zeitreihe
         Dim i As Integer
         Dim RVAfx As Struct_RVAfx
+        Dim RVAResult As Wave.RVA.Struct_RVAValues
+
+        'SimReihe aus SimErgebnis rausholen
+        SimReihe = SimErgebnis.Reihen(Me.SimGr).Clone()
+
+        'RVA-Berechnung durchfÃ¼hren
+        Call Me.IHASys.calculate_IHA(SimReihe)
+        RVAResult = Me.IHASys.RVAResult
 
         'fx-Werte berechnen
         '------------------
@@ -71,14 +134,14 @@ Public Class IHAProcessor
                 '========================
                 Dim fx As Double
 
-                If (OptZiel.Funktion = "") Then
+                If (Me.Funktion = "") Then
                     'fx(HA) Gesamtmittelwert
                     fx = RVAfx.All_Avg_fx
 
                 Else
                     'fx(HA) Mittelwert einer Parametergruppe
                     For i = 0 To RVAResult.NGroups - 1
-                        If (OptZiel.Funktion = RVAResult.IHAParamGroups(i).GName) Then
+                        If (Me.Funktion = RVAResult.IHAParamGroups(i).GName) Then
                             fx = RVAfx.PGroup_Avg_fx(i)
                             Exit For
                         End If
@@ -92,13 +155,13 @@ Public Class IHAProcessor
                 '=============
                 Dim diff As Double
 
-                If (OptZiel.Funktion = "") Then
+                If (Me.Funktion = "") Then
                     'fx(HA) Gesamtmittelwert
                     diff = RVAfx.All_Avg_fx - Me.RVAfxBase.All_Avg_fx
                 Else
                     'fx(HA) Mittelwert einer Parametergruppe
                     For i = 0 To RVAResult.NGroups - 1
-                        If (OptZiel.Funktion = RVAResult.IHAParamGroups(i).GName) Then
+                        If (Me.Funktion = RVAResult.IHAParamGroups(i).GName) Then
                             diff = RVAfx.PGroup_Avg_fx(i) - Me.RVAfxBase.PGroup_Avg_fx(i)
                             Exit For
                         End If
@@ -109,11 +172,14 @@ Public Class IHAProcessor
 
         End Select
 
+        'Zielrichtung berÃ¼cksichtigen
+        featurevalue *= Me.Richtung
+
         Return featurevalue
 
     End Function
 
-    'fx-Werte für ein RVA-Ergebnis berechnen
+    'fx-Werte fÃ¼r ein RVA-Ergebnis berechnen
     '***************************************
     Private Shared Function calcfx(ByVal RVAResult As Wave.RVA.Struct_RVAValues) As Struct_RVAfx
 
@@ -125,22 +191,22 @@ Public Class IHAProcessor
         ReDim RVAfx.PGroup_Avg_fx(RVAResult.NGroups - 1)
 
         All_Sum_fx = 0
-        'Schleife über Parametergruppen
+        'Schleife Ã¼ber Parametergruppen
         For i = 0 To RVAResult.NGroups - 1
 
             PGroup_Sum_fx(i) = 0
-            'Schleife über Parameter
+            'Schleife Ã¼ber Parameter
             For j = 0 To RVAResult.IHAParamGroups(i).NParams - 1
                 PGroup_Sum_fx(i) += fx(RVAResult.IHAParamGroups(i).IHAParams(j).HAMiddle)
             Next
 
-            'Mittelwert für eine Parametergruppe
+            'Mittelwert fÃ¼r eine Parametergruppe
             RVAfx.PGroup_Avg_fx(i) = PGroup_Sum_fx(i) / RVAResult.IHAParamGroups(i).NParams
 
             All_Sum_fx += RVAfx.PGroup_Avg_fx(i)
         Next
 
-        'Mittelwert über alle Parametergruppen
+        'Mittelwert Ã¼ber alle Parametergruppen
         RVAfx.All_Avg_fx = All_Sum_fx / RVAResult.NGroups
 
         Return RVAfx
@@ -151,7 +217,7 @@ Public Class IHAProcessor
     '***************************************************************************************
     Private Shared Function fx(ByVal HA As Double) As Double
 
-        'Parameter für Normalverteilung mit fx(0) ~= 1 und fx(-1) = fx(1) ~= 0
+        'Parameter fÃ¼r Normalverteilung mit fx(0) ~= 1 und fx(-1) = fx(1) ~= 0
         '[EXCEL:] 1/(std*WURZEL(2*PI()))*EXP(-1/2*((X-avg)/std)^2)
         Dim std As Double = 0.398942423706863                   'Standardabweichung
         Dim avg As Double = 0                                   'Erwartungswert

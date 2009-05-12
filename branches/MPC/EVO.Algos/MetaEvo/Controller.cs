@@ -191,9 +191,9 @@ namespace IHWB.EVO.MetaEvo
             //Für jedes Individuum durchgehen
             for (int k = 0; k < this.settings.MetaEvo.PopulationSize; k++)
             {
-                random = new double[this.prob.NumParams];
+                random = new double[this.prob.NumOptParams];
                 //Für jeden Parameter durchgehen
-                for (int j = 0; j < this.prob.NumParams; j++)
+                for (int j = 0; j < this.prob.NumOptParams; j++)
                 {
                     double max = this.prob.List_OptParameter[j].Max;
                     double min = this.prob.List_OptParameter[j].Min;

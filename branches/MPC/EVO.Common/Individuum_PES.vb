@@ -30,7 +30,7 @@
         Dim i As Integer
 
         'Parameterarray für PES
-        ReDim Me.mOptParas(Individuum.mProblem.NumParams - 1)
+        ReDim Me.mOptParas(Individuum.mProblem.NumOptParams - 1)
         For i = 0 To Me.mOptParas.GetUpperBound(0)
             Me.mOptParas(i) = New OptParameter()
         Next
