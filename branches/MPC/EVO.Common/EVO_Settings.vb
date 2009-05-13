@@ -288,6 +288,8 @@ Public Class EVO_Settings
     End Structure
 
     Public Structure MPC_Settings
+        Public Problempfad As String        'Pfad zum Problem
+        Public Problemname As String        'Dateiname des Problems
         Public Ausgabepfad As String        'In welchem Ordner die Ausgaben erzeugt werden sollen
         Public Schrittweite As Integer      'In welchen Abständen die Eingaben betrachtet werden sollen (Minuten)
         Public MPC_Round As Integer         'Wie oft MPC schon gelaufen ist
