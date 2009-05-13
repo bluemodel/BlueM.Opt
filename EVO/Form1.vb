@@ -48,7 +48,7 @@ Partial Public Class Form1
 
     'Apps
     Private Testprobleme1 As EVO.Apps.Testprobleme
-    Private WithEvents Sim1 As EVO.Apps.Sim
+    Public WithEvents Sim1 As EVO.Apps.Sim
     Private TSP1 As EVO.Apps.TSP
 
     'Controller
@@ -78,7 +78,6 @@ Partial Public Class Form1
     'Form1 laden
     '***********
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
-
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
 
