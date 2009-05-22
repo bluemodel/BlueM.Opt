@@ -298,10 +298,14 @@ Public Class SWMM
         'BUG 414: TODO: Objectives durchgehen und erforderliche Werte
         'in SimErgebnis speichern
 
-        Dim FFreqEast As Double, FFreqGath As Double, FFreqWest As Double
-        Dim AvgFEast As Double, AvgFGath As Double, AvgFWest As Double
+        Dim FFreqEast As Double, FFreqWest As Double
+        Dim AvgFEast As Double, AvgFWest As Double
+        Dim tmpDbl As Double, tmpStr As String
         Dim DateiPfad As String
         Dim Zeile As String
+
+        'Altes Simulationsergebnis löschen
+        Me.SimErgebnis.Clear()
 
         DateiPfad = WorkDir_Current & Datensatz & ".RPT"
 
@@ -325,7 +329,8 @@ Public Class SWMM
                         Exit Do
                     End If
                 Loop Until StrRead.Peek() = -1
-                'QWert = (FFreqEast * AvgFEast) + (FFreqWest * AvgFWest)
+                tmpDbl = (FFreqEast * AvgFEast) + (FFreqWest * AvgFWest)
+                Me.SimErgebnis.Werte.Add("System", tmpDbl)
                 Exit Do
             End If
         Loop Until StrRead.Peek() = -1
