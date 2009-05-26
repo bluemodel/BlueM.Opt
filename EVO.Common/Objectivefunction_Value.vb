@@ -39,7 +39,7 @@
         Dim QWert As Double
 
         'SimWert aus SimErgebnis rausholen
-        SimWert = SimErgebnis.Werte(Me.SimGr)
+        SimWert = SimErgebnis.Werte(Me.Bezeichnung)
 
         'Wertevergleich ausführen
         QWert = ObjectiveFunction.compareValues(SimWert, Me.RefWert, Me.Funktion)
