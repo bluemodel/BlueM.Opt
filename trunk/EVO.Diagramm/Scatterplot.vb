@@ -401,8 +401,6 @@ Partial Public Class Scatterplot
 
                 With Me.Diags(i, j)
 
-                    AddHandler .DoubleClick, AddressOf Me.ShowEditor
-
                     'Diagramm formatieren
                     '====================
                     .Header.Visible = False
