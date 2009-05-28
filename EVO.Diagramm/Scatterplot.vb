@@ -186,8 +186,6 @@ Partial Public Class Scatterplot
 
                 With Me.Diags(i, j)
 
-                    AddHandler .DoubleClick, AddressOf Me.ShowEditor
-
                     'Diagramm formatieren
                     '====================
                     .Header.Visible = False
@@ -559,14 +557,6 @@ Partial Public Class Scatterplot
         For i = 1 To Me.dimension
             Me.matrix.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100 / Me.dimension))
         Next
-
-    End Sub
-
-    'Ruft bei Doppelklick auf Diagramm den TeeChart Editor auf
-    '*********************************************************
-    Private Sub ShowEditor(ByVal sender As Object, ByVal e As System.EventArgs)
-
-        Call sender.ShowEditor()
 
     End Sub
 
