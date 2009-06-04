@@ -40,8 +40,9 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="TeeChart, Version=3.5.3371.26406, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
+    <Reference Include="TeeChart, Version=4.0.2009.16184, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>Resources\TeeChart.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -97,7 +98,6 @@
       <DependentUpon>Monitor.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
@@ -126,7 +126,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\monitor.ico" />
-    <Content Include="Resources\TeeChart.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EVO.Common\EVO.Common.vbproj">
@@ -137,6 +136,9 @@
       <Project>{A7B7B98D-94BE-47DB-954F-BBA2C1F53663}</Project>
       <Name>EVO.OptResult</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\TeeChart.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
