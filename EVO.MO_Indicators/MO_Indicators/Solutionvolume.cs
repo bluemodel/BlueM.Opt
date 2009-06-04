@@ -7,24 +7,26 @@ namespace IHWB.EVO.MO_Indicators
 {
     public class Solutionvolume
     {
+        public System.Collections.Specialized.StringCollection messages;
+
         double[] solutionvolume; 
         int historylength;    //Anzahl der Generationen die zum Vergleich herangenommen werden
         double[] basepoint;   //Basiswert von dem aus die Distanzquadrate berechnet werden
         double minimumchange = -1;  //Minimaler Änderungswert über |historylength| generationen
-        EVO.Diagramm.Monitor monitor1;
 
         public Solutionvolume(int historylength_input)
         {
             historylength = historylength_input;
             solutionvolume = new double[historylength];
+            messages = new System.Collections.Specialized.StringCollection();
         }
 
-        public Solutionvolume(int historylength_input, double minimumchange_input, ref EVO.Diagramm.Monitor monitor_input)
+        public Solutionvolume(int historylength_input, double minimumchange_input)
         {
             historylength = historylength_input;
             solutionvolume = new double[historylength];
             minimumchange = minimumchange_input;
-            monitor1 = monitor_input;
+            messages = new System.Collections.Specialized.StringCollection();
         }
 
         public double get_last_volume() 
@@ -67,6 +69,7 @@ namespace IHWB.EVO.MO_Indicators
         public bool calculate_and_decide(ref EVO.Common.Individuum_MetaEvo[] generation)
         {
             double sum = 0;
+            this.messages.Clear();
 
             calculate(ref generation);
             
@@ -74,7 +77,7 @@ namespace IHWB.EVO.MO_Indicators
             //die gegebene Anzahl an zu vergleichenden solutionvolumes schon einmal berechnet wurden
             if ((minimumchange != -1) && (solutionvolume[historylength-1] != 0))
             {
-                monitor1.LogAppend("Algo Manager: Solutionvolume: Actual change: " + Math.Round(((solutionvolume[1] / solutionvolume[0]) - 1) * 100, 2) + "% during last generation"); 
+                this.messages.Add("Algo Manager: Solutionvolume: Actual change: " + Math.Round(((solutionvolume[1] / solutionvolume[0]) - 1) * 100, 2) + "% during last generation"); 
 
                 for (int i = 0; i < solutionvolume.Length - 1; i++)
                 {
@@ -84,8 +87,8 @@ namespace IHWB.EVO.MO_Indicators
 
                 if (sum < minimumchange)
                 {
-                    monitor1.LogAppend("Algo Manager: Solutionvolume: Less than " + Math.Round(minimumchange * 100, 2) + "% (" + Math.Round(sum, 2) + "%) change during last " + historylength + " generations");
-                    monitor1.LogAppend("Algo Manager: Solutionvolume: [0]:" + solutionvolume[0] + " [1]:" + solutionvolume[1] + " [2]:" + solutionvolume[2] + "[3]:" + solutionvolume[3] + " [4]:" + solutionvolume[4]); 
+                    this.messages.Add("Algo Manager: Solutionvolume: Less than " + Math.Round(minimumchange * 100, 2) + "% (" + Math.Round(sum, 2) + "%) change during last " + historylength + " generations");
+                    this.messages.Add("Algo Manager: Solutionvolume: [0]:" + solutionvolume[0] + " [1]:" + solutionvolume[1] + " [2]:" + solutionvolume[2] + "[3]:" + solutionvolume[3] + " [4]:" + solutionvolume[4]); 
                     return true;
                 }
             }

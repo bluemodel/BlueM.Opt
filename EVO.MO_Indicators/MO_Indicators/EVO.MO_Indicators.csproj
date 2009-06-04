@@ -39,10 +39,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="TeeChart, Version=3.5.3371.26406, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EVO.Diagramm\Resources\TeeChart.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Hypervolume.cs" />
@@ -56,10 +52,6 @@
     <ProjectReference Include="..\..\EVO.Common\EVO.Common.vbproj">
       <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
       <Name>EVO.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\EVO.Diagramm\EVO.Diagramm.vbproj">
-      <Project>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</Project>
-      <Name>EVO.Diagramm</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
