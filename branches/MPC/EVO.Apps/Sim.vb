@@ -424,6 +424,8 @@ Public MustInherit Class Sim
 
         Dim isOK As Boolean
 
+        'MessageBox.Show(Me.mProblem.Method())
+
         isOK = False
 
         'Simulation vorbereiten
