@@ -607,7 +607,7 @@ Partial Public Class Form1
             '-------------------------------------------
             Me.Label_Methode.Enabled = True
             Me.ComboBox_Methode.Enabled = True
-            Me.mSettings.General.Method = "" 'Fehler für MPC ??
+            'Me.mSettings.General.Method = "" 'Fehler für MPC wenn auf "" gesetzt - alternativ settings noch einmal nach INI_Datensatz_ohneEvent() im MPC-Controller neu setzen
 
             'Progress zurücksetzen
             Call Me.mProgress.Initialize()
@@ -633,7 +633,7 @@ Partial Public Class Form1
 
         Else
 
-            Try
+            Try  ' "fehler beim setzen der methode: Die Eingabezeichenfolge hat das falsche Format" nach swmm fehler 68
 
                 'Mauszeiger busy
                 Cursor = Cursors.WaitCursor
