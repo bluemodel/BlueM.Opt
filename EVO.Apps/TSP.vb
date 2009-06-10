@@ -31,9 +31,7 @@ Public Class TSP
     Private n_Childs As Integer = 15
 
     Private ReprodOperator_TSP As String = "Order_Crossover_OX"
-    Private ReprodOperator_BM As String = "Select_Random_Uniform"
-    Private MutOperator_TSP As String = "Translocation"
-    Private MutOperator_BM As String = "Random_Switch"
+    Private MutOperator_TSP As String = "Exchange_Mutation_EM"
     Private Strategy As String = "plus" '"plus" oder "minus" Strategie
 
     '************************************* Struktur *****************************
@@ -411,28 +409,28 @@ Public Class TSP
         Dim i As Integer
 
         Select Case MutOperator_TSP
-            Case "Inversion"
+            Case "Inversion_SIM"
                 For i = 0 To n_Childs - 1
-                    Call MutOp_Inversion(ChildList(i).Path)
+                    Call MutOp_SIM(ChildList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
-            Case "Translocation"
+            Case "Translocation_3_Opt"
                 For i = 0 To n_Childs - 1
-                    Call MutOp_Translocation(ChildList(i).Path)
+                    Call MutOp_3_opt(ChildList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
-            Case "Transposition"
+            Case "Exchange_Mutation_EM"
                 For i = 0 To n_Childs - 1
-                    Call MutOp_Transposition(ChildList(i).Path)
+                    Call MutOp_EM(ChildList(i).Path)
                 Next
         End Select
 
     End Sub
 
-    'Mutationsoperator "Inversion"
+    'Mutationsoperator "Inversion (SIM)"
     'Schneidet ein Segment aus dem Path heraus und fügt es invers wieder ein
     'UPGRADE: Wird bis jetzt nur auf den mittleren Teil angewendet
-    Private Sub MutOp_Inversion(ByVal Path() As Integer)
+    Private Sub MutOp_SIM(ByVal Path() As Integer)
         Dim i As Integer
         Dim x As Integer
 
@@ -456,10 +454,10 @@ Public Class TSP
 
     End Sub
 
-    'Mutationsoperator "Translocation"
+    'Mutationsoperator "Translocation (3-Opt"
     'Vertauscht zufällig 3 Abschnitte aus dem String und verwendet Bernoulli verteilt die Inverse
     'UPGRADE: Jetzt werden immer 3 Translocation durchgeführt könnte man auf n-Ausbauen
-    Private Sub MutOp_Translocation(ByVal Path() As Integer)
+    Private Sub MutOp_3_opt(ByVal Path() As Integer)
         Dim i, j As Integer
         Dim x As Integer
         Dim tmp As Integer
@@ -518,11 +516,11 @@ Public Class TSP
 
     End Sub
 
-    'Mutationsoperator "Transposition"
+    'Mutationsoperator "Exchange Mutation (EM)"
     'Vertauscht n-mal zwei Werte innerhalb des Paths
-    Private Sub MutOp_Transposition(ByVal Path() As Integer)
+    Private Sub MutOp_EM(ByVal Path() As Integer)
         Dim i As Integer
-        Dim TransRate As Integer = 4             'Transpositionsrate in Prozent(!Achtung keine echte "Rate"!)
+        Dim TransRate As Integer = 4               'Transpositionsrate in Prozent(!Achtung keine echte "Rate"!)
         Dim n_trans As Integer                     'Anzahl der Transpositionen
         Dim Point1, Point2 As Integer
         Dim Swap As Integer
