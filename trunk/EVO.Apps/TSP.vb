@@ -22,13 +22,13 @@ Public Class TSP
     'LB + UB n=2   x         x
 
     'Public Variablen
-    Public n_Cities As Integer = 80
+    Public n_Cities As Integer = 70
     Public ListOfCities(,) As Object
-    Public n_Gen As Integer = 30000
+    Public n_Gen As Integer = 10000
 
     'Private Variablen
     Private n_Parents As Integer = 5
-    Private n_Childs As Integer = 15
+    Public n_Childs As Integer = 20
 
     Private ReprodOperator_TSP As String = "Order_Crossover_OX"
     Private MutOperator_TSP As String = "Translocation_3_Opt"
