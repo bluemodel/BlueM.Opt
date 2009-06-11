@@ -996,7 +996,7 @@ Partial Class Form1
         Dim gen As Integer
 
         'Intervall zum Updaten des Diagramms
-        Dim increm As Integer = 1000
+        Dim increm As Integer = 100
         Dim jepp As Integer = 0
 
         'BUG 212: Nach Klasse Diagramm auslagern!
@@ -1008,6 +1008,9 @@ Partial Class Form1
 
         'Zufällige Kinderpfade werden generiert
         Call TSP1.Generate_Random_Path_TSP()
+
+        'Progress
+        mProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
 
         'Generationsschleife
         For gen = 1 To TSP1.n_Gen
@@ -1030,6 +1033,7 @@ Partial Class Form1
                 Call TSP1.TeeChart_Zeichnen_TSP(Me.Hauptdiagramm1, TSP1.ParentList(0).Image)
                 Me.Hauptdiagramm1.Update()
                 jepp += increm
+                mProgress.iGen() = gen
             End If
 
             'Kinder werden Hier vollständig gelöscht
