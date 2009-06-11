@@ -995,6 +995,10 @@ Partial Class Form1
         'Laufvariable für die Generationen
         Dim gen As Integer
 
+        'Intervall zum Updaten des Diagramms
+        Dim increm As Integer = 1000
+        Dim jepp As Integer = 0
+
         'BUG 212: Nach Klasse Diagramm auslagern!
         Call TSP1.TeeChart_Initialise_TSP(Me.Hauptdiagramm1)
 
@@ -1022,8 +1026,10 @@ Partial Class Form1
 
             'Zeichnen des besten Elter
             'TODO: funzt nur, wenn ganz am ende gezeichnet wird
-            If gen = TSP1.n_Gen Then
+            If gen >= jepp Then
                 Call TSP1.TeeChart_Zeichnen_TSP(Me.Hauptdiagramm1, TSP1.ParentList(0).Image)
+                Me.Hauptdiagramm1.Update()
+                jepp += increm
             End If
 
             'Kinder werden Hier vollständig gelöscht

@@ -22,7 +22,7 @@ Public Class TSP
     'LB + UB n=2   x         x
 
     'Public Variablen
-    Public n_Cities As Integer = 100
+    Public n_Cities As Integer = 80
     Public ListOfCities(,) As Object
     Public n_Gen As Integer = 30000
 
@@ -31,7 +31,7 @@ Public Class TSP
     Private n_Childs As Integer = 15
 
     Private ReprodOperator_TSP As String = "Order_Crossover_OX"
-    Private MutOperator_TSP As String = "Exchange_Mutation_EM"
+    Private MutOperator_TSP As String = "Translocation_3_Opt"
     Private Strategy As String = "plus" '"plus" oder "minus" Strategie
 
     '************************************* Struktur *****************************
@@ -684,14 +684,18 @@ Public Class TSP
             TChart1.Series(0).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
         Next
 
+        'Zeichnen der einzelnen Verbindungen
+        'Es werden einzelne Serien verwendet, da die Werte gerne mal der X-Achse entsprechend sortiert werden
+        TChart1.Series(1).Clear()
+        For i = 1 To n_Cities - 1
+            TChart1.Series(i + 1).Clear()
+            TChart1.Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), Drawing.Color.Blue)
+            TChart1.Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), Drawing.Color.Blue)
+        Next
+
         'Zeichnen der Verbindung von der ersten bis zur letzten Stadt
         TChart1.Series(1).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
         TChart1.Series(n_Cities).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
-
-        For i = 1 To n_Cities - 1
-            TChart1.Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
-            TChart1.Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
-        Next
 
     End Sub
 
