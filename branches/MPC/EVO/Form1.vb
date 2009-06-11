@@ -838,9 +838,6 @@ Partial Public Class Form1
 
     Public Sub STARTEN_Button_Click_ohneEvent()
 
-        'Event für MPC auslösen
-        RaiseEvent Startbuttonpressed()
-
         'Stoppuhr
         Dim AllOptTime As New Stopwatch
         AllOptTime.Start()
@@ -902,11 +899,15 @@ Partial Public Class Form1
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
 
-            If ((Not Me.mSettings.General.useMPC) Or (Me.mSettings.MPC.MPC_Round = 0)) Then
+            'Settings-Weiche für MPC
+            If (Not Me.mSettings.General.useMPC) Then
                 Call Me.EVO_Einstellungen1.readForm()
-                'Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml") #MPC#
+            ElseIf ((Me.mSettings.General.useMPC) And (Me.mSettings.MPC.MPC_Round = 0)) Then
+                Call Me.EVO_Einstellungen1.readForm()
+
+                'Event für MPC auslösen
+                RaiseEvent Startbuttonpressed()
             End If
-            
 
             'EVO_Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()
@@ -1004,14 +1005,15 @@ Partial Public Class Form1
             Me.Button_Start.Enabled = False
             Me.Button_Stop.Enabled = False
 
+            'Ausgabe der Optimierungszeit
+            AllOptTime.Stop()
+
             If (Me.mSettings.General.useMPC) Then
                 'Event für MPC auslösen 
                 RaiseEvent OptimisationReady()
             Else
-            	'Ausgabe der Optimierungszeit
-            	AllOptTime.Stop()
-            	'MsgBox("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
-            	EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms")
+                'MsgBox("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
+                EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms")
             End If
 
         End If
