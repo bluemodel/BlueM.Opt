@@ -21,7 +21,7 @@ Public Class TSP
     'CutPoint:     1 2 3 4 5 6
     'LB + UB n=2   x         x
 
-    Public n_Cities As Integer = 70
+    Public n_Cities As Integer = 100
     Public ListOfCities(,) As Object
     Public n_Gen As Integer = 10000
     Public n_Parents As Integer = 5
@@ -29,14 +29,14 @@ Public Class TSP
 
     Public circumference As Double 'Kreisumfang
 
-    Private ReprodOperator As EnReprodOperator = EnReprodOperator.Order_Crossover_OX
+    Private ReprodOperator As EnReprodOperator = EnReprodOperator.Partially_Mapped_Crossover_PMX
     Enum EnReprodOperator
         Order_Crossover_OX = 1
         Partially_Mapped_Crossover_PMX = 2
         Select_Random_Uniform_SRU = 3
     End Enum
 
-    Private MutOperator As EnMutOperator = EnMutOperator.Translocation_n_Opt
+    Private MutOperator As EnMutOperator = EnMutOperator.Inversion_SIM
     Enum EnMutOperator
         Inversion_SIM = 1
         Translocation_3_Opt = 2
@@ -821,5 +821,12 @@ Public Class TSP
         Next
 
     End Sub
+
+    Public Function Faculty(ByVal n As Double) As Double
+        Dim i As Integer
+        For i = 1 To n
+            n *= n
+        Next
+    End Function
 
 End Class
