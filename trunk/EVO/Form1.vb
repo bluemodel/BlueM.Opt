@@ -994,6 +994,8 @@ Partial Class Form1
 
         'Laufvariable für die Generationen
         Dim gen As Integer
+        Dim i As Integer
+        Dim GoToExit As Boolean
 
         'Intervall zum Updaten des Diagramms
         Dim increm As Integer = 100
@@ -1028,12 +1030,37 @@ Partial Class Form1
             Call TSP1.Selection_Process()
 
             'Zeichnen des besten Elter
-            'TODO: funzt nur, wenn ganz am ende gezeichnet wird
             If gen >= jepp Then
                 Call TSP1.TeeChart_Zeichnen_TSP(Me.Hauptdiagramm1, TSP1.ParentList(0).Image)
                 Me.Hauptdiagramm1.Update()
                 jepp += increm
                 mProgress.iGen() = gen
+            End If
+
+            'Fall die Problemstellung ein Kreis ist wird abgebrochen, wenn das Optimum erreicht ist
+            If TSP1.Problem = Apps.TSP.EnProblem.circle And TSP1.ParentList(0).Penalty < TSP1.circumference Then
+                GoToExit = True
+                Select Case TSP1.ParentList(0).Path(0) < TSP1.ParentList(0).Path(1)
+                    Case True
+                        For i = 0 To TSP1.n_Cities - 2
+                            If Not TSP1.ParentList(0).Path(i) + 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = TSP1.n_Cities And TSP1.ParentList(0).Path(i + 1) = 1) Then
+                                GoToExit = False
+                                Exit For
+                            End If
+                        Next
+                    Case Else
+                        For i = 0 To TSP1.n_Cities - 2
+                            If Not TSP1.ParentList(0).Path(i) - 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = 1 And TSP1.ParentList(0).Path(i + 1) = TSP1.n_Cities) Then
+                                GoToExit = False
+                                Exit For
+                            End If
+                        Next
+                End Select
+
+            End If
+
+            If GoToExit = True Then
+                Exit For
             End If
 
             'Kinder werden Hier vollständig gelöscht

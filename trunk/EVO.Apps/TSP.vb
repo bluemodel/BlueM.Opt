@@ -21,18 +21,45 @@ Public Class TSP
     'CutPoint:     1 2 3 4 5 6
     'LB + UB n=2   x         x
 
-    'Public Variablen
     Public n_Cities As Integer = 70
     Public ListOfCities(,) As Object
     Public n_Gen As Integer = 10000
-
-    'Private Variablen
-    Private n_Parents As Integer = 5
+    Public n_Parents As Integer = 5
     Public n_Childs As Integer = 20
 
-    Private ReprodOperator_TSP As String = "Order_Crossover_OX"
-    Private MutOperator_TSP As String = "Translocation_3_Opt"
-    Private Strategy As String = "plus" '"plus" oder "minus" Strategie
+    Public circumference As Double 'Kreisumfang
+
+    Private ReprodOperator As EnReprodOperator = EnReprodOperator.Order_Crossover_OX
+    Enum EnReprodOperator
+        Order_Crossover_OX = 1
+        Partially_Mapped_Crossover_PMX = 2
+        Select_Random_Uniform_SRU = 3
+    End Enum
+
+    Private MutOperator As EnMutOperator = EnMutOperator.Translocation_n_Opt
+    Enum EnMutOperator
+        Inversion_SIM = 1
+        Translocation_3_Opt = 2
+        Translocation_n_Opt = 3
+        Exchange_Mutation_EM = 4
+    End Enum
+
+    'Anzahl der SubPaths bei beim n_Opt 0perator
+    Dim n_SP As Integer = 2
+
+    Private Strategy As EnStrategy = EnStrategy.Plus
+    Enum EnStrategy
+        Komma = 0
+        Plus = 1
+    End Enum
+
+    'Die Problemstellung
+    Public Problem As EnProblem
+    Enum EnProblem
+        circle = 0
+        random = 1
+    End Enum
+
 
     '************************************* Struktur *****************************
     Public Structure Faksimile_Type
@@ -52,15 +79,30 @@ Public Class TSP
 
         Dim i As Integer
         ReDim ListOfCities(n_Cities - 1, 2)
+        'Dim Problem As String = "Circle"
 
         Randomize()
         Call TeeChart_Initialise_TSP(TChart1)
 
-        For i = 0 To n_Cities - 1
-            ListOfCities(i, 0) = i + 1
-            ListOfCities(i, 1) = Math.Round(Rnd() * 100)
-            ListOfCities(i, 2) = Math.Round(Rnd() * 100)
-        Next
+        Select Case Problem
+
+            Case EnProblem.circle
+                Dim Radius As Integer = 45
+                Dim factor As Double = (Math.PI * 2) / n_Cities
+                For i = 0 To n_Cities - 1
+                    ListOfCities(i, 0) = i + 1
+                    ListOfCities(i, 1) = Math.Cos(i * factor) * Radius + 50
+                    ListOfCities(i, 2) = Math.Sin(i * factor) * Radius + 65
+                Next
+                circumference = 2 * Math.PI * Radius
+
+            Case EnProblem.random
+                For i = 0 To n_Cities - 1
+                    ListOfCities(i, 0) = i + 1
+                    ListOfCities(i, 1) = Math.Round(Rnd() * 100)
+                    ListOfCities(i, 2) = Math.Round(Rnd() * 130)
+                Next
+        End Select
 
         Call TeeChart_Zeichnen_TSP_cities(TChart1, ListOfCities)
 
@@ -167,14 +209,14 @@ Public Class TSP
     Public Sub Selection_Process()
         Dim i, j As Integer
 
-        If Strategy = "minus" Then
+        If Strategy = EnStrategy.Komma Then
             For i = 0 To n_Parents - 1
                 ParentList(i).Penalty = ChildList(i).Penalty
                 Array.Copy(ChildList(i).Image, ParentList(i).Image, ChildList(i).Image.Length)
                 Array.Copy(ChildList(i).Path, ParentList(i).Path, ChildList(i).Path.Length)
             Next i
 
-        ElseIf Strategy = "plus" Then
+        ElseIf Strategy = EnStrategy.Plus Then
             j = 0
             For i = 0 To n_Parents - 1
                 If ParentList(i).Penalty < ChildList(j).Penalty Then
@@ -211,9 +253,9 @@ Public Class TSP
         Dim x, y As Integer
         Dim Einzelkind(n_Cities - 1) As Integer
 
-        Select Case ReprodOperator_TSP
+        Select Case ReprodOperator
             'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
-            Case "Order_Crossover_OX"
+            Case EnReprodOperator.Order_Crossover_OX
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
@@ -227,7 +269,7 @@ Public Class TSP
                     Call ReprodOp_OX(ParentList(x).Path, ParentList(y).Path, ChildList(n_Childs - 1).Path, Einzelkind)
                 End If
 
-            Case "Partially_Mapped_Crossover_PMX"
+            Case EnReprodOperator.Partially_Mapped_Crossover_PMX
                 x = 0
                 y = 1
                 For i = 0 To n_Childs - 2 Step 2
@@ -301,7 +343,7 @@ Public Class TSP
         Next
     End Sub
 
-    'Reproductionsoperator: "Partially_Mapped_Crossover (PMX)"
+    'Reproductionsoperator: "Partially_Mapped_Crossover_(PMX)"
     'Kopiert den mittleren Teil des anderen Elter und füllt den Rest mit dem eigenen auf. Falls Doppelt wird gemaped.
     Public Sub ReprodOp_PMX(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
         Dim i As Integer
@@ -377,9 +419,9 @@ Public Class TSP
         Next
     End Sub
 
-    'Reproductionsoperator: "Select_Random_Uniform"
+    'Reproductionsoperator: "Select_Random_Uniform (SRU)"
     'Entscheidet zufällig welcher ob der Wert aus dem Path des Elter_A oder Elter_B verwendet wird
-    Private Sub ReprodOp_Select_Random_Uniform(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
+    Private Sub ReprodOp_SRU(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
 
         Dim i As Integer
 
@@ -408,18 +450,24 @@ Public Class TSP
     Public Sub Mutation_Control()
         Dim i As Integer
 
-        Select Case MutOperator_TSP
-            Case "Inversion_SIM"
+        Select Case MutOperator
+            Case EnMutOperator.Inversion_SIM
                 For i = 0 To n_Childs - 1
                     Call MutOp_SIM(ChildList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
-            Case "Translocation_3_Opt"
+            Case EnMutOperator.Translocation_3_Opt
                 For i = 0 To n_Childs - 1
                     Call MutOp_3_opt(ChildList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
-            Case "Exchange_Mutation_EM"
+            Case EnMutOperator.Translocation_n_Opt
+                For i = 0 To n_Childs - 1
+                    Call MutOp_n_opt(ChildList(i).Path)
+                    'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
+                Next i
+
+            Case EnMutOperator.Exchange_Mutation_EM
                 For i = 0 To n_Childs - 1
                     Call MutOp_EM(ChildList(i).Path)
                 Next
@@ -508,6 +556,70 @@ Public Class TSP
         'Übertragen der Substrings in den Path
         x = 0
         For i = 0 To 2
+            For j = 0 To SubPath(SwapPath(i)).GetUpperBound(0)
+                Path(x) = SubPath(SwapPath(i))(j)
+                x += 1
+            Next
+        Next
+
+    End Sub
+    'Mutationsoperator "Translocation (n-Opt)"
+    'Vertauscht zufällig n Abschnitte aus dem String und verwendet Bernoulli verteilt die Inverse
+    Private Sub MutOp_n_opt(ByVal Path() As Integer)
+        Dim i, j As Integer
+        Dim x As Integer
+        Dim tmp As Integer
+        Dim SwapPath(n_SP - 1) As Integer
+        Dim CutPoint(n_SP - 2) As Integer
+        Call Create_n_Cutpoints(CutPoint)
+
+        Dim SubPath(n_SP - 1)() As Integer
+
+        ReDim SubPath(0)(CutPoint(0))
+        For i = 1 To n_SP - 2
+            ReDim SubPath(i)(CutPoint(i) - CutPoint(i - 1) - 1)
+        Next
+        'ReDim SubPath(1)(CutPoint(1) - CutPoint(0) - 1)
+        ReDim SubPath(n_SP - 1)(n_Cities - CutPoint(n_SP - 2) - 2)
+
+        'Kopieren der Substrings
+        x = 0
+        For i = 0 To CutPoint(0)
+            SubPath(0)(x) = Path(i)
+            x += 1
+        Next
+        For j = 0 To n_SP - 3
+            x = 0
+            For i = CutPoint(j) + 1 To CutPoint(j + 1)
+                SubPath(j + 1)(x) = Path(i)
+                x += 1
+            Next
+        Next
+        x = 0
+        For i = CutPoint(n_SP - 2) + 1 To n_Cities - 1
+            SubPath(n_SP - 1)(x) = Path(i)
+            x += 1
+        Next
+
+        'Bernloulli Verteilte Inversion der Subpaths
+        For i = 0 To n_SP - 1
+            If Bernoulli() = True Then Array.Reverse(SubPath(i))
+        Next
+
+        'Generieren der neuen Reihenfolge
+        For i = 0 To n_SP - 1
+            Do
+                tmp = CInt(Int(n_SP * Rnd() + 1))
+            Loop While Is_No_OK(tmp, SwapPath) = False
+            SwapPath(i) = tmp
+        Next
+        For i = 0 To n_SP - 1
+            SwapPath(i) -= 1
+        Next
+
+        'Übertragen der Substrings in den Path
+        x = 0
+        For i = 0 To n_SP - 1
             For j = 0 To SubPath(SwapPath(i)).GetUpperBound(0)
                 Path(x) = SubPath(SwapPath(i))(j)
                 x += 1
@@ -652,7 +764,7 @@ Public Class TSP
             '.Chart.Axes.Left.Title.Caption = BlueM1.OptParameterListe(0).Bezeichnung 'HACK: Beschriftung der Axen
             .Chart.Axes.Left.Automatic = False
             .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Maximum = 100
+            .Chart.Axes.Left.Maximum = 130
 
             'Series(0): Series für die Sädte.
             Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
