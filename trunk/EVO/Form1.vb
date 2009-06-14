@@ -992,6 +992,59 @@ Partial Class Form1
     '************************************
     Private Sub STARTEN_TSP()
 
+        'Batch_Mode
+        Dim Batch_Mode As Boolean = True
+        'Anzahl der Tests
+        Dim n As Integer = 3
+
+        'Progress
+        mProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
+
+        'Monitor Stuff
+        Me.Monitor1.SelectTabLog()
+        Me.Monitor1.Show()
+        Me.Monitor1.LogAppend("Cities: " & TSP1.n_Cities)
+        Me.Monitor1.LogAppend("Combinations: " & TSP1.Faculty(TSP1.n_Cities) / 2)
+        Me.Monitor1.LogAppend("Parents: " & TSP1.n_Parents)
+        Me.Monitor1.LogAppend("Childs: " & TSP1.n_Childs)
+        Me.Monitor1.LogAppend("Generations: " & TSP1.n_Gen)
+        Me.Monitor1.LogAppend("Evaluations: " & TSP1.n_Childs * TSP1.n_Gen)
+        If TSP1.Problem = Apps.TSP.EnProblem.circle Then
+            Me.Monitor1.LogAppend("Quality Aim: " & Conversion.Int(TSP1.circumference))
+        End If
+
+        Select Case Batch_Mode
+
+            Case False
+                'Progress
+                mProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
+                Call TSP_Controller(False)
+
+            Case True
+                'Progress
+                mProgress.Initialize(n, 8, TSP1.n_Gen, TSP1.n_Childs)
+                Dim i, M, R As Integer
+
+                For R = 1 To 2
+                    TSP1.ReprodOperator = R
+
+                    For M = 1 To 4
+                        TSP1.MutOperator = M
+                        Me.Monitor1.LogAppend("ReprodOperator: " & TSP1.ReprodOperator & "; MutationOperator: " & TSP1.MutOperator)
+
+                        'n Wiederholungen
+                        For i = 1 To n
+                            Call TSP_Controller(True)
+                        Next
+                        '~~~~~~~~~~~~~~~~
+                    Next
+                Next
+        End Select
+
+    End Sub
+
+    Private Sub TSP_Controller(ByVal Batch_Mode As Boolean)
+
         'Laufvariable für die Generationen
         Dim gen As Integer
         Dim i As Integer
@@ -1000,10 +1053,6 @@ Partial Class Form1
         'Intervall zum Updaten des Diagramms
         Dim increm As Integer = 100
         Dim jepp As Integer = 0
-
-        'Monitor Stuuf
-        Me.Monitor1.SelectTabLog()
-        Me.Monitor1.Show()
 
         'BUG 212: Nach Klasse Diagramm auslagern!
         Call TSP1.TeeChart_Initialise_TSP(Me.Hauptdiagramm1)
@@ -1014,21 +1063,6 @@ Partial Class Form1
 
         'Zufällige Kinderpfade werden generiert
         Call TSP1.Generate_Random_Path_TSP()
-
-        'Progress
-        mProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
-
-        'Basisinformationen:
-        Me.Monitor1.LogAppend("Cities: " & TSP1.n_Cities)
-        Me.Monitor1.LogAppend("Combinations: " & TSP1.Faculty(TSP1.n_Cities)/2)
-        Me.Monitor1.LogAppend("Parents: " & TSP1.n_Parents)
-        Me.Monitor1.LogAppend("Childs: " & TSP1.n_Childs)
-        Me.Monitor1.LogAppend("Generations: " & TSP1.n_Gen)
-        Me.Monitor1.LogAppend("Evaluations: " & TSP1.n_Childs * TSP1.n_Gen)
-
-        If tsp1.Problem = Apps.TSP.EnProblem.circle Then
-            Me.Monitor1.LogAppend("Quality Aim: " & Conversion.Int(TSP1.circumference))
-        End If
 
         'Generationsschleife
         For gen = 1 To TSP1.n_Gen
@@ -1051,7 +1085,9 @@ Partial Class Form1
                 Me.Hauptdiagramm1.Update()
                 jepp += increm
                 mProgress.iGen() = gen
-                Me.Monitor1.LogAppend("Genearation: " & gen & "; Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
+                If Batch_Mode = False Then
+                    Me.Monitor1.LogAppend("Genearation: " & gen & "; Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
+                End If
             End If
 
             'Fall die Problemstellung ein Kreis ist wird abgebrochen, wenn das Optimum erreicht ist
@@ -1090,6 +1126,8 @@ Partial Class Form1
             Call TSP1.Mutation_Control()
 
         Next gen
+
+        Me.Monitor1.LogAppend("Final Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
 
     End Sub
 
