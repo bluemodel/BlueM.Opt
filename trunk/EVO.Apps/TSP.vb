@@ -29,11 +29,10 @@ Public Class TSP
 
     Public circumference As Double 'Kreisumfang
 
-    Private ReprodOperator As EnReprodOperator = EnReprodOperator.Partially_Mapped_Crossover_PMX
+    Private ReprodOperator As EnReprodOperator = EnReprodOperator.Order_Crossover_OX
     Enum EnReprodOperator
         Order_Crossover_OX = 1
         Partially_Mapped_Crossover_PMX = 2
-        Select_Random_Uniform_SRU = 3
     End Enum
 
     Private MutOperator As EnMutOperator = EnMutOperator.Inversion_SIM
@@ -282,7 +281,6 @@ Public Class TSP
                 If Even_Number(n_Childs) = False Then
                     Call ReprodOp_PMX(ParentList(x).Path, ParentList(y).Path, ChildList(n_Childs - 1).Path, Einzelkind)
                 End If
-
         End Select
 
     End Sub
@@ -418,31 +416,6 @@ Public Class TSP
             End If
         Next
     End Sub
-
-    'Reproductionsoperator: "Select_Random_Uniform (SRU)"
-    'Entscheidet zufällig welcher ob der Wert aus dem Path des Elter_A oder Elter_B verwendet wird
-    Private Sub ReprodOp_SRU(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
-
-        Dim i As Integer
-
-        For i = 0 To ChildPath_A.GetUpperBound(0)    'TODO: Es müsste eigentlich eine definierte Pfadlänge geben
-            If Bernoulli() = True Then
-                ChildPath_A(i) = ParPath_B(i)
-            Else
-                ChildPath_A(i) = ParPath_A(i)
-            End If
-        Next
-
-        For i = 0 To ChildPath_B.GetUpperBound(0)    'TODO: Es müsste eigentlich eine definierte Pfadlänge geben
-            If Bernoulli() = True Then
-                ChildPath_B(i) = ParPath_A(i)
-            Else
-                ChildPath_B(i) = ParPath_B(i)
-            End If
-        Next
-
-    End Sub
-
 
     '****************************************** Mutationsfunktionen ****************************************
 
@@ -824,9 +797,11 @@ Public Class TSP
 
     Public Function Faculty(ByVal n As Double) As Double
         Dim i As Integer
+        Dim j As Double = 1
         For i = 1 To n
-            n *= n
+            j = j * i
         Next
+        Return j
     End Function
 
 End Class
