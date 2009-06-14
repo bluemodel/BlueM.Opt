@@ -23,19 +23,19 @@ Public Class TSP
 
     Public n_Cities As Integer = 100
     Public ListOfCities(,) As Object
-    Public n_Gen As Integer = 10000
+    Public n_Gen As Integer = 500
     Public n_Parents As Integer = 5
     Public n_Childs As Integer = 20
 
     Public circumference As Double 'Kreisumfang
 
-    Private ReprodOperator As EnReprodOperator = EnReprodOperator.Order_Crossover_OX
+    Public ReprodOperator As EnReprodOperator = EnReprodOperator.Order_Crossover_OX
     Enum EnReprodOperator
         Order_Crossover_OX = 1
         Partially_Mapped_Crossover_PMX = 2
     End Enum
 
-    Private MutOperator As EnMutOperator = EnMutOperator.Inversion_SIM
+    Public MutOperator As EnMutOperator = EnMutOperator.Inversion_SIM
     Enum EnMutOperator
         Inversion_SIM = 1
         Translocation_3_Opt = 2
