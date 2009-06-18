@@ -119,13 +119,13 @@ Partial Class Form1
         'ToolStripMenuItem_Help
         '
         Me.ToolStripMenuItem_Help.Name = "ToolStripMenuItem_Help"
-        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(152, 22)
+        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(114, 22)
         Me.ToolStripMenuItem_Help.Text = "Hilfe"
         '
         'ToolStripMenuItem_About
         '
         Me.ToolStripMenuItem_About.Name = "ToolStripMenuItem_About"
-        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(152, 22)
+        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(114, 22)
         Me.ToolStripMenuItem_About.Text = "About"
         '
         'ToolStripSeparator4
@@ -459,6 +459,7 @@ Partial Class Form1
         Me.EVO_Einstellungen1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.EVO_Einstellungen1.Location = New System.Drawing.Point(4, 148)
+        'Me.EVO_Einstellungen1.MultithreadingAllowed = False
         Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(244, 707)
         Me.EVO_Einstellungen1.TabIndex = 2
