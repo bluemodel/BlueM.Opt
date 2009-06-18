@@ -31,7 +31,7 @@ Partial Public Class Form1
 
     Public mSettings As EVO.Common.EVO_Settings
 
-    'MPC-Options
+    'MPC-Events
     Public Event Startbuttonpressed()
     Public Event OptimisationReady()
 
@@ -406,6 +406,10 @@ Partial Public Class Form1
             'Mauszeiger wieder normal
             Cursor = Cursors.Default
 
+            If (Me.mSettings.General.useMPC) Then
+                INI_Datensatz_ohneEvent()
+            End If
+
         End If
 
     End Sub
@@ -571,6 +575,10 @@ Partial Public Class Form1
             Exit Sub
 
         Else
+            If (Me.mSettings.General.useMPC) Then
+                Me.mSettings.General.Dataset = Me.mSettings.MPC.Problempfad
+                Me.ComboBox_Datensatz.SelectedItem = Me.mSettings.General.Dataset
+            End If
 
             'Zurücksetzen
             '------------
