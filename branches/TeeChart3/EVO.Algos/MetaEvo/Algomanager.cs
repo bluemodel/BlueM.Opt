@@ -21,6 +21,11 @@ namespace IHWB.EVO.MetaEvo
         int localcounter;
         int localcounter2;
 
+        //Monitor
+        private Steema.TeeChart.Styles.Line Line_diversity;
+        private Steema.TeeChart.Styles.Line Line_evo_avg;
+        private Steema.TeeChart.Styles.Line Line_evo_threshold;
+
         public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input) 
         {
             settings = settings_input;
@@ -43,7 +48,13 @@ namespace IHWB.EVO.MetaEvo
                 settings.MetaEvo.AlgoMode = "Local: Calculating";
             }
 
-            solutionvolume = new EVO.MO_Indicators.Solutionvolume2(ref prob_input, 5, 2, ref monitor1, ref settings_input);
+            //Solutionvolume initialisieren
+            solutionvolume = new EVO.MO_Indicators.Solutionvolume2(prob_input.NumPrimObjective, 5, 2);
+
+            //Monitor initialisieren
+            this.initMonitor();
+            monitor1.SelectTabDiagramm();
+            monitor1.Show();
         }
 
         //new_generation mit Genpool verarbeiten und neue Individuen in new_generation erzeugen
@@ -58,8 +69,12 @@ namespace IHWB.EVO.MetaEvo
                 //0. Vorbereitung
                 //0.1. Feasible-Status prüfen
                 set_notfeasible2false(ref genpool, ref new_generation_input);
+
                 //Solutionvolume noch einmal berechnen um Fortschritt der lokalen Optimierung zu zeigen
                 solutionvolume.calculate(ref genpool);
+
+                //Solutionvolume zeichnen
+                this.updateMonitor();
 
                 for (int i = 0; i < genpool.Length; i++ )
                 {
@@ -119,6 +134,9 @@ namespace IHWB.EVO.MetaEvo
                     //Solutionvolume entscheidet auf Umschaltung zur lokalen Optimierung
                     settings.MetaEvo.AlgoMode = "Global: Finished";
                 }
+
+                //Solutionvolume zeichnen
+                this.updateMonitor();
             }
 
             this.monitor1.LogAppend("Algo Manager: Solutionvolume: Last Volume: " + solutionvolume.get_complete_infos());
@@ -142,7 +160,8 @@ namespace IHWB.EVO.MetaEvo
             //Generierung neuer Individuen (wieder in new_generation_input)
             algos.newGeneration(ref genpool, ref new_generation_input, ref wastepool);
         }
-        //Stezt den Genpool
+
+        //Setzt den Genpool
         public void set_genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input)
         {
             this.wastepool = new EVO.Common.Individuum_MetaEvo[genpool_input.Length];
@@ -168,6 +187,7 @@ namespace IHWB.EVO.MetaEvo
                 else input2[i].set_status("false#constraints#");
             }
         }
+
         //Sortieren nach einem gegebenen Penaltie(ok)
         private void quicksort(ref EVO.Common.Individuum_MetaEvo[] input, int kriterium, int low_input, int high_input)
         {
@@ -201,6 +221,7 @@ namespace IHWB.EVO.MetaEvo
             if (low_input < low) quicksort(ref input, kriterium, low_input, low);
             if (high < high_input) quicksort(ref input, kriterium, high, high_input);
         }
+
         //Prüfen ob ein ein Individuum von einem anderen Individuum dominiert wird (kleiner ist dominant)
         private void check_domination(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
@@ -304,6 +325,7 @@ namespace IHWB.EVO.MetaEvo
                 }
             }    
         }
+
         //Individuen die einen zu geringen Abstand der Penalties besitzen, löschen
         private void crowding_selection(int killindividuums_input, ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
@@ -336,7 +358,7 @@ namespace IHWB.EVO.MetaEvo
             while (killindividuums > 0)
             {
                 //Dichten bestimmen lassen
-                densities = calcualte_densities(ref work);
+                densities = calculate_densities(ref work);
 
                 pointer = 0;
                 //tmp = " [" + 0 + "]:" + densities[0] + " ";
@@ -354,6 +376,7 @@ namespace IHWB.EVO.MetaEvo
                 killindividuums--;
             }    
         }
+
         //Individuen wiederbeleben 
         private void revive(int numberawake_input, ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
@@ -390,7 +413,7 @@ namespace IHWB.EVO.MetaEvo
                         //Nur im genpool kommen true-Individuen vor
                         if ((work[j].get_status() == "true") && (work[j].ID != work[i].ID))
                         {
-                            distance = calcualte_distance(work[i].PrimObjectives, work[j].PrimObjectives);
+                            distance = calculate_distance(work[i].PrimObjectives, work[j].PrimObjectives);
                             //Initialisierung oder Vergleich
                             if ((distances[i, 0] > distance) || (distances[i, 0] == 0))
                             {
@@ -404,7 +427,7 @@ namespace IHWB.EVO.MetaEvo
             }
 
             //Dichtewerte der true-Individuen berechnen lassen
-            densities = calcualte_densities(ref work);
+            densities = calculate_densities(ref work);
 
             //Ranking bestimmen für alle False-Individuen
             for (int i = 0; i < work.Length; i++)
@@ -437,6 +460,7 @@ namespace IHWB.EVO.MetaEvo
                 numberawake_input++;
             }
         }
+
         //Kopieren der Verbleibenden Individuen auf die Generation input
         private void zip(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
@@ -466,6 +490,7 @@ namespace IHWB.EVO.MetaEvo
                 pointer_true++;
             }
         }
+
         //String mit Auszug der generation
         private string generationinfo(ref EVO.Common.Individuum_MetaEvo[] generation)
         {
@@ -502,6 +527,7 @@ namespace IHWB.EVO.MetaEvo
 
             return back + "----------";
         }
+
         //Feedback erstellen und Durchläufe zählen die keine Verbesserung erzeugt haben
         private void newGen_composition(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
@@ -606,6 +632,7 @@ namespace IHWB.EVO.MetaEvo
                 }
             }
         }
+
         //Kopiere true-Individuen auf neuen Genpool
         private void copy_some_to(ref EVO.Common.Individuum_MetaEvo[] newgen_input, ref EVO.Common.Individuum_MetaEvo[] newgen_output)
         {
@@ -614,6 +641,7 @@ namespace IHWB.EVO.MetaEvo
                 newgen_output[i] = newgen_input[i];
             }
         }
+
         //Umschalten auf Lokale Algorithmen, Reduzieren der Lösungen
         public void set_calculationmode_local(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
@@ -649,6 +677,7 @@ namespace IHWB.EVO.MetaEvo
             //Neue Algorithmuskomposition
             algos.set_algos("Hook and Jeeves");
         }
+
         //Reduzieren der Lösungen
         public void set_calculationmode_global_finished(ref EVO.Common.Individuum_MetaEvo[] new_generation_input)
         {
@@ -664,6 +693,7 @@ namespace IHWB.EVO.MetaEvo
                 this.monitor1.LogAppend("Algo Manager: Final Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
             }
         }
+
         //Mengendifferenz zwischen Genpoolgrösse und überlebenden Individuen
         private int calculate_difference2genpool(ref EVO.Common.Individuum_MetaEvo[] genpool_input, ref EVO.Common.Individuum_MetaEvo[] input2)
         {
@@ -680,8 +710,9 @@ namespace IHWB.EVO.MetaEvo
 
             return (alive - genpool_input.Length);
         }
+
         //Einfache Distanzsumme zwischen zwei Arrays; falls Abstand = 0, return -1
-        private double calcualte_distance(double[] input1, double[] input2)
+        private double calculate_distance(double[] input1, double[] input2)
         {
             double back = 0;
 
@@ -692,8 +723,9 @@ namespace IHWB.EVO.MetaEvo
             if (back == 0) return -1;
             return System.Math.Sqrt(back);
         }
+
         //Dichte des Raumes in dem sich das Individuum befindet
-        private double[] calcualte_densities(ref EVO.Common.Individuum_MetaEvo[] work_input)
+        private double[] calculate_densities(ref EVO.Common.Individuum_MetaEvo[] work_input)
         {
             double[] densitys = new double[work_input.Length];
             double tmp;
@@ -707,7 +739,7 @@ namespace IHWB.EVO.MetaEvo
                     {
                         if ((work_input[j] != null) && (work_input[j].get_status() == "true") && (i != j))
                         {
-                            tmp = calcualte_distance(work_input[i].PrimObjectives, work_input[j].PrimObjectives);
+                            tmp = calculate_distance(work_input[i].PrimObjectives, work_input[j].PrimObjectives);
                             if (tmp == -1) densitys[i]++;
                             else densitys[i] += (1 / ((tmp + 1) * (tmp + 1)) );
                         }
@@ -716,5 +748,73 @@ namespace IHWB.EVO.MetaEvo
             }
             return densitys;
         }
+
+        /// <summary>
+        /// Monitor Initialisieren
+        /// </summary>
+        private void initMonitor()
+        {
+            //Achsen
+
+            //Diversitätsachse
+            monitor1.Diag.Axes.Left.Title.Caption = "Diversität";
+
+            //Generationsachse (unten)
+            monitor1.Diag.Axes.Bottom.Visible = true;
+            monitor1.Diag.Axes.Bottom.Title.Caption = "Generation";
+            monitor1.Diag.Axes.Bottom.Horizontal = true;
+            monitor1.Diag.Axes.Bottom.Automatic = true;
+            monitor1.Diag.Axes.Bottom.Grid.Visible = true;
+
+            //Entwicklungsachse (rechts)
+            monitor1.Diag.Axes.Right.Visible = true;
+            monitor1.Diag.Axes.Right.Title.Caption = "Entwicklung";
+            monitor1.Diag.Axes.Right.Title.Angle = 90;
+            monitor1.Diag.Axes.Right.Automatic = true;
+            monitor1.Diag.Axes.Right.Grid.Visible = false;
+
+            //Linie Diversität 
+            Line_diversity = monitor1.Diag.getSeriesLine("Diversität (Durchschnittlicher Abstand zu einem Mittelpunkt)", "Red");
+            Line_diversity.Color = System.Drawing.Color.Blue;
+            Line_diversity.Pointer.Visible = true;
+            Line_diversity.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle;
+            //Line_diversity.Pointer.Brush.Color = System.Drawing.Color.Blue;
+            Line_diversity.Pointer.HorizSize = 2;
+            Line_diversity.Pointer.VertSize = 2;
+            Line_diversity.Pointer.Pen.Visible = false;
+
+            //Linie Entwicklung
+            Line_evo_avg = monitor1.Diag.getSeriesLine("Durchschnittliche Entwicklung über " + solutionvolume.historylength + " Generationen", "Green");
+            Line_evo_avg.CustomVertAxis = monitor1.Diag.Axes.Right;
+            Line_evo_avg.Color = System.Drawing.Color.LimeGreen;
+            Line_evo_avg.Pointer.Visible = true;
+            Line_evo_avg.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle;
+            //Line_evo_avg.Pointer.Brush.Color = System.Drawing.Color.LimeGreen;
+            Line_evo_avg.Pointer.HorizSize = 2;
+            Line_evo_avg.Pointer.VertSize = 2;
+            Line_evo_avg.Pointer.Pen.Visible = false;
+
+            //Linie Schwellwert
+            Line_evo_threshold = monitor1.Diag.getSeriesLine("Entwicklung Grenze", "Yellow");
+            Line_evo_threshold.CustomVertAxis = monitor1.Diag.Axes.Right;
+            Line_evo_threshold.Color = System.Drawing.Color.Green;
+            Line_evo_threshold.Pointer.Visible = true;
+            Line_evo_threshold.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle;
+            //Line_evo_threshold.Pointer.Brush.Color = System.Drawing.Color.Green;
+            Line_evo_threshold.Pointer.HorizSize = 2;
+            Line_evo_threshold.Pointer.VertSize = 2;
+            Line_evo_threshold.Pointer.Pen.Visible = false;
+        }
+
+        /// <summary>
+        /// Aktualisiert das Monitordiagramm mit den aktuellen Solutionvolume-Werten
+        /// </summary>
+        private void updateMonitor()
+        {
+            this.Line_diversity.Add(this.settings.MetaEvo.CurrentGeneration, solutionvolume.diversity);
+            this.Line_evo_avg.Add(this.settings.MetaEvo.CurrentGeneration, solutionvolume.evosum);
+            this.Line_evo_threshold.Add(this.settings.MetaEvo.CurrentGeneration, solutionvolume.maxevosum / solutionvolume.faktor2switch);
+        }
+
     }
 }

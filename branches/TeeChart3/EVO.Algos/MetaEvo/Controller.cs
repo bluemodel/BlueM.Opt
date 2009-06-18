@@ -416,8 +416,11 @@ namespace IHWB.EVO.MetaEvo
                         generation_tmp = new EVO.Common.Individuum_MetaEvo[j];
                         for (int i = 0; i < generation.Length; i++)
                         {
-                            if (generation[i].get_toSimulate()) generation_tmp[j-1] = generation[i];
-                            j--;
+                            if (generation[i].get_toSimulate())
+                            {
+                                generation_tmp[j - 1] = generation[i];
+                                j--;
+                            }
                         }
 
                         evaluate_multi_4single(ref generation_tmp);

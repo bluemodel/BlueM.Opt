@@ -46,7 +46,7 @@ Public Class BlueM
     ''' <remarks>Die erste Dateiendung in dieser Collection repräsentiert den Datensatz (wird z.B. als Filter für OpenFile-Dialoge verwendet)</remarks>
     Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
         Get
-            Dim exts As Collections.Specialized.StringCollection = New Collections.Specialized.StringCollection()
+            Dim exts As New Collections.Specialized.StringCollection()
 
             exts.AddRange(New String() {"ALL", "SYS", "FKT", "KTR", "EXT", "JGG", "WGG", _
                                         "TGG", "TAL", "HYA", "TRS", "EZG", "EIN", "URB", _

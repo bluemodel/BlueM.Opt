@@ -57,10 +57,6 @@
       <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
       <Name>EVO.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\EVO.Diagramm\EVO.Diagramm.vbproj">
-      <Project>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</Project>
-      <Name>EVO.Diagramm</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
