@@ -41,7 +41,7 @@ Partial Public Class Form1
     Private Anwendung As String
 
     'Problem
-    Private mProblem As EVO.Common.Problem
+    Public mProblem As EVO.Common.Problem
 
     'Progress
     Private mProgress As EVO.Common.Progress
