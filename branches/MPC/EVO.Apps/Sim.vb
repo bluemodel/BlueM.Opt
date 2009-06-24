@@ -181,25 +181,20 @@ Public MustInherit Class Sim
     ''' <param name="pfad">Der Pfad</param>
     Public Sub setDatensatz(ByVal pfad As String)
 
-        Dim isOK As Boolean
-
-        If (File.Exists(pfad)) Then
-            'Datensatzname bestimmen
-            Me.Datensatz = Path.GetFileNameWithoutExtension(pfad)
-            'Arbeitsverzeichnis bestimmen
-            Me.WorkDir_Current = Path.GetDirectoryName(pfad) & "\"
-            Me.WorkDir_Original = Path.GetDirectoryName(pfad) & "\"
-        Else
-            Throw New Exception("Der Datensatz '" & pfad & "' existiert nicht!")
-        End If
+		If (File.Exists(pfad)) Then
+			'Datensatzname bestimmen
+			Me.Datensatz = Path.GetFileNameWithoutExtension(pfad)
+			'Arbeitsverzeichnis bestimmen
+			Me.WorkDir_Current = Path.GetDirectoryName(pfad) & "\"
+			Me.WorkDir_Original = Path.GetDirectoryName(pfad) & "\"
+		Else
+			Throw New Exception("Der Datensatz '" & pfad & "' existiert nicht!")
+		End If
 
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
 
-        'Datensätze für Multithreading kopieren
-        isOK = Me.createThreadWorkDirs()
-
-    End Sub
+	End Sub
 
     ''' <summary>
     ''' Das Problem übergeben
@@ -771,7 +766,12 @@ Public MustInherit Class Sim
         Dim StrLeft As String
         Dim StrRight As String
         Dim DateiPfad As String
-        Dim WriteCheck As Boolean = False
+		Dim WriteCheck As Boolean = False
+		Dim FiStr As FileStream
+		Dim StrRead As StreamReader
+		Dim StrReadSync As TextReader
+		Dim StrWrite As StreamWriter
+		Dim StrWriteSync As TextWriter
 
         'ModellParameter aus OptParametern kalkulieren()
         Call Me.OptParameter_to_ModellParameter()
@@ -782,9 +782,9 @@ Public MustInherit Class Sim
 
             DateiPfad = Me.WorkDir_Current & Me.Datensatz & "." & Me.mProblem.List_ModellParameter(i).Datei
             'Datei öffnen
-            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-            Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+			FiStr = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
+			StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+			StrReadSync = TextReader.Synchronized(StrRead)
 
             'Anzahl der Zeilen feststellen
             AnzZeil = 0
@@ -851,8 +851,8 @@ Handler:
             Zeilenarray(Me.mProblem.List_ModellParameter(i).ZeileNr - 1) = Zeile
 
             'Alle Zeilen wieder in Datei schreiben
-            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-            Dim StrWriteSync As TextWriter = TextWriter.Synchronized(StrWrite)
+			StrWrite = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+			StrWriteSync = TextWriter.Synchronized(StrWrite)
 
             For j = 0 To AnzZeil - 1
                 StrWrite.WriteLine(Zeilenarray(j))
@@ -860,7 +860,7 @@ Handler:
 
             StrWriteSync.Close()
             StrWrite.Close()
-            FiStr.Close()
+			'FiStr.Close()
         Next
 
         If (Not WriteCheck) Then
@@ -946,40 +946,40 @@ Handler:
     ''' </summary>
     ''' <returns>True wenn fertig</returns>
     ''' <remarks>Erstellt im bin-Ordner Verzeichnisse Thread_1 bis Thread_n</remarks>
-    Private Function createThreadWorkDirs() As Boolean
+	Protected Function createThreadWorkDirs() As Boolean
 
-        Dim i As Integer
-        Dim isOK As Boolean
-        Dim Source, Dest, relPaths() As String
-        Dim binPath As String = System.Windows.Forms.Application.StartupPath()
+		Dim i As Integer
+		Dim isOK As Boolean
+		Dim Source, Dest, relPaths() As String
+		Dim binPath As String = System.Windows.Forms.Application.StartupPath()
 
-        Source = Me.WorkDir_Original
-        Dest = binPath & "\Thread_0\"
+		Source = Me.WorkDir_Original
+		Dest = binPath & "\Thread_0\"
 
-        'Alte Thread-Ordner löschen
-        isOK = Me.deleteThreadWorkDirs()
+		'Alte Thread-Ordner löschen
+		isOK = Me.deleteThreadWorkDirs()
 
-        'zu kopierende Dateien bestimmen
-        relPaths = Me.getDatensatzFiles(Source)
+		'zu kopierende Dateien bestimmen
+		relPaths = Me.getDatensatzFiles(Source)
 
-        'Dateien in Ordner Thread_0 kopieren
-        For Each relPath As String In relPaths
-            My.Computer.FileSystem.CopyFile(Source & relPath, Dest & relPath, True)
-        Next
+		'Dateien in Ordner Thread_0 kopieren
+		For Each relPath As String In relPaths
+			My.Computer.FileSystem.CopyFile(Source & relPath, Dest & relPath, True)
+		Next
 
-        'Für die weiteren Threads den Ordner Thread_0 kopieren
-        Source = binPath & "\Thread_0\"
+		'Für die weiteren Threads den Ordner Thread_0 kopieren
+		Source = binPath & "\Thread_0\"
 
-        For i = 1 To Me.n_Threads - 1
+		For i = 1 To Me.n_Threads - 1
 
-            Dest = binPath & "\Thread_" & i.ToString() & "\"
-            My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
+			Dest = binPath & "\Thread_" & i.ToString() & "\"
+			My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
 
-        Next
+		Next
 
-        Return True
+		Return True
 
-    End Function
+	End Function
 
     ''' <summary>
     ''' Gibt die relativen Pfade aller Datensatz-Dateien zurück

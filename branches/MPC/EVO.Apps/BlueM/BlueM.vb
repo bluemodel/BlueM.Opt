@@ -120,7 +120,10 @@ Public Class BlueM
         Next
         ReDim MyThreads(Me.n_Threads - 1)
 
-    End Sub
+		'Datensätze für Multithreading kopieren
+		Call Me.createThreadWorkDirs()
+
+	End Sub
 
     Public Overrides Sub setProblem(ByRef prob As EVO.Common.Problem)
 

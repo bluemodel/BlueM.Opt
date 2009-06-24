@@ -109,7 +109,12 @@ Public Class SWMM
         Next
         ReDim MyThreads(Me.n_Threads - 1)
 
-    End Sub
+		'Datensätze für Multithreading kopieren
+		Call Me.createThreadWorkDirs()
+
+		Me.WorkDir_Current = Me.getThreadWorkDir(0)
+
+	End Sub
 
     'Simulationsparameter einlesen
     '*****************************
@@ -197,7 +202,7 @@ Public Class SWMM
 
         Try
 
-            Call swmm_dll(0).Initialize(Me.WorkDir_Current & Me.Datensatz)
+			Call swmm_dll(0).Initialize(Me.WorkDir_Current & Me.Datensatz)
             Call swmm_dll(0).Start(1)
 
             Dim elapsedTime As Double = 0.0
