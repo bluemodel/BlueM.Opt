@@ -341,9 +341,9 @@ Public Class Problem
     Private Sub Read_OPT()
 
         'Format:
-        '*|--------------|-------|-----------|--------|--------|-----------|
-        '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |
-        '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|
+        '*|--------------|-------|-----------|--------|--------|-----------|----------|-----------|
+        '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |  Objekt  | Zeitpunkt |
+        '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|-<------>-|-<------->-|
 
         Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_OPT
 
@@ -382,6 +382,12 @@ Public Class Problem
                 List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
                 List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Common.Provider.FortranProvider)
                 List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
+                Try
+                    List_OptParameter(i).Objekt = array(7).Trim()
+                    List_OptParameter(i).Zeitpunkt = Convert.ToInt32(array(8).Trim())
+                Catch ex As Exception
+
+                End Try
                 'liegt eine Beziehung vor?
                 If (i > 0 And Not array(6).Trim() = "") Then
                     Me.List_OptParameter(i).Beziehung = Common.Constants.getBeziehung(array(6).Trim())
