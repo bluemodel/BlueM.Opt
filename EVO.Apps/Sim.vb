@@ -83,7 +83,6 @@ Public MustInherit Class Sim
     'Multithreading
     '--------------
     Public MustOverride ReadOnly Property MultithreadingSupported() As Boolean
-    Protected n_Threads As Integer   'Anzahl Threads
     Private _isPaused As Boolean
     Private _isStopped As Boolean
 
@@ -170,9 +169,14 @@ Public MustInherit Class Sim
     ''' <summary>
     ''' Die Anwendung auf Multithreading vorbereiten
     ''' </summary>
-    ''' <param name="input_n_Threads">Anzahl Threads</param>
-    Public Overridable Sub prepareThreads(ByVal input_n_Threads As Integer)
-        'in erbenden Klassen implementieren
+    Public Overridable Sub prepareMultithreading()
+
+        'Datensätze für Multithreading kopieren
+        Call Me.createThreadWorkDirs()
+
+        'Standardmäßig in Ordner Thread_0 simulieren
+        Me.WorkDir_Current = Me.getThreadWorkDir(0)
+
     End Sub
 
     ''' <summary>
@@ -180,8 +184,6 @@ Public MustInherit Class Sim
     ''' </summary>
     ''' <param name="pfad">Der Pfad</param>
     Public Sub setDatensatz(ByVal pfad As String)
-
-        Dim isOK As Boolean
 
         If (File.Exists(pfad)) Then
             'Datensatzname bestimmen
@@ -195,9 +197,6 @@ Public MustInherit Class Sim
 
         'Simulationsdaten einlesen
         Call Me.Read_SimParameter()
-
-        'Datensätze für Multithreading kopieren
-        isOK = Me.createThreadWorkDirs()
 
     End Sub
 
@@ -500,7 +499,7 @@ Public MustInherit Class Sim
             'Mit Multithreading
             '==================
             System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
-            OptTimePara.Start
+            OptTimePara.Start()
 
             Do
                 'Stoppen?
@@ -770,6 +769,11 @@ Public MustInherit Class Sim
         Dim StrRight As String
         Dim DateiPfad As String
         Dim WriteCheck As Boolean = False
+        Dim FiStr As FileStream
+        Dim StrRead As StreamReader
+        Dim StrReadSync As TextReader
+        Dim StrWrite As StreamWriter
+        Dim StrWriteSync As TextWriter
 
         'ModellParameter aus OptParametern kalkulieren()
         Call Me.OptParameter_to_ModellParameter()
@@ -780,9 +784,9 @@ Public MustInherit Class Sim
 
             DateiPfad = Me.WorkDir_Current & Me.Datensatz & "." & Me.mProblem.List_ModellParameter(i).Datei
             'Datei öffnen
-            Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-            Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+            FiStr = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
+            StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            StrReadSync = TextReader.Synchronized(StrRead)
 
             'Anzahl der Zeilen feststellen
             AnzZeil = 0
@@ -849,8 +853,8 @@ Handler:
             Zeilenarray(Me.mProblem.List_ModellParameter(i).ZeileNr - 1) = Zeile
 
             'Alle Zeilen wieder in Datei schreiben
-            Dim StrWrite As StreamWriter = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-            Dim StrWriteSync As TextWriter = TextWriter.Synchronized(StrWrite)
+            StrWrite = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            StrWriteSync = TextWriter.Synchronized(StrWrite)
 
             For j = 0 To AnzZeil - 1
                 StrWrite.WriteLine(Zeilenarray(j))
@@ -858,7 +862,6 @@ Handler:
 
             StrWriteSync.Close()
             StrWrite.Close()
-            FiStr.Close()
         Next
 
         If (Not WriteCheck) Then
@@ -940,10 +943,46 @@ Handler:
 #Region "Multithreading"
 
     ''' <summary>
+    ''' Ermittelt basierend auf der Anzahl der physikalischen Prozessoren die Anzahl zu verwendender Threads
+    ''' </summary>
+    ''' <remarks>Wenn Multithreading ausgeschaltet ist, wird nur 1 Thread benutzt</remarks>
+    Protected ReadOnly Property n_Threads() As Integer
+        Get
+
+            'Wenn Multithreading ausgeschaltet ist, nur 1 Thread benutzen
+            If (Not Me.mSettings.General.useMultithreading) Then
+                Return 1
+            End If
+
+            'Ansonsten Anzahl Threads ausrechnen:
+            '------------------------------------
+            Dim n_CPU As Integer
+            'Dim LogCPU As Integer = 0
+            'Dim PhysCPU As Integer = 0
+
+            'Gibt wahrscheinlich die Anzahl virtueller und physikalischer Prozessoren zurück
+            n_CPU = Environment.ProcessorCount
+            'LogCPU = Environment.ProcessorCount
+            'PhysCPU = Environment.ProcessorCount
+
+            If n_CPU = 1 Then
+                n_Threads = 4
+            Else
+                n_Threads = (2 * n_CPU) + 1
+            End If
+
+            'n_Threads = 6
+
+            Return n_Threads
+
+        End Get
+    End Property
+
+    ''' <summary>
     ''' Datensätze für Multithreading kopieren
     ''' </summary>
     ''' <returns>True wenn fertig</returns>
-    ''' <remarks>Erstellt im bin-Ordner Verzeichnisse Thread_1 bis Thread_n</remarks>
+    ''' <remarks>Erstellt im bin-Ordner Verzeichnisse Thread_0 bis Thread_n</remarks>
     Private Function createThreadWorkDirs() As Boolean
 
         Dim i As Integer
@@ -984,7 +1023,7 @@ Handler:
     ''' </summary>
     ''' <param name="rootdirectory">Das zu durchsuchende Verzeichnis</param>
     ''' <returns></returns>
-    Protected Function getDatensatzFiles(ByVal rootdirectory As String) As String()
+    Private Function getDatensatzFiles(ByVal rootdirectory As String) As String()
 
         Dim Files() As IO.FileInfo
         Dim DirInfo, Dirs() As IO.DirectoryInfo

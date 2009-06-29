@@ -51,9 +51,6 @@ Partial Class Form1
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
-    '**** Multithreading ****
-    Private n_Threads As Integer                        'Anzahl der Threads
-
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
     Private WithEvents scatterplot1, scatterplot2 As EVO.Diagramm.Scatterplot
@@ -74,9 +71,6 @@ Partial Class Form1
 
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
-
-        'Anzahl der möglichen Threads wird ermittelt
-        Me.n_Threads = Me.determineNoOfThreads()
 
         'Monitor zuweisen
         Me.Monitor1 = EVO.Diagramm.Monitor.getInstance()
@@ -151,7 +145,7 @@ Partial Class Form1
         Call Me.Hauptdiagramm1.Reset()
 
         'SolutionDialog
-        If (Not isNothing(Me.solutionDialog)) Then
+        If (Not IsNothing(Me.solutionDialog)) Then
             Me.solutionDialog.Close()
             Me.solutionDialog = Nothing
         End If
@@ -199,7 +193,7 @@ Partial Class Form1
     'Wiki aufrufen
     '*************
     Private Sub Help(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_Help.Click
-        Call Process.Start(HelpUrl)
+        Call Process.Start(HelpURL)
     End Sub
 
     'Einstellungen-Button hat selbst keine funktionalität -> nur DropDown
@@ -368,11 +362,10 @@ Partial Class Form1
 
                 End Select
 
-                'Bei Sim-Anwendungen Multithreading vorbereiten
+                'Bei Sim-Anwendungen ggf. Multithreading-Option aktivieren
                 If (Not IsNothing(Me.Sim1)) Then
                     If (Me.Sim1.MultithreadingSupported) Then
                         Me.EVO_Einstellungen1.MultithreadingAllowed = True
-                        Call Me.Sim1.prepareThreads(Me.n_Threads)
                     End If
                 End If
 
@@ -880,6 +873,9 @@ Partial Class Form1
 
                     'Settings an Sim1 übergeben
                     Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
+
+                    'Multithreading vorbereiten
+                    Call Me.Sim1.prepareMultithreading()
 
                     'Startwerte evaluieren
                     If (Me.mProblem.Method <> METH_SENSIPLOT) Then
@@ -2020,34 +2016,6 @@ Partial Class Form1
     End Sub
 
 #End Region 'Ergebnisdatenbank
-
-    ''' <summary>
-    ''' Ermittelt basierend auf der Anzahl der physikalischen Prozessoren die Anzahl zu verwendender Threads
-    ''' </summary>
-    ''' <remarks></remarks>
-    Private Function determineNoOfThreads() As Integer
-
-        Dim n_CPU As Integer
-        'Dim LogCPU As Integer = 0
-        'Dim PhysCPU As Integer = 0
-        Dim n_Threads As Integer
-
-        'Gibt wahrscheinlich die Anzahl virtueller und physikalischer Prozessoren zurück
-        n_CPU = Environment.ProcessorCount
-        'LogCPU = Environment.ProcessorCount
-        'PhysCPU = Environment.ProcessorCount
-
-        If n_CPU = 1 Then
-            n_Threads = 4
-        Else
-            n_Threads = (2 * n_CPU) + 1
-        End If
-
-        'n_Threads = 6
-
-        Return n_Threads
-
-    End Function
 
     ''' <summary>
     ''' Die Optimierung stoppen

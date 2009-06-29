@@ -98,27 +98,26 @@ Public Class BlueM
     ''' <summary>
     ''' BlueM auf Multithreading vorbereiten
     ''' </summary>
-    ''' <param name="input_n_Threads">Anzahl Threads</param>
-    Public Overrides Sub prepareThreads(ByVal input_n_Threads As Integer)
+    Public Overrides Sub prepareMultithreading()
 
-        Me.n_Threads = input_n_Threads
+        Call MyBase.prepareMultithreading()
 
         'BlueM DLL instanzieren je nach Anzahl der Threads
         '-------------------------------------------------
-        ReDim bluem_dll(Me.n_Threads - 1)
+        ReDim bluem_dll(n_Threads - 1)
         Dim i As Integer
 
-        For i = 0 To Me.n_Threads - 1
+        For i = 0 To n_Threads - 1
             bluem_dll(i) = New BlueM_EngineDotNetAccess(dll_path)
         Next
 
         'Thread-Objekte instanzieren
-        ReDim MyBlueMThreads(Me.n_Threads - 1)
-        For i = 0 To Me.n_Threads - 1
+        ReDim MyBlueMThreads(n_Threads - 1)
+        For i = 0 To n_Threads - 1
             MyBlueMThreads(i) = New BlueMThread(i, -1, "Folder", Datensatz, bluem_dll(i))
             MyBlueMThreads(i).set_is_OK()
         Next
-        ReDim MyThreads(Me.n_Threads - 1)
+        ReDim MyThreads(n_Threads - 1)
 
     End Sub
 

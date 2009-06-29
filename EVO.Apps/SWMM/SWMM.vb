@@ -88,12 +88,12 @@ Public Class SWMM
     ''' <summary>
     ''' SWMM auf Multithreading vorbereiten
     ''' </summary>
-    ''' <param name="input_n_Threads">Anzahl Threads</param>
-    Public Overrides Sub prepareThreads(ByVal input_n_Threads As Integer)
+    Public Overrides Sub prepareMultithreading()
+
+        Call MyBase.prepareMultithreading()
 
         'SWMM DLL instanzieren je nach Anzahl der Threads
         '------------------------------------------------
-        Me.n_Threads = input_n_Threads
         ReDim swmm_dll(Me.n_Threads - 1)
         Dim i As Integer
 
@@ -197,7 +197,7 @@ Public Class SWMM
 
         Try
 
-            Call swmm_dll(0).Initialize(Me.WorkDir_Current & Me.Datensatz)
+			Call swmm_dll(0).Initialize(Me.WorkDir_Current & Me.Datensatz)
             Call swmm_dll(0).Start(1)
 
             Dim elapsedTime As Double = 0.0
