@@ -74,14 +74,14 @@ Public Class TSP
 
     '******************************** Initialisierung *************************************
 
-    Public Sub TSP_Initialize(ByRef TChart1 As EVO.Diagramm.Hauptdiagramm)
+    Public Sub TSP_Initialize()
 
         Dim i As Integer
+
         ReDim ListOfCities(n_Cities - 1, 2)
         'Dim Problem As String = "Circle"
 
         Randomize()
-        Call TeeChart_Initialise_TSP(TChart1)
 
         Select Case Problem
 
@@ -102,8 +102,6 @@ Public Class TSP
                     ListOfCities(i, 2) = Math.Round(Rnd() * 130)
                 Next
         End Select
-
-        Call TeeChart_Zeichnen_TSP_cities(TChart1, ListOfCities)
 
     End Sub
 
@@ -717,83 +715,6 @@ Public Class TSP
         If tmp_c = 0 Then Even_Number = True
     End Function
 
-
-    '******************************************* TeeChart Funktionen **********************************
-    'BUG 212: Nach Klasse Diagramm auslagern!
-    Public Sub TeeChart_Initialise_TSP(ByRef TChart1 As EVO.Diagramm.Hauptdiagramm)
-        Dim i As Integer
-
-        With TChart1
-            .Clear()
-            .Header.Text = "Traveling Salesman Problem"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Formatierung der Axen
-            '.Chart.Axes.Bottom.Title.Caption = BlueM1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Bottom.Automatic = False
-            .Chart.Axes.Bottom.Minimum = 0
-            .Chart.Axes.Bottom.Maximum = 100
-            '.Chart.Axes.Left.Title.Caption = BlueM1.OptParameterListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            .Chart.Axes.Left.Automatic = False
-            .Chart.Axes.Left.Minimum = 0
-            .Chart.Axes.Left.Maximum = 130
-
-            'Series(0): Series für die Sädte.
-            Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
-            Point1.Title = "Städte"
-            Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
-            Point1.Pointer.HorizSize = 2
-            Point1.Pointer.VertSize = 2
-
-            'Series(n): für die Reisen
-            For i = 1 To n_Cities
-                Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
-                Line1.Title = "Reisen"
-                Line1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Line1.Color = System.Drawing.Color.Blue
-                Line1.Pointer.HorizSize = 3
-                Line1.Pointer.VertSize = 3
-            Next
-
-        End With
-    End Sub
-
-    Public Sub TeeChart_Zeichnen_TSP(ByRef TChart1 As EVO.Diagramm.Hauptdiagramm, ByVal TmpListOfCities(,) As Object)
-
-        Dim i As Integer
-
-        'Zeichnene der Punkte für die Städte
-        For i = 0 To n_Cities - 1
-            TChart1.Series(0).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
-        Next
-
-        'Zeichnen der einzelnen Verbindungen
-        'Es werden einzelne Serien verwendet, da die Werte gerne mal der X-Achse entsprechend sortiert werden
-        TChart1.Series(1).Clear()
-        For i = 1 To n_Cities - 1
-            TChart1.Series(i + 1).Clear()
-            TChart1.Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), Drawing.Color.Blue)
-            TChart1.Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), Drawing.Color.Blue)
-        Next
-
-        'Zeichnen der Verbindung von der ersten bis zur letzten Stadt
-        TChart1.Series(1).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
-        TChart1.Series(n_Cities).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
-
-    End Sub
-
-    Public Sub TeeChart_Zeichnen_TSP_cities(ByRef TChart1 As EVO.Diagramm.Hauptdiagramm, ByVal TmpListOfCities(,) As Object)
-
-        Dim i As Integer
-
-        'Zeichnene der Punkte für die Städte
-        For i = 0 To n_Cities - 1
-            TChart1.Series(0).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
-        Next
-
-    End Sub
 
     Public Function Faculty(ByVal n As Double) As Double
         Dim i As Integer
