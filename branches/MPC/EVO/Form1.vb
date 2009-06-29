@@ -1084,8 +1084,67 @@ Partial Public Class Form1
 	'************************************
 	Private Sub STARTEN_TSP()
 
+        'Batch_Mode
+        Dim Batch_Mode As Boolean = True
+        'Anzahl der Tests
+        Dim n As Integer = 3
+
+        'Progress
+        mProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
+
+        'Monitor Stuff
+        Me.Monitor1.SelectTabLog()
+        Me.Monitor1.Show()
+        Me.Monitor1.LogAppend("Cities: " & TSP1.n_Cities)
+        Me.Monitor1.LogAppend("Combinations: " & TSP1.Faculty(TSP1.n_Cities) / 2)
+        Me.Monitor1.LogAppend("Parents: " & TSP1.n_Parents)
+        Me.Monitor1.LogAppend("Childs: " & TSP1.n_Childs)
+        Me.Monitor1.LogAppend("Generations: " & TSP1.n_Gen)
+        Me.Monitor1.LogAppend("Evaluations: " & TSP1.n_Childs * TSP1.n_Gen)
+        If TSP1.Problem = Apps.TSP.EnProblem.circle Then
+            Me.Monitor1.LogAppend("Quality Aim: " & Conversion.Int(TSP1.circumference))
+        End If
+
+        Select Case Batch_Mode
+
+            Case False
+                'Progress
+                mProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
+                Call TSP_Controller(False)
+
+            Case True
+                'Progress
+                mProgress.Initialize(n, 8, TSP1.n_Gen, TSP1.n_Childs)
+                Dim i, M, R As Integer
+
+                For R = 1 To 2
+                    TSP1.ReprodOperator = R
+
+                    For M = 1 To 4
+                        TSP1.MutOperator = M
+                        Me.Monitor1.LogAppend("ReprodOperator: " & TSP1.ReprodOperator & "; MutationOperator: " & TSP1.MutOperator)
+
+                        'n Wiederholungen
+                        For i = 1 To n
+                            Call TSP_Controller(True)
+                        Next
+                        '~~~~~~~~~~~~~~~~
+                    Next
+                Next
+        End Select
+
+    End Sub
+
+    Private Sub TSP_Controller(ByVal Batch_Mode As Boolean)
+
 		'Laufvariable für die Generationen
 		Dim gen As Integer
+        Dim i As Integer
+        Dim GoToExit As Boolean
+
+        'Intervall zum Updaten des Diagramms
+        Dim increm As Integer = 100
+        Dim jepp As Integer = 0
 
 		'BUG 212: Nach Klasse Diagramm auslagern!
 		Call TSP1.TeeChart_Initialise_TSP(Me.Hauptdiagramm1)
@@ -1113,10 +1172,41 @@ Partial Public Class Form1
 			Call TSP1.Selection_Process()
 
 			'Zeichnen des besten Elter
-			'TODO: funzt nur, wenn ganz am ende gezeichnet wird
-			If gen = TSP1.n_Gen Then
+            If gen >= jepp Then
 				Call TSP1.TeeChart_Zeichnen_TSP(Me.Hauptdiagramm1, TSP1.ParentList(0).Image)
-			End If
+                Me.Hauptdiagramm1.Update()
+                jepp += increm
+                mProgress.iGen() = gen
+                If Batch_Mode = False Then
+                    Me.Monitor1.LogAppend("Genearation: " & gen & "; Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
+                End If
+            End If
+
+            'Fall die Problemstellung ein Kreis ist wird abgebrochen, wenn das Optimum erreicht ist
+            If TSP1.Problem = Apps.TSP.EnProblem.circle And TSP1.ParentList(0).Penalty < TSP1.circumference Then
+                GoToExit = True
+                Select Case TSP1.ParentList(0).Path(0) < TSP1.ParentList(0).Path(1)
+                    Case True
+                        For i = 0 To TSP1.n_Cities - 2
+                            If Not TSP1.ParentList(0).Path(i) + 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = TSP1.n_Cities And TSP1.ParentList(0).Path(i + 1) = 1) Then
+                                GoToExit = False
+                                Exit For
+                            End If
+                        Next
+                    Case Else
+                        For i = 0 To TSP1.n_Cities - 2
+                            If Not TSP1.ParentList(0).Path(i) - 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = 1 And TSP1.ParentList(0).Path(i + 1) = TSP1.n_Cities) Then
+                                GoToExit = False
+                                Exit For
+                            End If
+                        Next
+                End Select
+
+            End If
+
+            If GoToExit = True Then
+                Exit For
+            End If
 
 			'Kinder werden Hier vollständig gelöscht
 			Call TSP1.Reset_Childs()
@@ -1128,6 +1218,8 @@ Partial Public Class Form1
 			Call TSP1.Mutation_Control()
 
 		Next gen
+
+        Me.Monitor1.LogAppend("Final Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
 
 	End Sub
 
