@@ -131,6 +131,10 @@
       <Project>{A9272445-616D-4B4F-ACFF-DE6F5591AF63}</Project>
       <Name>SensiPlot</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EVO.Algos\TSP\TSP.vbproj">
+      <Project>{6FCD5583-4A2A-4298-8A48-D46FAEFC5D7C}</Project>
+      <Name>TSP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EVO.Apps\EVO.Apps.vbproj">
       <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
       <Name>EVO.Apps</Name>
