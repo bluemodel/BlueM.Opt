@@ -13,6 +13,9 @@ NEW:
   - Possibility of using simulation result values for objective functions
 * The problem description is displayed in the log after loading
 * For PES-problems that have 'Schrittweitenvektor' switched on, the Monitor now displays the step size of each parameter separately (bug 374)
+CHANGED:
+* Simulations are now always carried out in a temporary "Thread_N" folder
+  (Exception: simulation of selected solutions for displaying results in Wave)
 
 Version 1.3
 -----------
