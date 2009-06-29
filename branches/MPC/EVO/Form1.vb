@@ -58,8 +58,6 @@ Partial Public Class Form1
     Dim isrun As Boolean = False                        'Optimierung läuft
     Dim ispause As Boolean = False                      'Optimierung ist pausiert
 
-    '**** Multithreading ****
-
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
     Private WithEvents scatterplot1, scatterplot2 As EVO.Diagramm.Scatterplot
@@ -114,7 +112,7 @@ Partial Public Class Form1
 		'XP-look
 		System.Windows.Forms.Application.EnableVisualStyles()
 
-
+		'Monitor zuweisen
 		Me.Monitor1 = EVO.Diagramm.Monitor.getInstance()
 
 		'Formular initialisieren
@@ -412,7 +410,7 @@ Partial Public Class Form1
 
 				End Select
 
-				'Bei Sim-Anwendungen Multithreading vorbereiten
+				'Bei Sim-Anwendungen ggf. Multithreading-Option aktivieren
 				If (Not IsNothing(Me.Sim1)) Then
 					If (Me.Sim1.MultithreadingSupported) Then
 						Me.EVO_Einstellungen1.MultithreadingAllowed = True
@@ -963,8 +961,8 @@ Partial Public Class Form1
 					'Settings an Sim1 übergeben
 					Call Me.Sim1.setSettings(Me.mSettings)
 
-					'Anzahl Threads bestimmen und übergeben
-					Call Me.Sim1.prepareThreads(Me.n_Threads)
+					'Multithreading vorbereiten
+					Call Me.Sim1.prepareMultithreading()
 
 					'Startwerte evaluieren
 					If (Me.mProblem.Method <> METH_SENSIPLOT) Then
