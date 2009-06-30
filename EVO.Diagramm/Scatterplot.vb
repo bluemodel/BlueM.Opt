@@ -29,7 +29,7 @@ Partial Public Class Scatterplot
     Private dimension As Integer
     Private OptResult, OptResultRef As EVO.OptResult.OptResult
     Private Auswahl() As Integer
-    Private ShowSekPopOnly, ShowRefResult As Boolean
+    Private ShowSekPopOnly, ShowStartValue, ShowIstWerte, ShowRefResult As Boolean
     Private ShownSpace As EVO.Common.SPACE
 
 #End Region 'Eigenschaften
@@ -80,6 +80,8 @@ Partial Public Class Scatterplot
             Me.Auswahl = Dialog.selectedVariables
             Me.ShowSekPopOnly = Dialog.ShowSekPopOnly
             Me.ShowRefResult = Dialog.ShowRefResult
+            Me.ShowStartValue = Dialog.ShowStartValue
+            Me.ShowIstWerte = Dialog.ShowIstWerte
 
             Application.DoEvents()
 
@@ -154,15 +156,19 @@ Partial Public Class Scatterplot
                     max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)), max(i))
                 Next
             End If
+
             'Startwert
-            ind = Me.OptResult.getSolution(1)
-            min(i) = Math.Min(ind.Objectives(Me.Auswahl(i)), min(i))
-            max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)), max(i))
-            'IstWerte
-            If (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert) Then
-                min(i) = Math.Min(Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert, min(i))
-                max(i) = Math.Max(Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert, max(i))
+            If (Me.ShowStartValue) Then
+                ind = Me.OptResult.getSolution(1)
+                min(i) = Math.Min(ind.Objectives(Me.Auswahl(i)), min(i))
+                max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)), max(i))
+                'IstWerte
+                If (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert) Then
+                    min(i) = Math.Min(Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert, min(i))
+                    max(i) = Math.Max(Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert, max(i))
+                End If
             End If
+
             'Vergleichsergebnis
             If (Me.ShowRefResult) Then
                 For Each ind In Me.OptResultRef.getSekPop()
@@ -257,50 +263,52 @@ Partial Public Class Scatterplot
 
                     'IstWerte eintragen
                     '==================
-                    If (i <> j And _
-                        (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert Or _
-                        Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).hasIstWert)) Then
+                    If (Me.ShowIstWerte) Then
+                        If (i <> j And _
+                            (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert Or _
+                            Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).hasIstWert)) Then
 
-                        shape1 = New Steema.TeeChart.Styles.Shape(.Chart)
-                        shape1.Style = Steema.TeeChart.Styles.ShapeStyles.Rectangle
-                        shape1.Title = "Verbesserungsbereich"
+                            shape1 = New Steema.TeeChart.Styles.Shape(.Chart)
+                            shape1.Style = Steema.TeeChart.Styles.ShapeStyles.Rectangle
+                            shape1.Title = "Verbesserungsbereich"
 
-                        'Shape formatieren
-                        shape1.Color = Color.Black
-                        shape1.Brush.Style = Drawing2D.HatchStyle.DarkUpwardDiagonal
-                        shape1.Brush.Color = Color.Black
-                        shape1.Brush.ForegroundColor = Color.White
-                        shape1.Brush.Transparency = 75
-                        shape1.Pen.Transparency = 0
-                        shape1.Pen.Color = Color.Red
-                        shape1.Pen.Width = 1
+                            'Shape formatieren
+                            shape1.Color = Color.Black
+                            shape1.Brush.Style = Drawing2D.HatchStyle.DarkUpwardDiagonal
+                            shape1.Brush.Color = Color.Black
+                            shape1.Brush.ForegroundColor = Color.White
+                            shape1.Brush.Transparency = 75
+                            shape1.Pen.Transparency = 0
+                            shape1.Pen.Color = Color.Red
+                            shape1.Pen.Width = 1
 
-                        If (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert And _
-                             Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).hasIstWert) Then
-                            'X- und Y-Werte:
-                            '---------------
-                            shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
-                            shape1.X1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert
-                            shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
-                            shape1.Y1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).IstWert
+                            If (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert And _
+                                 Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).hasIstWert) Then
+                                'X- und Y-Werte:
+                                '---------------
+                                shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
+                                shape1.X1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert
+                                shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
+                                shape1.Y1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).IstWert
 
-                        ElseIf (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert) Then
-                            'Nur X-Wert:
-                            '-----------
-                            shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
-                            shape1.X1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert
-                            shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
-                            shape1.Y1 = max(j) * 1.1 ^ (max(j) / Math.Abs(max(j)))
+                            ElseIf (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert) Then
+                                'Nur X-Wert:
+                                '-----------
+                                shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
+                                shape1.X1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert
+                                shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
+                                shape1.Y1 = max(j) * 1.1 ^ (max(j) / Math.Abs(max(j)))
 
-                        ElseIf (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).hasIstWert) Then
-                            'Nur Y-Wert:
-                            '-----------
-                            shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
-                            shape1.X1 = max(i) * 1.1 ^ (max(i) / Math.Abs(max(i)))
-                            shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
-                            shape1.Y1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).IstWert
+                            ElseIf (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).hasIstWert) Then
+                                'Nur Y-Wert:
+                                '-----------
+                                shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
+                                shape1.X1 = max(i) * 1.1 ^ (max(i) / Math.Abs(max(i)))
+                                shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
+                                shape1.Y1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).IstWert
+                            End If
+
                         End If
-
                     End If
 
                     'Lösungen eintragen
@@ -331,9 +339,11 @@ Partial Public Class Scatterplot
 
                     'Startwert
                     '=========
-                    serie = .getSeriesPoint("Startwert", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                    ind = Me.OptResult.getSolution(1)
-                    serie.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID.ToString())
+                    If (Me.ShowStartValue) Then
+                        serie = .getSeriesPoint("Startwert", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        ind = Me.OptResult.getSolution(1)
+                        serie.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID.ToString())
+                    End If
 
 
                     'Vergleichsergebnis anzeigen
@@ -507,8 +517,10 @@ Partial Public Class Scatterplot
 
                     'Startwerte der Parameter eintragen
                     '==================================
-                    serie = .getSeriesPoint("Startwert", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                    serie.Add(Me.mProblem.List_OptParameter(Me.Auswahl(i)).StartWert, Me.mProblem.List_OptParameter(Me.Auswahl(j)).StartWert, "Startwert")
+                    If (Me.ShowStartValue) Then
+                        serie = .getSeriesPoint("Startwert", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie.Add(Me.mProblem.List_OptParameter(Me.Auswahl(i)).StartWert, Me.mProblem.List_OptParameter(Me.Auswahl(j)).StartWert, "Startwert")
+                    End If
 
                     'Diagramme auf der Diagonalen ausblenden
                     '=======================================
