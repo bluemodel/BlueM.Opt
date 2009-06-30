@@ -27,12 +27,18 @@ Public Class Controller
     ''' <param name="inputSettings"></param>
     ''' <param name="inputProgress"></param>
     ''' <param name="inputHptDiagramm"></param>
-    Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.EVO_Settings, ByRef inputProgress As Common.Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
+    Public Sub Init(ByRef inputProblem As Common.Problem, _
+                    ByRef inputSettings As Common.EVO_Settings, _
+                    ByRef inputProgress As Common.Progress, _
+                    ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
 
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
         Me.myProgress = inputProgress
         Me.myHauptDiagramm = inputHptDiagramm
+
+        'Individuumsklasse initialisieren
+        EVO.Common.Individuum.Initialise(Me.myProblem)
 
         Me.myMonitor = EVO.Diagramm.Monitor.getInstance()
     End Sub
@@ -122,6 +128,7 @@ Public Class Controller
 
             'HACK: OptParameter ins Individuum kopieren
             For i = 0 To ind.OptParameter.Length - 1
+                Call Array.Copy(Me.myProblem.List_OptParameter, ind.OptParameter, Me.myProblem.NumOptParams)
                 ind.OptParameter(i).Xn = aktuellePara(i)
             Next
 
@@ -167,6 +174,7 @@ Public Class Controller
 
                 'HACK: OptParameter ins Individuum kopieren
                 For i = 0 To ind.OptParameter.Length - 1
+                    Call Array.Copy(Me.myProblem.List_OptParameter, ind.OptParameter, Me.myProblem.NumOptParams)
                     ind.OptParameter(i).Xn = aktuellePara(i)
                 Next
 
@@ -204,6 +212,7 @@ Public Class Controller
 
                     'HACK: OptParameter ins Individuum kopieren
                     For i = 0 To ind.OptParameter.Length - 1
+                        Call Array.Copy(Me.myProblem.List_OptParameter, ind.OptParameter, Me.myProblem.NumOptParams)
                         ind.OptParameter(i).Xn = aktuellePara(i)
                     Next
 

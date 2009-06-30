@@ -36,6 +36,9 @@ namespace modelEAU.DDS
             this.mProgress = inputProgress;
             this.Hauptdiagramm1 = inputHauptdiagramm;
 
+            //Individuumsklasse initialisieren
+            IHWB.EVO.Common.Individuum.Initialise(ref this.mProblem);
+
             this.mMonitor = IHWB.EVO.Diagramm.Monitor.getInstance();
         }
 
@@ -136,6 +139,7 @@ namespace modelEAU.DDS
                 //------------------------------------
                 for (j = 0; j < ind.OptParameter.Length; j++)
                 {
+                    Array.Copy(this.mProblem.List_OptParameter, ind.OptParameter, this.mProblem.NumOptParams);
                     ind.OptParameter[j].Xn = Current_Parameter[j];
                 }
 
@@ -203,6 +207,7 @@ namespace modelEAU.DDS
                 //------------------------------------
                 for (j = 0; j < ind.OptParameter.Length; j++)
                 {
+                    Array.Copy(this.mProblem.List_OptParameter, ind.OptParameter, this.mProblem.NumOptParams);
                     ind.OptParameter[j].Xn = Current_Parameter[j];
                 }
 
