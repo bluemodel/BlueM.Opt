@@ -642,7 +642,7 @@ Partial Class Form1
 
                         'Kontrolle: Nur SO möglich!
                         If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
-                            Throw New Exception("Methode von Hook und Jeeves erlaubt nur Single-Objective Optimierung!")
+                            Throw New Exception("Methode von Hooke und Jeeves erlaubt nur Single-Objective Optimierung!")
                         End If
 
                         'Ergebnis-Buttons
