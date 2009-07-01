@@ -291,9 +291,10 @@ Public Class EVO_Settings
         Public Problempfad As String        'Pfad zum Problem
         Public Problemname As String        'Dateiname des Problems
         Public Ausgabepfad As String        'In welchem Ordner die Ausgaben erzeugt werden sollen
-        Public Schrittweite As Integer      'In welchen Abständen die Eingaben betrachtet werden sollen (Minuten)
+        Public SteuerungsAdaption As TimeSpan 'In welchen Abständen die Steuerung aktualisiert werden soll
+        Public SteuerungsSchritt As TimeSpan 'In welchen Abständen eine Steuerung erfolgt
         Public MPC_Round As Integer         'Wie oft MPC schon gelaufen ist
-        Public Vorhersage As Integer        'Welcher Zeitraum zur Vorhersage herangezogen werden soll (Stunden)
+        Public Vorhersage As TimeSpan       'Welcher Zeitraum zur Vorhersage herangezogen werden soll 
         Public Start As DateTime            'Wann die Berechnung der Steuerung gestartet werden soll
         Public Ende As DateTime             'Wann die Berechnung der Steuerung enden soll
 
