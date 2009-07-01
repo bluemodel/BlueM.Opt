@@ -126,9 +126,8 @@ Public Class Controller
             'Individuum instanzieren
             ind = New Common.Individuum_PES("HJ", durchlauf)
 
-            'HACK: OptParameter ins Individuum kopieren
+            'OptParameter ins Individuum kopieren
             For i = 0 To ind.OptParameter.Length - 1
-                Call Array.Copy(Me.myProblem.List_OptParameter, ind.OptParameter, Me.myProblem.NumOptParams)
                 ind.OptParameter(i).Xn = aktuellePara(i)
             Next
 
@@ -172,9 +171,8 @@ Public Class Controller
                 'Individuum instanzieren
                 ind = New Common.Individuum_PES("HJ", durchlauf)
 
-                'HACK: OptParameter ins Individuum kopieren
+                'OptParameter ins Individuum kopieren
                 For i = 0 To ind.OptParameter.Length - 1
-                    Call Array.Copy(Me.myProblem.List_OptParameter, ind.OptParameter, Me.myProblem.NumOptParams)
                     ind.OptParameter(i).Xn = aktuellePara(i)
                 Next
 
@@ -210,9 +208,8 @@ Public Class Controller
                     'Individuum instanzieren
                     ind = New Common.Individuum_PES("HJ", durchlauf)
 
-                    'HACK: OptParameter ins Individuum kopieren
+                    'OptParameter ins Individuum kopieren
                     For i = 0 To ind.OptParameter.Length - 1
-                        Call Array.Copy(Me.myProblem.List_OptParameter, ind.OptParameter, Me.myProblem.NumOptParams)
                         ind.OptParameter(i).Xn = aktuellePara(i)
                     Next
 
@@ -222,6 +219,7 @@ Public Class Controller
 
                         'Evaluierung Sim
                         SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
+
                         'TODO: Evaluierungsfehler behandeln
 
                         'Lösung im TeeChart einzeichnen

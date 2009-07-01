@@ -84,8 +84,6 @@ namespace IHWB.EVO.MetaEvo
 
             this.role = this.settings.MetaEvo.Role;
 
-            //Setzen des Problems zum Design des Individuums
-            EVO.Common.Individuum_MetaEvo.Initialise(ref this.prob);
             individuumnumber = 2;
 
             this.monitor1.Show();

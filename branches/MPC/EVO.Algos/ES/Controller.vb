@@ -908,34 +908,36 @@ Public Class Controller
             Case METH_HYBRID
                 'HYBRID:
                 '-------
-                If (Me.mySettings.PES.Schrittweite.is_DnVektor) Then
-                    'Bei Schrittweitenvektor mehrere Linien
-                    For i = 0 To ind.OptParameter.Length - 1
-                        'Parameter zuordnen
-                        For j = 0 To Me.myProblem.List_OptParameter_Save.Length - 1
-                            If (ind.OptParameter(i).Bezeichnung = Me.myProblem.List_OptParameter_Save(j).Bezeichnung) Then
-                                Me.Line_Dn(j).Add(durchlauf, ind.OptParameter(i).Dn, durchlauf.ToString)
-                                Exit For
-                            End If
+                If (ind.OptParameter.Length > 0) Then
+                    If (Me.mySettings.PES.Schrittweite.is_DnVektor) Then
+                        'Bei Schrittweitenvektor mehrere Linien
+                        For i = 0 To ind.OptParameter.Length - 1
+                            'Parameter zuordnen
+                            For j = 0 To Me.myProblem.List_OptParameter_Save.Length - 1
+                                If (ind.OptParameter(i).Bezeichnung = Me.myProblem.List_OptParameter_Save(j).Bezeichnung) Then
+                                    Me.Line_Dn(j).Add(durchlauf, ind.OptParameter(i).Dn, durchlauf.ToString)
+                                    Exit For
+                                End If
+                            Next
                         Next
-                    Next
-                Else
-                    'Ansonsten nur eine Schrittweite
-                    Me.Line_Dn(0).Add(durchlauf, ind.OptParameter(0).Dn, durchlauf.ToString)
+                    Else
+                        'Ansonsten nur eine Schrittweite
+                        Me.Line_Dn(0).Add(durchlauf, ind.OptParameter(0).Dn, durchlauf.ToString)
+                    End If
                 End If
 
             Case METH_PES
-                'PES
-                '---
-                If (Me.mySettings.PES.Schrittweite.is_DnVektor) Then
-                    'Bei Schrittweitenvektor mehrere Linien
-                    For i = 0 To ind.OptParameter.Length - 1
-                        Me.Line_Dn(i).Add(durchlauf, ind.OptParameter(i).Dn, durchlauf.ToString)
-                    Next
-                Else
-                    'Ansonsten nur eine Schrittweite
-                    Me.Line_Dn(0).Add(durchlauf, ind.OptParameter(0).Dn, durchlauf.ToString)
-                End If
+                    'PES
+                    '---
+                    If (Me.mySettings.PES.Schrittweite.is_DnVektor) Then
+                        'Bei Schrittweitenvektor mehrere Linien
+                        For i = 0 To ind.OptParameter.Length - 1
+                            Me.Line_Dn(i).Add(durchlauf, ind.OptParameter(i).Dn, durchlauf.ToString)
+                        Next
+                    Else
+                        'Ansonsten nur eine Schrittweite
+                        Me.Line_Dn(0).Add(durchlauf, ind.OptParameter(0).Dn, durchlauf.ToString)
+                    End If
 
         End Select
 
