@@ -401,34 +401,44 @@ Partial Class Form1
         'Combo_Datensatz auffüllen
         Call Me.Datensatz_populateCombo()
 
+        Select Case Me.Anwendung
 
-        If (Me.Anwendung = ANW_TESTPROBLEME) Then
+            Case ANW_TESTPROBLEME
+                'Testprobleme:
+                '-------------
 
-            'Bei Testproblemen:
-            '------------------
+                'Browse-Button deaktivieren
+                Me.Button_BrowseDatensatz.Enabled = False
 
-            'Browse-Button deaktivieren
-            Me.Button_BrowseDatensatz.Enabled = False
+            Case ANW_TSP
+                'Traveling Salesman:
+                '-------------------
 
-        Else
-            'Bei Simulationsanwendungen:
-            '---------------------------
+                'Alles deaktivieren
+                Me.Label_Datensatz.Enabled = False
+                Me.ComboBox_Datensatz.Enabled = False
+                Me.Button_BrowseDatensatz.Enabled = False
 
-            'Browse-Button aktivieren
-            Me.Button_BrowseDatensatz.Enabled = True
+            Case Else
+                'Simulationsanwendungen:
+                '-----------------------
 
-            'zuletzt benutzten Datensatz setzen?
-            If (Me.ComboBox_Datensatz.Items.Count > 0) Then
-                'obersten (zuletzt genutzten) Datensatz auswählen
-                pfad = Me.ComboBox_Datensatz.Items(0)
-                Me.ComboBox_Datensatz.SelectedItem = pfad
-                'Datensatz setzen
-                Cursor = Cursors.WaitCursor
-                Call Sim1.setDatensatz(pfad)
-                Cursor = Cursors.Default
-            End If
+                'Browse-Button aktivieren
+                Me.Button_BrowseDatensatz.Enabled = True
 
-        End If
+                'zuletzt benutzten Datensatz setzen?
+                If (Me.ComboBox_Datensatz.Items.Count > 0) Then
+                    'obersten (zuletzt genutzten) Datensatz auswählen
+                    pfad = Me.ComboBox_Datensatz.Items(0)
+                    Me.ComboBox_Datensatz.SelectedItem = pfad
+                    'Datensatz setzen
+                    Cursor = Cursors.WaitCursor
+                    Call Sim1.setDatensatz(pfad)
+                    Cursor = Cursors.Default
+                End If
+
+        End Select
+
 
     End Sub
 
@@ -448,6 +458,10 @@ Partial Class Form1
 
                 'Mit Testproblemen füllen
                 Me.ComboBox_Datensatz.Items.AddRange(Testprobleme1.Testprobleme)
+
+            Case ANW_TSP
+
+                'Datensatz nicht erforderlich
 
             Case Else '(Sim-Anwendungen)
 
