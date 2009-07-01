@@ -27,7 +27,10 @@ Public Class Controller
     ''' <param name="inputSettings"></param>
     ''' <param name="inputProgress"></param>
     ''' <param name="inputHptDiagramm"></param>
-    Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.EVO_Settings, ByRef inputProgress As Common.Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
+    Public Sub Init(ByRef inputProblem As Common.Problem, _
+                    ByRef inputSettings As Common.EVO_Settings, _
+                    ByRef inputProgress As Common.Progress, _
+                    ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
 
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
@@ -120,7 +123,7 @@ Public Class Controller
             'Individuum instanzieren
             ind = New Common.Individuum_PES("HJ", durchlauf)
 
-            'HACK: OptParameter ins Individuum kopieren
+            'OptParameter ins Individuum kopieren
             For i = 0 To ind.OptParameter.Length - 1
                 ind.OptParameter(i).Xn = aktuellePara(i)
             Next
@@ -165,7 +168,7 @@ Public Class Controller
                 'Individuum instanzieren
                 ind = New Common.Individuum_PES("HJ", durchlauf)
 
-                'HACK: OptParameter ins Individuum kopieren
+                'OptParameter ins Individuum kopieren
                 For i = 0 To ind.OptParameter.Length - 1
                     ind.OptParameter(i).Xn = aktuellePara(i)
                 Next
@@ -202,7 +205,7 @@ Public Class Controller
                     'Individuum instanzieren
                     ind = New Common.Individuum_PES("HJ", durchlauf)
 
-                    'HACK: OptParameter ins Individuum kopieren
+                    'OptParameter ins Individuum kopieren
                     For i = 0 To ind.OptParameter.Length - 1
                         ind.OptParameter(i).Xn = aktuellePara(i)
                     Next
@@ -213,6 +216,7 @@ Public Class Controller
 
                         'Evaluierung Sim
                         SIM_Eval_is_OK = Me.Sim1.Evaluate(ind)
+
                         'TODO: Evaluierungsfehler behandeln
 
                         'Lösung im TeeChart einzeichnen
