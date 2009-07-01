@@ -23,7 +23,6 @@ Imports IHWB.EVO.Common.Constants
 ''' <summary>
 ''' Main Window
 ''' </summary>
-''' 
 Partial Public Class Form1
     Inherits System.Windows.Forms.Form
 
@@ -49,7 +48,6 @@ Partial Public Class Form1
     'Apps
     Private Testprobleme1 As EVO.Apps.Testprobleme
     Public WithEvents Sim1 As EVO.Apps.Sim
-    Private TSP1 As EVO.Apps.TSP
 
     'Controller
     Private controller As EVO.IController
@@ -68,46 +66,12 @@ Partial Public Class Form1
 
 #End Region 'Eigenschaften
 
-	''' <summary>
-	''' Ermittelt basierend auf der Anzahl der physikalischen Prozessoren die Anzahl zu verwendender Threads
-	''' </summary>
-	''' <remarks></remarks>
-	Private ReadOnly Property n_Threads() As Integer
-
-		Get
-
-			If (Not Me.mSettings.General.UseMultiThreading) Then
-				Return 1
-			End If
-
-			Dim n_CPU As Integer
-			'Dim LogCPU As Integer = 0
-			'Dim PhysCPU As Integer = 0
-
-			'Gibt wahrscheinlich die Anzahl virtueller und physikalischer Prozessoren zurück
-			n_CPU = Environment.ProcessorCount
-			'LogCPU = Environment.ProcessorCount
-			'PhysCPU = Environment.ProcessorCount
-
-			If n_CPU = 1 Then
-				n_Threads = 4
-			Else
-				n_Threads = (2 * n_CPU) + 1
-			End If
-
-			'n_Threads = 6
-
-			Return n_Threads
-
-		End Get
-	End Property
-
 #Region "Methoden"
 
 #Region "UI"
 
 	'Form1 laden
-
+    '***********
 	Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
 		'XP-look
 		System.Windows.Forms.Application.EnableVisualStyles()
@@ -401,10 +365,7 @@ Partial Public Class Form1
 					Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
 						'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-						TSP1 = New EVO.Apps.TSP()
-
-						Call TSP1.TSP_Initialize(Me.Hauptdiagramm1)
-
+                        'HACK: bei TSP Datensatz und Methode nicht notwendig, Abkürzung:
 						'Start-Button aktivieren (keine Methodenauswahl erforderlich)
 						Button_Start.Enabled = True
 
@@ -718,7 +679,7 @@ Partial Public Class Form1
 
 						'Kontrolle: Nur SO möglich!
 						If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
-							Throw New Exception("Methode von Hook und Jeeves erlaubt nur Single-Objective Optimierung!")
+							Throw New Exception("Methode von Hooke und Jeeves erlaubt nur Single-Objective Optimierung!")
 						End If
 
 						'Ergebnis-Buttons
@@ -1028,7 +989,13 @@ Partial Public Class Form1
 
 
 				Case ANW_TSP
-					Call STARTEN_TSP()
+                    'TSP-Controller instanzieren
+                    controller = New EVO.TSP.TSPController()
+
+                    'Controller für TSP initialisieren und starten
+                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                    'Call controller.InitApp() bei TSP nicht benötigt
+                    Call controller.Start()
 
 			End Select
 
@@ -1078,150 +1045,7 @@ Partial Public Class Form1
 
 	End Sub
 
-	'Anwendung Traveling Salesman - Start                         
-	'************************************
-	Private Sub STARTEN_TSP()
-
-        'Batch_Mode
-        Dim Batch_Mode As Boolean = True
-        'Anzahl der Tests
-        Dim n As Integer = 3
-
-        'Progress
-        mProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
-
-        'Monitor Stuff
-        Me.Monitor1.SelectTabLog()
-        Me.Monitor1.Show()
-        Me.Monitor1.LogAppend("Cities: " & TSP1.n_Cities)
-        Me.Monitor1.LogAppend("Combinations: " & TSP1.Faculty(TSP1.n_Cities) / 2)
-        Me.Monitor1.LogAppend("Parents: " & TSP1.n_Parents)
-        Me.Monitor1.LogAppend("Childs: " & TSP1.n_Childs)
-        Me.Monitor1.LogAppend("Generations: " & TSP1.n_Gen)
-        Me.Monitor1.LogAppend("Evaluations: " & TSP1.n_Childs * TSP1.n_Gen)
-        If TSP1.Problem = Apps.TSP.EnProblem.circle Then
-            Me.Monitor1.LogAppend("Quality Aim: " & Conversion.Int(TSP1.circumference))
-        End If
-
-        Select Case Batch_Mode
-
-            Case False
-                'Progress
-                mProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
-                Call TSP_Controller(False)
-
-            Case True
-                'Progress
-                mProgress.Initialize(n, 8, TSP1.n_Gen, TSP1.n_Childs)
-                Dim i, M, R As Integer
-
-                For R = 1 To 2
-                    TSP1.ReprodOperator = R
-
-                    For M = 1 To 4
-                        TSP1.MutOperator = M
-                        Me.Monitor1.LogAppend("ReprodOperator: " & TSP1.ReprodOperator & "; MutationOperator: " & TSP1.MutOperator)
-
-                        'n Wiederholungen
-                        For i = 1 To n
-                            Call TSP_Controller(True)
-                        Next
-                        '~~~~~~~~~~~~~~~~
-                    Next
-                Next
-        End Select
-
-    End Sub
-
-    Private Sub TSP_Controller(ByVal Batch_Mode As Boolean)
-
-		'Laufvariable für die Generationen
-		Dim gen As Integer
-        Dim i As Integer
-        Dim GoToExit As Boolean
-
-        'Intervall zum Updaten des Diagramms
-        Dim increm As Integer = 100
-        Dim jepp As Integer = 0
-
-		'BUG 212: Nach Klasse Diagramm auslagern!
-		Call TSP1.TeeChart_Initialise_TSP(Me.Hauptdiagramm1)
-
-		'Arrays werden Dimensioniert
-		Call TSP1.Dim_Parents_TSP()
-		Call TSP1.Dim_Childs()
-
-		'Zufällige Kinderpfade werden generiert
-		Call TSP1.Generate_Random_Path_TSP()
-
-		'Generationsschleife
-		For gen = 1 To TSP1.n_Gen
-
-			'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
-			Call TSP1.Cities_according_ChildPath()
-
-			'Bestimmung des der Qualität der Kinder
-			Call TSP1.Evaluate_child_Quality()
-
-			'Sortieren der Kinden anhand der Qualität
-			Call TSP1.Sort_Faksimile(TSP1.ChildList)
-
-			'Selections Prozess (Übergabe der Kinder an die Eltern je nach Strategie)
-			Call TSP1.Selection_Process()
-
-			'Zeichnen des besten Elter
-            If gen >= jepp Then
-				Call TSP1.TeeChart_Zeichnen_TSP(Me.Hauptdiagramm1, TSP1.ParentList(0).Image)
-                Me.Hauptdiagramm1.Update()
-                jepp += increm
-                mProgress.iGen() = gen
-                If Batch_Mode = False Then
-                    Me.Monitor1.LogAppend("Genearation: " & gen & "; Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
-                End If
-            End If
-
-            'Fall die Problemstellung ein Kreis ist wird abgebrochen, wenn das Optimum erreicht ist
-            If TSP1.Problem = Apps.TSP.EnProblem.circle And TSP1.ParentList(0).Penalty < TSP1.circumference Then
-                GoToExit = True
-                Select Case TSP1.ParentList(0).Path(0) < TSP1.ParentList(0).Path(1)
-                    Case True
-                        For i = 0 To TSP1.n_Cities - 2
-                            If Not TSP1.ParentList(0).Path(i) + 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = TSP1.n_Cities And TSP1.ParentList(0).Path(i + 1) = 1) Then
-                                GoToExit = False
-                                Exit For
-                            End If
-                        Next
-                    Case Else
-                        For i = 0 To TSP1.n_Cities - 2
-                            If Not TSP1.ParentList(0).Path(i) - 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = 1 And TSP1.ParentList(0).Path(i + 1) = TSP1.n_Cities) Then
-                                GoToExit = False
-                                Exit For
-                            End If
-                        Next
-                End Select
-
-            End If
-
-            If GoToExit = True Then
-                Exit For
-            End If
-
-			'Kinder werden Hier vollständig gelöscht
-			Call TSP1.Reset_Childs()
-
-			'Reproduktionsoperatoren, hier gehts dezent zur Sache
-			Call TSP1.Reproduction_Control()
-
-			'Mutationsoperatoren
-			Call TSP1.Mutation_Control()
-
-		Next gen
-
-        Me.Monitor1.LogAppend("Final Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
-
-	End Sub
-
-#End Region	'Start Button Pressed
+#End Region 'Start Button Pressed
 
 #Region "Diagrammfunktionen"
 

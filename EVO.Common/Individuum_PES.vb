@@ -29,10 +29,10 @@
         '-----------------------------------------
         Dim i As Integer
 
-        'Parameterarray für PES
+        'Parameterarray für PES aus Problem kopieren
         ReDim Me.mOptParas(Individuum.mProblem.NumOptParams - 1)
-        For i = 0 To Me.mOptParas.GetUpperBound(0)
-            Me.mOptParas(i) = New OptParameter()
+        For i = 0 To Individuum.mProblem.NumOptParams - 1
+            Me.mOptParas(i) = Individuum.mProblem.List_OptParameter(i).Clone()
         Next
 
     End Sub
@@ -66,7 +66,7 @@
 
         'Array für PES Parameter
         For i = 0 To Me.OptParameter.GetUpperBound(0)
-            CType(Clone, Individuum_PES).mOptParas(i) = Me.mOptParas(i).Clone
+            CType(Clone, Individuum_PES).mOptParas(i) = Me.mOptParas(i).Clone()
         Next
 
         Return Clone

@@ -33,6 +33,18 @@ Public Class ScatterplotDialog
         End Get
     End Property
 
+    Public ReadOnly Property ShowStartValue() As Boolean
+        Get
+            Return Me.CheckBox_showStartValue.Checked
+        End Get
+    End Property
+
+    Public ReadOnly Property ShowIstWerte() As Boolean
+        Get
+            Return Me.CheckBox_showIstWerte.Checked
+        End Get
+    End Property
+
     Public ReadOnly Property ShowRefResult() As Boolean
         Get
             If (Me.CheckBox_showRef.Enabled) Then
@@ -63,7 +75,7 @@ Public Class ScatterplotDialog
 
         'Option für Referenz-Ergebnis ggf. ausblenden
         If (Not Me.RefResultExists) Then
-            Me.GroupBox_Ref.Enabled = False
+            Me.CheckBox_showRef.Enabled = False
         End If
 
         'Default-Auswahl setzen

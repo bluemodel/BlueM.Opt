@@ -1475,7 +1475,6 @@ Public Class Problem
                 startind = New EVO.Common.Individuum_PES("start", 1)
                 'Startwerte der OptParameter setzen
                 For i = 0 To Me.NumOptParams - 1
-                    startind.OptParameter(i) = Me.List_OptParameter(i).Clone()
                     startind.OptParameter(i).RWert = Me.List_OptParameter(i).StartWert
                 Next
         End Select

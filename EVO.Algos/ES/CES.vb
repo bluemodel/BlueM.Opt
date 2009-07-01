@@ -197,6 +197,7 @@ Public Class CES
 
         'Die Variablen für die Individuuen werden gesetzt
         '************************************************
+        'TODO: Wenn sich am Problem nix geändert hat ist dieser Aufruf überflüssig!
         Call Individuum.Initialise(Me.mProblem)
 
         'Parents werden dimensioniert
