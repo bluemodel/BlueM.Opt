@@ -38,6 +38,7 @@ Partial Class Form1
         Me.Button_genP = New System.Windows.Forms.Button
         Me.Button_loadRefResult = New System.Windows.Forms.Button
         Me.Button_MouseMove = New System.Windows.Forms.Button
+        Me.Button_About = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung = New System.Windows.Forms.GroupBox
         Me.Label_Anwendung = New System.Windows.Forms.Label
         Me.ComboBox_Anwendung = New System.Windows.Forms.ComboBox
@@ -66,7 +67,6 @@ Partial Class Form1
         Me.NumericUpDownXMouse = New System.Windows.Forms.NumericUpDown
         Me.NumericUpDownyMouse = New System.Windows.Forms.NumericUpDown
         Me.CheckBoxPolder = New System.Windows.Forms.CheckBox
-        Me.Button_About = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
         CType(Me.Numeric_MCS_bis, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -193,6 +193,16 @@ Partial Class Form1
         Me.Button_MouseMove.Text = "MoveMouse"
         Me.ToolTip1.SetToolTip(Me.Button_MouseMove, "Optimierung starten")
         Me.Button_MouseMove.UseVisualStyleBackColor = True
+        '
+        'Button_About
+        '
+        Me.Button_About.Image = Global.IHWB.EVO.My.Resources.Resources.information
+        Me.Button_About.Location = New System.Drawing.Point(792, 4)
+        Me.Button_About.Name = "Button_About"
+        Me.Button_About.Size = New System.Drawing.Size(22, 22)
+        Me.Button_About.TabIndex = 34
+        Me.ToolTip1.SetToolTip(Me.Button_About, "About BlueM.Opt")
+        Me.Button_About.UseVisualStyleBackColor = True
         '
         'GroupBox_Anwendung
         '
@@ -455,16 +465,6 @@ Partial Class Form1
         Me.CheckBoxPolder.Text = "Polder"
         Me.CheckBoxPolder.UseVisualStyleBackColor = True
         '
-        'Button_About
-        '
-        Me.Button_About.Image = Global.IHWB.EVO.My.Resources.Resources.information
-        Me.Button_About.Location = New System.Drawing.Point(792, 4)
-        Me.Button_About.Name = "Button_About"
-        Me.Button_About.Size = New System.Drawing.Size(22, 22)
-        Me.Button_About.TabIndex = 34
-        Me.ToolTip1.SetToolTip(Me.Button_About, "About BlueM.Opt")
-        Me.Button_About.UseVisualStyleBackColor = True
-        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -496,12 +496,13 @@ Partial Class Form1
         Me.Controls.Add(Me.GroupBox_Anwendung)
         Me.Controls.Add(Me.EVO_Opt_Verlauf1)
         Me.Controls.Add(Me.DForm)
-        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Location = New System.Drawing.Point(100, 100)
+        Me.MaximizeBox = False
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Evolutionsstrategie"
+        Me.Text = "BlueM.Opt - Rimax33-Version"
         Me.GroupBox_Anwendung.ResumeLayout(False)
         Me.GroupBox_Anwendung.PerformLayout()
         Me.GroupBox_ErgebnisDB.ResumeLayout(False)
