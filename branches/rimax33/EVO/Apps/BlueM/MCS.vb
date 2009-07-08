@@ -656,6 +656,8 @@ Public Class MCS
             Dim StrRe As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim i, j As Integer
 
+            Textnew = ""
+
             Do
                 Text = StrRe.ReadLine.ToString
                 i += 1
@@ -1073,6 +1075,7 @@ Public Class MCS
             Dim VG As Double
 
             Text = ""
+            TextNew = ""
             out = ""
             VG = 0.0
             i = 0
@@ -1114,10 +1117,10 @@ Public Class MCS
 
                 End If
 
-                    TextNew = TextNew + Text + Environment.NewLine
+                TextNew = TextNew + Text + Environment.NewLine
 
-                    'Console.Out.WriteLine(TextNew)
-                    'Console.Out.WriteLine(Text)
+                'Console.Out.WriteLine(TextNew)
+                'Console.Out.WriteLine(Text)
 
 
             Loop Until StrRe.Peek() = -1

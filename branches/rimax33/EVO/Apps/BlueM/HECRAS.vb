@@ -13,30 +13,29 @@ Public Class HECRAS
     Private Declare Sub Sleep Lib "kernel32" (ByVal lngMilliseconds As Int32)
     'DllImport("kernel32.dll", SetLastError:=True)
     Public Function TerminateProcess(ByVal hProcess As IntPtr, ByVal uExitCode As System.UInt32) As Boolean
+
     End Function
 
     Private Declare Function CloseHandle Lib "kernel32" ( _
-  ByVal hObject As Long) As Long
+        ByVal hObject As Long) As Long
 
     Private Declare Function OpenProcess Lib "kernel32" ( _
-      ByVal dwDesiredAccess As Long, _
-      ByVal bInheritHandle As Long, _
-      ByVal dwProcessId As Long) As Long
+        ByVal dwDesiredAccess As Long, _
+        ByVal bInheritHandle As Long, _
+        ByVal dwProcessId As Long) As Long
 
     Private Declare Function GetExitCodeProcess Lib "kernel32" ( _
-      ByVal hProcess As Long, _
-    ByVal lpExitCode As Long) As Long
-    Const STILL_ACTIVE = &H103
-    Const PROCESS_ALL_ACCESS = &H1F0FFF
-    Const PROCESS_TERMINATE = &H1
+        ByVal hProcess As Long, _
+        ByVal lpExitCode As Long) As Long
 
-
-
+    Const STILL_ACTIVE As Integer = &H103
+    Const PROCESS_ALL_ACCESS As Integer = &H1F0FFF
+    Const PROCESS_TERMINATE As Integer = &H1
 
     Public Sub main()
 
         '  Dim SimPfad As String = "D:\BM\1001c-Polder-X10p7-1ZF-1Opt\"
-       
+
         readDateFromBlueM(Common.globalWorkDir + Common.globalDatensatz + ".ALL")
 
         getWaveFromBlueM(Common.globalWorkDir + Common.globalDatensatz + ".wel")
@@ -372,7 +371,7 @@ Public Class HECRAS
                 If Text.Substring(i, 1) = Chr(10) Then
                     ReDim Preserve TextTeile(j)
                     TextTeile(j) = Text.Substring(intLetzte, i - intLetzte)
-                    Dim strarray() = TextTeile(j).Split(Chr(9))
+                    Dim strarray() As String = TextTeile(j).Split(Chr(9))
                     If (strarray(4) <> "") Then QPolder(j) = Math.Max(0.0, CDbl(strarray(4).trim))
 
                     If (QPolder(j) > Qmax) Then Qmax = QPolder(j)
@@ -449,13 +448,5 @@ Public Class HECRAS
         End Try
 
     End Sub
-
-   
-
-
-
-
-
-
 
 End Class
