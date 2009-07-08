@@ -147,6 +147,12 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AboutBox.Designer.vb">
+      <DependentUpon>AboutBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="AboutBox.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Apps\BlueM\BlueM.vb" />
     <Compile Include="Apps\BlueM\Damage.vb" />
     <Compile Include="Apps\BlueM\IHAProcessor.vb" />
@@ -243,6 +249,9 @@
     </Compile>
     <Compile Include="OptResult.vb" />
     <Compile Include="Settings.vb" />
+    <EmbeddedResource Include="AboutBox.resx">
+      <DependentUpon>AboutBox.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Apps\SensiPlot.resx">
       <DependentUpon>SensiPlot.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -296,8 +305,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="ClassDiagram1.cd" />
-    <None Include="ClassDiagram2.cd" />
     <None Include="My Project\Settings.settings">
       <CustomToolNamespace>My</CustomToolNamespace>
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -321,6 +328,8 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </Content>
+    <Content Include="Resources\BlueM.png" />
+    <None Include="Resources\information.png" />
     <None Include="Resources\database_connect.png" />
     <None Include="Resources\database_go.png" />
     <None Include="Resources\database_save.png" />
