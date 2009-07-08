@@ -448,6 +448,12 @@ Partial Class Form1
 
                             'Original ModellParameter schreiben
                             Call Sim1.Write_ModellParameter()
+
+                            'Original Transportstrecken einlesen
+                            Call Sim1.SKos1.Read_TRS_Orig_Daten(Sim1)
+
+                            'Die Original Gerinneflaechen für SKos einlesen
+                            'Call Sim1.skos.
                     End Select
 
                     'EVO_Einstellungen einrichten
@@ -737,7 +743,7 @@ Partial Class Form1
         For i = 0 To ((SensiPlot1.Anz_Steps - 1) * (Anz_SensiPara - 1))
 
             '2. OptParameterwert variieren
-            If (Me.globalAnzPar > 1) Then
+            If (Anz_SensiPara > 1) Then
                 Select Case SensiPlot1.Selected_SensiType
                     Case "Gleichverteilt"
                         Sim1.List_OptParameter(SensiPlot1.Selected_OptParameter(1)).Xn = Rnd()
@@ -1892,6 +1898,17 @@ Start_Evolutionsrunden:
                             Achse.Max = 0
                             Achsen.Add(Achse)
 
+                            'Achsenzuordnung
+                            'BUG 327!
+                            For i = 0 To Common.Manager.AnzZiele - 1
+                                If (Common.Manager.List_Ziele(i).Bezeichnung = Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung) Then
+                                    Me.Hauptdiagramm.ZielIndexX = i
+                                    Exit For 'Abbruch
+                                End If
+                            Next
+                            Me.Hauptdiagramm.ZielIndexY = -1
+                            Me.Hauptdiagramm.ZielIndexZ = -1
+
                         Else
                             '2 OptParameter:
                             '---------------
@@ -1913,6 +1930,17 @@ Start_Evolutionsrunden:
                             Achse.Auto = True
                             Achse.Max = 0
                             Achsen.Add(Achse)
+
+                            'Achsenzuordnung
+                            'BUG 327!
+                            Me.Hauptdiagramm.ZielIndexX = -1
+                            For i = 0 To Common.Manager.AnzZiele - 1
+                                If (Common.Manager.List_Ziele(i).Bezeichnung = Common.Manager.List_OptZiele(SensiPlot1.Selected_OptZiel).Bezeichnung) Then
+                                    Me.Hauptdiagramm.ZielIndexY = i
+                                    Exit For 'Abbruch
+                                End If
+                            Next
+                            Me.Hauptdiagramm.ZielIndexZ = -1
 
                         End If
 

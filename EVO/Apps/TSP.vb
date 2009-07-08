@@ -22,12 +22,12 @@ Public Class TSP
     'LB + UB n=2   x         x
 
     'Public Variablen
-    Public n_Cities As Integer = 80
+    Public n_Cities As Integer = 100
     Public ListOfCities(,) As Object
-    Public n_Gen As Integer = 10000
+    Public n_Gen As Integer = 30000
 
     'Private Variablen
-    Private n_Parents As Integer = 3
+    Private n_Parents As Integer = 5
     Private n_Childs As Integer = 15
 
     Private ReprodOperator_TSP As String = "Order_Crossover_OX"
@@ -64,7 +64,7 @@ Public Class TSP
             ListOfCities(i, 2) = Math.Round(Rnd() * 100)
         Next
 
-        Call TeeChart_Zeichnen_TSP(TChart1, ListOfCities)
+        Call TeeChart_Zeichnen_TSP_cities(TChart1, ListOfCities)
 
     End Sub
 
@@ -693,6 +693,17 @@ Public Class TSP
         For i = 1 To n_Cities - 1
             TChart1.Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
             TChart1.Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
+        Next
+
+    End Sub
+
+    Public Sub TeeChart_Zeichnen_TSP_cities(ByRef TChart1 As Steema.TeeChart.TChart, ByVal TmpListOfCities(,) As Object)
+
+        Dim i As Integer
+
+        'Zeichnene der Punkte für die Städte
+        For i = 0 To n_Cities - 1
+            TChart1.Series(0).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
         Next
 
     End Sub
