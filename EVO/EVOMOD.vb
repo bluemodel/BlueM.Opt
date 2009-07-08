@@ -16,7 +16,7 @@ Module EVOMOD
     '*******************************************************************************
 
     'Anwendungen
-    Public Const ANW_BLUEM As String = "BlueM"
+    Public Const ANW_BLUEM As String = "BlueM.Sim"
     Public Const ANW_SMUSI As String = "SMUSI"
     Public Const ANW_SCAN As String = "S:CAN"
     Public Const ANW_SWMM As String = "SWMM"
