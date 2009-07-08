@@ -242,6 +242,12 @@ Public Class Diagramm
     '***************************
     Friend Sub showSelectedSolution(ByVal ind As Common.Individuum)
 
+        'Sonderfall Sensiplot
+        If (Form1.Method = METH_SENSIPLOT) Then
+            'BUG 327!
+            Exit Sub
+        End If
+
         '2D oder 3D?
         If (Not Me.is3D) Then
 
@@ -249,11 +255,17 @@ Public Class Diagramm
             '-----------
             Dim serie As Steema.TeeChart.Styles.Series
             serie = Me.getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-            serie.Add(ind.Zielwerte(Me.ZielIndexX), ind.Zielwerte(Me.ZielIndexY), ind.ID.ToString())
             serie.Marks.Visible = True
             serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie.Marks.Transparency = 50
             serie.Marks.ArrowLength = 10
+            If (Me.ZielIndexX = -1) Then
+                'X-Achse ist Simulations-ID (Single-Objective)
+                serie.Add(ind.ID, ind.Zielwerte(Me.ZielIndexY), ind.ID.ToString())
+            Else
+                'X- und Y-Achsen sind beides Zielwerte
+                serie.Add(ind.Zielwerte(Me.ZielIndexX), ind.Zielwerte(Me.ZielIndexY), ind.ID.ToString())
+            End If
 
         Else
             '3D-Diagramm
