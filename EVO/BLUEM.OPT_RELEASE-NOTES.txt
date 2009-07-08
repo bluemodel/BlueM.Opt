@@ -1,0 +1,18 @@
+﻿===============================================================
+BlueM.Opt Release Notes
+===============================================================
+Autoren: Christoph Hübner, Felix Froehlich, Dirk Muschalla
+(c) IHWB TU-Darmstadt
+Website: http://130.83.196.220/bluem/wiki/index.php/BlueM.Opt
+===============================================================
+
+Version 1.0r
+------------
+   BlueM.Opt v1.0r ist eine Weiterentwicklung/Anpassung 
+	von BlueM.Opt v1.0 für die Bedürfnisse des RIMAX33-Forschungsprojekts.
+	Zusätzliche Features:
+	* Monte Carlo Simulationen
+   * Optimierung von (Abgabe-)Zeitreihen
+	* Ansteuerung von HEC-RAS
+	Mehr Infos:
+	http://130.83.196.220/rimax33/wiki/index.php/BlueM.Opt_v1.0r
