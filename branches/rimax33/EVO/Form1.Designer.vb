@@ -66,6 +66,7 @@ Partial Class Form1
         Me.NumericUpDownXMouse = New System.Windows.Forms.NumericUpDown
         Me.NumericUpDownyMouse = New System.Windows.Forms.NumericUpDown
         Me.CheckBoxPolder = New System.Windows.Forms.CheckBox
+        Me.Button_About = New System.Windows.Forms.Button
         Me.GroupBox_Anwendung.SuspendLayout()
         Me.GroupBox_ErgebnisDB.SuspendLayout()
         CType(Me.Numeric_MCS_bis, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -454,11 +455,22 @@ Partial Class Form1
         Me.CheckBoxPolder.Text = "Polder"
         Me.CheckBoxPolder.UseVisualStyleBackColor = True
         '
+        'Button_About
+        '
+        Me.Button_About.Image = Global.IHWB.EVO.My.Resources.Resources.information
+        Me.Button_About.Location = New System.Drawing.Point(792, 4)
+        Me.Button_About.Name = "Button_About"
+        Me.Button_About.Size = New System.Drawing.Size(22, 22)
+        Me.Button_About.TabIndex = 34
+        Me.ToolTip1.SetToolTip(Me.Button_About, "About BlueM.Opt")
+        Me.Button_About.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.BackColor = System.Drawing.SystemColors.Control
         Me.ClientSize = New System.Drawing.Size(819, 753)
+        Me.Controls.Add(Me.Button_About)
         Me.Controls.Add(Me.CheckBoxPolder)
         Me.Controls.Add(Me.NumericUpDownyMouse)
         Me.Controls.Add(Me.NumericUpDownXMouse)
@@ -539,4 +551,5 @@ Partial Class Form1
     Friend WithEvents NumericUpDownXMouse As System.Windows.Forms.NumericUpDown
     Friend WithEvents NumericUpDownyMouse As System.Windows.Forms.NumericUpDown
     Friend WithEvents CheckBoxPolder As System.Windows.Forms.CheckBox
+    Private WithEvents Button_About As System.Windows.Forms.Button
 End Class

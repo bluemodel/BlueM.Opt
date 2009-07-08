@@ -108,6 +108,11 @@ Partial Class Form1
 
     End Sub
 
+    Private Sub Button_About_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_About.Click
+        Dim about As New AboutBox()
+        about.ShowDialog(Me)
+    End Sub
+
 #Region "Initialisierung der Anwendungen"
 
     'Die Anwendung wurde ausgewählt und wird jetzt initialisiert
