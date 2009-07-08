@@ -83,14 +83,10 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Accessibility" />
     <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="IHWB.SMUSI.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Apps\SMUSI\IHWB.SMUSI.DllAdapter.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualBasic.Compatibility">
-      <Name>Microsoft.VisualBasic.Compatibility</Name>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -119,10 +115,6 @@
       <Project>{7A7828C7-812B-45C0-AC5A-AE2DB74B7CD8}</Project>
       <Name>IHA.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\SMUSI.DLLAdapter\IHWB.SMUSI.DllAdapter\IHWB.SMUSI.DllAdapter.csproj">
-      <Project>{5EF7B5ED-84AE-4302-9B76-E1B87D1AB306}</Project>
-      <Name>IHWB.SMUSI.DllAdapter</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>
@@ -138,7 +130,6 @@
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
-    <Import Include="Microsoft.VisualBasic.Compatibility" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Data" />
