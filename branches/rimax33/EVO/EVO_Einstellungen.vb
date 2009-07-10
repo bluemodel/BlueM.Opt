@@ -29,6 +29,9 @@ Public Class EVO_Einstellungen
     Public isLoad As Boolean = False                 'Flag der anzeigt, ob die Settings aus einer XML Datei gelesen werden
     Private isInitializing As Boolean
 
+    'MCS
+    Public Event MCS_Starten_Click()
+
     'Methoden
     '########
 
@@ -336,6 +339,16 @@ Public Class EVO_Einstellungen
 
         End With
 
+        'MCS
+        '---
+        With Me.msettings.MCS
+            .nMin = Me.Numeric_MCS_nMin.Value
+            .nStart = Me.Numeric_MCS_StarteBeiLauf.Value
+            .nEnde = Me.Numeric_MCS_EndeBeiLauf.Value
+            .tvor = Me.Numeric_MCS_Vorentl.Value
+            .doPolder = Me.CheckBoxPolder.Checked
+        End With
+
     End Sub
 
     'Setzt/Aktiviert/Deaktiviert die Einstellungen auf den PES Settings
@@ -601,17 +614,30 @@ Public Class EVO_Einstellungen
 
 #End Region 'Schnittstelle
 
-    Sub ButtonGenP_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonGenP.Click
-        Dim gen As New MCS
-        gen.erstelle_Niederschlag(Me.Numeric_StarteBeiLauf.Value, Me.Numeric_EndeBeiLauf.Value)
+#Region "MCS"
+
+    Private Sub Button_MouseMove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_MouseMove.Click
+        Cursor.Position = New Point(Me.NumericUpDownXMouse.Value, Me.NumericUpDownyMouse.Value)
     End Sub
 
-    'läd einzelnes schon vorhandes P-Ereignis mit vorzugebener Nummer
+    Private Sub Button_genP_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonGenP.Click
+        Dim gen As New MCS()
+        gen.erstelle_Niederschlag(Me.Numeric_MCS_StarteBeiLauf.Value, Me.Numeric_MCS_EndeBeiLauf.Value)
+    End Sub
+
+    'lädt einzelnes schon vorhandes P-Ereignis mit vorzugebener Nummer
     '******************************************************************
     Private Sub Button_LadeP_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_LadeP.Click
-        Dim gen As New MCS
+        Dim gen As New MCS()
         gen.MonteCarlo(Me.Numeric_LadeP.Value, 48, False)
     End Sub
 
-    
+    'MCS Button Klick
+    '****************
+    Private Sub Button_MCS_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_MCS.Click
+        RaiseEvent MCS_Starten_Click() '-> Form1.MCS_Starten()
+    End Sub
+
+#End Region 'MCS
+
 End Class

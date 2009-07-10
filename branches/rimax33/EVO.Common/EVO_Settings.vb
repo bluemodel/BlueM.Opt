@@ -257,7 +257,18 @@ Public Class EVO_Settings
 
     End Structure
 
+	'MCS
+	'***
+    Public Structure MCS_Settings
+        Public nMin As Integer
+        Public nStart As Integer
+        Public nEnde As Integer
+        Public tvor As Double
+        Public doPolder As Boolean
+    End Structure
+
     Public PES As PES_Settings
     Public CES As CES_Settings
     Public HookJeeves As HookJeeves_Settings
+    Public MCS As MCS_Settings
 End Class

@@ -126,14 +126,29 @@ Partial Class EVO_Einstellungen
         Me.Numeric_HJ_DeltaStart = New System.Windows.Forms.NumericUpDown
         Me.CheckBox_HJ_DNVektor = New System.Windows.Forms.CheckBox
         Me.TabPage_MCS = New System.Windows.Forms.TabPage
-        Me.Numeric_StarteBeiLauf = New System.Windows.Forms.NumericUpDown
-        Me.LabelStartnMCS = New System.Windows.Forms.Label
-        Me.Numeric_EndeBeiLauf = New System.Windows.Forms.NumericUpDown
-        Me.Label_Anzahl_MCS = New System.Windows.Forms.Label
+        Me.GroupBox_Polder = New System.Windows.Forms.GroupBox
+        Me.CheckBoxPolder = New System.Windows.Forms.CheckBox
+        Me.Button_MouseMove = New System.Windows.Forms.Button
+        Me.NumericUpDownXMouse = New System.Windows.Forms.NumericUpDown
+        Me.NumericUpDownyMouse = New System.Windows.Forms.NumericUpDown
+        Me.GroupBox_MCS = New System.Windows.Forms.GroupBox
+        Me.Label_Einst = New System.Windows.Forms.Label
+        Me.Label_Vorentl = New System.Windows.Forms.Label
         Me.Numeric_LadeP = New System.Windows.Forms.NumericUpDown
+        Me.LabelStartnMCS = New System.Windows.Forms.Label
         Me.Label_LadeP = New System.Windows.Forms.Label
         Me.Button_LadeP = New System.Windows.Forms.Button
+        Me.Numeric_MCS_Vorentl = New System.Windows.Forms.NumericUpDown
+        Me.Label_Anzahl_MCS = New System.Windows.Forms.Label
         Me.ButtonGenP = New System.Windows.Forms.Button
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.Numeric_MCS_EndeBeiLauf = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_MCS_StarteBeiLauf = New System.Windows.Forms.NumericUpDown
+        Me.GroupBox_MCSPES = New System.Windows.Forms.GroupBox
+        Me.Label12 = New System.Windows.Forms.Label
+        Me.Label_AbbruchDauer = New System.Windows.Forms.Label
+        Me.Numeric_MCS_nMin = New System.Windows.Forms.NumericUpDown
+        Me.Button_MCS = New System.Windows.Forms.Button
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ÖffnenToolStripButton = New System.Windows.Forms.ToolStripButton
         Me.SpeichernToolStripButton = New System.Windows.Forms.ToolStripButton
@@ -209,9 +224,16 @@ Partial Class EVO_Einstellungen
         CType(Me.Numeric_HJ_DeltaFinish, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_MCS.SuspendLayout()
-        CType(Me.Numeric_StarteBeiLauf, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_EndeBeiLauf, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox_Polder.SuspendLayout()
+        CType(Me.NumericUpDownXMouse, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.NumericUpDownyMouse, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox_MCS.SuspendLayout()
         CType(Me.Numeric_LadeP, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_MCS_Vorentl, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_MCS_EndeBeiLauf, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_MCS_StarteBeiLauf, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox_MCSPES.SuspendLayout()
+        CType(Me.Numeric_MCS_nMin, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.GroupBox_Einstellungen.SuspendLayout()
         Me.SuspendLayout()
@@ -1335,73 +1357,137 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_MCS
         '
-        Me.TabPage_MCS.Controls.Add(Me.Numeric_StarteBeiLauf)
-        Me.TabPage_MCS.Controls.Add(Me.LabelStartnMCS)
-        Me.TabPage_MCS.Controls.Add(Me.Numeric_EndeBeiLauf)
-        Me.TabPage_MCS.Controls.Add(Me.Label_Anzahl_MCS)
-        Me.TabPage_MCS.Controls.Add(Me.Numeric_LadeP)
-        Me.TabPage_MCS.Controls.Add(Me.Label_LadeP)
-        Me.TabPage_MCS.Controls.Add(Me.Button_LadeP)
-        Me.TabPage_MCS.Controls.Add(Me.ButtonGenP)
+        Me.TabPage_MCS.Controls.Add(Me.GroupBox_Polder)
+        Me.TabPage_MCS.Controls.Add(Me.GroupBox_MCS)
+        Me.TabPage_MCS.Controls.Add(Me.GroupBox_MCSPES)
+        Me.TabPage_MCS.Controls.Add(Me.Button_MCS)
         Me.TabPage_MCS.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_MCS.Name = "TabPage_MCS"
-        Me.TabPage_MCS.Size = New System.Drawing.Size(210, 630)
+        Me.TabPage_MCS.Size = New System.Drawing.Size(222, 630)
         Me.TabPage_MCS.TabIndex = 3
         Me.TabPage_MCS.Text = "MCS"
         '
-        'Numeric_StarteBeiLauf
+        'GroupBox_Polder
         '
-        Me.Numeric_StarteBeiLauf.Location = New System.Drawing.Point(109, 96)
-        Me.Numeric_StarteBeiLauf.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        Me.Numeric_StarteBeiLauf.Name = "Numeric_StarteBeiLauf"
-        Me.Numeric_StarteBeiLauf.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Numeric_StarteBeiLauf.Size = New System.Drawing.Size(69, 20)
-        Me.Numeric_StarteBeiLauf.TabIndex = 11
-        Me.Numeric_StarteBeiLauf.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_StarteBeiLauf.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.GroupBox_Polder.Controls.Add(Me.CheckBoxPolder)
+        Me.GroupBox_Polder.Controls.Add(Me.Button_MouseMove)
+        Me.GroupBox_Polder.Controls.Add(Me.NumericUpDownXMouse)
+        Me.GroupBox_Polder.Controls.Add(Me.NumericUpDownyMouse)
+        Me.GroupBox_Polder.Location = New System.Drawing.Point(3, 3)
+        Me.GroupBox_Polder.Name = "GroupBox_Polder"
+        Me.GroupBox_Polder.Size = New System.Drawing.Size(216, 72)
+        Me.GroupBox_Polder.TabIndex = 40
+        Me.GroupBox_Polder.TabStop = False
+        Me.GroupBox_Polder.Text = "Polder"
         '
-        'LabelStartnMCS
+        'CheckBoxPolder
         '
-        Me.LabelStartnMCS.AutoSize = True
-        Me.LabelStartnMCS.Location = New System.Drawing.Point(12, 96)
-        Me.LabelStartnMCS.Name = "LabelStartnMCS"
-        Me.LabelStartnMCS.Size = New System.Drawing.Size(79, 13)
-        Me.LabelStartnMCS.TabIndex = 10
-        Me.LabelStartnMCS.Text = "Starte bei Lauf:"
+        Me.CheckBoxPolder.AutoSize = True
+        Me.CheckBoxPolder.Location = New System.Drawing.Point(6, 19)
+        Me.CheckBoxPolder.Name = "CheckBoxPolder"
+        Me.CheckBoxPolder.Size = New System.Drawing.Size(56, 17)
+        Me.CheckBoxPolder.TabIndex = 33
+        Me.CheckBoxPolder.Text = "Polder"
+        Me.CheckBoxPolder.UseVisualStyleBackColor = True
         '
-        'Numeric_EndeBeiLauf
+        'Button_MouseMove
         '
-        Me.Numeric_EndeBeiLauf.Location = New System.Drawing.Point(108, 65)
-        Me.Numeric_EndeBeiLauf.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        Me.Numeric_EndeBeiLauf.Name = "Numeric_EndeBeiLauf"
-        Me.Numeric_EndeBeiLauf.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.Numeric_EndeBeiLauf.Size = New System.Drawing.Size(69, 20)
-        Me.Numeric_EndeBeiLauf.TabIndex = 9
-        Me.Numeric_EndeBeiLauf.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_EndeBeiLauf.Value = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.Button_MouseMove.BackColor = System.Drawing.SystemColors.Control
+        Me.Button_MouseMove.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Button_MouseMove.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Button_MouseMove.Location = New System.Drawing.Point(107, 41)
+        Me.Button_MouseMove.Name = "Button_MouseMove"
+        Me.Button_MouseMove.Size = New System.Drawing.Size(103, 23)
+        Me.Button_MouseMove.TabIndex = 30
+        Me.Button_MouseMove.Text = "MoveMouse"
+        Me.ToolTip1.SetToolTip(Me.Button_MouseMove, "Optimierung starten")
+        Me.Button_MouseMove.UseVisualStyleBackColor = True
         '
-        'Label_Anzahl_MCS
+        'NumericUpDownXMouse
         '
-        Me.Label_Anzahl_MCS.AutoSize = True
-        Me.Label_Anzahl_MCS.Location = New System.Drawing.Point(12, 67)
-        Me.Label_Anzahl_MCS.Name = "Label_Anzahl_MCS"
-        Me.Label_Anzahl_MCS.Size = New System.Drawing.Size(76, 13)
-        Me.Label_Anzahl_MCS.TabIndex = 8
-        Me.Label_Anzahl_MCS.Text = "Ende bei Lauf:"
+        Me.NumericUpDownXMouse.Location = New System.Drawing.Point(6, 42)
+        Me.NumericUpDownXMouse.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.NumericUpDownXMouse.Minimum = New Decimal(New Integer() {10000, 0, 0, -2147483648})
+        Me.NumericUpDownXMouse.Name = "NumericUpDownXMouse"
+        Me.NumericUpDownXMouse.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.NumericUpDownXMouse.Size = New System.Drawing.Size(46, 20)
+        Me.NumericUpDownXMouse.TabIndex = 31
+        Me.NumericUpDownXMouse.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.NumericUpDownXMouse.Value = New Decimal(New Integer() {250, 0, 0, 0})
+        '
+        'NumericUpDownyMouse
+        '
+        Me.NumericUpDownyMouse.Location = New System.Drawing.Point(55, 42)
+        Me.NumericUpDownyMouse.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.NumericUpDownyMouse.Minimum = New Decimal(New Integer() {10000, 0, 0, -2147483648})
+        Me.NumericUpDownyMouse.Name = "NumericUpDownyMouse"
+        Me.NumericUpDownyMouse.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.NumericUpDownyMouse.Size = New System.Drawing.Size(46, 20)
+        Me.NumericUpDownyMouse.TabIndex = 32
+        Me.NumericUpDownyMouse.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.NumericUpDownyMouse.Value = New Decimal(New Integer() {50, 0, 0, 0})
+        '
+        'GroupBox_MCS
+        '
+        Me.GroupBox_MCS.Controls.Add(Me.Label_Einst)
+        Me.GroupBox_MCS.Controls.Add(Me.Label_Vorentl)
+        Me.GroupBox_MCS.Controls.Add(Me.Numeric_LadeP)
+        Me.GroupBox_MCS.Controls.Add(Me.LabelStartnMCS)
+        Me.GroupBox_MCS.Controls.Add(Me.Label_LadeP)
+        Me.GroupBox_MCS.Controls.Add(Me.Button_LadeP)
+        Me.GroupBox_MCS.Controls.Add(Me.Numeric_MCS_Vorentl)
+        Me.GroupBox_MCS.Controls.Add(Me.Label_Anzahl_MCS)
+        Me.GroupBox_MCS.Controls.Add(Me.ButtonGenP)
+        Me.GroupBox_MCS.Controls.Add(Me.Label5)
+        Me.GroupBox_MCS.Controls.Add(Me.Numeric_MCS_EndeBeiLauf)
+        Me.GroupBox_MCS.Controls.Add(Me.Numeric_MCS_StarteBeiLauf)
+        Me.GroupBox_MCS.Location = New System.Drawing.Point(3, 81)
+        Me.GroupBox_MCS.Name = "GroupBox_MCS"
+        Me.GroupBox_MCS.Size = New System.Drawing.Size(216, 228)
+        Me.GroupBox_MCS.TabIndex = 39
+        Me.GroupBox_MCS.TabStop = False
+        Me.GroupBox_MCS.Text = "MCS"
+        '
+        'Label_Einst
+        '
+        Me.Label_Einst.AutoSize = True
+        Me.Label_Einst.Location = New System.Drawing.Point(6, 16)
+        Me.Label_Einst.Name = "Label_Einst"
+        Me.Label_Einst.Size = New System.Drawing.Size(97, 13)
+        Me.Label_Einst.TabIndex = 27
+        Me.Label_Einst.Text = "EINSTELLUNGEN"
+        '
+        'Label_Vorentl
+        '
+        Me.Label_Vorentl.AutoSize = True
+        Me.Label_Vorentl.Location = New System.Drawing.Point(6, 36)
+        Me.Label_Vorentl.Name = "Label_Vorentl"
+        Me.Label_Vorentl.Size = New System.Drawing.Size(90, 13)
+        Me.Label_Vorentl.TabIndex = 28
+        Me.Label_Vorentl.Text = "Vorentlastung [h]:"
         '
         'Numeric_LadeP
         '
-        Me.Numeric_LadeP.Location = New System.Drawing.Point(109, 403)
+        Me.Numeric_LadeP.Location = New System.Drawing.Point(142, 170)
         Me.Numeric_LadeP.Name = "Numeric_LadeP"
         Me.Numeric_LadeP.Size = New System.Drawing.Size(68, 20)
         Me.Numeric_LadeP.TabIndex = 7
         Me.Numeric_LadeP.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         Me.Numeric_LadeP.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
+        'LabelStartnMCS
+        '
+        Me.LabelStartnMCS.AutoSize = True
+        Me.LabelStartnMCS.Location = New System.Drawing.Point(6, 87)
+        Me.LabelStartnMCS.Name = "LabelStartnMCS"
+        Me.LabelStartnMCS.Size = New System.Drawing.Size(79, 13)
+        Me.LabelStartnMCS.TabIndex = 10
+        Me.LabelStartnMCS.Text = "Starte bei Lauf:"
+        '
         'Label_LadeP
         '
         Me.Label_LadeP.AutoSize = True
-        Me.Label_LadeP.Location = New System.Drawing.Point(12, 405)
+        Me.Label_LadeP.Location = New System.Drawing.Point(6, 172)
         Me.Label_LadeP.Name = "Label_LadeP"
         Me.Label_LadeP.Size = New System.Drawing.Size(84, 13)
         Me.Label_LadeP.TabIndex = 6
@@ -1409,21 +1495,126 @@ Partial Class EVO_Einstellungen
         '
         'Button_LadeP
         '
-        Me.Button_LadeP.Location = New System.Drawing.Point(108, 429)
+        Me.Button_LadeP.Location = New System.Drawing.Point(141, 196)
         Me.Button_LadeP.Name = "Button_LadeP"
         Me.Button_LadeP.Size = New System.Drawing.Size(69, 23)
         Me.Button_LadeP.TabIndex = 5
         Me.Button_LadeP.Text = "lade P"
         Me.Button_LadeP.UseVisualStyleBackColor = True
         '
+        'Numeric_MCS_Vorentl
+        '
+        Me.Numeric_MCS_Vorentl.Location = New System.Drawing.Point(163, 34)
+        Me.Numeric_MCS_Vorentl.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.Numeric_MCS_Vorentl.Name = "Numeric_MCS_Vorentl"
+        Me.Numeric_MCS_Vorentl.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Numeric_MCS_Vorentl.Size = New System.Drawing.Size(47, 20)
+        Me.Numeric_MCS_Vorentl.TabIndex = 29
+        Me.Numeric_MCS_Vorentl.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MCS_Vorentl.Value = New Decimal(New Integer() {24, 0, 0, 0})
+        '
+        'Label_Anzahl_MCS
+        '
+        Me.Label_Anzahl_MCS.AutoSize = True
+        Me.Label_Anzahl_MCS.Location = New System.Drawing.Point(6, 113)
+        Me.Label_Anzahl_MCS.Name = "Label_Anzahl_MCS"
+        Me.Label_Anzahl_MCS.Size = New System.Drawing.Size(76, 13)
+        Me.Label_Anzahl_MCS.TabIndex = 8
+        Me.Label_Anzahl_MCS.Text = "Ende bei Lauf:"
+        '
         'ButtonGenP
         '
-        Me.ButtonGenP.Location = New System.Drawing.Point(16, 139)
+        Me.ButtonGenP.Location = New System.Drawing.Point(6, 137)
         Me.ButtonGenP.Name = "ButtonGenP"
-        Me.ButtonGenP.Size = New System.Drawing.Size(162, 23)
+        Me.ButtonGenP.Size = New System.Drawing.Size(204, 23)
         Me.ButtonGenP.TabIndex = 2
         Me.ButtonGenP.Text = "Generiere P Ereignisse"
         Me.ButtonGenP.UseVisualStyleBackColor = True
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(6, 69)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(92, 13)
+        Me.Label5.TabIndex = 25
+        Me.Label5.Text = "MCS-SCHLEIFEN"
+        '
+        'Numeric_MCS_EndeBeiLauf
+        '
+        Me.Numeric_MCS_EndeBeiLauf.Location = New System.Drawing.Point(154, 111)
+        Me.Numeric_MCS_EndeBeiLauf.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.Numeric_MCS_EndeBeiLauf.Name = "Numeric_MCS_EndeBeiLauf"
+        Me.Numeric_MCS_EndeBeiLauf.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Numeric_MCS_EndeBeiLauf.Size = New System.Drawing.Size(56, 20)
+        Me.Numeric_MCS_EndeBeiLauf.TabIndex = 18
+        Me.Numeric_MCS_EndeBeiLauf.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MCS_EndeBeiLauf.Value = New Decimal(New Integer() {1000, 0, 0, 0})
+        '
+        'Numeric_MCS_StarteBeiLauf
+        '
+        Me.Numeric_MCS_StarteBeiLauf.Location = New System.Drawing.Point(154, 85)
+        Me.Numeric_MCS_StarteBeiLauf.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.Numeric_MCS_StarteBeiLauf.Name = "Numeric_MCS_StarteBeiLauf"
+        Me.Numeric_MCS_StarteBeiLauf.Size = New System.Drawing.Size(56, 20)
+        Me.Numeric_MCS_StarteBeiLauf.TabIndex = 19
+        Me.Numeric_MCS_StarteBeiLauf.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MCS_StarteBeiLauf.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'GroupBox_MCSPES
+        '
+        Me.GroupBox_MCSPES.Controls.Add(Me.Label12)
+        Me.GroupBox_MCSPES.Controls.Add(Me.Label_AbbruchDauer)
+        Me.GroupBox_MCSPES.Controls.Add(Me.Numeric_MCS_nMin)
+        Me.GroupBox_MCSPES.Location = New System.Drawing.Point(3, 315)
+        Me.GroupBox_MCSPES.Name = "GroupBox_MCSPES"
+        Me.GroupBox_MCSPES.Size = New System.Drawing.Size(216, 61)
+        Me.GroupBox_MCSPES.TabIndex = 38
+        Me.GroupBox_MCSPES.TabStop = False
+        Me.GroupBox_MCSPES.Text = "MCSPES"
+        '
+        'Label12
+        '
+        Me.Label12.AutoSize = True
+        Me.Label12.Location = New System.Drawing.Point(6, 16)
+        Me.Label12.Name = "Label12"
+        Me.Label12.Size = New System.Drawing.Size(119, 13)
+        Me.Label12.TabIndex = 26
+        Me.Label12.Text = "ABBRUCHKRITERIUM"
+        '
+        'Label_AbbruchDauer
+        '
+        Me.Label_AbbruchDauer.AutoSize = True
+        Me.Label_AbbruchDauer.Location = New System.Drawing.Point(6, 34)
+        Me.Label_AbbruchDauer.Name = "Label_AbbruchDauer"
+        Me.Label_AbbruchDauer.Size = New System.Drawing.Size(33, 13)
+        Me.Label_AbbruchDauer.TabIndex = 23
+        Me.Label_AbbruchDauer.Text = "nMin:"
+        '
+        'Numeric_MCS_nMin
+        '
+        Me.Numeric_MCS_nMin.Location = New System.Drawing.Point(154, 32)
+        Me.Numeric_MCS_nMin.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.Numeric_MCS_nMin.Name = "Numeric_MCS_nMin"
+        Me.Numeric_MCS_nMin.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Numeric_MCS_nMin.Size = New System.Drawing.Size(56, 20)
+        Me.Numeric_MCS_nMin.TabIndex = 24
+        Me.Numeric_MCS_nMin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_MCS_nMin.Value = New Decimal(New Integer() {100, 0, 0, 0})
+        '
+        'Button_MCS
+        '
+        Me.Button_MCS.BackColor = System.Drawing.SystemColors.Control
+        Me.Button_MCS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Button_MCS.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.Button_MCS.Location = New System.Drawing.Point(6, 382)
+        Me.Button_MCS.Name = "Button_MCS"
+        Me.Button_MCS.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.Button_MCS.Size = New System.Drawing.Size(82, 31)
+        Me.Button_MCS.TabIndex = 17
+        Me.Button_MCS.Text = "> MCS"
+        Me.ToolTip1.SetToolTip(Me.Button_MCS, "Optimierung starten")
+        Me.Button_MCS.UseVisualStyleBackColor = True
         '
         'ToolStrip1
         '
@@ -1513,6 +1704,20 @@ Partial Class EVO_Einstellungen
         Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.Numeric_HJ_DeltaFinish, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_HJ_DeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage_MCS.ResumeLayout(False)
+        Me.GroupBox_Polder.ResumeLayout(False)
+        Me.GroupBox_Polder.PerformLayout()
+        CType(Me.NumericUpDownXMouse, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.NumericUpDownyMouse, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox_MCS.ResumeLayout(False)
+        Me.GroupBox_MCS.PerformLayout()
+        CType(Me.Numeric_LadeP, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_MCS_Vorentl, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_MCS_EndeBeiLauf, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_MCS_StarteBeiLauf, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox_MCSPES.ResumeLayout(False)
+        Me.GroupBox_MCSPES.PerformLayout()
+        CType(Me.Numeric_MCS_nMin, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
@@ -1588,9 +1793,7 @@ Partial Class EVO_Einstellungen
     Friend WithEvents Numeric_LadeP As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label_LadeP As System.Windows.Forms.Label
     Friend WithEvents Button_LadeP As System.Windows.Forms.Button
-    Friend WithEvents Numeric_EndeBeiLauf As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label_Anzahl_MCS As System.Windows.Forms.Label
-    Friend WithEvents Numeric_StarteBeiLauf As System.Windows.Forms.NumericUpDown
     Friend WithEvents LabelStartnMCS As System.Windows.Forms.Label
 
     Friend WithEvents Combo_CES_MemStrategy As System.Windows.Forms.ComboBox
@@ -1603,4 +1806,21 @@ Partial Class EVO_Einstellungen
     Private WithEvents CheckBox_CES_RealOptimisation As System.Windows.Forms.CheckBox
     Private WithEvents LabelAnzEltern As System.Windows.Forms.Label
     Private WithEvents CheckBox_CES_StartPESPop As System.Windows.Forms.CheckBox
+    Private WithEvents GroupBox_MCS As System.Windows.Forms.GroupBox
+    Friend WithEvents Label_Einst As System.Windows.Forms.Label
+    Private WithEvents Label_Vorentl As System.Windows.Forms.Label
+    Friend WithEvents Numeric_MCS_Vorentl As System.Windows.Forms.NumericUpDown
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents Numeric_MCS_EndeBeiLauf As System.Windows.Forms.NumericUpDown
+    Private WithEvents GroupBox_MCSPES As System.Windows.Forms.GroupBox
+    Friend WithEvents Label12 As System.Windows.Forms.Label
+    Friend WithEvents Label_AbbruchDauer As System.Windows.Forms.Label
+    Private WithEvents Numeric_MCS_nMin As System.Windows.Forms.NumericUpDown
+    Private WithEvents GroupBox_Polder As System.Windows.Forms.GroupBox
+    Friend WithEvents CheckBoxPolder As System.Windows.Forms.CheckBox
+    Private WithEvents Button_MouseMove As System.Windows.Forms.Button
+    Friend WithEvents NumericUpDownXMouse As System.Windows.Forms.NumericUpDown
+    Friend WithEvents NumericUpDownyMouse As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_MCS_StarteBeiLauf As System.Windows.Forms.NumericUpDown
+    Private WithEvents Button_MCS As System.Windows.Forms.Button
 End Class

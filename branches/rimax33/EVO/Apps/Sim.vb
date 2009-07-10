@@ -1516,7 +1516,8 @@ Handler:
         Next
 
         'Lösung abspeichern
-        If Form1.Method <> "PESMCS" And Not Common.polder Then
+        'TODO: Bei Polderberechnung Lösung nicht abspeichern!
+        If Form1.Method <> "PESMCS" Then
             Call Me.OptResult.addSolution(Indi)
         End If
         SIM_Evaluierung = True
