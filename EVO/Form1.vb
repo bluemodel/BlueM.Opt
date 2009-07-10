@@ -378,7 +378,10 @@ Partial Class Form1
 
                     'Ergebnis-Buttons
                     Me.Button_openMDB.Enabled = False
-                    Me.Button_MCS.Enabled = True
+
+                    'EVO_Einstellungen einrichten
+                    EVO_Einstellungen1.Enabled = True
+                    Me.EVO_Einstellungen1.TabControl1.SelectedTab = Me.EVO_Einstellungen1.TabPage_MCS
 
 
                 Case METH_MCSPES 'Methode MCS
@@ -1412,8 +1415,8 @@ Partial Class Form1
         Dim PES1 As EVO.Kern.PES
 
         'für MCS
-        Dim i, k, nStart, nEnde, Vorlaufzeit As New Integer
-        Dim mcs As New MCS
+        Dim i, k As Integer
+        Dim mcs As New MCS()
 
         'Hypervolumen instanzieren
         '-------------------------
@@ -1495,9 +1498,6 @@ Start_Evolutionsrunden:
                 'xxxxxxxxxxxxxxxxxxxxxx
                 For PES1.PES_iAkt.iAktGen = 0 To EVO_Einstellungen1.Settings.PES.n_Gen - 1
 
-                   
-
-
                     '**************************************************************
 
                     Call EVO_Opt_Verlauf1.Generation(PES1.PES_iAkt.iAktGen + 1)
@@ -1567,7 +1567,7 @@ Start_Evolutionsrunden:
                                             QWertMinDauer = 0
                                         End If
                                         QWertMinDauer += 1
-                                        If QWertMinDauer >= Me.NumericUpDown_nMin.Value Then Exit Sub
+                                        If (QWertMinDauer >= Me.EVO_Einstellungen1.Settings.MCS.nMin) Then Exit Sub
                                         If QWertMin < 10000.0 Then Exit Sub
                                         Console.Out.WriteLine(QWertMin.ToString + " " + QWertMinDauer.ToString)
 
@@ -1575,11 +1575,14 @@ Start_Evolutionsrunden:
                                         '**************************************************************
                                     ElseIf Method = METH_PESMCS Then
 
-                                        Call Sim1.PREPARE_Evaluation_PES(myPara)
+                                        Dim nStart, nEnde As Integer
+                                        Dim tvor As Double
 
-                                        nStart = Me.Numeric_MCS_von.Value
-                                        nEnde = Me.Numeric_MCS_bis.Value
-                                        Common.Constants.tVor = Me.NumericUpDown_Vorentl.Value
+                                        nStart = Me.EVO_Einstellungen1.Settings.MCS.nStart
+                                        nEnde = Me.EVO_Einstellungen1.Settings.MCS.nEnde
+                                        tvor = Me.EVO_Einstellungen1.Settings.MCS.tvor
+
+                                        Call Sim1.PREPARE_Evaluation_PES(myPara)
 
                                         For k = 0 To Common.Manager.AnzZiele - 1
                                             QWert(k) = 0.0
@@ -1588,7 +1591,7 @@ Start_Evolutionsrunden:
                                         For i = nStart To nEnde Step 2
 
                                             'Variieren der Niederschläge
-                                            mcs.MonteCarlo(i, Common.Constants.tVor, True) 'letzter Wert Evo true/false
+                                            mcs.MonteCarlo(i, tVor, True) 'letzter Wert Evo true/false
                                             'Evaluierung des Simulationsmodells
 
                                             SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
@@ -1617,9 +1620,9 @@ Start_Evolutionsrunden:
 
                                         'Evaluierung des Simulationsmodells
                                         SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
-                                        Common.polder = Me.CheckBoxPolder.Checked
-                                        If Common.polder Then
-                                            Dim hec As New HECRAS
+
+                                        If (Me.EVO_Einstellungen1.Settings.MCS.doPolder) Then
+                                            Dim hec As New HECRAS()
                                             hec.main()
                                             SIM_Eval_is_OK = Sim1.SIM_Evaluierung(ind)
                                         End If
@@ -2797,17 +2800,18 @@ Start_Evolutionsrunden:
     'run MCSPES
     '**************************************************************
     Public Sub MonteCarloSimulation()
-        Dim i, nStart, nEnde, Vorlaufzeit As New Integer
-        Dim mcs As New MCS
 
+        Dim i, nStart, nEnde As Integer
+        Dim tvor As Double
+        Dim mcs As New MCS()
 
-        nStart = Me.Numeric_MCS_von.Value
-        nEnde = Me.Numeric_MCS_bis.Value
-        Common.Constants.tVor = Me.NumericUpDown_Vorentl.Value
+        nStart = Me.EVO_Einstellungen1.Settings.MCS.nStart
+        nEnde = Me.EVO_Einstellungen1.Settings.MCS.nEnde
+        tVor = Me.EVO_Einstellungen1.Settings.MCS.tvor
 
         For i = nStart To nEnde
 
-            mcs.MonteCarlo(i, Common.Constants.tVor, True) 'letzter Wert Evo true/false
+            mcs.MonteCarlo(i, tvor, True) 'letzter Wert Evo true/false
 
             Call STARTEN_PES()
 
@@ -2832,19 +2836,20 @@ Start_Evolutionsrunden:
 #End Region 'Methoden
 
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_MCS.Click
-        Dim i, nStart, nEnde As New Integer
-        Dim mcs As New MCS
+    Private Sub MCS_Starten() Handles EVO_Einstellungen1.MCS_Starten_Click
 
+        Dim i, nStart, nEnde As Integer
+        Dim tvor As Double
+        Dim mcs As New MCS()
 
-        nStart = Me.Numeric_MCS_von.Value
-        nEnde = Me.Numeric_MCS_bis.Value
-        Common.Constants.tVor = Me.NumericUpDown_Vorentl.Value
-       
+        nStart = Me.EVO_Einstellungen1.Settings.MCS.nStart
+        nEnde = Me.EVO_Einstellungen1.Settings.MCS.nEnde
+        tvor = Me.EVO_Einstellungen1.Settings.MCS.tvor
+
         'My.Settings.Datensatz = "D:\BM\503-neu-SO-10000-PohTS\Ia-Ist\Ia.ALL"
 
         For i = nStart To nEnde
-            mcs.MonteCarlo(i, Common.Constants.tVor, False) 'letzter Wert Evo true/false
+            mcs.MonteCarlo(i, tvor, False) 'letzter Wert Evo true/false
         Next i
 
         If False Then
@@ -2857,32 +2862,16 @@ Start_Evolutionsrunden:
             My.Settings.Datensatz = "D:\BM\506-hNGEV-Fac1\IIIe-24h-Kli\IIIe.ALL"
 
             For i = nStart To nEnde
-                mcs.MonteCarlo(i, Common.Constants.tVor, False) 'letzter Wert Evo true/false
+                mcs.MonteCarlo(i, tVor, False) 'letzter Wert Evo true/false
             Next i
 
             My.Settings.Datensatz = "D:\BM\506-hNGEV-Fac1\IIIf-24h-LehKli\IIIf.ALL"
 
             For i = nStart To nEnde
-                mcs.MonteCarlo(i, Common.Constants.tVor, False) 'letzter Wert Evo true/false
+                mcs.MonteCarlo(i, tVor, False) 'letzter Wert Evo true/false
             Next i
         End If
 
-    End Sub
-
-    Private Sub Button_genP_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_genP.Click
-        Dim gen As New MCS
-        gen.erstelle_Niederschlag(Me.Numeric_MCS_von.Value, Me.Numeric_MCS_bis.Value)
-    End Sub
-
-
-    Private Sub Button_Start_ClientSizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Button_Start.ClientSizeChanged
-
-    End Sub
-
-    Private Sub Button1_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_MouseMove.Click
-        
-        Cursor.Position = New Point(Me.NumericUpDownXMouse.Value, Me.NumericUpDownyMouse.Value)
-        
     End Sub
 
     Private Declare Sub Sleep Lib "kernel32" (ByVal lngMilliseconds As Int32)

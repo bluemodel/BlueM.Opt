@@ -14,8 +14,6 @@ Public Module Constants
     '*******************************************************************************
     '*******************************************************************************
     Public hN As Double
-    Public tVor As Double
-    Public polder As Boolean
     Public weirHeight As Double
     Public globalDatensatz As String
     Public globalWorkDir As String
