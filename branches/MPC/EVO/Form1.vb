@@ -578,7 +578,7 @@ Partial Public Class Form1
 
         Else
 			If (Me.mSettings.General.useMPC) Then
-				Me.mSettings.General.Dataset = Me.mSettings.MPC.Problempfad
+                Me.mSettings.General.Dataset = Me.mSettings.MPC.Problempfad + Me.mSettings.MPC.Problemname + ".inp"
 				Me.ComboBox_Datensatz.SelectedItem = Me.mSettings.General.Dataset
 			End If
 
