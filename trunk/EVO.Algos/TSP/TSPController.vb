@@ -8,6 +8,7 @@
     Private myProgress As EVO.Common.Progress
 
     Private TSP1 As TSP
+    Private Stopp As Boolean
 
     ''' <summary>
     ''' TSP Controller initialisieren
@@ -23,6 +24,8 @@
         Me.myProgress = inputProgress
         Me.myHauptDiagramm = inputHptDiagramm
         Me.myMonitor = EVO.Diagramm.Monitor.getInstance()
+
+        Stopp = False 
     End Sub
 
     Public Sub InitApp(ByRef inputSim As Apps.Sim) Implements IController.InitApp
@@ -41,7 +44,7 @@
 
         Me.TSP1 = New TSP()
 
-        Call TSP1.TSP_Initialize()
+        Call TSP1.TSP_Initialize(me.mySettings.TSP)
         Call InitDiagramm()
         Call Zeichnen_TSP_cities(TSP1.ListOfCities)
 
@@ -51,19 +54,19 @@
         Dim n As Integer = 3
 
         'Progress
-        Me.myProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
+        Me.myProgress.Initialize(0, 0, me.mySettings.TSP.n_Gen, me.mySettings.TSP.n_Childs)
 
         'Monitor Stuff
         With Me.myMonitor
             .SelectTabLog()
             .Show()
-            .LogAppend("Cities: " & TSP1.n_Cities)
-            .LogAppend("Combinations: " & TSP1.Faculty(TSP1.n_Cities) / 2)
-            .LogAppend("Parents: " & TSP1.n_Parents)
-            .LogAppend("Childs: " & TSP1.n_Childs)
-            .LogAppend("Generations: " & TSP1.n_Gen)
-            .LogAppend("Evaluations: " & TSP1.n_Childs * TSP1.n_Gen)
-            If TSP1.Problem = TSP.EnProblem.circle Then
+            .LogAppend("Cities: " & me.mySettings.TSP.n_Cities)
+            .LogAppend("Combinations: " & TSP1.Faculty(me.mySettings.TSP.n_Cities) / 2)
+            .LogAppend("Parents: " & me.mySettings.TSP.n_Parents)
+            .LogAppend("Childs: " & me.mySettings.TSP.n_Childs)
+            .LogAppend("Generations: " & me.mySettings.TSP.n_Gen)
+            .LogAppend("Evaluations: " & me.mySettings.TSP.n_Childs * me.mySettings.TSP.n_Gen)
+            If me.mySettings.TSP.Problem = common.EnProblem.circle Then
                 .LogAppend("Quality Aim: " & Conversion.Int(TSP1.circumference))
             End If
         End With
@@ -72,20 +75,20 @@
 
             Case TSP.EnMode.Standard_Opt
                 'Progress
-                Me.myProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
+                Me.myProgress.Initialize(0, 0, me.mySettings.TSP.n_Gen, me.mySettings.TSP.n_Childs)
                 Call TSP_Controller(False)
 
             Case TSP.EnMode.Batch_OPpt
                 'Progress
-                Me.myProgress.Initialize(n, 8, TSP1.n_Gen, TSP1.n_Childs)
+                Me.myProgress.Initialize(n, 8, me.mySettings.TSP.n_Gen, me.mySettings.TSP.n_Childs)
                 Dim i, M, R As Integer
 
                 For R = 1 To 2
-                    TSP1.ReprodOperator = R
+                    me.mySettings.TSP.ReprodOperator = R
 
                     For M = 1 To 4
-                        TSP1.MutOperator = M
-                        Me.myMonitor.LogAppend("ReprodOperator: " & TSP1.ReprodOperator & "; MutationOperator: " & TSP1.MutOperator)
+                        me.mySettings.TSP.MutOperator = M
+                        Me.myMonitor.LogAppend("ReprodOperator: " & me.mySettings.TSP.ReprodOperator & "; MutationOperator: " & me.mySettings.TSP.MutOperator)
 
                         'n Wiederholungen
                         For i = 1 To TSP1.nTests
@@ -95,11 +98,11 @@
                     Next
                 Next
             Case TSP.EnMode.Just_Calc
-                TSP1.n_Childs = 1
+                me.mySettings.TSP.n_Childs = 1
                 Dim i, j, y As Double
                 Dim t As TimeSpan
 
-                y = TSP1.Faculty(TSP1.n_Cities - 1) / 2
+                y = TSP1.Faculty(me.mySettings.TSP.n_Cities - 1) / 2
                 j = 10000000
 
                 Dim Time As New Stopwatch
@@ -120,7 +123,9 @@
     End Sub 
 
     Public Sub Stoppen() Implements IController.Stoppen
-        'TODO: TSP Stoppen
+        
+         Stopp = True
+
     End Sub
 
     Private Sub TSP_Controller(ByVal Batch_Mode As Boolean)
@@ -148,7 +153,7 @@
         Call TSP1.Generate_Random_Path_TSP()
 
         'Generationsschleife
-        For gen = 1 To TSP1.n_Gen
+        For gen = 1 To me.mySettings.TSP.n_Gen
 
             'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
             Call TSP1.Cities_according_ChildPath()
@@ -178,7 +183,8 @@
                 jepp += increm
                 Me.myProgress.iGen() = gen
                 If Batch_Mode = False Then
-                    Me.myMonitor.LogAppend("Genearation: " & gen & "; Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty) & "  " & Conversion.Int((TSP1.circumference * 100) / Conversion.Int(TSP1.ParentList(0).Penalty)) & "%")
+                    Me.myMonitor.LogAppend("Gen.: " & gen & "; Länge: " & Conversion.Int(TSP1.ParentList(0).Penalty) & "; Faktor: " _
+                    & math.Round(TSP1.ParentList(0).Penalty/TSP1.circumference, 3,MidpointRounding.ToEven))
                     'png Export
                     If TSP1.pngExport = True and Conversion.Int(TSP1.ParentList(0).Penalty) < PenaltyTMP Then
                         Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
@@ -188,19 +194,19 @@
             End If
 
             'Fall die Problemstellung ein Kreis ist wird abgebrochen, wenn das Optimum erreicht ist
-            If TSP1.Problem = TSP.EnProblem.circle And TSP1.ParentList(0).Penalty < TSP1.circumference Then
+            If me.mySettings.TSP.Problem = common.EnProblem.circle And TSP1.ParentList(0).Penalty < TSP1.circumference Then
                 GoToExit = True
                 Select Case TSP1.ParentList(0).Path(0) < TSP1.ParentList(0).Path(1)
                     Case True
-                        For i = 0 To TSP1.n_Cities - 2
-                            If Not TSP1.ParentList(0).Path(i) + 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = TSP1.n_Cities And TSP1.ParentList(0).Path(i + 1) = 1) Then
+                        For i = 0 To me.mySettings.TSP.n_Cities - 2
+                            If Not TSP1.ParentList(0).Path(i) + 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = me.mySettings.TSP.n_Cities And TSP1.ParentList(0).Path(i + 1) = 1) Then
                                 GoToExit = False
                                 Exit For
                             End If
                         Next
                     Case Else
-                        For i = 0 To TSP1.n_Cities - 2
-                            If Not TSP1.ParentList(0).Path(i) - 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = 1 And TSP1.ParentList(0).Path(i + 1) = TSP1.n_Cities) Then
+                        For i = 0 To me.mySettings.TSP.n_Cities - 2
+                            If Not TSP1.ParentList(0).Path(i) - 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = 1 And TSP1.ParentList(0).Path(i + 1) = me.mySettings.TSP.n_Cities) Then
                                 GoToExit = False
                                 Exit For
                             End If
@@ -209,11 +215,12 @@
 
             End If
 
-            If GoToExit = True Then
+            If GoToExit = True or Stopp Then
                 If Batch_Mode = False Then
                     Call Zeichnen_TSP(TSP1.ParentList(0).Image)
                     Me.myHauptDiagramm.Update()
-                    Me.myMonitor.LogAppend("Genearation: " & gen & "; Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty) & "  " & Conversion.Int((TSP1.circumference * 100) / Conversion.Int(TSP1.ParentList(0).Penalty)) & "%")
+                    Me.myMonitor.LogAppend("Gen.: " & gen & "; Länge: " & Conversion.Int(TSP1.ParentList(0).Penalty) & "; Faktor: " _
+                    & math.Round(TSP1.ParentList(0).Penalty/TSP1.circumference, 3,MidpointRounding.ToEven))
                     'png Export
                     If TSP1.pngExport = True Then
                         Me.myHauptdiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
@@ -272,7 +279,7 @@
             Point1.Pointer.VertSize = 2
 
             'Series(n): für die Reisen
-            For i = 1 To TSP1.n_Cities
+            For i = 1 To me.mySettings.TSP.n_Cities
                 Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
                 Line1.Title = "Reisen"
                 Line1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
@@ -284,7 +291,7 @@
         End With
 
         'Zeichnen der Punkte für die Städte
-        For i = 0 To TSP1.n_Cities - 1
+        For i = 0 To me.mySettings.TSP.n_Cities - 1
             Me.myHauptDiagramm.Series(0).Add(TSP1.ListOfCities(i, 1), TSP1.ListOfCities(i, 2), "")
         Next
 
@@ -303,7 +310,7 @@
         'Es werden einzelne Serien verwendet, da die Werte gerne mal der X-Achse entsprechend sortiert werden
         With Me.myHauptDiagramm
             .Series(1).Clear()
-            For i = 1 To TSP1.n_Cities - 1
+            For i = 1 To me.mySettings.TSP.n_Cities - 1
                 .Series(i + 1).Clear()
                 .Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), Drawing.Color.Blue)
                 .Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), Drawing.Color.Blue)
@@ -311,7 +318,7 @@
 
             'Zeichnen der Verbindung von der ersten bis zur letzten Stadt
             .Series(1).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
-            .Series(TSP1.n_Cities).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
+            .Series(me.mySettings.TSP.n_Cities).Add(TmpListOfCities(0, 1), TmpListOfCities(0, 2), "")
 
             .Update()
         End With
@@ -328,7 +335,7 @@
         Dim i As Integer
 
         'Zeichnen der Punkte für die Städte
-        For i = 0 To TSP1.n_Cities - 1
+        For i = 0 To me.mySettings.TSP.n_Cities - 1
             Me.myHauptDiagramm.Series(0).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), "")
         Next
 

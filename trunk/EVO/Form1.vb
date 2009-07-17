@@ -354,7 +354,14 @@ Partial Class Form1
 
                         'HACK: bei TSP Datensatz und Methode nicht notwendig, Abkürzung:
                         'Start-Button aktivieren (keine Methodenauswahl erforderlich)
-                        Button_Start.Enabled = True
+                        'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
+                        Me.IsInitializing = True
+                        Call Me.ComboBox_Methode.Items.Clear()
+                        Call Me.ComboBox_Methode.Items.Add(METH_TSP)
+                        Me.IsInitializing = False
+                        Me.ComboBox_Methode.Enabled = True
+                        Me.ComboBox_Methode.SelectedIndex = 0
+                        'Button_Start.Enabled = True
 
                 End Select
 
@@ -713,6 +720,8 @@ Partial Class Form1
 
                         'Progress mit Standardwerten initialisieren
                         Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
+                    Case METH_TSP
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                 End Select
 
