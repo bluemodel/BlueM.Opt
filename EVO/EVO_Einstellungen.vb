@@ -85,6 +85,8 @@ Public Class EVO_Einstellungen
         Call Me.msettings.MetaEvo.setStandard()
         Call Me.msettings.DDS.setStandard()
         Call Me.msettings.SensiPlot.setStandard()
+        Call Me.msettings.TSP.setStandard()
+
         'Call Me.writeForm()
         Me.isInitializing = False
 
@@ -188,6 +190,14 @@ Public Class EVO_Einstellungen
 
                 'Standardeinstellungen setzen
                 Call Me.setStandard_SensiPlot()
+
+            Case METH_TSP
+
+                'Tabpage anzeigen
+                Me.TabControl1.TabPages.Add(Me.TabPage_TSP)
+
+                'Standardeinstellungen setzen
+                Call Me.setStandard_TSP()
 
         End Select
 
@@ -356,6 +366,12 @@ Public Class EVO_Einstellungen
         Me.Combo_CES_HybridType.DataSource = System.Enum.GetValues(GetType(HYBRID_TYPE))
         Me.Combo_CES_MemStrategy.DataSource = System.Enum.GetValues(GetType(MEMORY_STRATEGY))
 
+        'TSP
+        '---
+        Me.TSP_ComboBox_prob_instance.DataSource = System.Enum.GetValues(GetType(EnProblem))
+        Me.TSP_ComboBox_Reproductionoperator.DataSource = System.Enum.GetValues(GetType(EnReprodOperator))
+        Me.TSP_ComboBox_Mutationoperator.DataSource = System.Enum.GetValues(GetType(EnMutOperator))
+        
     End Sub
 
     Private Sub FILLCOMBO_POPPENALTY(ByRef Cntrl As System.Windows.Forms.ComboBox)
@@ -526,6 +542,19 @@ Public Class EVO_Einstellungen
             .show_Wave = Me.SensiPlot_CheckBox_wave.Checked
 
         End With
+
+        'TSP
+        '---
+        With Me.msettings.TSP
+            .n_Cities = Me.TSP_Numeric_n_cities.Value
+            .Problem = Me.TSP_ComboBox_prob_instance.SelectedItem
+            .n_Parents = Me.TSP_Numeric_n_parents.Value
+            .n_Childs = Me.TSP_Numeric_n_children.Value
+            .n_Gen = Me.TSP_Numeric_n_generations.Value
+            .ReprodOperator = Me.TSP_ComboBox_Reproductionoperator.SelectedItem
+            .MutOperator = Me.TSP_ComboBox_Mutationoperator.SelectedItem
+        End With
+
 
     End Sub
 
@@ -719,7 +748,7 @@ Public Class EVO_Einstellungen
             Next
 
             'Objective
-            If (.Selected_Objective <> -1) Then
+            If (Me.mProblem.NumObjectives > 0 and .Selected_Objective <> -1) Then
                 Me.SensiPlot_ListBox_Objectives.SetSelected(.Selected_Objective, True)
             End If
 
@@ -737,6 +766,19 @@ Public Class EVO_Einstellungen
             Me.SensiPlot_CheckBox_wave.Checked = .show_Wave
 
         End With
+
+        'TSP
+        '---
+        With Me.msettings.TSP
+            Me.TSP_Numeric_n_cities.Value = .n_Cities
+            Me.TSP_ComboBox_prob_instance.SelectedItem = .Problem
+            Me.TSP_Numeric_n_parents.Value = .n_Parents
+            Me.TSP_Numeric_n_children.Value = .n_Childs
+            Me.TSP_Numeric_n_generations.Value = .n_Gen
+            Me.TSP_ComboBox_Reproductionoperator.SelectedItem = .ReprodOperator
+            Me.TSP_ComboBox_Mutationoperator.SelectedItem = .MutOperator
+        End With
+
 
         Call Application.DoEvents()
 
@@ -813,6 +855,13 @@ Public Class EVO_Einstellungen
     '******************************************
     Private Sub setStandard_SensiPlot()
         Call Me.msettings.SensiPlot.setStandard()
+        Call Me.writeForm()
+    End Sub
+
+    'Standardeinstellungen setzen für SensiPlot
+    '******************************************
+    Private Sub setStandard_TSP()
+        Call Me.msettings.TSP.setStandard()
         Call Me.writeForm()
     End Sub
 
@@ -964,4 +1013,7 @@ Public Class EVO_Einstellungen
 
 #End Region 'Methoden
 
+Private Sub TSP_Numeric_n_children_ValueChanged( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles TSP_Numeric_n_children.ValueChanged
+
+End Sub
 End Class

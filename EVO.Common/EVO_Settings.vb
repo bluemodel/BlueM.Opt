@@ -351,6 +351,32 @@ Public Class EVO_Settings
 
     End Structure
 
+    Public Structure TSP_Settings
+
+        Public n_Cities As Integer
+        Public n_Gen As Integer
+        Public n_Parents As Integer
+        Public n_Childs As Integer
+
+        Public Problem As EnProblem
+        Public ReprodOperator As EnReprodOperator
+        Public MutOperator As EnMutOperator
+        Public Strategy As EVO_STRATEGIE
+
+        Public Sub setStandard()
+            n_Cities = 70
+            n_Gen = 20000
+            n_Parents = 5   'mindestens 3 Eltern!
+            n_Childs = 40
+
+            Problem = EnProblem.circle
+            ReprodOperator = EnReprodOperator.Order_Crossover_OX
+            MutOperator = EnMutOperator.Translocation_3_Opt
+            Strategy = EVO_STRATEGIE.Plus_Strategie
+        End Sub
+
+    End Structure
+
     Public General As General_Settings
     Public PES As PES_Settings
     Public CES As CES_Settings
@@ -358,5 +384,6 @@ Public Class EVO_Settings
     Public MetaEvo As MetaEvo_Settings
     Public DDS As DDS_Settings
     Public SensiPlot As SensiPlot_Settings
+    Public TSP As TSP_Settings
 
 End Class
