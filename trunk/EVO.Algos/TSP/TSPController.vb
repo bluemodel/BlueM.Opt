@@ -42,6 +42,8 @@
         Me.TSP1 = New TSP()
 
         Call TSP1.TSP_Initialize()
+        Call InitDiagramm()
+        Call Zeichnen_TSP_cities(TSP1.ListOfCities)
 
         'Batch_Mode
         Dim Batch_Mode As Boolean = True
@@ -66,14 +68,14 @@
             End If
         End With
 
-        Select Case Batch_Mode
+        Select Case TSP1.Mode
 
-            Case False
+            Case TSP.EnMode.Standard_Opt
                 'Progress
                 Me.myProgress.Initialize(0, 0, TSP1.n_Gen, TSP1.n_Childs)
                 Call TSP_Controller(False)
 
-            Case True
+            Case TSP.EnMode.Batch_OPpt
                 'Progress
                 Me.myProgress.Initialize(n, 8, TSP1.n_Gen, TSP1.n_Childs)
                 Dim i, M, R As Integer
@@ -86,15 +88,36 @@
                         Me.myMonitor.LogAppend("ReprodOperator: " & TSP1.ReprodOperator & "; MutationOperator: " & TSP1.MutOperator)
 
                         'n Wiederholungen
-                        For i = 1 To n
+                        For i = 1 To TSP1.nTests
                             Call TSP_Controller(True)
                         Next
                         '~~~~~~~~~~~~~~~~
                     Next
                 Next
-        End Select
+            Case TSP.EnMode.Just_Calc
+                TSP1.n_Childs = 1
+                Dim i, j, y As Double
+                Dim t As TimeSpan
 
-    End Sub
+                y = TSP1.Faculty(TSP1.n_Cities - 1) / 2
+                j = 10000000
+
+                Dim Time As New Stopwatch
+                Call TSP1.Dim_Childs()
+                Call TSP1.Generate_Random_Path_TSP()
+                Call TSP1.Cities_according_ChildPath()
+
+                Time.Start()
+                For i = 1 To j
+                    TSP1.Evaluate_child_Quality()
+                Next
+                Time.Stop()
+
+                Me.myMonitor.LogAppend("Zahl der Berechnungen: " & j)
+                Me.myMonitor.LogAppend("Die Berechnung dauerte:   " & Time.Elapsed.Hours & "h  " & Time.Elapsed.Minutes & "m  " & Time.Elapsed.Seconds & "s     " & Time.Elapsed.Milliseconds & "ms")
+
+        End Select
+    End Sub 
 
     Public Sub Stoppen() Implements IController.Stoppen
         'TODO: TSP Stoppen
@@ -106,13 +129,16 @@
         Dim gen As Integer
         Dim i As Integer
         Dim GoToExit As Boolean
+        'Zwischenspeicher das Penalty zum drucken
+        Dim PenaltyTMP As Integer = 2100000000
 
         'Intervall zum Updaten des Diagramms
         Dim increm As Integer = 100
         Dim jepp As Integer = 0
 
-		'Diagramm initialisieren
-        Call Me.InitDiagramm()
+        'BUG 212: Nach Klasse Diagramm auslagern!
+        Me.myHauptDiagramm.Export.Image.PNG.Width = 477
+        Me.myHauptDiagramm.Export.Image.PNG.Height = 627
 
         'Arrays werden Dimensioniert
         Call TSP1.Dim_Parents_TSP()
@@ -126,6 +152,16 @@
 
             'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
             Call TSP1.Cities_according_ChildPath()
+
+            'Zeichnen des ersten Childs
+            If gen = 1 Then
+                Call Zeichnen_TSP(TSP1.ChildList(0).Image)
+                Me.myHauptDiagramm.Update()
+                'png Export
+                If TSP1.pngExport = True Then
+                    Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ChildList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
+                End If
+            End If
 
             'Bestimmung des der Qualität der Kinder
             Call TSP1.Evaluate_child_Quality()
@@ -142,7 +178,12 @@
                 jepp += increm
                 Me.myProgress.iGen() = gen
                 If Batch_Mode = False Then
-                    Me.myMonitor.LogAppend("Generation: " & gen & "; Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
+                    Me.myMonitor.LogAppend("Genearation: " & gen & "; Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty) & "  " & Conversion.Int((TSP1.circumference * 100) / Conversion.Int(TSP1.ParentList(0).Penalty)) & "%")
+                    'png Export
+                    If TSP1.pngExport = True and Conversion.Int(TSP1.ParentList(0).Penalty) < PenaltyTMP Then
+                        Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
+                        PenaltyTMP = Conversion.Int(TSP1.ParentList(0).Penalty)
+                    End If
                 End If
             End If
 
@@ -169,6 +210,15 @@
             End If
 
             If GoToExit = True Then
+                If Batch_Mode = False Then
+                    Call Zeichnen_TSP(TSP1.ParentList(0).Image)
+                    Me.myHauptDiagramm.Update()
+                    Me.myMonitor.LogAppend("Genearation: " & gen & "; Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty) & "  " & Conversion.Int((TSP1.circumference * 100) / Conversion.Int(TSP1.ParentList(0).Penalty)) & "%")
+                    'png Export
+                    If TSP1.pngExport = True Then
+                        Me.myHauptdiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
+                    End If
+                End If
                 Exit For
             End If
 

@@ -1,3 +1,5 @@
+Imports System.IO
+
 Public Class TSP
 
     '*******************************************************************************
@@ -21,11 +23,27 @@ Public Class TSP
     'CutPoint:     1 2 3 4 5 6
     'LB + UB n=2   x         x
 
-    Public n_Cities As Integer = 100
+    'PNG Export exportiert alle 100 Generationen png Bilder
+    Public pngExport As Boolean = True
+    'Standardmäig unter den bin Verzeichnis
+    Public ExPath As String
+
+    'Batch_Mode
+    Public Mode As EnMode = EnMode.Standard_Opt
+    'Anzahl der Tests
+    Public nTests As Integer = 3
+
+    Enum EnMode
+        Standard_Opt = 1
+        Batch_OPpt = 2
+        Just_Calc = 3
+    End Enum
+
+    Public n_Cities As Integer = 75
     Public ListOfCities(,) As Object
-    Public n_Gen As Integer = 500
-    Public n_Parents As Integer = 5
-    Public n_Childs As Integer = 20
+    Public n_Gen As Integer = 20000
+    Public n_Parents As Integer = 5   'mindestens 3 Eltern!
+    Public n_Childs As Integer = 40
 
     Public circumference As Double 'Kreisumfang
 
@@ -35,14 +53,13 @@ Public Class TSP
         Partially_Mapped_Crossover_PMX = 2
     End Enum
 
-    Public MutOperator As EnMutOperator = EnMutOperator.Inversion_SIM
+    Public MutOperator As EnMutOperator = EnMutOperator.Translocation_3_Opt
     Enum EnMutOperator
         Inversion_SIM = 1
         Translocation_3_Opt = 2
         Translocation_n_Opt = 3
         Exchange_Mutation_EM = 4
     End Enum
-
     'Anzahl der SubPaths bei beim n_Opt 0perator
     Dim n_SP As Integer = 2
 
@@ -53,12 +70,11 @@ Public Class TSP
     End Enum
 
     'Die Problemstellung
-    Public Problem As EnProblem
+    Public Problem As EnProblem = EnProblem.Circle
     Enum EnProblem
         circle = 0
         random = 1
     End Enum
-
 
     '************************************* Struktur *****************************
     Public Structure Faksimile_Type
@@ -96,12 +112,20 @@ Public Class TSP
                 circumference = 2 * Math.PI * Radius
 
             Case EnProblem.random
+                Dim lowerb As Integer = 2
+                Dim upperb1 As Integer = 98
+                Dim upperb2 As Integer = 128
                 For i = 0 To n_Cities - 1
                     ListOfCities(i, 0) = i + 1
-                    ListOfCities(i, 1) = Math.Round(Rnd() * 100)
-                    ListOfCities(i, 2) = Math.Round(Rnd() * 130)
+                    ListOfCities(i, 1) = CInt(Int((upperb1 - lowerb + 1) * Rnd() + lowerb))
+                    ListOfCities(i, 2) = CInt(Int((upperb2 - lowerb + 1) * Rnd() + lowerb))
                 Next
         End Select
+
+        If pngExport = True Then
+            Directory.CreateDirectory(Directory.GetCurrentDirectory & "\TSP_Export").ToString()
+            ExPath = Directory.GetCurrentDirectory & "\TSP_Export\"
+        End If
 
     End Sub
 
