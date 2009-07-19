@@ -161,23 +161,23 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_ListBox_Objectives = New System.Windows.Forms.ListBox
         Me.SensiPlot_Label_OptParameter = New System.Windows.Forms.Label
         Me.SensiPlot_ListBox_OptParameter = New System.Windows.Forms.ListBox
-        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
         Me.TabPage_TSP = New System.Windows.Forms.TabPage
-        Me.TSP_Label_n_cities = New System.Windows.Forms.Label
-        Me.TSP_Numeric_n_cities = New System.Windows.Forms.NumericUpDown
-        Me.TSP_Label_n_parents = New System.Windows.Forms.Label
-        Me.TSP_Numeric_n_parents = New System.Windows.Forms.NumericUpDown
-        Me.TSP_Numeric_n_children = New System.Windows.Forms.NumericUpDown
-        Me.TSP_Label_n_children = New System.Windows.Forms.Label
+        Me.TSP_ComboBox_prob_instance = New System.Windows.Forms.ComboBox
+        Me.TSP_Label_Instance = New System.Windows.Forms.Label
+        Me.TSP_ComboBox_Mutationoperator = New System.Windows.Forms.ComboBox
+        Me.TSP_Label_Mutationoperator = New System.Windows.Forms.Label
+        Me.TSP_Label_Reproductionoperator = New System.Windows.Forms.Label
+        Me.TSP_ComboBox_Reproductionoperator = New System.Windows.Forms.ComboBox
         Me.TSP_Numeric_n_generations = New System.Windows.Forms.NumericUpDown
         Me.TSP_Label_n_generations = New System.Windows.Forms.Label
-        Me.TSP_ComboBox_Reproductionoperator = New System.Windows.Forms.ComboBox
-        Me.TSP_Label_Reproductionoperator = New System.Windows.Forms.Label
-        Me.TSP_Label_Mutationoperator = New System.Windows.Forms.Label
-        Me.TSP_ComboBox_Mutationoperator = New System.Windows.Forms.ComboBox
-        Me.TSP_Label_Instance = New System.Windows.Forms.Label
-        Me.TSP_ComboBox_prob_instance = New System.Windows.Forms.ComboBox
+        Me.TSP_Numeric_n_children = New System.Windows.Forms.NumericUpDown
+        Me.TSP_Label_n_children = New System.Windows.Forms.Label
+        Me.TSP_Numeric_n_parents = New System.Windows.Forms.NumericUpDown
+        Me.TSP_Label_n_parents = New System.Windows.Forms.Label
+        Me.TSP_Numeric_n_cities = New System.Windows.Forms.NumericUpDown
+        Me.TSP_Label_n_cities = New System.Windows.Forms.Label
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -274,12 +274,12 @@ Partial Class EVO_Einstellungen
         Me.TabPage_SensiPlot.SuspendLayout()
         CType(Me.SensiPlot_NumericUpDown_NumSteps, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SensiPlot_GroupBox_Modus.SuspendLayout()
-        Me.GroupBox_Einstellungen.SuspendLayout()
         Me.TabPage_TSP.SuspendLayout()
-        CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.TSP_Numeric_n_children, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TSP_Numeric_n_generations, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TSP_Numeric_n_children, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox_Einstellungen.SuspendLayout()
         Me.SuspendLayout()
         '
         'Label_CES_MemSize
@@ -1790,18 +1790,6 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_ListBox_OptParameter.Size = New System.Drawing.Size(209, 173)
         Me.SensiPlot_ListBox_OptParameter.TabIndex = 3
         '
-        'GroupBox_Einstellungen
-        '
-        Me.GroupBox_Einstellungen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox_Einstellungen.Controls.Add(Me.TabControl1)
-        Me.GroupBox_Einstellungen.Location = New System.Drawing.Point(0, 0)
-        Me.GroupBox_Einstellungen.Name = "GroupBox_Einstellungen"
-        Me.GroupBox_Einstellungen.Size = New System.Drawing.Size(234, 713)
-        Me.GroupBox_Einstellungen.TabIndex = 0
-        Me.GroupBox_Einstellungen.TabStop = False
-        Me.GroupBox_Einstellungen.Text = "Einstellungen:"
-        '
         'TabPage_TSP
         '
         Me.TabPage_TSP.Controls.Add(Me.TSP_ComboBox_prob_instance)
@@ -1826,73 +1814,70 @@ Partial Class EVO_Einstellungen
         Me.TabPage_TSP.Text = "TSP"
         Me.TabPage_TSP.UseVisualStyleBackColor = True
         '
-        'TSP_Label_n_cities
+        'TSP_ComboBox_prob_instance
         '
-        Me.TSP_Label_n_cities.AutoSize = True
-        Me.TSP_Label_n_cities.Location = New System.Drawing.Point(10, 15)
-        Me.TSP_Label_n_cities.Name = "TSP_Label_n_cities"
-        Me.TSP_Label_n_cities.Size = New System.Drawing.Size(67, 13)
-        Me.TSP_Label_n_cities.TabIndex = 0
-        Me.TSP_Label_n_cities.Text = "No. of Cities:"
+        Me.TSP_ComboBox_prob_instance.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.TSP_ComboBox_prob_instance.FormattingEnabled = True
+        Me.TSP_ComboBox_prob_instance.Items.AddRange(New Object() {"Random", "Circle"})
+        Me.TSP_ComboBox_prob_instance.Location = New System.Drawing.Point(105, 39)
+        Me.TSP_ComboBox_prob_instance.Name = "TSP_ComboBox_prob_instance"
+        Me.TSP_ComboBox_prob_instance.Size = New System.Drawing.Size(110, 21)
+        Me.TSP_ComboBox_prob_instance.TabIndex = 57
         '
-        'TSP_Numeric_n_cities
+        'TSP_Label_Instance
         '
-        Me.TSP_Numeric_n_cities.Location = New System.Drawing.Point(162, 13)
-        Me.TSP_Numeric_n_cities.Maximum = New Decimal(New Integer() {1215752192, 23, 0, 0})
-        Me.TSP_Numeric_n_cities.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.TSP_Numeric_n_cities.Name = "TSP_Numeric_n_cities"
-        Me.TSP_Numeric_n_cities.Size = New System.Drawing.Size(53, 20)
-        Me.TSP_Numeric_n_cities.TabIndex = 5
-        Me.TSP_Numeric_n_cities.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.TSP_Numeric_n_cities.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.TSP_Label_Instance.AutoSize = True
+        Me.TSP_Label_Instance.Location = New System.Drawing.Point(10, 42)
+        Me.TSP_Label_Instance.Name = "TSP_Label_Instance"
+        Me.TSP_Label_Instance.Size = New System.Drawing.Size(92, 13)
+        Me.TSP_Label_Instance.TabIndex = 56
+        Me.TSP_Label_Instance.Text = "Problem Instance:"
         '
-        'TSP_Label_n_parents
+        'TSP_ComboBox_Mutationoperator
         '
-        Me.TSP_Label_n_parents.AutoSize = True
-        Me.TSP_Label_n_parents.Location = New System.Drawing.Point(10, 86)
-        Me.TSP_Label_n_parents.Name = "TSP_Label_n_parents"
-        Me.TSP_Label_n_parents.Size = New System.Drawing.Size(78, 13)
-        Me.TSP_Label_n_parents.TabIndex = 6
-        Me.TSP_Label_n_parents.Text = "No. of Parents:"
+        Me.TSP_ComboBox_Mutationoperator.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.TSP_ComboBox_Mutationoperator.FormattingEnabled = True
+        Me.TSP_ComboBox_Mutationoperator.Items.AddRange(New Object() {"Local Optimizer", "Global Optimizer", "Both"})
+        Me.TSP_ComboBox_Mutationoperator.Location = New System.Drawing.Point(81, 189)
+        Me.TSP_ComboBox_Mutationoperator.Name = "TSP_ComboBox_Mutationoperator"
+        Me.TSP_ComboBox_Mutationoperator.Size = New System.Drawing.Size(134, 21)
+        Me.TSP_ComboBox_Mutationoperator.TabIndex = 57
         '
-        'TSP_Numeric_n_parents
+        'TSP_Label_Mutationoperator
         '
-        Me.TSP_Numeric_n_parents.Location = New System.Drawing.Point(162, 84)
-        Me.TSP_Numeric_n_parents.Maximum = New Decimal(New Integer() {1410065408, 2, 0, 0})
-        Me.TSP_Numeric_n_parents.Minimum = New Decimal(New Integer() {3, 0, 0, 0})
-        Me.TSP_Numeric_n_parents.Name = "TSP_Numeric_n_parents"
-        Me.TSP_Numeric_n_parents.Size = New System.Drawing.Size(53, 20)
-        Me.TSP_Numeric_n_parents.TabIndex = 7
-        Me.TSP_Numeric_n_parents.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.TSP_Numeric_n_parents.Value = New Decimal(New Integer() {3, 0, 0, 0})
+        Me.TSP_Label_Mutationoperator.AutoSize = True
+        Me.TSP_Label_Mutationoperator.Location = New System.Drawing.Point(10, 192)
+        Me.TSP_Label_Mutationoperator.Name = "TSP_Label_Mutationoperator"
+        Me.TSP_Label_Mutationoperator.Size = New System.Drawing.Size(68, 13)
+        Me.TSP_Label_Mutationoperator.TabIndex = 56
+        Me.TSP_Label_Mutationoperator.Text = "MutationOp.:"
         '
-        'TSP_Numeric_n_children
+        'TSP_Label_Reproductionoperator
         '
-        Me.TSP_Numeric_n_children.Location = New System.Drawing.Point(162, 110)
-        Me.TSP_Numeric_n_children.Maximum = New Decimal(New Integer() {-727379968, 232, 0, 0})
-        Me.TSP_Numeric_n_children.Minimum = New Decimal(New Integer() {7, 0, 0, 0})
-        Me.TSP_Numeric_n_children.Name = "TSP_Numeric_n_children"
-        Me.TSP_Numeric_n_children.Size = New System.Drawing.Size(53, 20)
-        Me.TSP_Numeric_n_children.TabIndex = 9
-        Me.TSP_Numeric_n_children.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.TSP_Numeric_n_children.Value = New Decimal(New Integer() {7, 0, 0, 0})
+        Me.TSP_Label_Reproductionoperator.AutoSize = True
+        Me.TSP_Label_Reproductionoperator.Location = New System.Drawing.Point(10, 165)
+        Me.TSP_Label_Reproductionoperator.Name = "TSP_Label_Reproductionoperator"
+        Me.TSP_Label_Reproductionoperator.Size = New System.Drawing.Size(62, 13)
+        Me.TSP_Label_Reproductionoperator.TabIndex = 55
+        Me.TSP_Label_Reproductionoperator.Text = "ReprodOp.:"
         '
-        'TSP_Label_n_children
+        'TSP_ComboBox_Reproductionoperator
         '
-        Me.TSP_Label_n_children.AutoSize = True
-        Me.TSP_Label_n_children.Location = New System.Drawing.Point(10, 112)
-        Me.TSP_Label_n_children.Name = "TSP_Label_n_children"
-        Me.TSP_Label_n_children.Size = New System.Drawing.Size(80, 13)
-        Me.TSP_Label_n_children.TabIndex = 8
-        Me.TSP_Label_n_children.Text = "No. of Children:"
+        Me.TSP_ComboBox_Reproductionoperator.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.TSP_ComboBox_Reproductionoperator.FormattingEnabled = True
+        Me.TSP_ComboBox_Reproductionoperator.Items.AddRange(New Object() {"PMX", "OX"})
+        Me.TSP_ComboBox_Reproductionoperator.Location = New System.Drawing.Point(81, 162)
+        Me.TSP_ComboBox_Reproductionoperator.Name = "TSP_ComboBox_Reproductionoperator"
+        Me.TSP_ComboBox_Reproductionoperator.Size = New System.Drawing.Size(134, 21)
+        Me.TSP_ComboBox_Reproductionoperator.TabIndex = 54
         '
         'TSP_Numeric_n_generations
         '
-        Me.TSP_Numeric_n_generations.Location = New System.Drawing.Point(162, 136)
+        Me.TSP_Numeric_n_generations.Location = New System.Drawing.Point(125, 136)
         Me.TSP_Numeric_n_generations.Maximum = New Decimal(New Integer() {-1981284353, -1966660860, 0, 0})
         Me.TSP_Numeric_n_generations.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TSP_Numeric_n_generations.Name = "TSP_Numeric_n_generations"
-        Me.TSP_Numeric_n_generations.Size = New System.Drawing.Size(53, 20)
+        Me.TSP_Numeric_n_generations.Size = New System.Drawing.Size(90, 20)
         Me.TSP_Numeric_n_generations.TabIndex = 11
         Me.TSP_Numeric_n_generations.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         Me.TSP_Numeric_n_generations.Value = New Decimal(New Integer() {1, 0, 0, 0})
@@ -1906,62 +1891,77 @@ Partial Class EVO_Einstellungen
         Me.TSP_Label_n_generations.TabIndex = 10
         Me.TSP_Label_n_generations.Text = "No. of Generations:"
         '
-        'TSP_ComboBox_Reproductionoperator
+        'TSP_Numeric_n_children
         '
-        Me.TSP_ComboBox_Reproductionoperator.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.TSP_ComboBox_Reproductionoperator.FormattingEnabled = True
-        Me.TSP_ComboBox_Reproductionoperator.Items.AddRange(New Object() {"PMX", "OX"})
-        Me.TSP_ComboBox_Reproductionoperator.Location = New System.Drawing.Point(81, 162)
-        Me.TSP_ComboBox_Reproductionoperator.Name = "TSP_ComboBox_Reproductionoperator"
-        Me.TSP_ComboBox_Reproductionoperator.Size = New System.Drawing.Size(134, 21)
-        Me.TSP_ComboBox_Reproductionoperator.TabIndex = 54
+        Me.TSP_Numeric_n_children.Location = New System.Drawing.Point(125, 110)
+        Me.TSP_Numeric_n_children.Maximum = New Decimal(New Integer() {-727379968, 232, 0, 0})
+        Me.TSP_Numeric_n_children.Minimum = New Decimal(New Integer() {7, 0, 0, 0})
+        Me.TSP_Numeric_n_children.Name = "TSP_Numeric_n_children"
+        Me.TSP_Numeric_n_children.Size = New System.Drawing.Size(90, 20)
+        Me.TSP_Numeric_n_children.TabIndex = 9
+        Me.TSP_Numeric_n_children.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TSP_Numeric_n_children.Value = New Decimal(New Integer() {7, 0, 0, 0})
         '
-        'TSP_Label_Reproductionoperator
+        'TSP_Label_n_children
         '
-        Me.TSP_Label_Reproductionoperator.AutoSize = True
-        Me.TSP_Label_Reproductionoperator.Location = New System.Drawing.Point(10, 165)
-        Me.TSP_Label_Reproductionoperator.Name = "TSP_Label_Reproductionoperator"
-        Me.TSP_Label_Reproductionoperator.Size = New System.Drawing.Size(62, 13)
-        Me.TSP_Label_Reproductionoperator.TabIndex = 55
-        Me.TSP_Label_Reproductionoperator.Text = "ReprodOp.:"
+        Me.TSP_Label_n_children.AutoSize = True
+        Me.TSP_Label_n_children.Location = New System.Drawing.Point(10, 112)
+        Me.TSP_Label_n_children.Name = "TSP_Label_n_children"
+        Me.TSP_Label_n_children.Size = New System.Drawing.Size(80, 13)
+        Me.TSP_Label_n_children.TabIndex = 8
+        Me.TSP_Label_n_children.Text = "No. of Children:"
         '
-        'TSP_Label_Mutationoperator
+        'TSP_Numeric_n_parents
         '
-        Me.TSP_Label_Mutationoperator.AutoSize = True
-        Me.TSP_Label_Mutationoperator.Location = New System.Drawing.Point(10, 192)
-        Me.TSP_Label_Mutationoperator.Name = "TSP_Label_Mutationoperator"
-        Me.TSP_Label_Mutationoperator.Size = New System.Drawing.Size(68, 13)
-        Me.TSP_Label_Mutationoperator.TabIndex = 56
-        Me.TSP_Label_Mutationoperator.Text = "MutationOp.:"
+        Me.TSP_Numeric_n_parents.Location = New System.Drawing.Point(125, 84)
+        Me.TSP_Numeric_n_parents.Maximum = New Decimal(New Integer() {1410065408, 2, 0, 0})
+        Me.TSP_Numeric_n_parents.Minimum = New Decimal(New Integer() {3, 0, 0, 0})
+        Me.TSP_Numeric_n_parents.Name = "TSP_Numeric_n_parents"
+        Me.TSP_Numeric_n_parents.Size = New System.Drawing.Size(90, 20)
+        Me.TSP_Numeric_n_parents.TabIndex = 7
+        Me.TSP_Numeric_n_parents.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TSP_Numeric_n_parents.Value = New Decimal(New Integer() {3, 0, 0, 0})
         '
-        'TSP_ComboBox_Mutationoperator
+        'TSP_Label_n_parents
         '
-        Me.TSP_ComboBox_Mutationoperator.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.TSP_ComboBox_Mutationoperator.FormattingEnabled = True
-        Me.TSP_ComboBox_Mutationoperator.Items.AddRange(New Object() {"Local Optimizer", "Global Optimizer", "Both"})
-        Me.TSP_ComboBox_Mutationoperator.Location = New System.Drawing.Point(81, 189)
-        Me.TSP_ComboBox_Mutationoperator.Name = "TSP_ComboBox_Mutationoperator"
-        Me.TSP_ComboBox_Mutationoperator.Size = New System.Drawing.Size(134, 21)
-        Me.TSP_ComboBox_Mutationoperator.TabIndex = 57
+        Me.TSP_Label_n_parents.AutoSize = True
+        Me.TSP_Label_n_parents.Location = New System.Drawing.Point(10, 86)
+        Me.TSP_Label_n_parents.Name = "TSP_Label_n_parents"
+        Me.TSP_Label_n_parents.Size = New System.Drawing.Size(78, 13)
+        Me.TSP_Label_n_parents.TabIndex = 6
+        Me.TSP_Label_n_parents.Text = "No. of Parents:"
         '
-        'TSP_Label_Instance
+        'TSP_Numeric_n_cities
         '
-        Me.TSP_Label_Instance.AutoSize = True
-        Me.TSP_Label_Instance.Location = New System.Drawing.Point(10, 42)
-        Me.TSP_Label_Instance.Name = "TSP_Label_Instance"
-        Me.TSP_Label_Instance.Size = New System.Drawing.Size(92, 13)
-        Me.TSP_Label_Instance.TabIndex = 56
-        Me.TSP_Label_Instance.Text = "Problem Instance:"
+        Me.TSP_Numeric_n_cities.Location = New System.Drawing.Point(162, 13)
+        Me.TSP_Numeric_n_cities.Maximum = New Decimal(New Integer() {1215752192, 23, 0, 0})
+        Me.TSP_Numeric_n_cities.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.TSP_Numeric_n_cities.Name = "TSP_Numeric_n_cities"
+        Me.TSP_Numeric_n_cities.Size = New System.Drawing.Size(53, 20)
+        Me.TSP_Numeric_n_cities.TabIndex = 5
+        Me.TSP_Numeric_n_cities.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TSP_Numeric_n_cities.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
-        'TSP_ComboBox_prob_instance
+        'TSP_Label_n_cities
         '
-        Me.TSP_ComboBox_prob_instance.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.TSP_ComboBox_prob_instance.FormattingEnabled = True
-        Me.TSP_ComboBox_prob_instance.Items.AddRange(New Object() {"Random", "Circle"})
-        Me.TSP_ComboBox_prob_instance.Location = New System.Drawing.Point(105, 39)
-        Me.TSP_ComboBox_prob_instance.Name = "TSP_ComboBox_prob_instance"
-        Me.TSP_ComboBox_prob_instance.Size = New System.Drawing.Size(110, 21)
-        Me.TSP_ComboBox_prob_instance.TabIndex = 57
+        Me.TSP_Label_n_cities.AutoSize = True
+        Me.TSP_Label_n_cities.Location = New System.Drawing.Point(10, 15)
+        Me.TSP_Label_n_cities.Name = "TSP_Label_n_cities"
+        Me.TSP_Label_n_cities.Size = New System.Drawing.Size(67, 13)
+        Me.TSP_Label_n_cities.TabIndex = 0
+        Me.TSP_Label_n_cities.Text = "No. of Cities:"
+        '
+        'GroupBox_Einstellungen
+        '
+        Me.GroupBox_Einstellungen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox_Einstellungen.Controls.Add(Me.TabControl1)
+        Me.GroupBox_Einstellungen.Location = New System.Drawing.Point(0, 0)
+        Me.GroupBox_Einstellungen.Name = "GroupBox_Einstellungen"
+        Me.GroupBox_Einstellungen.Size = New System.Drawing.Size(234, 713)
+        Me.GroupBox_Einstellungen.TabIndex = 0
+        Me.GroupBox_Einstellungen.TabStop = False
+        Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
         'EVO_Einstellungen
         '
@@ -2036,13 +2036,13 @@ Partial Class EVO_Einstellungen
         CType(Me.SensiPlot_NumericUpDown_NumSteps, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SensiPlot_GroupBox_Modus.ResumeLayout(False)
         Me.SensiPlot_GroupBox_Modus.PerformLayout()
-        Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.TabPage_TSP.ResumeLayout(False)
         Me.TabPage_TSP.PerformLayout()
-        CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.TSP_Numeric_n_children, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TSP_Numeric_n_generations, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TSP_Numeric_n_children, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox_Einstellungen.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
