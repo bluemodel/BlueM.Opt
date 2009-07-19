@@ -61,12 +61,12 @@
             .SelectTabLog()
             .Show()
             .LogAppend("Cities: " & me.mySettings.TSP.n_Cities)
-            .LogAppend("Combinations: " & TSP1.Faculty(me.mySettings.TSP.n_Cities) / 2)
-            .LogAppend("Parents: " & me.mySettings.TSP.n_Parents)
-            .LogAppend("Childs: " & me.mySettings.TSP.n_Childs)
-            .LogAppend("Generations: " & me.mySettings.TSP.n_Gen)
-            .LogAppend("Evaluations: " & me.mySettings.TSP.n_Childs * me.mySettings.TSP.n_Gen)
-            If me.mySettings.TSP.Problem = common.EnProblem.circle Then
+            .LogAppend("Combinations: " & TSP1.n_Comb(Me.mySettings.TSP.n_Cities))
+            .LogAppend("Parents: " & Me.mySettings.TSP.n_Parents)
+            .LogAppend("Childs: " & Me.mySettings.TSP.n_Childs)
+            .LogAppend("Generations: " & Me.mySettings.TSP.n_Gen)
+            .LogAppend("Evaluations: " & Me.mySettings.TSP.n_Childs * Me.mySettings.TSP.n_Gen)
+            If Me.mySettings.TSP.Problem = common.EnProblem.circle Then
                 .LogAppend("Quality Aim: " & Conversion.Int(TSP1.circumference))
             End If
         End With
@@ -75,20 +75,20 @@
 
             Case TSP.EnMode.Standard_Opt
                 'Progress
-                Me.myProgress.Initialize(0, 0, me.mySettings.TSP.n_Gen, me.mySettings.TSP.n_Childs)
+                Me.myProgress.Initialize(0, 0, Me.mySettings.TSP.n_Gen, Me.mySettings.TSP.n_Childs)
                 Call TSP_Controller(False)
 
             Case TSP.EnMode.Batch_OPpt
                 'Progress
-                Me.myProgress.Initialize(n, 8, me.mySettings.TSP.n_Gen, me.mySettings.TSP.n_Childs)
+                Me.myProgress.Initialize(n, 8, Me.mySettings.TSP.n_Gen, Me.mySettings.TSP.n_Childs)
                 Dim i, M, R As Integer
 
                 For R = 1 To 2
-                    me.mySettings.TSP.ReprodOperator = R
+                    Me.mySettings.TSP.ReprodOperator = R
 
                     For M = 1 To 4
-                        me.mySettings.TSP.MutOperator = M
-                        Me.myMonitor.LogAppend("ReprodOperator: " & me.mySettings.TSP.ReprodOperator & "; MutationOperator: " & me.mySettings.TSP.MutOperator)
+                        Me.mySettings.TSP.MutOperator = M
+                        Me.myMonitor.LogAppend("ReprodOperator: " & Me.mySettings.TSP.ReprodOperator & "; MutationOperator: " & Me.mySettings.TSP.MutOperator)
 
                         'n Wiederholungen
                         For i = 1 To TSP1.nTests
@@ -98,11 +98,9 @@
                     Next
                 Next
             Case TSP.EnMode.Just_Calc
-                me.mySettings.TSP.n_Childs = 1
-                Dim i, j, y As Double
-                Dim t As TimeSpan
+                Me.mySettings.TSP.n_Childs = 1
+                Dim i, j As Double
 
-                y = TSP1.Faculty(me.mySettings.TSP.n_Cities - 1) / 2
                 j = 10000000
 
                 Dim Time As New Stopwatch
