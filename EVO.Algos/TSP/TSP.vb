@@ -714,14 +714,35 @@ Public Class TSP
         If tmp_c = 0 Then Even_Number = True
     End Function
 
+    'Anzahl der mglichen Kombinationen
+    'mit n_comb=(n-1)/2
+    Public Function n_Comb(ByVal n As Double) As String
 
-    Public Function Faculty(ByVal n As Double) As Double
+        n = n - 1
+
         Dim i As Integer
-        Dim j As Double = 1
-        For i = 1 To n
-            j = j * i
-        Next
-        Return j
+        Dim Summe As Double
+        Dim Mant As Double
+        Dim Expo As Double
+        Dim Prod As Double
+
+        If n < 170 Then
+            Prod = 1
+            For i = 1 To n
+                Prod = Prod * i
+            Next i
+            n_Comb = Trim$(Str$(Prod / 2))
+        Else
+            Summe = 0
+            For i = 1 To n
+                Summe = Summe + math.log(i)
+            Next i
+            Summe = Summe / math.log(10)
+            Expo = Int(Summe)
+            Mant = 10 ^ (Summe - Expo)
+            n_Comb = (Mant/2) & " E+" & Expo
+        End If
+
     End Function
 
 End Class
