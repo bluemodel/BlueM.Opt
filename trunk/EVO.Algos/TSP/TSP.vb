@@ -670,34 +670,12 @@ Public Class TSP
     End Sub
 
     'Hilfsfunktion zum generieren von zufälligen Schnittpunkten innerhalb eines Pfades
-    'Mit Bernoulli Verteilung mal von rechts mal von links
-    'Wieso nicht einfach zwemal schneiden und dann sortieren?
     Public Sub Create_n_Cutpoints(ByRef CutPoint() As Integer)
         'Generiert zwei CutPoints
         Dim i As Integer
-        Dim lowerb As Integer
-        Dim upperb As Integer
-
-        ''wird zufällig entweder von Link oder von Rechts geschnitten
-        'If Bernoulli() = True Then
-        '    lowerb = 0
-        '    For i = 0 To CutPoint.GetUpperBound(0)
-        '        upperb = mySettings.n_Cities - CutPoint.GetLength(0) - 1 + i
-        '        CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-        '        lowerb = CutPoint(i) + 1
-        '    Next i
-        'Else
-        '    upperb = mySettings.n_Cities - 2
-        '    For i = CutPoint.GetUpperBound(0) To 0 Step -1
-        '        lowerb = i
-        '        CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-        '        upperb = CutPoint(i) - 1
-        '    Next i
-        'End If
-
-        lowerb = 0
-        upperb = mySettings.n_Cities - 2
-        
+        Dim lowerb As Integer = 0
+        Dim upperb As Integer = mySettings.n_Cities - 2
+                
         For i = 0 To CutPoint.GetUpperBound(0)
             CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
         Next
