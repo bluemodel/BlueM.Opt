@@ -20,8 +20,8 @@ Public Class TSP
     '********************************************* Konvention *****************************
     'Cities:      1 2 3 4 5 6 7
     'Pathindex:   0 1 2 3 4 5 6
-    'CutPoint:     1 2 3 4 5 6
-    'LB + UB n=2   x         x
+    'CutPoint:     0 1 2 3 4 5
+    'LB + UB(n-2)  x         x
 
     'PNG Export exportiert alle 100 Generationen png Bilder
     Public pngExport As Boolean = True
