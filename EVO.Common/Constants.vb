@@ -70,7 +70,7 @@ Public Module Constants
 
     'Reproduktionsoperator
     Public Enum CES_REPRODOP as Integer
-        Selt_Rand_Uniform = 1
+        Uniform_Crossover = 1
         Order_Crossover = 2
         Part_Mapped_Cross = 3
     End Enum

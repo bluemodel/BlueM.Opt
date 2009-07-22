@@ -139,7 +139,7 @@ Public Class CES
         If (Settings.CES.OptStrategie <> EVO_STRATEGIE.Komma_Strategie And Settings.CES.OptStrategie <> EVO_STRATEGIE.Plus_Strategie) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
         End If
-        If (Settings.CES.OptReprodOp <> CES_REPRODOP.Selt_Rand_Uniform And CES_REPRODOP.Order_Crossover And CES_REPRODOP.Part_Mapped_Cross) Then
+        If (Settings.CES.OptReprodOp <> CES_REPRODOP.Uniform_Crossover And CES_REPRODOP.Order_Crossover And CES_REPRODOP.Part_Mapped_Cross) Then
             Throw New Exception("Typ der Reproduction ist nicht richtig!")
         End If
         If (Settings.CES.OptMutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch) Then
@@ -386,11 +386,11 @@ Public Class CES
 
         Select Case mSettings.CES.OptReprodOp
             'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
-            Case CES_REPRODOP.Selt_Rand_Uniform
+            Case CES_REPRODOP.Uniform_Crossover
                 x = 0
                 y = 1
                 For i = 0 To mSettings.CES.n_Childs - 2 Step 2
-                    Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                    Call Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
                     x += 1
                     y += 1
@@ -398,7 +398,7 @@ Public Class CES
                     If y = mSettings.CES.n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(mSettings.CES.n_Childs) = False Then
-                    Call ReprodOp_Select_Random_Uniform(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                    Call Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
                     Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
                 End If
 
@@ -439,14 +439,14 @@ Public Class CES
 
     End Sub
 
-    'Reproductionsoperator: "Select_Random_Uniform"
-    'Entscheidet zufällig ob der Wert aus dem Path des Elter_A oder Elter_B verwendet wird
-    '*************************************************************************************
-    Private Sub ReprodOp_Select_Random_Uniform(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
+    'Reproductionsoperator: "Uniform_Crossover"
+    'Entscheidet zufällig ob der Wert aus dem Path des Elter_A oder Elter_B für das Allel verwendet wird
+    '***************************************************************************************************
+    Private Sub Uniform_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
 
         Dim i As Integer
 
-        For i = 0 To ChildPath_A.GetUpperBound(0)    'TODO: Es müsste eigentlich eine definierte Pfadlänge geben
+        For i = 0 To ChildPath_A.GetUpperBound(0)
             If Bernoulli() = True Then
                 ChildPath_A(i) = ParPath_B(i)
             Else
@@ -454,7 +454,7 @@ Public Class CES
             End If
         Next
 
-        For i = 0 To ChildPath_B.GetUpperBound(0)    'TODO: Es müsste eigentlich eine definierte Pfadlänge geben
+        For i = 0 To ChildPath_B.GetUpperBound(0)
             If Bernoulli() = True Then
                 ChildPath_B(i) = ParPath_A(i)
             Else
