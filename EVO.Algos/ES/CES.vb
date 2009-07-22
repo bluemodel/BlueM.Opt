@@ -1056,27 +1056,16 @@ Public Class CES
     'Mit Bernoulli Verteilung mal von rechts mal von links
     '*****************************************************
     Public Sub Create_n_Cutpoints(ByRef CutPoint() As Integer)
-        'Generiert zwei CutPoints
-        Dim i As Integer
-        Dim lowerb As Integer
-        Dim upperb As Integer
 
-        'wird zufällig entweder von Link oder von Rechts geschnitten
-        If Bernoulli() = True Then
-            lowerb = 0
-            For i = 0 To CutPoint.GetUpperBound(0)
-                upperb = ModSett.n_Locations - CutPoint.GetLength(0) - 1 + i
-                CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-                lowerb = CutPoint(i) + 1
-            Next i
-        Else
-            upperb = ModSett.n_Locations - 2
-            For i = CutPoint.GetUpperBound(0) To 0 Step -1
-                lowerb = i
-                CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
-                upperb = CutPoint(i) - 1
-            Next i
-        End If
+        Dim i As Integer
+        Dim lowerb As Integer = 0
+        Dim upperb As Integer = ModSett.n_Locations - 2
+                               
+        For i = 0 To CutPoint.GetUpperBound(0)
+            CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
+        Next
+
+        Array.Sort(CutPoint)
 
     End Sub
 
