@@ -390,7 +390,7 @@ Public Class CES
                 x = 0
                 y = 1
                 For i = 0 To mSettings.CES.n_Childs - 2 Step 2
-                    Call Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                    Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
                     x += 1
                     y += 1
@@ -398,7 +398,7 @@ Public Class CES
                     If y = mSettings.CES.n_Parents - 1 Then y = 0
                 Next i
                 If Even_Number(mSettings.CES.n_Childs) = False Then
-                    Call Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                    Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
                     Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
                 End If
 
@@ -442,7 +442,7 @@ Public Class CES
     'Reproductionsoperator: "Uniform_Crossover"
     'Entscheidet zufällig ob der Wert aus dem Path des Elter_A oder Elter_B für das Allel verwendet wird
     '***************************************************************************************************
-    Private Sub Uniform_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
+    Private Sub ReprodOp_Uniform_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
 
         Dim i As Integer
 
