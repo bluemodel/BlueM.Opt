@@ -671,7 +671,7 @@ Public Class TSP
 
     'Hilfsfunktion zum generieren von zufälligen Schnittpunkten innerhalb eines Pfades
     Public Sub Create_n_Cutpoints(ByRef CutPoint() As Integer)
-        'Generiert zwei CutPoints
+
         Dim i As Integer
         Dim lowerb As Integer = 0
         Dim upperb As Integer = mySettings.n_Cities - 2
