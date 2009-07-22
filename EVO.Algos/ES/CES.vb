@@ -473,14 +473,16 @@ Public Class CES
         Dim i As Integer
         Dim x, y As Integer
 
+        'Geht nur mit zwei Schnittpunkten
         Dim CutPoint(1) As Integer
         Call Create_n_Cutpoints(CutPoint)
 
-        'Kopieren des mittleren Paths
+        'Kopieren des mittleren Paths Teil 2
         For i = CutPoint(0) + 1 To CutPoint(1)
             ChildPath_A(i) = ParPath_A(i)
             ChildPath_B(i) = ParPath_B(i)
         Next
+
         'Auffüllen des Paths Teil 3 des Childs A mit dem anderen Elter beginnend bei 0
         x = 0
         For i = CutPoint(1) + 1 To ModSett.n_Locations - 1
