@@ -74,9 +74,10 @@ Public Class Functions
         Do
             'Entscheidet welche Werte dominiert werden und welche nicht
             Call Pareto_Non_Dominated_Sorting(Temp, rang)
-            'Sortiert die nicht dominanten Lösungen nach oben,
-            'die dominanten nach unten und zählt die Mitglieder der aktuellen Front
+            'Nach Dominanz sortieren
             NFrontMember_aktuell = Pareto_Non_Dominated_Count_and_Sort(Temp)
+            'Array umdrehen, weil wir die nicht dominanten Lösungen oben haben wollen
+            Call Array.Reverse(Temp)
             'NFrontMember_aktuell: Anzahl der Mitglieder der gerade bestimmten Front
             'NFrontMember_gesamt: Alle bisher als nicht dominiert klassifizierten Individuum
             NFrontMember_gesamt += NFrontMember_aktuell
@@ -240,44 +241,33 @@ Public Class Functions
 
     End Sub
 
-    'NON_DOMINATED_COUNT_AND_SORT - Sortiert die nicht dominanten Lösungen nach oben,
-    'die dominanten nach unten, gibt die Zahl der dominanten Lösungen zurück (Front)
-    '*******************************************************************************
-    Private Function Pareto_Non_Dominated_Count_and_Sort(ByRef NDSorting() As Individuum) As Integer
+    ''' <summary>
+    ''' Sortiert die dominanten Individuen nach oben, die nicht dominanten nach unten, 
+    ''' gibt die Zahl der dominanten Individuen zurück (Front)
+    ''' </summary>
+    ''' <param name="inds">zu sortierendes Array von Individuen</param>
+    ''' <returns>Anzahl dominanter Individuen (Front)</returns>
+    ''' <remarks></remarks>
+    Private Function Pareto_Non_Dominated_Count_and_Sort(ByRef inds() As Individuum) As Integer
 
-        Dim i As Integer
-        Dim Temp() As Individuum
-        Dim counter As Integer
-        Dim NFrontMember As Integer
+        Dim NFrontMembers As Integer
 
-        ReDim Temp(NDSorting.GetUpperBound(0))
+        Dim comparer As New IndComparerDominated()
 
-        NFrontMember = 0
-        counter = 0
+        'Anhand von Dominated-Property sortieren (False kommt nach oben)
+        Call Array.Sort(inds, comparer)
 
-        'Die dominierten Lösungen werden nach oben kopiert
-        For i = 0 To NDSorting.GetUpperBound(0)
-            If (NDSorting(i).dominated = True) Then
-                counter += 1
-                Temp(counter - 1) = NDSorting(i).Clone()
+        'Nicht-dominierte Individuen zählen
+        NFrontMembers = 0
+        For Each ind As Individuum In inds
+            If (ind.Dominated = False)
+                NFrontMembers += 1
+            Else
+                Exit For
             End If
-        Next i
+        Next
 
-        'Zahl der dominanten Lösungen wird errechnet
-        NFrontMember = NDSorting.GetUpperBound(0) + 1 - counter
-
-        'Die nicht dominierten Lösungen werden nach unten kopiert
-        For i = 0 To NDSorting.GetUpperBound(0)
-            If (NDSorting(i).dominated = False) Then
-                counter += 1
-                Temp(counter - 1) = NDSorting(i).Clone()
-            End If
-        Next i
-
-        'Temp zurück in NDSorting kopieren
-        NDSorting = Individuum.Clone_Indi_Array(Temp)
-
-        Return NFrontMember
+        Return NFrontMembers
 
     End Function
 
@@ -434,12 +424,12 @@ Public Class Functions
 
         'SekPop neu sortieren und hinteren Ränge entfernen
         Call Pareto_Non_Dominated_Sorting(SekundärQb, 1)
-        NFrontMember_aktuell = SekundärQb_Non_Dominated_Count_and_Sort(SekundärQb)
+        NFrontMember_aktuell = Pareto_Non_Dominated_Count_and_Sort(SekundärQb)
         ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
 
         'Dubletten aus SekPop entfernen
         Call SekundärQb_Dubletten(SekundärQb)
-        NFrontMember_aktuell = SekundärQb_Non_Dominated_Count_and_Sort(SekundärQb)
+        NFrontMember_aktuell = Pareto_Non_Dominated_Count_and_Sort(SekundärQb)
         ReDim Preserve SekundärQb(NFrontMember_aktuell - 1)
 
         'SekPop ggf. auf Maximalanzahl Mitglieder begrenzen (mit Crowding Distance)
@@ -470,46 +460,5 @@ Public Class Functions
             Next j
         Next i
     End Sub
-
-    'NON_DOMINATED_COUNT_AND_SORT_SEKUNDÄRE_POPULATION
-    'Sortiert die dominanten Lösungen nach oben, die nicht dominanten nach unten
-    'Gibt die Zahl der dominanten Lösungen zurück (Front) hier für die Sekundäre Population
-    '**************************************************************************************
-    Private Function SekundärQb_Non_Dominated_Count_and_Sort(ByRef SekundärQb() As Individuum) As Integer
-
-        Dim i As Integer
-        Dim Temp() As Individuum
-        Dim counter As Integer
-        Dim NFrontMember As Integer
-
-        ReDim Temp(SekundärQb.GetUpperBound(0))
-
-        NFrontMember = 0
-        counter = 0
-
-        'Die nicht dominierten Lösungen werden nach oben kopiert
-        For i = 0 To SekundärQb.GetUpperBound(0)
-            If (SekundärQb(i).dominated = False) Then
-                counter += 1
-                Temp(counter - 1) = SekundärQb(i).Clone()
-            End If
-        Next i
-
-        NFrontMember = counter
-
-        'Die dominierten Lösungen werden nach unten kopiert
-        For i = 0 To SekundärQb.GetUpperBound(0)
-            If (SekundärQb(i).dominated = True) Then
-                counter += 1
-                Temp(counter - 1) = SekundärQb(i).Clone()
-            End If
-        Next i
-
-        'Temp nach SekundärQb zurückkopieren
-        SekundärQb = Individuum.Clone_Indi_Array(Temp)
-
-        Return NFrontMember
-
-    End Function
 
 End Class
