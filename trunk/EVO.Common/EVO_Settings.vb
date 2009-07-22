@@ -197,7 +197,7 @@ Public Class EVO_Settings
                     Me.n_Parents = 5
                     Me.n_Childs = 15
                     Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
-                    Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
+                    Me.OptReprodOp = CES_REPRODOP.Uniform_Crossover
                     Me.OptMutOperator = CES_MUTATION.RND_Switch
                     Me.pr_MutRate = 25
 
@@ -224,7 +224,7 @@ Public Class EVO_Settings
                     Me.n_Parents = 3
                     Me.n_Childs = 7
                     Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
-                    Me.OptReprodOp = CES_REPRODOP.Selt_Rand_Uniform
+                    Me.OptReprodOp = CES_REPRODOP.Uniform_Crossover
                     Me.OptMutOperator = CES_MUTATION.RND_Switch
                     Me.pr_MutRate = 25
 
