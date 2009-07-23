@@ -65,6 +65,7 @@ Partial Class EVO_Einstellungen
         Dim Label_Meta5 As System.Windows.Forms.Label
         Dim Label_Meta10 As System.Windows.Forms.Label
         Dim GroupBox_Diagramm As System.Windows.Forms.GroupBox
+        Dim Label_CES_k_Value As System.Windows.Forms.Label
         Me.CheckBox_drawOnlyCurrentGen = New System.Windows.Forms.CheckBox
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_General = New System.Windows.Forms.TabPage
@@ -178,6 +179,7 @@ Partial Class EVO_Einstellungen
         Me.TSP_Label_n_cities = New System.Windows.Forms.Label
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
+        Me.Numeric_CES_k_Value = New System.Windows.Forms.NumericUpDown
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -224,6 +226,7 @@ Partial Class EVO_Einstellungen
         Label_Meta5 = New System.Windows.Forms.Label
         Label_Meta10 = New System.Windows.Forms.Label
         GroupBox_Diagramm = New System.Windows.Forms.GroupBox
+        Label_CES_k_Value = New System.Windows.Forms.Label
         GroupBox_Diagramm.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPage_General.SuspendLayout()
@@ -280,6 +283,7 @@ Partial Class EVO_Einstellungen
         CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Einstellungen.SuspendLayout()
+        CType(Me.Numeric_CES_k_Value, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Label_CES_MemSize
@@ -329,7 +333,7 @@ Partial Class EVO_Einstellungen
         'Label_CES_MutationRate
         '
         Label_CES_MutationRate.AutoSize = True
-        Label_CES_MutationRate.Location = New System.Drawing.Point(3, 181)
+        Label_CES_MutationRate.Location = New System.Drawing.Point(3, 207)
         Label_CES_MutationRate.Name = "Label_CES_MutationRate"
         Label_CES_MutationRate.Size = New System.Drawing.Size(77, 13)
         Label_CES_MutationRate.TabIndex = 48
@@ -383,7 +387,7 @@ Partial Class EVO_Einstellungen
         'Label_CES_Mutation
         '
         Label_CES_Mutation.AutoSize = True
-        Label_CES_Mutation.Location = New System.Drawing.Point(3, 154)
+        Label_CES_Mutation.Location = New System.Drawing.Point(3, 180)
         Label_CES_Mutation.Name = "Label_CES_Mutation"
         Label_CES_Mutation.Size = New System.Drawing.Size(51, 13)
         Label_CES_Mutation.TabIndex = 3
@@ -1128,7 +1132,7 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_CES_UseSecPop_CES.AutoSize = True
         Me.CheckBox_CES_UseSecPop_CES.Checked = True
         Me.CheckBox_CES_UseSecPop_CES.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_CES_UseSecPop_CES.Location = New System.Drawing.Point(4, 280)
+        Me.CheckBox_CES_UseSecPop_CES.Location = New System.Drawing.Point(4, 312)
         Me.CheckBox_CES_UseSecPop_CES.Name = "CheckBox_CES_UseSecPop_CES"
         Me.CheckBox_CES_UseSecPop_CES.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.CheckBox_CES_UseSecPop_CES.Size = New System.Drawing.Size(150, 17)
@@ -1143,7 +1147,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_CES_SecPop.Controls.Add(Me.Label_CES_NMembersSecPop)
         Me.GroupBox_CES_SecPop.Controls.Add(Me.Numeric_CES_n_exchange_SecPop)
         Me.GroupBox_CES_SecPop.Controls.Add(Me.Numeric_CES_n_member_SecPop)
-        Me.GroupBox_CES_SecPop.Location = New System.Drawing.Point(4, 303)
+        Me.GroupBox_CES_SecPop.Location = New System.Drawing.Point(4, 335)
         Me.GroupBox_CES_SecPop.Name = "GroupBox_CES_SecPop"
         Me.GroupBox_CES_SecPop.Size = New System.Drawing.Size(200, 81)
         Me.GroupBox_CES_SecPop.TabIndex = 13
@@ -1204,7 +1208,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_CES_Hybrid.Controls.Add(Me.Combo_CES_HybridType)
         Me.GroupBox_CES_Hybrid.Controls.Add(Label_CES_MemRank)
         Me.GroupBox_CES_Hybrid.Controls.Add(Label_CES_Hybrid_Type)
-        Me.GroupBox_CES_Hybrid.Location = New System.Drawing.Point(4, 413)
+        Me.GroupBox_CES_Hybrid.Location = New System.Drawing.Point(4, 445)
         Me.GroupBox_CES_Hybrid.Name = "GroupBox_CES_Hybrid"
         Me.GroupBox_CES_Hybrid.Size = New System.Drawing.Size(200, 217)
         Me.GroupBox_CES_Hybrid.TabIndex = 12
@@ -1286,7 +1290,7 @@ Partial Class EVO_Einstellungen
         'CheckBox_CES_RealOptimisation
         '
         Me.CheckBox_CES_RealOptimisation.AutoSize = True
-        Me.CheckBox_CES_RealOptimisation.Location = New System.Drawing.Point(4, 390)
+        Me.CheckBox_CES_RealOptimisation.Location = New System.Drawing.Point(4, 422)
         Me.CheckBox_CES_RealOptimisation.Name = "CheckBox_CES_RealOptimisation"
         Me.CheckBox_CES_RealOptimisation.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.CheckBox_CES_RealOptimisation.Size = New System.Drawing.Size(154, 17)
@@ -1296,6 +1300,8 @@ Partial Class EVO_Einstellungen
         '
         'GroupBoxCES
         '
+        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_k_Value)
+        Me.GroupBoxCES.Controls.Add(Label_CES_k_Value)
         Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_MutRate)
         Me.GroupBoxCES.Controls.Add(Label_CES_MutationRate)
         Me.GroupBoxCES.Controls.Add(Me.Combo_CES_Reproduction)
@@ -1312,7 +1318,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBoxCES.Controls.Add(Label_CES_Selection)
         Me.GroupBoxCES.Location = New System.Drawing.Point(4, 69)
         Me.GroupBoxCES.Name = "GroupBoxCES"
-        Me.GroupBoxCES.Size = New System.Drawing.Size(200, 205)
+        Me.GroupBoxCES.Size = New System.Drawing.Size(200, 237)
         Me.GroupBoxCES.TabIndex = 9
         Me.GroupBoxCES.TabStop = False
         Me.GroupBoxCES.Text = "Mixed Integer Evolution Strategy"
@@ -1320,7 +1326,7 @@ Partial Class EVO_Einstellungen
         'Numeric_CES_MutRate
         '
         Me.Numeric_CES_MutRate.Increment = New Decimal(New Integer() {5, 0, 0, 0})
-        Me.Numeric_CES_MutRate.Location = New System.Drawing.Point(139, 178)
+        Me.Numeric_CES_MutRate.Location = New System.Drawing.Point(139, 204)
         Me.Numeric_CES_MutRate.Name = "Numeric_CES_MutRate"
         Me.Numeric_CES_MutRate.Size = New System.Drawing.Size(53, 20)
         Me.Numeric_CES_MutRate.TabIndex = 49
@@ -1362,7 +1368,7 @@ Partial Class EVO_Einstellungen
         '
         Me.Combo_CES_Mutation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.Combo_CES_Mutation.FormattingEnabled = True
-        Me.Combo_CES_Mutation.Location = New System.Drawing.Point(69, 151)
+        Me.Combo_CES_Mutation.Location = New System.Drawing.Point(69, 177)
         Me.Combo_CES_Mutation.Name = "Combo_CES_Mutation"
         Me.Combo_CES_Mutation.Size = New System.Drawing.Size(123, 21)
         Me.Combo_CES_Mutation.TabIndex = 7
@@ -1963,6 +1969,25 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
+        'Numeric_CES_k_Value
+        '
+        Me.Numeric_CES_k_Value.Enabled = False
+        Me.Numeric_CES_k_Value.Location = New System.Drawing.Point(138, 151)
+        Me.Numeric_CES_k_Value.Name = "Numeric_CES_k_Value"
+        Me.Numeric_CES_k_Value.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_k_Value.TabIndex = 51
+        Me.Numeric_CES_k_Value.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_k_Value.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'Label_CES_k_Value
+        '
+        Label_CES_k_Value.AutoSize = True
+        Label_CES_k_Value.Location = New System.Drawing.Point(2, 154)
+        Label_CES_k_Value.Name = "Label_CES_k_Value"
+        Label_CES_k_Value.Size = New System.Drawing.Size(107, 13)
+        Label_CES_k_Value.TabIndex = 50
+        Label_CES_k_Value.Text = "k-Value (No Of Cuts):"
+        '
         'EVO_Einstellungen
         '
         Me.Controls.Add(Me.GroupBox_Einstellungen)
@@ -2043,6 +2068,7 @@ Partial Class EVO_Einstellungen
         CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
+        CType(Me.Numeric_CES_k_Value, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -2159,4 +2185,5 @@ Partial Class EVO_Einstellungen
     Private WithEvents TSP_ComboBox_Reproductionoperator As System.Windows.Forms.ComboBox
     Private WithEvents TSP_ComboBox_prob_instance As System.Windows.Forms.ComboBox
     Friend WithEvents TSP_Label_Instance As System.Windows.Forms.Label
+    Private WithEvents Numeric_CES_k_Value As System.Windows.Forms.NumericUpDown
 End Class
