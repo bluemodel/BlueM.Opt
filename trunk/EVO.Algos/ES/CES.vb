@@ -377,82 +377,48 @@ Public Class CES
     'XXXXXXXXXXXXXXXXXXXXXXX
 
     'Steuerung der Reproduktionsoperatoren
-    'ToD: Schleifen mstrukturieren! Können stark verkürzt werden!
-    '************************************************************
+   '************************************************************
     Public Sub Reproduction_Control()
         Dim i As Integer
         Dim x, y As Integer
         Dim Einzelkind_Path(ModSett.n_Locations - 1) As Integer
         Dim Einzelkind_Dn_CES As Double
+        'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
+        
+        x = 0
+        y = 1
 
-        Select Case mSettings.CES.OptReprodOp
-            'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
-            Case CES_REPRODOP.Uniform_Crossover
-                x = 0
-                y = 1
-                For i = 0 To mSettings.CES.n_Childs - 2 Step 2
+        For i = 0 To mSettings.CES.n_Childs - 2 Step 2
+            Select Case mSettings.CES.OptReprodOp
+                Case CES_REPRODOP.Uniform_Crossover
                     Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
-                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
-                    x += 1
-                    y += 1
-                    If x = mSettings.CES.n_Parents - 1 Then x = 0
-                    If y = mSettings.CES.n_Parents - 1 Then y = 0
-                Next i
-                If Even_Number(mSettings.CES.n_Childs) = False Then
-                    Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
-                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
-                End If
-            
-            Case CES_REPRODOP.k_Point_Crossover
-                x = 0
-                y = 1
-                For i = 0 To mSettings.CES.n_Childs - 2 Step 2
+                Case CES_REPRODOP.k_Point_Crossover
                     Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
-                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
-                    x += 1
-                    y += 1
-                    If x = mSettings.CES.n_Parents - 1 Then x = 0
-                    If y = mSettings.CES.n_Parents - 1 Then y = 0
-                Next i
-                If Even_Number(mSettings.CES.n_Childs) = False Then
-                    Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
-                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
-                End If
-
-            Case CES_REPRODOP.Order_Crossover
-
-                x = 0
-                y = 1
-                For i = 0 To mSettings.CES.n_Childs - 2 Step 2
+                Case CES_REPRODOP.Order_Crossover
                     Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
-                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
-                    x += 1
-                    y += 1
-                    If x = mSettings.CES.n_Parents - 1 Then x = 0
-                    If y = mSettings.CES.n_Parents - 1 Then y = 0
-                Next i
-                If Even_Number(mSettings.CES.n_Childs) = False Then
-                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
-                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
-                End If
-
-            Case CES_REPRODOP.Part_Mapped_Cross
-                x = 0
-                y = 1
-                For i = 0 To mSettings.CES.n_Childs - 2 Step 2
+                Case CES_REPRODOP.Part_Mapped_Cross
                     Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
-                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
-                    x += 1
-                    y += 1
-                    If x = mSettings.CES.n_Parents - 1 Then x = 0
-                    If y = mSettings.CES.n_Parents - 1 Then y = 0
-                Next i
-                If Even_Number(mSettings.CES.n_Childs) = False Then
-                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
-                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
-                End If
+            End Select
+            Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
+            x += 1
+            y += 1
+            If x = mSettings.CES.n_Parents - 1 Then x = 0
+            If y = mSettings.CES.n_Parents - 1 Then y = 0
+        Next i
 
-        End Select
+        If Even_Number(mSettings.CES.n_Childs) = False Then
+            Select Case mSettings.CES.OptReprodOp
+                Case CES_REPRODOP.Uniform_Crossover
+                    Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                Case CES_REPRODOP.k_Point_Crossover
+                    Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                Case CES_REPRODOP.Order_Crossover
+                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                Case CES_REPRODOP.Part_Mapped_Cross
+                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+            End Select
+            Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
+        End If
 
     End Sub
 
