@@ -390,10 +390,16 @@ Public Class CES
 
         For i = 0 To mSettings.CES.n_Childs - 2 Step 2
             Select Case mSettings.CES.OptReprodOp
-                Case CES_REPRODOP.Uniform_Crossover
-                    Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                Case CES_REPRODOP.One_Point_Crossover
+                    mSettings.CES.k_Value = 1
+                    Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                Case CES_REPRODOP.Two_Point_Crossover
+                    mSettings.CES.k_Value = 2
+                    Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                 Case CES_REPRODOP.k_Point_Crossover
                     Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                Case CES_REPRODOP.Uniform_Crossover
+                    Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     'Case CES_REPRODOP.Order_Crossover
                     '    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                     'Case CES_REPRODOP.Part_Mapped_Cross
@@ -408,10 +414,16 @@ Public Class CES
 
         If Even_Number(mSettings.CES.n_Childs) = False Then
             Select Case mSettings.CES.OptReprodOp
-                Case CES_REPRODOP.Uniform_Crossover
-                    Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                Case CES_REPRODOP.One_Point_Crossover
+                    mSettings.CES.k_Value = 1
+                    Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                Case CES_REPRODOP.Two_Point_Crossover
+                    mSettings.CES.k_Value = 2
+                    Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
                 Case CES_REPRODOP.k_Point_Crossover
                     Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                Case CES_REPRODOP.Uniform_Crossover
+                    Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
                     'Case CES_REPRODOP.Order_Crossover
                     '    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
                     'Case CES_REPRODOP.Part_Mapped_Cross
@@ -455,11 +467,9 @@ Public Class CES
         Dim i As Integer
         Dim x As Integer = 0
 
-        'Anzahl der CutPoints
-        Dim k As Integer = 3
         Dim FromSame As Boolean = True
 
-        Dim CutPoint(k - 1) As Integer
+        Dim CutPoint(mSettings.CES.k_Value - 1) As Integer
         Call Create_n_Cutpoints(CutPoint)        
 
         For i = 0 To ChildPath_A.GetUpperBound(0)
@@ -1085,6 +1095,15 @@ Public Class CES
         Next
 
         Array.Sort(CutPoint)
+
+        'ToDO: Doppler müssen aussortiert und neu generiert werden
+
+        'For i = 0 To CutPoint.GetUpperBound(0) -1 
+        '    If CutPoint(i) = CutPoint(i + 1) Then
+        '        Array.Clear(CutPoint,i,1)
+        '    End If
+        'Next
+        'Array.Sort(CutPoint)
 
     End Sub
 
