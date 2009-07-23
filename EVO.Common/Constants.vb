@@ -69,11 +69,11 @@ Public Module Constants
     End Enum
 
     'Reproduktionsoperator
-    Public Enum CES_REPRODOP as Integer
+    Public Enum CES_REPRODOP As Integer
         k_Point_Crossover = 1
         Uniform_Crossover = 2
-        Order_Crossover = 3
-        Part_Mapped_Cross = 4
+        'Order_Crossover = 3
+        'Part_Mapped_Cross = 4
     End Enum
 
     'Mutationsoperator
