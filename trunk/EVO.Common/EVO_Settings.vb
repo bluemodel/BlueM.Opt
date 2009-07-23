@@ -166,6 +166,7 @@ Public Class EVO_Settings
         Public n_Childs As Integer              'Anzahl der Kinder
         Public OptStrategie As EVO_STRATEGIE    '"plus" oder "minus" Strategie
         Public OptReprodOp As CES_REPRODOP      'Reprofuktionaoperator
+        Public k_Value As Integer               'Anzahl der Schnittpunkte
         Public OptMutOperator As CES_MUTATION   'Mutationsoperator
         Public pr_MutRate As Integer            'Definiert die Wahrscheinlichkeit der Mutationsrate in %
 

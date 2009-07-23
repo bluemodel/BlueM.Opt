@@ -139,9 +139,9 @@ Public Class CES
         If (Settings.CES.OptStrategie <> EVO_STRATEGIE.Komma_Strategie And Settings.CES.OptStrategie <> EVO_STRATEGIE.Plus_Strategie) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
         End If
-        If (Settings.CES.OptReprodOp <> CES_REPRODOP.Uniform_Crossover And CES_REPRODOP.Order_Crossover And CES_REPRODOP.Part_Mapped_Cross) Then
-            Throw New Exception("Typ der Reproduction ist nicht richtig!")
-        End If
+        'If (Settings.CES.OptReprodOp <> CES_REPRODOP.Uniform_Crossover And CES_REPRODOP.Order_Crossover And CES_REPRODOP.Part_Mapped_Cross) Then
+        '    Throw New Exception("Typ der Reproduction ist nicht richtig!")
+        'End If
         If (Settings.CES.OptMutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch) Then
             Throw New Exception("Typ der Mutation ist nicht richtig!")
         End If
@@ -394,10 +394,10 @@ Public Class CES
                     Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
                 Case CES_REPRODOP.k_Point_Crossover
                     Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
-                Case CES_REPRODOP.Order_Crossover
-                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
-                Case CES_REPRODOP.Part_Mapped_Cross
-                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                    'Case CES_REPRODOP.Order_Crossover
+                    '    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                    'Case CES_REPRODOP.Part_Mapped_Cross
+                    '    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
             End Select
             Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
             x += 1
@@ -412,10 +412,10 @@ Public Class CES
                     Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
                 Case CES_REPRODOP.k_Point_Crossover
                     Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
-                Case CES_REPRODOP.Order_Crossover
-                    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
-                Case CES_REPRODOP.Part_Mapped_Cross
-                    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                    'Case CES_REPRODOP.Order_Crossover
+                    '    Call ReprodOp_Order_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                    'Case CES_REPRODOP.Part_Mapped_Cross
+                    '    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
             End Select
             Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
         End If

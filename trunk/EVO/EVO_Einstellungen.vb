@@ -459,6 +459,7 @@ Public Class EVO_Einstellungen
             .n_Childs = Me.Numeric_CES_n_childs.Value
             .OptStrategie = Me.Combo_CES_Selection.SelectedItem
             .OptReprodOp = Me.Combo_CES_Reproduction.SelectedItem
+            .k_Value = Me.Numeric_CES_k_Value.Value
             .OptMutOperator = Me.Combo_CES_Mutation.SelectedItem
             .pr_MutRate = Me.Numeric_CES_MutRate.Value
             .is_SecPop = Me.CheckBox_CES_UseSecPop_CES.Checked
@@ -669,6 +670,7 @@ Public Class EVO_Einstellungen
             Me.Numeric_CES_n_childs.Value = .n_Childs
             Me.Combo_CES_Selection.SelectedItem = .OptStrategie
             Me.Combo_CES_Reproduction.SelectedItem = .OptReprodOp
+            Me.Numeric_CES_k_Value.Value = .k_Value
             Me.Combo_CES_Mutation.SelectedItem = .OptMutOperator
             Me.Numeric_CES_MutRate.Value = .pr_MutRate
             Me.CheckBox_CES_UseSecPop_CES.Checked = .is_SecPop
@@ -1016,4 +1018,15 @@ Public Class EVO_Einstellungen
 Private Sub TSP_Numeric_n_children_ValueChanged( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles TSP_Numeric_n_children.ValueChanged
 
 End Sub
+
+    Private Sub Combo_CES_Reproduction_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_CES_Reproduction.SelectedIndexChanged
+
+        If Me.Combo_CES_Reproduction.SelectedItem = EVO.Common.CES_REPRODOP.k_Point_Crossover Then
+            Me.Numeric_CES_k_Value.Enabled = True
+            Me.Numeric_CES_k_Value.Value = 3
+        Else
+            Me.Numeric_CES_k_Value.Enabled = False
+            Me.Numeric_CES_k_Value.Value = 0
+        End If
+    End Sub
 End Class
