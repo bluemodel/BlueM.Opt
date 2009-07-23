@@ -377,7 +377,8 @@ Public Class CES
     'XXXXXXXXXXXXXXXXXXXXXXX
 
     'Steuerung der Reproduktionsoperatoren
-    '*************************************
+    'ToD: Schleifen mstrukturieren! Können stark verkürzt werden!
+    '************************************************************
     Public Sub Reproduction_Control()
         Dim i As Integer
         Dim x, y As Integer
@@ -399,6 +400,22 @@ Public Class CES
                 Next i
                 If Even_Number(mSettings.CES.n_Childs) = False Then
                     Call ReprodOp_Uniform_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
+                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
+                End If
+            
+            Case CES_REPRODOP.k_Point_Crossover
+                x = 0
+                y = 1
+                For i = 0 To mSettings.CES.n_Childs - 2 Step 2
+                    Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(i).Path, Childs(i + 1).Path)
+                    Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(i).CES_Dn, Childs(i + 1).CES_Dn)
+                    x += 1
+                    y += 1
+                    If x = mSettings.CES.n_Parents - 1 Then x = 0
+                    If y = mSettings.CES.n_Parents - 1 Then y = 0
+                Next i
+                If Even_Number(mSettings.CES.n_Childs) = False Then
+                    Call ReprodOp_k_Point_Crossover(Parents(x).Path, Parents(y).Path, Childs(mSettings.CES.n_Childs - 1).Path, Einzelkind_Path)
                     Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Childs(mSettings.CES.n_Childs - 1).CES_Dn, Einzelkind_Dn_CES)
                 End If
 
@@ -462,6 +479,42 @@ Public Class CES
             End If
         Next
 
+    End Sub
+
+    'Reproductionsoperator: "k_Point_Crossover"
+    'Entscheidet zufällig ob der Wert aus dem Path des Elter_A oder Elter_B für das Allel verwendet wird
+    '***************************************************************************************************
+    Private Sub ReprodOp_k_Point_Crossover(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
+
+        Dim i As Integer
+        Dim x As Integer = 0
+
+        'Anzahl der CutPoints
+        Dim k As Integer = 3
+        Dim FromSame As Boolean = True
+
+        Dim CutPoint(k - 1) As Integer
+        Call Create_n_Cutpoints(CutPoint)        
+
+        For i = 0 To ChildPath_A.GetUpperBound(0)
+            If FromSame Then
+                ChildPath_A(i) = ParPath_A(i)
+                ChildPath_B(i) = ParPath_B(i)
+            Else
+                ChildPath_A(i) = ParPath_B(i)
+                ChildPath_B(i) = ParPath_A(i)
+            End If
+            If i = CutPoint(x) then
+                If FromSame then
+                    FromSame = False
+                Else
+                    FromSame = True
+                End If
+                If x < CutPoint.GetUpperBound(0) then
+                    x +=1
+                End If
+            End If
+        Next
     End Sub
 
 
