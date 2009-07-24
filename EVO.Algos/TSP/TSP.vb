@@ -640,15 +640,23 @@ Public Class TSP
     End Function
 
     'Hilfsfunktion um zu Prüfen ob eine Zahl bereits in einem Array vorhanden ist oder nicht
-    Public Function Is_No_OK(ByVal No As Integer, ByVal Path() As Integer) As Boolean
+    Public Function Is_No_OK(ByRef No As Integer, ByRef Path() As Integer) As Boolean
         Is_No_OK = True
-        Dim i As Integer
-        For i = 0 To Path.GetUpperBound(0)
-            If No = Path(i) Then
-                Is_No_OK = False
-                Exit Function
-            End If
-        Next
+
+        'Dim i As Integer
+        'For i = 0 To Path.GetUpperBound(0)
+        '    If No = Path(i) Then
+        '        Is_No_OK = False
+        '        'Exit Function
+        '    End If
+        'Next
+
+        Dim Index As Integer = -7
+        Index = Array.IndexOf(Path, No)
+        If Index <> -1 Then
+            Is_No_OK = False
+        End If
+
     End Function
 
     'Hilfsfunktion zum sortieren der Faksimile
