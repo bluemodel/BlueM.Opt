@@ -145,7 +145,7 @@ Public Class Controller
         Call CES1.CESInitialise(Me.mySettings, Me.myProblem, Sim1.VerzweigungsDatei.GetLength(0))
 
         'Progress initialisieren
-        Call Me.myProgress.Initialize(1, 1, Me.mySettings.CES.n_Generations, Me.mySettings.CES.n_Childs)
+        Call Me.myProgress.Initialize(1, 1, Me.mySettings.CES.n_Generations, Me.mySettings.CES.n_Children)
 
         'ColorArray dimensionieren
         ReDim Me.ColorArray(CES1.ModSett.n_Locations, -1)
@@ -165,13 +165,13 @@ Public Class Controller
 
         'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        For i_ch = 0 To CES1.mSettings.CES.n_Childs - 1
+        For i_ch = 0 To CES1.mSettings.CES.n_Children - 1
             'Das Dn wird gesetzt
             If Me.mySettings.PES.Schrittweite.is_DnVektor = False Then
-                CES1.Childs(i_ch).CES_Dn = Me.mySettings.PES.Schrittweite.DnStart
+                CES1.Children(i_ch).CES_Dn = Me.mySettings.PES.Schrittweite.DnStart
             End If
             For i_loc = 0 To CES1.ModSett.n_Locations - 1
-                Call Sim1.Identify_Measures_Elements_Parameters(i_loc, CES1.Childs(i_ch).Path(i_loc), CES1.Childs(i_ch).Measures(i_loc), CES1.Childs(i_ch).Loc(i_loc).Loc_Elem, CES1.Childs(i_ch).Loc(i_loc).PES_OptPara)
+                Call Sim1.Identify_Measures_Elements_Parameters(i_loc, CES1.Children(i_ch).Path(i_loc), CES1.Children(i_ch).Measures(i_loc), CES1.Children(i_ch).Loc(i_loc).Loc_Elem, CES1.Children(i_ch).Loc(i_loc).PES_OptPara)
             Next
         Next
 
@@ -182,7 +182,7 @@ Public Class Controller
         End If
 
         'Startwerte werden der Verlaufsanzeige zugewiesen
-        Call Me.myProgress.Initialize(1, 1, Me.mySettings.CES.n_Generations, Me.mySettings.CES.n_Childs)
+        Call Me.myProgress.Initialize(1, 1, Me.mySettings.CES.n_Generations, Me.mySettings.CES.n_Children)
 
         'xxxx Optimierung xxxxxx
         'Generationsschleife CES
@@ -194,7 +194,7 @@ Public Class Controller
         For Me.CES_i_gen = 0 To CES1.mSettings.CES.n_Generations - 1
 
             'HACK: IDs an Individuen vergeben
-            For Each ind As EVO.Common.Individuum_CES In CES1.Childs
+            For Each ind As EVO.Common.Individuum_CES In CES1.Children
                 durchlauf_all += 1
                 ind.ID = durchlauf_all + 1
             Next
@@ -203,7 +203,7 @@ Public Class Controller
             OptTimeParaPerGen.Start()
 
             'Individuen mit Multithreading evaluieren
-            isOK = Sim1.Evaluate(CES1.Childs, True)
+            isOK = Sim1.Evaluate(CES1.Children, True)
 
             OptTimeParaPerGen.Stop()
             EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation " & Me.CES_i_gen & " dauerte:   " & OptTimeParaPerGen.Elapsed.Hours & "h  " & OptTimeParaPerGen.Elapsed.Minutes & "m  " & OptTimeParaPerGen.Elapsed.Seconds & "s     " & OptTimeParaPerGen.Elapsed.Seconds & "ms")
@@ -214,7 +214,7 @@ Public Class Controller
             If (Me.stopped) Then Exit Sub
 
             'Evaluierte Individuen verarbeiten
-            For i_Child As Integer = 0 To CES1.Childs.Length - 1
+            For i_Child As Integer = 0 To CES1.Children.Length - 1
 
                 If (Not isOK(i_Child)) Then
                     Throw New Exception("Der Nachfahre mit der ID.: " & i_Child & " wurde nicht richtig Evaluiert! Die Simulation wurde mit Fehlern abgebrochen")
@@ -237,7 +237,7 @@ Public Class Controller
             'BUG 259: CES: Punkt-Labels der Sekundärpopulation fehlen noch!
             If (Me.myProblem.NumPrimObjective = 1) Then
                 'Sortieren der Kinden anhand der Qualität
-                Call CES1.Sort_Individuum(CES1.Childs)
+                Call CES1.Sort_Individuum(CES1.Children)
                 'Selectionsprozess je nach "plus" oder "minus" Strategie
                 Call CES1.Selection_Process()
                 'Zeichnen der besten Eltern
@@ -273,7 +273,7 @@ Public Class Controller
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             If (Me.myProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
                 'Kinder werden zur Sicherheit gelöscht aber nicht zerstört ;-)
-                CES1.Childs = Common.Individuum.New_Indi_Array(EVO.Common.Individuum.Individuumsklassen.Individuum_CES, CES1.Childs.GetLength(0), "Child")
+                CES1.Children = Common.Individuum.New_Indi_Array(EVO.Common.Individuum.Individuumsklassen.Individuum_CES, CES1.Children.GetLength(0), "Child")
                 'Reproduktionsoperatoren, hier gehts dezent zur Sache
                 Call CES1.Reproduction_Control()
                 'Mutationsoperatoren
@@ -282,9 +282,9 @@ Public Class Controller
 
             'Hier werden dem Child die passenden Massnahmen und deren Elemente pro Location zugewiesen
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            For i_ch = 0 To Me.mySettings.CES.n_Childs - 1
+            For i_ch = 0 To Me.mySettings.CES.n_Children - 1
                 For i_loc = 0 To CES1.ModSett.n_Locations - 1
-                    Call Sim1.Identify_Measures_Elements_Parameters(i_loc, CES1.Childs(i_ch).Path(i_loc), CES1.Childs(i_ch).Measures(i_loc), CES1.Childs(i_ch).Loc(i_loc).Loc_Elem, CES1.Childs(i_ch).Loc(i_loc).PES_OptPara)
+                    Call Sim1.Identify_Measures_Elements_Parameters(i_loc, CES1.Children(i_ch).Path(i_loc), CES1.Children(i_ch).Measures(i_loc), CES1.Children(i_ch).Loc(i_loc).Loc_Elem, CES1.Children(i_ch).Loc(i_loc).PES_OptPara)
                 Next
             Next
 
@@ -339,25 +339,25 @@ Public Class Controller
 
         'pro Child
         'xxxxxxxxx
-        For i_Child = 0 To CES1.Childs.GetUpperBound(0)
+        For i_Child = 0 To CES1.Children.GetUpperBound(0)
 
             'Das Dn des Child mutieren
             If Me.mySettings.PES.Schrittweite.is_DnVektor = False Then
                 Dim PESX As EVO.ES.PES
                 PESX = New EVO.ES.PES
                 Call PESX.PesInitialise(Me.mySettings, Me.myProblem)
-                CES1.Childs(i_Child).CES_Dn = PESX.CES_Dn_Mutation(CES1.Childs(i_Child).CES_Dn)
+                CES1.Children(i_Child).CES_Dn = PESX.CES_Dn_Mutation(CES1.Children(i_Child).CES_Dn)
             End If
 
             'Ermittelt fuer jedes Child den PES Parent Satz (PES_Parents ist das Ergebnis)
-            Call CES1.Memory_Search_per_Child(CES1.Childs(i_Child))
+            Call CES1.Memory_Search_per_Child(CES1.Children(i_Child))
 
             'und pro Location
             'xxxxxxxxxxxxxxxx
             For i_loc = 0 To CES1.ModSett.n_Locations - 1
 
                 'Die Parameter (falls vorhanden) werden überschrieben
-                If Not CES1.Childs(i_Child).Loc(i_loc).PES_OptPara.GetLength(0) = 0 Then
+                If Not CES1.Children(i_Child).Loc(i_loc).PES_OptPara.GetLength(0) = 0 Then
 
                     'Ermittelt fuer jede Location den PES Parent Satz (PES_Parents ist das Ergebnis)
                     '*******************************************************************************
@@ -382,12 +382,12 @@ Public Class Controller
                         Case Is = 0
                             'Noch keine Eltern vorhanden (die Child Location bekommt neue - zufällige Werte oder original Parameter)
                             '*******************************************************************************************************
-                            For m = 0 To CES1.Childs(i_Child).Loc(i_loc).PES_OptPara.GetUpperBound(0)
-                                CES1.Childs(i_Child).Loc(i_loc).PES_OptPara(m).Dn = CES1.mSettings.PES.Schrittweite.DnStart
+                            For m = 0 To CES1.Children(i_Child).Loc(i_loc).PES_OptPara.GetUpperBound(0)
+                                CES1.Children(i_Child).Loc(i_loc).PES_OptPara(m).Dn = CES1.mSettings.PES.Schrittweite.DnStart
                                 'Falls zufällige Startwerte
                                 If CES1.mSettings.PES.OptStartparameter = Common.Constants.EVO_STARTPARAMETER.Zufall Then
                                     Randomize()
-                                    CES1.Childs(i_Child).Loc(i_loc).PES_OptPara(m).Xn = Rnd()
+                                    CES1.Children(i_Child).Loc(i_loc).PES_OptPara(m).Xn = Rnd()
                                 End If
                             Next
 
@@ -406,7 +406,7 @@ Public Class Controller
 
                             'Vorbereitung um das PES zu initieren
                             '************************************
-                            Me.myProblem.List_OptParameter = CES1.Childs(i_Child).Loc(i_loc).PES_OptPara
+                            Me.myProblem.List_OptParameter = CES1.Children(i_Child).Loc(i_loc).PES_OptPara
 
                             'Schritte 1 - 3: PES wird initialisiert (Weiteres siehe dort ;-)
                             '**************************************************************
@@ -418,16 +418,16 @@ Public Class Controller
                             Next
 
                             'Startet die Prozesse evolutionstheoretischen Prozesse nacheinander
-                            Call PES1.EsReproMut(CES1.Childs(i_Child).CES_Dn, Me.mySettings.CES.is_PopMutStart)
+                            Call PES1.EsReproMut(CES1.Children(i_Child).CES_Dn, Me.mySettings.CES.is_PopMutStart)
 
                             'Auslesen der Variierten Parameter
-                            CES1.Childs(i_Child).Loc(i_loc).PES_OptPara = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
+                            CES1.Children(i_Child).Loc(i_loc).PES_OptPara = EVO.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
 
                     End Select
                 End If
 
                 'Hier wird mean Dn auf alle Locations und PES OptParas übertragen
-                'CES1.Childs(i_ch).Set_mean_PES_Dn = CES1.Childs(i_ch).Get_mean_PES_Dn
+                'CES1.Children(i_ch).Set_mean_PES_Dn = CES1.Children(i_ch).Get_mean_PES_Dn
             Next
         Next
 
@@ -447,17 +447,17 @@ Public Class Controller
                 '****************************************
                 'Aktueller Pfad wird an Sim zurückgegeben
                 'Bereitet das BlaueModell für die Kombinatorik vor
-                Call Sim1.PREPARE_Evaluation_CES(CES1.Childs(i))
+                Call Sim1.PREPARE_Evaluation_CES(CES1.Children(i))
 
                 'Hier werden Child die passenden Elemente zugewiesen
                 Dim j As Integer
                 For j = 0 To CES1.ModSett.n_Locations - 1
-                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Childs(i).Path(j), CES1.Childs(i).Measures(j), CES1.Childs(i).Loc(j).Loc_Elem, CES1.Childs(i).Loc(j).PES_OptPara)
+                    Call Sim1.Identify_Measures_Elements_Parameters(j, CES1.Children(i).Path(j), CES1.Children(i).Measures(j), CES1.Children(i).Loc(j).Loc_Elem, CES1.Children(i).Loc(j).PES_OptPara)
                 Next
 
                 'Reduktion der OptimierungsParameter und immer dann wenn nicht Nullvariante
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                If (Me.myProblem.Reduce_OptPara_and_ModPara(CES1.Childs(i).Get_All_Loc_Elem)) Then
+                If (Me.myProblem.Reduce_OptPara_and_ModPara(CES1.Children(i).Get_All_Loc_Elem)) Then
 
                     'Starten der PES
                     '***************
@@ -479,8 +479,8 @@ Public Class Controller
     ''' <param name="i_Child">0-basierte Nachfahrens-Nummer</param>
     Private Sub processIndividuum_CES(ByVal i_Child As Integer)
 
-        'HYBRID: Speichert die PES Erfahrung diesen Childs im PES Memory
-        '***************************************************************
+        'HYBRID: Speichert die PES Erfahrung dieses Child im PES Memory
+        '**************************************************************
         If (Me.myProblem.Method = METH_HYBRID And Me.mySettings.CES.ty_Hybrid = Common.Constants.HYBRID_TYPE.Mixed_Integer) Then
             Call CES1.Memory_Store(i_Child, Me.CES_i_gen)
         End If
@@ -488,11 +488,11 @@ Public Class Controller
         'Lösung im TeeChart einzeichnen und Dn zeichnen
         '==============================================
         If myProblem.CES_T_Modus = CES_T_MODUS.No_Test Then
-            Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Childs(i_Child)))
+            Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Children(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Children(i_Child)))
         Else
-            Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Childs(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, Color.Orange)
+            Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Children(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, Color.Orange)
         End If
-        Me.Zeichne_Dn(CES1.Childs(i_Child).ID, CES1.Childs(i_Child))
+        Me.Zeichne_Dn(CES1.Children(i_Child).ID, CES1.Children(i_Child))
 
         'Verlauf aktualisieren
         Me.myProgress.iNachf = i_Child + 1

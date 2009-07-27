@@ -1192,7 +1192,7 @@ Partial Class Form1
 
                             ElseIf (Me.mProblem.Method = METH_MetaEvo) Then
                                 'Bei MetaEvo:
-                                Achse.Maximum = EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations * EVO_Einstellungen1.Settings.MetaEvo.ChildsPerParent * EVO_Einstellungen1.Settings.MetaEvo.PopulationSize
+                                Achse.Maximum = EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations * EVO_Einstellungen1.Settings.MetaEvo.ChildrenPerParent * EVO_Einstellungen1.Settings.MetaEvo.PopulationSize
 
                             ElseIf (Me.mProblem.Method = METH_HOOKJEEVES) Then
                                 'Bei Hooke & Jeeves:
@@ -1204,7 +1204,7 @@ Partial Class Form1
 
                             Else
                                 'Bei CES etc.:
-                                Achse.Maximum = EVO_Einstellungen1.Settings.CES.n_Childs * EVO_Einstellungen1.Settings.CES.n_Generations
+                                Achse.Maximum = EVO_Einstellungen1.Settings.CES.n_Children * EVO_Einstellungen1.Settings.CES.n_Generations
                             End If
 
                             Achsen.Add(Achse)

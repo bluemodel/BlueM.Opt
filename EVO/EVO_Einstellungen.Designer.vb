@@ -27,7 +27,7 @@ Partial Class EVO_Einstellungen
         Dim Label_CES_MutationRate As System.Windows.Forms.Label
         Dim Label_CES_Reproduction As System.Windows.Forms.Label
         Dim Label_CES_NExchangeSecPop As System.Windows.Forms.Label
-        Dim Label_CES_NChilds As System.Windows.Forms.Label
+        Dim Label_CES_NChildren As System.Windows.Forms.Label
         Dim Label_CES_NParents As System.Windows.Forms.Label
         Dim Label_CES_NGenerations As System.Windows.Forms.Label
         Dim Label_CES_Mutation As System.Windows.Forms.Label
@@ -121,7 +121,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBoxCES = New System.Windows.Forms.GroupBox
         Me.Numeric_CES_MutRate = New System.Windows.Forms.NumericUpDown
         Me.Combo_CES_Reproduction = New System.Windows.Forms.ComboBox
-        Me.Numeric_CES_n_childs = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_CES_n_Children = New System.Windows.Forms.NumericUpDown
         Me.Numeric_CES_n_Parents = New System.Windows.Forms.NumericUpDown
         Me.Combo_CES_Mutation = New System.Windows.Forms.ComboBox
         Me.Numeric_CES_n_Generations = New System.Windows.Forms.NumericUpDown
@@ -188,7 +188,7 @@ Partial Class EVO_Einstellungen
         Label_CES_MutationRate = New System.Windows.Forms.Label
         Label_CES_Reproduction = New System.Windows.Forms.Label
         Label_CES_NExchangeSecPop = New System.Windows.Forms.Label
-        Label_CES_NChilds = New System.Windows.Forms.Label
+        Label_CES_NChildren = New System.Windows.Forms.Label
         Label_CES_NParents = New System.Windows.Forms.Label
         Label_CES_NGenerations = New System.Windows.Forms.Label
         Label_CES_Mutation = New System.Windows.Forms.Label
@@ -256,7 +256,7 @@ Partial Class EVO_Einstellungen
         CType(Me.Numeric_CES_NExchange_SecPop_PES, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBoxCES.SuspendLayout()
         CType(Me.Numeric_CES_MutRate, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_CES_n_childs, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_n_Children, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_CES_n_Parents, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_CES_n_Generations, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_HookeJeeves.SuspendLayout()
@@ -357,14 +357,14 @@ Partial Class EVO_Einstellungen
         Label_CES_NExchangeSecPop.TabIndex = 46
         Label_CES_NExchangeSecPop.Text = "Exchange with SecPop:"
         '
-        'Label_CES_NChilds
+        'Label_CES_NChildren
         '
-        Label_CES_NChilds.AutoSize = True
-        Label_CES_NChilds.Location = New System.Drawing.Point(2, 74)
-        Label_CES_NChilds.Name = "Label_CES_NChilds"
-        Label_CES_NChilds.Size = New System.Drawing.Size(90, 13)
-        Label_CES_NChilds.TabIndex = 2
-        Label_CES_NChilds.Text = "Number of Childs:"
+        Label_CES_NChildren.AutoSize = True
+        Label_CES_NChildren.Location = New System.Drawing.Point(2, 74)
+        Label_CES_NChildren.Name = "Label_CES_NChildren"
+        Label_CES_NChildren.Size = New System.Drawing.Size(90, 13)
+        Label_CES_NChildren.TabIndex = 2
+        Label_CES_NChildren.Text = "Number of Children:"
         '
         'Label_CES_NParents
         '
@@ -1306,12 +1306,12 @@ Partial Class EVO_Einstellungen
         Me.GroupBoxCES.Controls.Add(Label_CES_MutationRate)
         Me.GroupBoxCES.Controls.Add(Me.Combo_CES_Reproduction)
         Me.GroupBoxCES.Controls.Add(Label_CES_Reproduction)
-        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_childs)
+        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_Children)
         Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_Parents)
         Me.GroupBoxCES.Controls.Add(Me.Combo_CES_Mutation)
         Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_Generations)
         Me.GroupBoxCES.Controls.Add(Me.Combo_CES_Selection)
-        Me.GroupBoxCES.Controls.Add(Label_CES_NChilds)
+        Me.GroupBoxCES.Controls.Add(Label_CES_NChildren)
         Me.GroupBoxCES.Controls.Add(Label_CES_NParents)
         Me.GroupBoxCES.Controls.Add(Label_CES_NGenerations)
         Me.GroupBoxCES.Controls.Add(Label_CES_Mutation)
@@ -1342,16 +1342,16 @@ Partial Class EVO_Einstellungen
         Me.Combo_CES_Reproduction.Size = New System.Drawing.Size(123, 21)
         Me.Combo_CES_Reproduction.TabIndex = 8
         '
-        'Numeric_CES_n_childs
+        'Numeric_CES_n_Children
         '
-        Me.Numeric_CES_n_childs.Location = New System.Drawing.Point(139, 72)
-        Me.Numeric_CES_n_childs.Maximum = New Decimal(New Integer() {1000000000, 0, 0, 0})
-        Me.Numeric_CES_n_childs.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.Numeric_CES_n_childs.Name = "Numeric_CES_n_childs"
-        Me.Numeric_CES_n_childs.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_CES_n_childs.TabIndex = 5
-        Me.Numeric_CES_n_childs.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_CES_n_childs.Value = New Decimal(New Integer() {15, 0, 0, 0})
+        Me.Numeric_CES_n_Children.Location = New System.Drawing.Point(139, 72)
+        Me.Numeric_CES_n_Children.Maximum = New Decimal(New Integer() {1000000000, 0, 0, 0})
+        Me.Numeric_CES_n_Children.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_CES_n_Children.Name = "Numeric_CES_n_Children"
+        Me.Numeric_CES_n_Children.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_n_Children.TabIndex = 5
+        Me.Numeric_CES_n_Children.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_n_Children.Value = New Decimal(New Integer() {15, 0, 0, 0})
         '
         'Numeric_CES_n_Parents
         '
@@ -2031,7 +2031,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBoxCES.ResumeLayout(False)
         Me.GroupBoxCES.PerformLayout()
         CType(Me.Numeric_CES_MutRate, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_CES_n_childs, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_n_Children, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_CES_n_Parents, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_CES_n_Generations, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_HookeJeeves.ResumeLayout(False)
@@ -2111,7 +2111,7 @@ Partial Class EVO_Einstellungen
     Private WithEvents Combo_CES_Reproduction As System.Windows.Forms.ComboBox
     Private WithEvents Combo_CES_Mutation As System.Windows.Forms.ComboBox
     Private WithEvents GroupBoxCES As System.Windows.Forms.GroupBox
-    Private WithEvents Numeric_CES_n_childs As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_CES_n_Children As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_CES_n_Parents As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_CES_n_Generations As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_CES_n_member_SecPop As System.Windows.Forms.NumericUpDown

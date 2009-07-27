@@ -456,7 +456,7 @@ Public Class EVO_Einstellungen
             ' = me.Combo_CES_IniValues.SelectedItem
             .n_Generations = Me.Numeric_CES_n_Generations.Value
             .n_Parents = Me.Numeric_CES_n_Parents.Value
-            .n_Childs = Me.Numeric_CES_n_childs.Value
+            .n_Children = Me.Numeric_CES_n_Children.Value
             .OptStrategie = Me.Combo_CES_Selection.SelectedItem
             .OptReprodOp = Me.Combo_CES_Reproduction.SelectedItem
             .k_Value = Me.Numeric_CES_k_Value.Value
@@ -550,7 +550,7 @@ Public Class EVO_Einstellungen
             .n_Cities = Me.TSP_Numeric_n_cities.Value
             .Problem = Me.TSP_ComboBox_prob_instance.SelectedItem
             .n_Parents = Me.TSP_Numeric_n_parents.Value
-            .n_Childs = Me.TSP_Numeric_n_children.Value
+            .n_Children = Me.TSP_Numeric_n_children.Value
             .n_Gen = Me.TSP_Numeric_n_generations.Value
             .ReprodOperator = Me.TSP_ComboBox_Reproductionoperator.SelectedItem
             .MutOperator = Me.TSP_ComboBox_Mutationoperator.SelectedItem
@@ -583,7 +583,7 @@ Public Class EVO_Einstellungen
                     Me.TextAnzEltern.Enabled = True
                     Me.LabelAnzEltern.Text = "Maximal Zahl der Eltern:"
 
-                    'Childs
+                    'Children
                     Me.TextAnzNachf.Text = 1
                     Me.TextAnzNachf.Enabled = False
 
@@ -598,7 +598,7 @@ Public Class EVO_Einstellungen
                     Me.TextAnzEltern.Enabled = True
                     Me.LabelAnzEltern.Text = "Anzahl der Eltern:"
 
-                    'Childs
+                    'Children
                     Me.TextAnzNachf.Text = 15
                     Me.TextAnzNachf.Enabled = True
 
@@ -667,7 +667,7 @@ Public Class EVO_Einstellungen
             'me.Combo_CES_IniValues.SelectedItem = .
             Me.Numeric_CES_n_Generations.Value = .n_Generations
             Me.Numeric_CES_n_Parents.Value = .n_Parents
-            Me.Numeric_CES_n_childs.Value = .n_Childs
+            Me.Numeric_CES_n_Children.Value = .n_Children
             Me.Combo_CES_Selection.SelectedItem = .OptStrategie
             Me.Combo_CES_Reproduction.SelectedItem = .OptReprodOp
             Me.Numeric_CES_k_Value.Value = .k_Value
@@ -750,7 +750,7 @@ Public Class EVO_Einstellungen
             Next
 
             'Objective
-            If (Me.mProblem.NumObjectives > 0 and .Selected_Objective <> -1) Then
+            If (Me.mProblem.NumObjectives > 0 And .Selected_Objective <> -1) Then
                 Me.SensiPlot_ListBox_Objectives.SetSelected(.Selected_Objective, True)
             End If
 
@@ -775,7 +775,7 @@ Public Class EVO_Einstellungen
             Me.TSP_Numeric_n_cities.Value = .n_Cities
             Me.TSP_ComboBox_prob_instance.SelectedItem = .Problem
             Me.TSP_Numeric_n_parents.Value = .n_Parents
-            Me.TSP_Numeric_n_children.Value = .n_Childs
+            Me.TSP_Numeric_n_children.Value = .n_Children
             Me.TSP_Numeric_n_generations.Value = .n_Gen
             Me.TSP_ComboBox_Reproductionoperator.SelectedItem = .ReprodOperator
             Me.TSP_ComboBox_Mutationoperator.SelectedItem = .MutOperator
@@ -788,12 +788,12 @@ Public Class EVO_Einstellungen
 
     'Settings für TestModus
     '**********************
-    Public Sub setTestModus(ByVal Modus As CES_T_MODUS, ByVal Path() As Integer, ByVal nGen As Integer, ByVal nParents As Integer, ByVal NChilds As Integer)
+    Public Sub setTestModus(ByVal Modus As CES_T_MODUS, ByVal Path() As Integer, ByVal nGen As Integer, ByVal nParents As Integer, ByVal NChildren As Integer)
 
         Dim i As Integer
         Dim PathStr As String
 
-        If NChilds = 1 Then
+        If NChildren = 1 Then
             PathStr = "   Path: "
             For i = 0 To Path.GetUpperBound(0)
                 PathStr = PathStr & Path(i) & " "
@@ -801,15 +801,15 @@ Public Class EVO_Einstellungen
             PathStr = PathStr.TrimEnd
         Else
             PathStr = "   n_combi: "
-            PathStr = PathStr & NChilds
+            PathStr = PathStr & NChildren
         End If
 
         Me.Label_CES_OptModus.Text = "Modus: " & Modus.ToString & PathStr
         Me.Numeric_CES_n_Generations.Value = nGen
         Me.Numeric_CES_n_Parents.Minimum = 1
         Me.Numeric_CES_n_Parents.Value = nParents
-        Me.Numeric_CES_n_childs.Minimum = 1
-        Me.Numeric_CES_n_childs.Value = NChilds
+        Me.Numeric_CES_n_Children.Minimum = 1
+        Me.Numeric_CES_n_Children.Value = NChildren
 
     End Sub
 
