@@ -163,7 +163,7 @@ Public Class EVO_Settings
         'CES
         Public n_Generations As Integer         'Anzahl der Generationen
         Public n_Parents As Integer             'Anzahl der Eltern
-        Public n_Childs As Integer              'Anzahl der Kinder
+        Public n_Children As Integer              'Anzahl der Kinder
         Public OptStrategie As EVO_STRATEGIE    '"plus" oder "minus" Strategie
         Public OptReprodOp As CES_REPRODOP      'Reprofuktionaoperator
         Public k_Value As Integer               'Anzahl der Schnittpunkte
@@ -196,7 +196,7 @@ Public Class EVO_Settings
                     'CES
                     Me.n_Generations = 500
                     Me.n_Parents = 5
-                    Me.n_Childs = 15
+                    Me.n_Children = 15
                     Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
                     Me.OptReprodOp = CES_REPRODOP.Uniform_Crossover
                     Me.OptMutOperator = CES_MUTATION.RND_Switch
@@ -223,7 +223,7 @@ Public Class EVO_Settings
                     'CES
                     Me.n_Generations = 100
                     Me.n_Parents = 3
-                    Me.n_Childs = 7
+                    Me.n_Children = 7
                     Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
                     Me.OptReprodOp = CES_REPRODOP.Uniform_Crossover
                     Me.OptMutOperator = CES_MUTATION.RND_Switch
@@ -302,7 +302,7 @@ Public Class EVO_Settings
         Public MySQL_Password As String
 
         'Versteckte Optionen
-        Public ChildsPerParent As Integer
+        Public ChildrenPerParent As Integer
 
         'Standardwerte setzen
         '********************
@@ -322,7 +322,7 @@ Public Class EVO_Settings
             Me.MySQL_User = "remoteuser"
             Me.MySQL_Password = ""
 
-            Me.ChildsPerParent = 3
+            Me.ChildrenPerParent = 3
         End Sub
 
     End Structure
@@ -357,7 +357,7 @@ Public Class EVO_Settings
         Public n_Cities As Integer
         Public n_Gen As Integer
         Public n_Parents As Integer
-        Public n_Childs As Integer
+        Public n_Children As Integer
 
         Public Problem As EnProblem
         Public ReprodOperator As EnReprodOperator
@@ -368,7 +368,7 @@ Public Class EVO_Settings
             n_Cities = 70
             n_Gen = 20000
             n_Parents = 5   'mindestens 3 Eltern!
-            n_Childs = 40
+            n_Children = 40
 
             Problem = EnProblem.circle
             ReprodOperator = EnReprodOperator.Order_Crossover_OX

@@ -54,18 +54,18 @@
         Dim n As Integer = 3
 
         'Progress
-        Me.myProgress.Initialize(0, 0, me.mySettings.TSP.n_Gen, me.mySettings.TSP.n_Childs)
+        Me.myProgress.Initialize(0, 0, Me.mySettings.TSP.n_Gen, Me.mySettings.TSP.n_Children)
 
         'Monitor Stuff
         With Me.myMonitor
             .SelectTabLog()
             .Show()
-            .LogAppend("Cities: " & me.mySettings.TSP.n_Cities)
+            .LogAppend("Cities: " & Me.mySettings.TSP.n_Cities)
             .LogAppend("Combinations: " & TSP1.n_Comb(Me.mySettings.TSP.n_Cities))
             .LogAppend("Parents: " & Me.mySettings.TSP.n_Parents)
-            .LogAppend("Childs: " & Me.mySettings.TSP.n_Childs)
+            .LogAppend("Children: " & Me.mySettings.TSP.n_Children)
             .LogAppend("Generations: " & Me.mySettings.TSP.n_Gen)
-            .LogAppend("Evaluations: " & Me.mySettings.TSP.n_Childs * Me.mySettings.TSP.n_Gen)
+            .LogAppend("Evaluations: " & Me.mySettings.TSP.n_Children * Me.mySettings.TSP.n_Gen)
             If Me.mySettings.TSP.Problem = common.EnProblem.circle Then
                 .LogAppend("Quality Aim: " & Conversion.Int(TSP1.circumference))
             End If
@@ -75,12 +75,12 @@
 
             Case TSP.EnMode.Standard_Opt
                 'Progress
-                Me.myProgress.Initialize(0, 0, Me.mySettings.TSP.n_Gen, Me.mySettings.TSP.n_Childs)
+                Me.myProgress.Initialize(0, 0, Me.mySettings.TSP.n_Gen, Me.mySettings.TSP.n_Children)
                 Call TSP_Controller(False)
 
             Case TSP.EnMode.Batch_OPpt
                 'Progress
-                Me.myProgress.Initialize(n, 8, Me.mySettings.TSP.n_Gen, Me.mySettings.TSP.n_Childs)
+                Me.myProgress.Initialize(n, 8, Me.mySettings.TSP.n_Gen, Me.mySettings.TSP.n_Children)
                 Dim i, M, R As Integer
 
                 For R = 1 To 2
@@ -98,13 +98,13 @@
                     Next
                 Next
             Case TSP.EnMode.Just_Calc
-                Me.mySettings.TSP.n_Childs = 1
+                Me.mySettings.TSP.n_Children = 1
                 Dim i, j As Double
 
                 j = 10000000
 
                 Dim Time As New Stopwatch
-                Call TSP1.Dim_Childs()
+                Call TSP1.Dim_Children()
                 Call TSP1.Generate_Random_Path_TSP()
                 Call TSP1.Cities_according_ChildPath()
 
@@ -118,11 +118,11 @@
                 Me.myMonitor.LogAppend("Die Berechnung dauerte:   " & Time.Elapsed.Hours & "h  " & Time.Elapsed.Minutes & "m  " & Time.Elapsed.Seconds & "s     " & Time.Elapsed.Milliseconds & "ms")
 
         End Select
-    End Sub 
+    End Sub
 
     Public Sub Stoppen() Implements IController.Stoppen
-        
-         Stopp = True
+
+        Stopp = True
 
     End Sub
 
@@ -145,24 +145,24 @@
 
         'Arrays werden Dimensioniert
         Call TSP1.Dim_Parents_TSP()
-        Call TSP1.Dim_Childs()
+        Call TSP1.Dim_Children()
 
         'Zufällige Kinderpfade werden generiert
         Call TSP1.Generate_Random_Path_TSP()
 
         'Generationsschleife
-        For gen = 1 To me.mySettings.TSP.n_Gen
+        For gen = 1 To Me.mySettings.TSP.n_Gen
 
             'Den Kindern werden die Städte Ihres Pfades entsprechend zugewiesen
             Call TSP1.Cities_according_ChildPath()
 
-            'Zeichnen des ersten Childs
+            'Zeichnen des ersten Child
             If gen = 1 Then
-                Call Zeichnen_TSP(TSP1.ChildList(0).Image)
+                Call Zeichnen_TSP(TSP1.ChildrenList(0).Image)
                 Me.myHauptDiagramm.Update()
                 'png Export
                 If TSP1.pngExport = True Then
-                    Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ChildList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
+                    Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ChildrenList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
                 End If
             End If
 
@@ -170,7 +170,7 @@
             Call TSP1.Evaluate_child_Quality()
 
             'Sortieren der Kinden anhand der Qualität
-            Call TSP1.Sort_Faksimile(TSP1.ChildList)
+            Call TSP1.Sort_Faksimile(TSP1.ChildrenList)
 
             'Selections Prozess (Übergabe der Kinder an die Eltern je nach Strategie)
             Call TSP1.Selection_Process()
@@ -182,9 +182,9 @@
                 Me.myProgress.iGen() = gen
                 If Batch_Mode = False Then
                     Me.myMonitor.LogAppend("Gen.: " & gen & "; Länge: " & Conversion.Int(TSP1.ParentList(0).Penalty) & "; Faktor: " _
-                    & math.Round(TSP1.ParentList(0).Penalty/TSP1.circumference, 3,MidpointRounding.ToEven))
+                    & math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven))
                     'png Export
-                    If TSP1.pngExport = True and Conversion.Int(TSP1.ParentList(0).Penalty) < PenaltyTMP Then
+                    If TSP1.pngExport = True And Conversion.Int(TSP1.ParentList(0).Penalty) < PenaltyTMP Then
                         Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
                         PenaltyTMP = Conversion.Int(TSP1.ParentList(0).Penalty)
                     End If
@@ -192,19 +192,19 @@
             End If
 
             'Fall die Problemstellung ein Kreis ist wird abgebrochen, wenn das Optimum erreicht ist
-            If me.mySettings.TSP.Problem = common.EnProblem.circle And TSP1.ParentList(0).Penalty < TSP1.circumference Then
+            If Me.mySettings.TSP.Problem = common.EnProblem.circle And TSP1.ParentList(0).Penalty < TSP1.circumference Then
                 GoToExit = True
                 Select Case TSP1.ParentList(0).Path(0) < TSP1.ParentList(0).Path(1)
                     Case True
-                        For i = 0 To me.mySettings.TSP.n_Cities - 2
-                            If Not TSP1.ParentList(0).Path(i) + 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = me.mySettings.TSP.n_Cities And TSP1.ParentList(0).Path(i + 1) = 1) Then
+                        For i = 0 To Me.mySettings.TSP.n_Cities - 2
+                            If Not TSP1.ParentList(0).Path(i) + 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = Me.mySettings.TSP.n_Cities And TSP1.ParentList(0).Path(i + 1) = 1) Then
                                 GoToExit = False
                                 Exit For
                             End If
                         Next
                     Case Else
-                        For i = 0 To me.mySettings.TSP.n_Cities - 2
-                            If Not TSP1.ParentList(0).Path(i) - 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = 1 And TSP1.ParentList(0).Path(i + 1) = me.mySettings.TSP.n_Cities) Then
+                        For i = 0 To Me.mySettings.TSP.n_Cities - 2
+                            If Not TSP1.ParentList(0).Path(i) - 1 = TSP1.ParentList(0).Path(i + 1) And Not (TSP1.ParentList(0).Path(i) = 1 And TSP1.ParentList(0).Path(i + 1) = Me.mySettings.TSP.n_Cities) Then
                                 GoToExit = False
                                 Exit For
                             End If
@@ -213,12 +213,12 @@
 
             End If
 
-            If GoToExit = True or Stopp Then
+            If GoToExit = True Or Stopp Then
                 If Batch_Mode = False Then
                     Call Zeichnen_TSP(TSP1.ParentList(0).Image)
                     Me.myHauptDiagramm.Update()
                     Me.myMonitor.LogAppend("Gen.: " & gen & "; Länge: " & Conversion.Int(TSP1.ParentList(0).Penalty) & "; Faktor: " _
-                    & math.Round(TSP1.ParentList(0).Penalty/TSP1.circumference, 3,MidpointRounding.ToEven))
+                    & math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven))
                     'png Export
                     If TSP1.pngExport = True Then
                         Me.myHauptdiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
@@ -228,7 +228,7 @@
             End If
 
             'Kinder werden Hier vollständig gelöscht
-            Call TSP1.Reset_Childs()
+            Call TSP1.Reset_Children()
 
             'Reproduktionsoperatoren, hier gehts dezent zur Sache
             Call TSP1.Reproduction_Control()
