@@ -1957,4 +1957,30 @@ Partial Class Form1
 
 #End Region 'Methoden
 
+    Private Sub BachModeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
+
+        Dim n_cycles As Integer = 1
+        Dim ReprodItems As String
+        Dim MutItems As String
+
+        Dim i As Integer
+        For i = 1 to n_cycles
+            For Each ReprodItems In [Enum].GetNames(GetType(EVO.Common.Constants.CES_REPRODOP))
+                For Each MutItems In [Enum].GetNames(GetType(EVO.Common.CES_MUTATION))
+                    MsgBox(ReprodItems & " and " & MutItems)
+
+                    'Call Button_New_Click(sender, e)
+
+                    'ComboBox_Anwendung.SelectedItem = ANW_BLUEM
+                    'ComboBox_Datensatz.Items.Add("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
+                    'ComboBox_Datensatz.SelectedItem = "D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL"
+                    'ComboBox_Methode.SelectedItem = METH_CES
+
+                    'Call STARTEN_Button_Click(sender, e)
+
+                Next
+            Next
+        Next
+    End Sub
+
 End Class
