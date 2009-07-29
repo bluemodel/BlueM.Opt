@@ -323,7 +323,7 @@ Public Class SWMM
                   Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
                   Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
                   Dim KeyWord_Block As String, KeyWord_SimGr As String
-                  Dim SpVon As Short, SpLen As Short, NoSpalte As short
+                    Dim NoSpalte As Short
                   Dim tmpValue As Double
                   'Datei durchgehen und mit Block und Spaltenangabe aus obj den gesuchten Wert ermitteln
                   'und diesen dann in Sim_Ergebnis schreiben
@@ -363,8 +363,18 @@ Public Class SWMM
                               NoSpalte = 4
                            Case "FlowVolume"
                               NoSpalte = 5
-                           Case "PollutantMass"
+                           Case "Pollutant_01"
                               NoSpalte = 6
+                           Case "Pollutant_02"
+                              NoSpalte = 7
+                           Case "Pollutant_03"
+                              NoSpalte = 8
+                           Case "Pollutant_04"
+                              NoSpalte = 9
+                           Case "Pollutant_05"
+                              NoSpalte = 10
+                           Case "Pollutant_06"
+                              NoSpalte = 11
                            Case Else
                               Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
                         End Select
