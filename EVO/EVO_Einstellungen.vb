@@ -654,8 +654,6 @@ Public Class EVO_Einstellungen
 
         writer.Close()
 
-        Me.isSaved = True
-
     End Sub
 
     'Laden der Settings aus einer XML-Datei

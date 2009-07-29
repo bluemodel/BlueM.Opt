@@ -2106,14 +2106,14 @@ Partial Class EVO_Einstellungen
     Private WithEvents PES_Checkbox_isTournamentSelection As System.Windows.Forms.CheckBox
     Private WithEvents PES_Combo_DnMutation As System.Windows.Forms.ComboBox
     Private WithEvents CES_Label_OptModus As System.Windows.Forms.Label
-    Friend WithEvents CES_Combo_Selection As System.Windows.Forms.ComboBox
+    Private WithEvents CES_Combo_Selection As System.Windows.Forms.ComboBox
     Private WithEvents Combo_CES_IniValues As System.Windows.Forms.ComboBox
-    Friend WithEvents CES_Combo_Reproduction As System.Windows.Forms.ComboBox
-    Friend WithEvents CES_Combo_Mutation As System.Windows.Forms.ComboBox
+    Private WithEvents CES_Combo_Reproduction As System.Windows.Forms.ComboBox
+    Private WithEvents CES_Combo_Mutation As System.Windows.Forms.ComboBox
     Private WithEvents GroupBoxCES As System.Windows.Forms.GroupBox
-    Friend WithEvents CES_Numeric_n_Children As System.Windows.Forms.NumericUpDown
-    Friend WithEvents CES_Numeric_n_Parents As System.Windows.Forms.NumericUpDown
-    Friend WithEvents CES_Numeric_n_Generations As System.Windows.Forms.NumericUpDown
+    Private WithEvents CES_Numeric_n_Children As System.Windows.Forms.NumericUpDown
+    Private WithEvents CES_Numeric_n_Parents As System.Windows.Forms.NumericUpDown
+    Private WithEvents CES_Numeric_n_Generations As System.Windows.Forms.NumericUpDown
     Private WithEvents CES_Numeric_n_member_SecPop As System.Windows.Forms.NumericUpDown
     Private WithEvents CES_Numeric_n_exchange_SecPop As System.Windows.Forms.NumericUpDown
     Private WithEvents Label_CES_NMembersSecPop As System.Windows.Forms.Label
@@ -2171,19 +2171,19 @@ Partial Class EVO_Einstellungen
     Private WithEvents TabPage_General As System.Windows.Forms.TabPage
     Private WithEvents CheckBox_drawOnlyCurrentGen As System.Windows.Forms.CheckBox
     Private WithEvents TabPage_TSP As System.Windows.Forms.TabPage
-    Friend WithEvents TSP_Label_n_cities As System.Windows.Forms.Label
+    Private WithEvents TSP_Label_n_cities As System.Windows.Forms.Label
     Private WithEvents TSP_Numeric_n_generations As System.Windows.Forms.NumericUpDown
-    Friend WithEvents TSP_Label_n_generations As System.Windows.Forms.Label
+    Private WithEvents TSP_Label_n_generations As System.Windows.Forms.Label
     Private WithEvents TSP_Numeric_n_children As System.Windows.Forms.NumericUpDown
-    Friend WithEvents TSP_Label_n_children As System.Windows.Forms.Label
+    Private WithEvents TSP_Label_n_children As System.Windows.Forms.Label
     Private WithEvents TSP_Numeric_n_parents As System.Windows.Forms.NumericUpDown
-    Friend WithEvents TSP_Label_n_parents As System.Windows.Forms.Label
+    Private WithEvents TSP_Label_n_parents As System.Windows.Forms.Label
     Private WithEvents TSP_Numeric_n_cities As System.Windows.Forms.NumericUpDown
     Private WithEvents TSP_ComboBox_Mutationoperator As System.Windows.Forms.ComboBox
-    Friend WithEvents TSP_Label_Mutationoperator As System.Windows.Forms.Label
-    Friend WithEvents TSP_Label_Reproductionoperator As System.Windows.Forms.Label
+    Private WithEvents TSP_Label_Mutationoperator As System.Windows.Forms.Label
+    Private WithEvents TSP_Label_Reproductionoperator As System.Windows.Forms.Label
     Private WithEvents TSP_ComboBox_Reproductionoperator As System.Windows.Forms.ComboBox
     Private WithEvents TSP_ComboBox_prob_instance As System.Windows.Forms.ComboBox
-    Friend WithEvents TSP_Label_Instance As System.Windows.Forms.Label
+    Private WithEvents TSP_Label_Instance As System.Windows.Forms.Label
     Private WithEvents CES_Numeric_k_Value As System.Windows.Forms.NumericUpDown
 End Class
