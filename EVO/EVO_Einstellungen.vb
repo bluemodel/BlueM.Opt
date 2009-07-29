@@ -152,10 +152,7 @@ Public Class EVO_Einstellungen
             Case METH_DDS
                 Call Me.Initialise_DDS()
 
-            Case METH_CES
-                Call Me.Initialise_CES()
-
-            Case METH_HYBRID
+            Case METH_CES, METH_HYBRID
                 Call Me.Initialise_PES()
                 Call Me.Initialise_CES()
 

@@ -203,15 +203,14 @@ Public Class Controller
             OptTimeParaPerGen.Start()
 
             'Individuen mit Multithreading evaluieren
+            '****************************************
             isOK = Sim1.Evaluate(CES1.Children, True)
+            '****************************************
 
             OptTimeParaPerGen.Stop()
             EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation " & Me.CES_i_gen & " dauerte:   " & OptTimeParaPerGen.Elapsed.Hours & "h  " & OptTimeParaPerGen.Elapsed.Minutes & "m  " & OptTimeParaPerGen.Elapsed.Seconds & "s     " & OptTimeParaPerGen.Elapsed.Seconds & "ms")
             TimePerGeneration(Me.CES_i_gen + 1) = OptTimeParaPerGen.Elapsed
             TimePerGeneration(0) += OptTimeParaPerGen.Elapsed
-
-            'Stop?
-            If (Me.stopped) Then Exit Sub
 
             'Evaluierte Individuen verarbeiten
             For i_Child As Integer = 0 To CES1.Children.Length - 1
@@ -268,6 +267,14 @@ Public Class Controller
             End If
             ' ^ ENDE Selectionsprozess
             'xxxxxxxxxxxxxxxxxxxxxxxxx
+
+            'Abbruchkriterium für die Qualitätsprüfung
+            If CES1.Parents(0).PrimObjectives(0) < 1372.82 Then
+                Exit Sub
+            End If
+
+            'Stop?
+            If (Me.stopped) Then Exit Sub
 
             'REPRODUKTION und MUTATION Nicht wenn Testmodus
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
