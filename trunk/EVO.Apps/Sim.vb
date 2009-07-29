@@ -626,7 +626,7 @@ Public MustInherit Class Sim
         End If
 
         OptTimePara.Stop()
-        'EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation dauerte:   " & OptTimePara.Elapsed.Hours & "h  " & OptTimePara.Elapsed.Minutes & "m  " & OptTimePara.Elapsed.Seconds & "s     " & OptTimePara.Elapsed.Seconds & "ms")
+        'EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation dauerte:   " & OptTimePara.Elapsed.Hours & "h  " & OptTimePara.Elapsed.Minutes & "m  " & OptTimePara.Elapsed.Seconds & "s     " & OptTimePara.Elapsed & "ms")
 
         Return isOK
 

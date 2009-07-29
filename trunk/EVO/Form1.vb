@@ -984,8 +984,7 @@ Partial Class Form1
 
             'Ausgabe der Optimierungszeit
             AllOptTime.Stop()
-            'MsgBox("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
-            EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms")
+            EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Milliseconds & "ms")
         End If
 
     End Sub
@@ -1975,6 +1974,12 @@ Partial Class Form1
 
                     Me.EVO_Einstellungen1.CES_Combo_Reproduction.SelectedItem = ReprodItem
                     Me.EVO_Einstellungen1.CES_Combo_Mutation.SelectedItem = MutItem
+
+                    Call Monitor1.SelectTabLog()
+                    Call Monitor1.Show()
+
+                    Monitor1.LogAppend("ReprodOperator: " & ReprodItem.ToString)
+                    Monitor1.LogAppend("MutOperator: " & MutItem.ToString)
 
                     Call STARTEN_Button_Click(sender, e)
 
