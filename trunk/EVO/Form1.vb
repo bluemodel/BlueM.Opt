@@ -36,6 +36,9 @@ Partial Class Form1
     'Problem
     Private mProblem As EVO.Common.Problem
 
+    'Settings
+    Private mSettings As EVO.Common.Settings
+
     'Progress
     Private mProgress As EVO.Common.Progress
 
@@ -719,6 +722,7 @@ Partial Class Form1
 
                         'Progress mit Standardwerten initialisieren
                         Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.getSettings.MetaEvo.NumberGenerations, EVO_Einstellungen1.getSettings.MetaEvo.PopulationSize)
+
                     Case METH_TSP
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -825,7 +829,7 @@ Partial Class Form1
             Me.Button_Start.Text = "Continue"
 
             'Bei Multithreading muss Sim explizit pausiert werden
-            If (Me.EVO_Einstellungen1.getSettings.General.useMultithreading) Then
+            If (Me.mSettings.General.useMultithreading) Then
                 Me.Sim1.isPause = True
             End If
 
@@ -841,7 +845,7 @@ Partial Class Form1
             Me.Button_Start.Text = "Pause"
 
             'Bei Multithreading muss Sim explizit wieder gestartet werden
-            If (Me.EVO_Einstellungen1.getSettings.General.useMultithreading) Then
+            If (Me.mSettings.General.useMultithreading) Then
                 Me.Sim1.isPause = False
             End If
 
@@ -871,7 +875,10 @@ Partial Class Form1
             'Anwendungs-Groupbox deaktivieren
             Me.GroupBox_Anwendung.Enabled = False
 
-            'Settings in temp-Verzeichnis speichern
+            'Settings speichern (in Me.mSettings sowie in Datei)
+            Me.mSettings = Me.EVO_Einstellungen1.getSettings
+            Me.EVO_Einstellungen1.isSaved = True
+
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
             Call Me.EVO_Einstellungen1.saveSettings(dir & "Settings.xml")
@@ -880,7 +887,7 @@ Partial Class Form1
             Call Me.EVO_Einstellungen1.freeze()
 
             'Settings an Hauptdiagramm übergeben
-            Call Me.Hauptdiagramm1.setSettings(Me.EVO_Einstellungen1.getSettings)
+            Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
 
             'Diagramm vorbereiten und initialisieren
             Call Me.PrepareDiagramm()
@@ -890,7 +897,7 @@ Partial Class Form1
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
                     'Settings an Sim1 übergeben
-                    Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.getSettings)
+                    Call Me.Sim1.setSettings(Me.mSettings)
 
                     'Multithreading vorbereiten
                     Call Me.Sim1.prepareMultithreading()
@@ -925,7 +932,7 @@ Partial Class Form1
                     End Select
 
                     'Controller für Sim initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.getSettings, Me.mProgress, Me.Hauptdiagramm1)
+                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Sim1)
                     Call controller.Start()
 
@@ -953,7 +960,7 @@ Partial Class Form1
                     End Select
 
                     'Controller für Testproblem initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.getSettings, Me.mProgress, Me.Hauptdiagramm1)
+                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Testprobleme1)
                     Call controller.Start()
 
@@ -964,7 +971,7 @@ Partial Class Form1
                     controller = New EVO.TSP.TSPController()
 
                     'Controller für TSP initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.getSettings, Me.mProgress, Me.Hauptdiagramm1)
+                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
                     'Call controller.InitApp() bei TSP nicht benötigt
                     Call controller.Start()
 
@@ -1916,7 +1923,7 @@ Partial Class Form1
                 Call Me.controller.Stoppen()
                 Me.controller = Nothing
                 'bei Multithreading Sim explizit stoppen
-                If (Me.EVO_Einstellungen1.getSettings.General.useMultithreading) Then
+                If (Me.mSettings.General.useMultithreading) Then
                     Me.Sim1.isStopped = True
                 End If
             Else
@@ -1968,12 +1975,19 @@ Partial Class Form1
                     'MsgBox(ReprodItems & " and " & MutItems)
 
                     ComboBox_Anwendung.SelectedItem = ANW_BLUEM
-                    ComboBox_Datensatz.Items.Add("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
-                    ComboBox_Datensatz.SelectedItem = "D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL"
+                    ComboBox_Datensatz.Items.Add("D:\CODING\Datensaetze\Erft_1984_06_Qmax_Skos\Erft.ALL")
+                    ComboBox_Datensatz.SelectedItem = "D:\CODING\Datensaetze\Erft_1984_06_Qmax_Skos\Erft.ALL"
                     ComboBox_Methode.SelectedItem = METH_CES
 
-                    Me.EVO_Einstellungen1.CES_Combo_Reproduction.SelectedItem = ReprodItem
-                    Me.EVO_Einstellungen1.CES_Combo_Mutation.SelectedItem = MutItem
+                    'Settings holen
+                    Me.mSettings = EVO_Einstellungen1.getSettings
+
+                    'Settings ändern
+                    Me.mSettings.CES.OptReprodOp = ReprodItem
+                    Me.mSettings.CES.OptMutOperator = MutItem
+
+                    'Verhindern, dass die Settings neu eingelesen werden
+                    Me.EVO_Einstellungen1.isSaved = True
 
                     Call Monitor1.SelectTabLog()
                     Call Monitor1.Show()
