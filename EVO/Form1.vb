@@ -290,7 +290,7 @@ Partial Class Form1
                 Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
 
                 'Settings zurücksetzen
-                Me.EVO_Einstellungen1.isSaved = False
+                Call Me.EVO_Einstellungen1.Reset()
 
                 'Multithreading standardmäßig verbieten
                 Me.EVO_Einstellungen1.MultithreadingAllowed = False
