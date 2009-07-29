@@ -28,8 +28,10 @@ Public Class EVO_Einstellungen
     Private mMultithreadingAllowed As Boolean
     Private isInitializing As Boolean
 
-    Public isSaved As Boolean = False                'Flag der anzeigt, ob die Einstellungen bereits gesichert wurden
-    Public isLoad As Boolean = False                 'Flag der anzeigt, ob die Settings aus einer XML Datei gelesen werden
+    ''' <summary>
+    ''' Flag der anzeigt, ob die Einstellungen bereits aus dem Form gelesen und gesichert wurden
+    ''' </summary>
+    Public isSaved As Boolean
 
     ''' <summary>
     ''' Liste der momentan verwendeten Methoden
@@ -65,9 +67,9 @@ Public Class EVO_Einstellungen
     ''' Liest die Settings aus dem Form ein und gibt sie zurück
     ''' </summary>
     ''' <returns>die Settings</returns>
+    ''' <remarks>Wenn noch nicht gespeichert wurde (d.h isSaved = False), werden die Settings zuerst aus dem Form eingelesen</remarks>
     Public ReadOnly Property getSettings() As EVO.Common.Settings
         Get
-            'Wenn Einstellungen noch nicht gespeichert, zuerst aus Form einlesen
             If (Not Me.isSaved) Then
                 Call Me.readForm()
             End If
@@ -88,14 +90,14 @@ Public Class EVO_Einstellungen
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         Call Me.InitializeComponent()
 
-        ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        Me.isInitializing = False
+
+        'Init
+        Me.usedMethods = New Collections.Specialized.StringCollection()
+        Me.isSaved = False
 
         'Settings instanzieren
         Me.mSettings = New Common.Settings()
-
-        Me.usedMethods = New Collections.Specialized.StringCollection()
-
-        Me.isInitializing = False
 
     End Sub
 
@@ -103,6 +105,8 @@ Public Class EVO_Einstellungen
     ''' Einstellungen zurücksetzen
     ''' </summary>
     Public Sub Reset()
+
+        Me.isSaved = False
 
         'Settings zurücksetzen
         Me.mSettings.Reset()
@@ -642,14 +646,11 @@ Public Class EVO_Einstellungen
         Dim writer As StreamWriter
         Dim serializer As XmlSerializer
 
-        'Neu einlesen
-        Call Me.readForm()
-
         'Streamwriter öffnen
         writer = New StreamWriter(filename)
 
         serializer = New XmlSerializer(GetType(Common.Settings), New XmlRootAttribute("Settings"))
-        serializer.Serialize(writer, Me.mSettings)
+        serializer.Serialize(writer, Me.getSettings)
 
         writer.Close()
 
@@ -675,9 +676,9 @@ Public Class EVO_Einstellungen
             Me.mSettings = CType(serializer.Deserialize(fs), Common.Settings)
 
             'Geladene Settings in Form schreiben
-            isLoad = True
+            Me.isInitializing = True
             Call Me.writeForm()
-            isLoad = False
+            Me.isInitializing = False
 
         Catch e As Exception
             MsgBox("Fehler beim Einlesen der Einstellungen!" & eol & e.Message, MsgBoxStyle.Exclamation)
@@ -857,7 +858,7 @@ Public Class EVO_Einstellungen
 
         If (Me.isInitializing) Then Exit Sub
 
-        If (Me.mProblem.Method = METH_HYBRID And Not isLoad) Then
+        If (Me.mProblem.Method = METH_HYBRID) Then
 
             Dim Item As HYBRID_TYPE
             Item = Me.CES_Combo_HybridType.SelectedItem
