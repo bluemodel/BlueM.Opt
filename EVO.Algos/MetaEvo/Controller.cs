@@ -15,7 +15,7 @@ namespace IHWB.EVO.MetaEvo
         EVO.Common.Constants.ApplicationTypes apptype;
 
         EVO.Common.Problem prob; 
-        EVO.Common.EVO_Settings settings;
+        EVO.Common.Settings settings;
         EVO.Common.Individuum_MetaEvo individuumForClient;
         EVO.Common.Individuum_MetaEvo[] generation;
         EVO.Common.Progress progress1;
@@ -44,7 +44,7 @@ namespace IHWB.EVO.MetaEvo
         /// <param name="progress1_input">der Verlauf</param>
         /// <param name="monitor_input">der Monitor</param>
         /// <param name="hauptdiagramm_input">das Hauptdiagramm</param>
-        public void Init(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Common.Progress progress1_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)  
+        public void Init(ref EVO.Common.Problem prob_input, ref EVO.Common.Settings settings_input, ref EVO.Common.Progress progress1_input, ref EVO.Diagramm.Hauptdiagramm hauptdiagramm_input)  
         {
             //Daten einlesen
             this.prob = prob_input;

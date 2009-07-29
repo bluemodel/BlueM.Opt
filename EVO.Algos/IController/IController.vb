@@ -11,7 +11,7 @@ Public Interface IController
     ''' <param name="inputProgress">der Verlauf</param>
     ''' <param name="inputHptDiagramm">das Hauptdiagramm</param>
     Sub Init(ByRef inputProblem As EVO.Common.Problem, _
-             ByRef inputSettings As EVO.Common.EVO_Settings, _
+             ByRef inputSettings As EVO.Common.Settings, _
              ByRef inputProgress As EVO.Common.Progress, _
              ByRef inputHptDiagramm As EVO.Diagramm.Hauptdiagramm)
 

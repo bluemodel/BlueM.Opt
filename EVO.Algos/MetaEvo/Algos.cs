@@ -29,9 +29,9 @@ namespace IHWB.EVO.MetaEvo
         int populationsize;
         int HJ_minimumstepsize;
         EVO.Diagramm.Monitor monitor1;
-        EVO.Common.EVO_Settings settings;
+        EVO.Common.Settings settings;
 
-        public Algos(ref EVO.Common.EVO_Settings settings_input, int individuum_id_input, ref EVO.Diagramm.Monitor monitor_input)
+        public Algos(ref EVO.Common.Settings settings_input, int individuum_id_input, ref EVO.Diagramm.Monitor monitor_input)
         {
             individuum_id = individuum_id_input;
             monitor1 = monitor_input;

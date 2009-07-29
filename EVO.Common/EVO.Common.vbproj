@@ -51,7 +51,6 @@
   <ItemGroup>
     <Compile Include="Constants.vb" />
     <Compile Include="Constraintfunction.vb" />
-    <Compile Include="EVO_Settings.vb" />
     <Compile Include="FileHelper.vb" />
     <Compile Include="Individuum.vb">
     </Compile>
@@ -86,6 +85,14 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="ObjectiveFunction.vb" />
+    <Compile Include="Settings\Settings.vb" />
+    <Compile Include="Settings\Settings_CES.vb" />
+    <Compile Include="Settings\Settings_DDS.vb" />
+    <Compile Include="Settings\Settings_HookeJeeves.vb" />
+    <Compile Include="Settings\Settings_MetaEvo.vb" />
+    <Compile Include="Settings\Settings_PES.vb" />
+    <Compile Include="Settings\Settings_Sensiplot.vb" />
+    <Compile Include="Settings\Settings_TSP.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

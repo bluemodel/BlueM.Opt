@@ -24,7 +24,7 @@ Public Class CES
     Private mProblem As EVO.Common.Problem
 
     'Die Settings für alles aus dem Form
-    Public mSettings As EVO_Settings             'TODO: sollte private sein!
+    Public mSettings As Settings             'TODO: sollte private sein!
 
     'Modell Setting
     Public Structure ModSettings
@@ -93,7 +93,7 @@ Public Class CES
 
     'Initialisierung der PES
     '***********************
-    Public Sub CESInitialise(ByRef settings As EVO_Settings, ByRef prob As EVO.Common.Problem, ByVal AnzVerzweig As Integer)
+    Public Sub CESInitialise(ByRef settings As Settings, ByRef prob As EVO.Common.Problem, ByVal AnzVerzweig As Integer)
 
         'Problem speichern
         Me.mProblem = prob
@@ -115,7 +115,7 @@ Public Class CES
     'Schritt 1: FORM SETTINGS
     'Function Form SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
-    Private Sub CES_Form_Settings(ByRef Settings As EVO_Settings)
+    Private Sub CES_Form_Settings(ByRef Settings As Settings)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -324,7 +324,7 @@ Public Class CES
                     '***************************************************************************************************
                     For m = 0 To Children(i).Loc(j).PES_OptPara.GetUpperBound(0)
                         Children(i).Loc(j).PES_OptPara(m).Dn = mSettings.PES.Schrittweite.DnStart
-                        If mSettings.PES.OptStartparameter = EVO_STARTPARAMETER.Zufall Then
+                        If mSettings.PES.Startparameter = EVO_STARTPARAMETER.Zufall Then
                             Randomize()
                             Children(i).Loc(j).PES_OptPara(m).Xn = Rnd()
                         End If

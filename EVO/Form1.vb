@@ -115,12 +115,11 @@ Partial Class Form1
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Methode.Items.Clear()
-        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_MetaEvo, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS})
+        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_METAEVO, METH_SENSIPLOT, METH_HOOKEJEEVES, METH_DDS})
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'Einstellungen
-        Me.EVO_Einstellungen1.setStandard_All()
-        Me.EVO_Einstellungen1.ResetUI()
+        Me.EVO_Einstellungen1.Reset()
 
         'Monitor zurücksetzen
         Me.Monitor1.Reset()
@@ -207,7 +206,7 @@ Partial Class Form1
 
         'Dialog einrichten
         OpenFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
-        OpenFileDialog1.FileName = "EVO_Settings.xml"
+        OpenFileDialog1.FileName = "Settings.xml"
         OpenFileDialog1.Title = "Einstellungsdatei auswählen"
         If (Not IsNothing(Sim1)) Then
             OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
@@ -218,7 +217,7 @@ Partial Class Form1
         'Dialog anzeigen
         If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
 
-            'EVO_Settings aus Datei laden
+            'Settings aus Datei laden
             Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName)
 
         End If
@@ -231,7 +230,7 @@ Partial Class Form1
 
         'Dialog einrichten
         SaveFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
-        SaveFileDialog1.FileName = "EVO_Settings.xml"
+        SaveFileDialog1.FileName = "Settings.xml"
         SaveFileDialog1.DefaultExt = "xml"
         SaveFileDialog1.Title = "Einstellungsdatei speichern"
         If (Not IsNothing(Sim1)) Then
@@ -290,7 +289,7 @@ Partial Class Form1
                 Me.ToolStripButton_Scatterplot.Enabled = False
                 Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
 
-                'EVO_Settings zurücksetzen
+                'Settings zurücksetzen
                 Me.EVO_Einstellungen1.isSaved = False
 
                 'Multithreading standardmäßig verbieten
@@ -345,7 +344,7 @@ Partial Class Form1
                         'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
                         Me.IsInitializing = True
                         Call Me.ComboBox_Methode.Items.Clear()
-                        Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_MetaEvo, METH_HOOKJEEVES, METH_DDS})
+                        Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_METAEVO, METH_HOOKEJEEVES, METH_DDS})
                         Me.IsInitializing = False
 
 
@@ -658,7 +657,7 @@ Partial Class Form1
                         'TODO: Progress mit Standardwerten initialisieren
 
 
-                    Case METH_HOOKJEEVES
+                    Case METH_HOOKEJEEVES
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                         'Kontrolle: Nur SO möglich!
@@ -707,19 +706,19 @@ Partial Class Form1
                         '-------------------------------------------
                         'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                         If Not (Me.mProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
-                            Call EVO_Einstellungen1.setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
+                            Call EVO_Einstellungen1.CES_setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
                         End If
 
                         'TODO: Progress mit Standardwerten initialisieren
 
-                    Case METH_MetaEvo
+                    Case METH_METAEVO
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                         'Ergebnis-Buttons
                         Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                         'Progress mit Standardwerten initialisieren
-                        Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
+                        Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.getSettings.MetaEvo.NumberGenerations, EVO_Einstellungen1.getSettings.MetaEvo.PopulationSize)
                     Case METH_TSP
                         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -826,7 +825,7 @@ Partial Class Form1
             Me.Button_Start.Text = "Continue"
 
             'Bei Multithreading muss Sim explizit pausiert werden
-            If (Me.EVO_Einstellungen1.Settings.General.useMultithreading) Then
+            If (Me.EVO_Einstellungen1.getSettings.General.useMultithreading) Then
                 Me.Sim1.isPause = True
             End If
 
@@ -842,7 +841,7 @@ Partial Class Form1
             Me.Button_Start.Text = "Pause"
 
             'Bei Multithreading muss Sim explizit wieder gestartet werden
-            If (Me.EVO_Einstellungen1.Settings.General.useMultithreading) Then
+            If (Me.EVO_Einstellungen1.getSettings.General.useMultithreading) Then
                 Me.Sim1.isPause = False
             End If
 
@@ -872,16 +871,16 @@ Partial Class Form1
             'Anwendungs-Groupbox deaktivieren
             Me.GroupBox_Anwendung.Enabled = False
 
-            'EVO_Settings in temp-Verzeichnis speichern
+            'Settings in temp-Verzeichnis speichern
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
-            Call Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
+            Call Me.EVO_Einstellungen1.saveSettings(dir & "Settings.xml")
 
-            'EVO_Settings deaktivieren
+            'Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()
 
-            'EVO_Settings an Hauptdiagramm übergeben
-            Call Me.Hauptdiagramm1.setSettings(Me.EVO_Einstellungen1.Settings)
+            'Settings an Hauptdiagramm übergeben
+            Call Me.Hauptdiagramm1.setSettings(Me.EVO_Einstellungen1.getSettings)
 
             'Diagramm vorbereiten und initialisieren
             Call Me.PrepareDiagramm()
@@ -891,7 +890,7 @@ Partial Class Form1
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
                     'Settings an Sim1 übergeben
-                    Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.Settings)
+                    Call Me.Sim1.setSettings(Me.EVO_Einstellungen1.getSettings)
 
                     'Multithreading vorbereiten
                     Call Me.Sim1.prepareMultithreading()
@@ -911,11 +910,11 @@ Partial Class Form1
                             'ES-Controller initialisieren und starten
                             controller = New EVO.ES.Controller()
 
-                        Case METH_MetaEvo
+                        Case METH_METAEVO
                             'MetaEVO-Controller initialisieren und starten
                             controller = New EVO.MetaEvo.Controller()
 
-                        Case METH_HOOKJEEVES
+                        Case METH_HOOKEJEEVES
                             'HJ-Controller initialisieren und starten
                             controller = New EVO.HookeAndJeeves.Controller()
 
@@ -926,7 +925,7 @@ Partial Class Form1
                     End Select
 
                     'Controller für Sim initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Hauptdiagramm1)
+                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.getSettings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Sim1)
                     Call controller.Start()
 
@@ -937,7 +936,7 @@ Partial Class Form1
                             'ES-Controller instanzieren
                             controller = New EVO.ES.Controller()
 
-                        Case METH_HOOKJEEVES
+                        Case METH_HOOKEJEEVES
                             'HJ-Controller instanzieren
                             controller = New EVO.HookeAndJeeves.Controller()
 
@@ -945,7 +944,7 @@ Partial Class Form1
                             'DDS-Controller instanzieren
                             controller = New modelEAU.DDS.Controller()
 
-                        Case METH_MetaEvo
+                        Case METH_METAEVO
                             'MetaEVO-Controller instanzieren
                             controller = New EVO.MetaEvo.Controller()
 
@@ -954,7 +953,7 @@ Partial Class Form1
                     End Select
 
                     'Controller für Testproblem initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Hauptdiagramm1)
+                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.getSettings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Testprobleme1)
                     Call controller.Start()
 
@@ -965,7 +964,7 @@ Partial Class Form1
                     controller = New EVO.TSP.TSPController()
 
                     'Controller für TSP initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.Settings, Me.mProgress, Me.Hauptdiagramm1)
+                    Call controller.Init(Me.mProblem, Me.EVO_Einstellungen1.getSettings, Me.mProgress, Me.Hauptdiagramm1)
                     'Call controller.InitApp() bei TSP nicht benötigt
                     Call controller.Start()
 
@@ -1100,7 +1099,7 @@ Partial Class Form1
                     Case METH_SENSIPLOT 'SensiPlot
                         'XXXXXXXXXXXXXXXXXXXXXXXXX
 
-                        If (Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_OptParameters.GetLength(0) = 1) Then
+                        If (Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_OptParameters.GetLength(0) = 1) Then
 
                             '1 OptParameter:
                             '---------------
@@ -1108,12 +1107,12 @@ Partial Class Form1
                             'Achsen:
                             '-------
                             'X-Achse = QWert
-                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_Objective).Bezeichnung
+                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_Objective).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = OptParameter
-                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -1121,7 +1120,7 @@ Partial Class Form1
                             'Achsenzuordnung
                             'BUG 327!
                             For i = 0 To Me.mProblem.NumObjectives - 1
-                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_Objective).Bezeichnung) Then
+                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexX = i
                                     Exit For 'Abbruch
                                 End If
@@ -1136,17 +1135,17 @@ Partial Class Form1
                             'Achsen:
                             '-------
                             'X-Achse = OptParameter1
-                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = Objective
-                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_Objective).Bezeichnung
+                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_Objective).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Z-Achse = OptParameter2
-                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_OptParameters(1)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_OptParameters(1)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -1155,7 +1154,7 @@ Partial Class Form1
                             'BUG 327!
                             Me.Hauptdiagramm1.ZielIndexX = -1
                             For i = 0 To Me.mProblem.NumObjectives - 1
-                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.Settings.SensiPlot.Selected_Objective).Bezeichnung) Then
+                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexY = i
                                     Exit For 'Abbruch
                                 End If
@@ -1184,17 +1183,17 @@ Partial Class Form1
                             Achse.Automatic = False
                             If (Me.mProblem.Method = METH_PES) Then
                                 'Bei PES:
-                                If (EVO_Einstellungen1.Settings.PES.Pop.is_POPUL) Then
-                                    Achse.Maximum = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf * EVO_Einstellungen1.Settings.PES.Pop.n_Runden + 1
+                                If (EVO_Einstellungen1.getSettings.PES.Pop.is_POPUL) Then
+                                    Achse.Maximum = EVO_Einstellungen1.getSettings.PES.n_Gen * EVO_Einstellungen1.getSettings.PES.n_Nachf * EVO_Einstellungen1.getSettings.PES.Pop.n_Runden + 1
                                 Else
-                                    Achse.Maximum = EVO_Einstellungen1.Settings.PES.n_Gen * EVO_Einstellungen1.Settings.PES.n_Nachf + 1
+                                    Achse.Maximum = EVO_Einstellungen1.getSettings.PES.n_Gen * EVO_Einstellungen1.getSettings.PES.n_Nachf + 1
                                 End If
 
-                            ElseIf (Me.mProblem.Method = METH_MetaEvo) Then
+                            ElseIf (Me.mProblem.Method = METH_METAEVO) Then
                                 'Bei MetaEvo:
-                                Achse.Maximum = EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations * EVO_Einstellungen1.Settings.MetaEvo.ChildrenPerParent * EVO_Einstellungen1.Settings.MetaEvo.PopulationSize
+                                Achse.Maximum = EVO_Einstellungen1.getSettings.MetaEvo.NumberGenerations * EVO_Einstellungen1.getSettings.MetaEvo.ChildrenPerParent * EVO_Einstellungen1.getSettings.MetaEvo.PopulationSize
 
-                            ElseIf (Me.mProblem.Method = METH_HOOKJEEVES) Then
+                            ElseIf (Me.mProblem.Method = METH_HOOKEJEEVES) Then
                                 'Bei Hooke & Jeeves:
                                 Achse.Automatic = True
 
@@ -1204,7 +1203,7 @@ Partial Class Form1
 
                             Else
                                 'Bei CES etc.:
-                                Achse.Maximum = EVO_Einstellungen1.Settings.CES.n_Children * EVO_Einstellungen1.Settings.CES.n_Generations
+                                Achse.Maximum = EVO_Einstellungen1.getSettings.CES.n_Children * EVO_Einstellungen1.getSettings.CES.n_Generations
                             End If
 
                             Achsen.Add(Achse)
@@ -1918,7 +1917,7 @@ Partial Class Form1
                 Call Me.controller.Stoppen()
                 Me.controller = Nothing
                 'bei Multithreading Sim explizit stoppen
-                If (Me.EVO_Einstellungen1.Settings.General.useMultithreading) Then
+                If (Me.EVO_Einstellungen1.getSettings.General.useMultithreading) Then
                     Me.Sim1.isStopped = True
                 End If
             Else

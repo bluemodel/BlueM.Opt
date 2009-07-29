@@ -30,7 +30,7 @@ Public Class PES
     'Deklarationsteil Variablen und Strukturen
     '#########################################
 
-    Private mSettings As EVO_Settings
+    Private mSettings As Settings
 
     'Das Problem
     Private mProblem As Problem
@@ -115,7 +115,7 @@ Public Class PES
 
     'Initialisierung der PES
     '***************************************
-    Public Sub PesInitialise(ByRef settings As EVO_Settings, ByRef prob As Problem)
+    Public Sub PesInitialise(ByRef settings As Settings, ByRef prob As Problem)
 
         'Problem speichern
         Me.mProblem = prob
@@ -137,18 +137,18 @@ Public Class PES
     'Schritt 1: SETTINGS
     'Function ES_SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
-    Private Sub PES_Form_Settings(ByRef settings As EVO_Settings)
+    Private Sub PES_Form_Settings(ByRef settings As Settings)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If (Not System.Enum.IsDefined(GetType(EVO_STRATEGIE), settings.PES.OptStrategie)) Then
+        If (Not System.Enum.IsDefined(GetType(EVO_STRATEGIE), settings.PES.Strategie)) Then
             Throw New Exception("Ungültige Einstellung für 'Strategie'!")
         End If
-        If (Not System.Enum.IsDefined(GetType(EVO_STARTPARAMETER), settings.PES.OptStartparameter)) Then
+        If (Not System.Enum.IsDefined(GetType(EVO_STARTPARAMETER), settings.PES.Startparameter)) Then
             Throw New Exception("Ungültige Einstellung für 'Startparameter'!")
         End If
         'Schrittweite
-        If (Not System.Enum.IsDefined(GetType(EVO_DnMutation), settings.PES.Schrittweite.OptDnMutation)) Then
+        If (Not System.Enum.IsDefined(GetType(EVO_DnMutation), settings.PES.Schrittweite.DnMutation)) Then
             Throw New Exception("Ungültige Einstellung für 'Mutation'!")
         End If
         If (settings.PES.Schrittweite.DnStart < 0) Then
@@ -190,10 +190,10 @@ Public Class PES
         If (settings.PES.Pop.n_Popul < settings.PES.Pop.n_PopEltern) Then
             Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen!")
         End If
-        If (Not System.Enum.IsDefined(GetType(EVO_POP_ELTERN), settings.PES.Pop.OptPopEltern)) Then
+        If (Not System.Enum.IsDefined(GetType(EVO_POP_ELTERN), settings.PES.Pop.PopEltern)) Then
             Throw New Exception("Ungültige Einstellung für die Ermittlung der Populationseltern!")
         End If
-        If (Not System.Enum.IsDefined(GetType(EVO_STRATEGIE), settings.PES.Pop.OptPopStrategie)) Then
+        If (Not System.Enum.IsDefined(GetType(EVO_STRATEGIE), settings.PES.Pop.PopStrategie)) Then
             Throw New Exception("Ungültige Einstellung für 'Selektion' auf Populationsebene!")
         End If
 
@@ -270,7 +270,7 @@ Public Class PES
         If (mSettings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
             For n = 0 To mSettings.PES.Pop.n_Popul - 1
                 For m = 0 To Me.mProblem.NumPrimObjective - 1
-                    Select Case mSettings.PES.Pop.OptPopPenalty
+                    Select Case mSettings.PES.Pop.PopPenalty
 
                         Case EVO_POP_PENALTY.Crowding
                             'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
@@ -328,7 +328,7 @@ Public Class PES
         Randomize()
 
         'Die Startparameter für die Eltern werden gesetzt
-        Select Case Me.mSettings.PES.OptStartparameter
+        Select Case Me.mSettings.PES.Startparameter
 
             Case EVO_STARTPARAMETER.Zufall 'Zufällige Startwerte
                 For v = 0 To Me.mProblem.NumOptParams - 1
@@ -442,9 +442,9 @@ Public Class PES
         'MUTATIONSPROZESS
         '################
         'Mutieren der Ausgangswerte mit und ohne Vektor
-        If mSettings.PES.Schrittweite.is_DnVektor = False Then
+        If mSettings.PES.Schrittweite.isDnVektor = False Then
             Call CES_Xn_Mutation(CES_Dn)
-        ElseIf mSettings.PES.Schrittweite.is_DnVektor = True Then
+        ElseIf mSettings.PES.Schrittweite.isDnVektor = True Then
             Call EsMutation()
         End If
 
@@ -457,7 +457,7 @@ Public Class PES
         Dim m, n, v As Integer
         Dim R As Integer                      'Zufälliger Integer Wert
 
-        Select Case mSettings.PES.Pop.OptPopEltern
+        Select Case mSettings.PES.Pop.PopEltern
 
             Case EVO_POP_ELTERN.Rekombination 'MultiRekombination über alle Eltern (x/x,y) oder (x/x+y)
                 For n = 0 To mSettings.PES.n_Eltern - 1
@@ -861,7 +861,7 @@ Public Class PES
 
         'Einheitliche Schrittweite
         '-------------------------
-        If (Not mSettings.PES.Schrittweite.is_DnVektor) Then
+        If (Not mSettings.PES.Schrittweite.isDnVektor) Then
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
@@ -893,7 +893,7 @@ Public Class PES
 
                     'Schrittweitenvektor
                     '-------------------
-                    If (mSettings.PES.Schrittweite.is_DnVektor) Then
+                    If (mSettings.PES.Schrittweite.isDnVektor) Then
                         '+/-1
                         expo = (2 * Int(Rnd() + 0.5) - 1)
                         'Schrittweite wird mutiert
@@ -943,13 +943,13 @@ Public Class PES
 
         'Einheitliche Schrittweite
         '-------------------------
-        If (Not mSettings.PES.Schrittweite.is_DnVektor) Then
-            If (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Rechenberg) Then
+        If (Not mSettings.PES.Schrittweite.isDnVektor) Then
+            If (mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Rechenberg) Then
                 '+/-1
                 expo = (2 * Int(Rnd() + 0.5) - 1)
                 'Schrittweite wird mutiert
                 DnTemp(0) = AktPara(0).Dn * galpha ^ expo
-            ElseIf (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
+            ElseIf (mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Schwefel) Then
                 tau = mSettings.PES.Schrittweite.DnC / Math.Sqrt(Me.mProblem.NumOptParams)
                 'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                 Z = Me.NormalDistributationRND(1.0, 0.0)
@@ -966,7 +966,7 @@ Public Class PES
 
         'Dn Vektor und Schwefel
         '----------------------
-        If (mSettings.PES.Schrittweite.is_DnVektor And mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
+        If (mSettings.PES.Schrittweite.isDnVektor And mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Schwefel) Then
             taufix = mSettings.PES.Schrittweite.DnC / Math.Sqrt(2 * Me.mProblem.NumOptParams)
             ZFix = Me.NormalDistributationRND(1.0, 0.0)
         End If
@@ -990,14 +990,14 @@ Public Class PES
 
                 'Schrittweitenvektor
                 '-------------------
-                If (mSettings.PES.Schrittweite.is_DnVektor) Then
+                If (mSettings.PES.Schrittweite.isDnVektor) Then
 
-                    If (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Rechenberg) Then
+                    If (mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Rechenberg) Then
                         '+/-1
                         expo = (2 * Int(Rnd() + 0.5) - 1)
                         'Schrittweite wird mutiert
                         DnTemp(v) = AktPara(v).Dn * galpha ^ expo
-                    ElseIf (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
+                    ElseIf (mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Schwefel) Then
                         tau = mSettings.PES.Schrittweite.DnC / Math.Sqrt(2 * Math.Sqrt(Me.mProblem.NumOptParams))
                         'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                         Z = Me.NormalDistributationRND(1.0, 0.0)
@@ -1011,10 +1011,10 @@ Public Class PES
                 'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
 
                 'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Me.mProblem.NumParams) * System.Math.Sin(6.2832 * Rnd())
-                If (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Rechenberg) Then
+                If (mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Rechenberg) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
                     Z = Me.NormalDistributationRND(1 / Math.Sqrt(Me.mProblem.NumOptParams), 0.0)
-                ElseIf (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
+                ElseIf (mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Schwefel) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
                     Z = Me.NormalDistributationRND(1.0, 0.0)
                 End If
@@ -1045,12 +1045,12 @@ Public Class PES
         Dim expo As Integer                  'Exponent für Schrittweite (+/-1)
         Dim tau As Double
 
-        If (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Rechenberg) Then
+        If (mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Rechenberg) Then
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
             DnTemp = Dn_CES * galpha ^ expo
-        ElseIf (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
+        ElseIf (mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Schwefel) Then
             tau = mSettings.PES.Schrittweite.DnC / Math.Sqrt(Me.mProblem.NumOptParams)
             'Normalverteilte Zufallszahl (SD = 1, mean = 0)
             Z = Me.NormalDistributationRND(1.0, 0.0)
@@ -1090,10 +1090,10 @@ Public Class PES
                 'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
 
                 'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Anz.Para) * System.Math.Sin(6.2832 * Rnd())
-                If (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Rechenberg) Then
+                If (mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Rechenberg) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
                     Z = Me.NormalDistributationRND(1 / Math.Sqrt(Me.mProblem.NumOptParams), 0.0)
-                ElseIf (mSettings.PES.Schrittweite.OptDnMutation = EVO_DnMutation.Schwefel) Then
+                ElseIf (mSettings.PES.Schrittweite.DnMutation = EVO_DnMutation.Schwefel) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
                     Z = Me.NormalDistributationRND(1.0, 0.0)
                 End If
@@ -1150,7 +1150,7 @@ Public Class PES
                     i = m
                 End If
             Else
-                Select Case mSettings.PES.Pop.OptPopPenalty
+                Select Case mSettings.PES.Pop.PopPenalty
 
                     Case EVO_POP_PENALTY.Crowding
                         If Qbpop(m, 0) > h1 Then
@@ -1206,7 +1206,7 @@ Public Class PES
                 Next m
             End If
         Else
-            Select Case mSettings.PES.Pop.OptPopPenalty
+            Select Case mSettings.PES.Pop.PopPenalty
 
                 Case EVO_POP_PENALTY.Crowding
                     If h1 < Qbpop(i, 0) Then
@@ -1262,8 +1262,8 @@ Public Class PES
 
             'Falls die Qualität des aktuellen Nachkommen besser ist (Penaltyfunktion geringer)
             'als die schlechteste im Bestwertspeicher, wird dieser ersetzt
-            If ind.PrimObjectives(0) < Best.Qb(j, PES_iAkt.iAktPop, 0) Then
-                Best.Qb(j, PES_iAkt.iAktPop, 0) = ind.PrimObjectives(0)
+            If Ind.PrimObjectives(0) < Best.Qb(j, PES_iAkt.iAktPop, 0) Then
+                Best.Qb(j, PES_iAkt.iAktPop, 0) = Ind.PrimObjectives(0)
                 For v = 0 To Me.mProblem.NumOptParams - 1
                     'Die Schrittweite wird ebenfalls übernommen
                     Best.Db(v, j, PES_iAkt.iAktPop) = Ind.OptParameter(v).Dn
@@ -1289,7 +1289,7 @@ Public Class PES
     Public Sub EsResetBWSpeicher()
         Dim n, i As Integer
 
-        If (mSettings.PES.OptStrategie = EVO_STRATEGIE.Komma_Strategie) Then
+        If (mSettings.PES.Strategie = EVO_STRATEGIE.Komma_Strategie) Then
             For n = 0 To mSettings.PES.n_Eltern - 1
                 For i = 0 To Me.mProblem.NumPrimObjective - 1
                     Best.Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
@@ -1305,7 +1305,7 @@ Public Class PES
     Public Sub EsResetPopBWSpeicher()
         Dim n, i As Integer
 
-        If (mSettings.PES.Pop.OptPopStrategie = EVO_STRATEGIE.Komma_Strategie) Then
+        If (mSettings.PES.Pop.PopStrategie = EVO_STRATEGIE.Komma_Strategie) Then
             For n = 0 To mSettings.PES.Pop.n_Popul - 1
                 For i = 0 To Me.mProblem.NumPrimObjective - 1
                     Qbpop(n, i) = 1.0E+300
@@ -1324,7 +1324,7 @@ Public Class PES
         Dim Realisierungsspeicher(,) As Double
         Dim Z As Integer
 
-        Select Case mSettings.PES.Pop.OptPopPenalty
+        Select Case mSettings.PES.Pop.PopPenalty
             Case EVO_POP_PENALTY.Crowding
                 Z = 0
             Case EVO_POP_PENALTY.Spannweite
@@ -1358,7 +1358,7 @@ Public Class PES
         Else
             'Multi-Objective mit Paretofront
             '-------------------------------
-            Select Case mSettings.PES.Pop.OptPopPenalty
+            Select Case mSettings.PES.Pop.PopPenalty
 
                 Case EVO_POP_PENALTY.Crowding
                     For m = 0 To mSettings.PES.Pop.n_Popul - 1
