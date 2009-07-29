@@ -1975,8 +1975,8 @@ Partial Class Form1
                     'MsgBox(ReprodItems & " and " & MutItems)
 
                     ComboBox_Anwendung.SelectedItem = ANW_BLUEM
-                    ComboBox_Datensatz.Items.Add("D:\CODING\Datensaetze\Erft_1984_06_Qmax_Skos\Erft.ALL")
-                    ComboBox_Datensatz.SelectedItem = "D:\CODING\Datensaetze\Erft_1984_06_Qmax_Skos\Erft.ALL"
+                    ComboBox_Datensatz.Items.Add("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
+                    ComboBox_Datensatz.SelectedItem = "D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL"
                     ComboBox_Methode.SelectedItem = METH_CES
 
                     'Settings holen
@@ -1992,12 +1992,13 @@ Partial Class Form1
                     Call Monitor1.SelectTabLog()
                     Call Monitor1.Show()
 
-                    Monitor1.LogAppend("ReprodOperator: " & ReprodItem.ToString)
-                    Monitor1.LogAppend("MutOperator: " & MutItem.ToString)
+                    Monitor1.LogAppend("ReprodOperator: " & Me.mSettings.CES.OptReprodOp.ToString)
+                    Monitor1.LogAppend("MutOperator: " & Me.mSettings.CES.OptMutOperator.ToString)
 
                     Call STARTEN_Button_Click(sender, e)
 
                     'Qualität wird im Controler geprüft dann Stopp Button
+                    Call Monitor1.savelog("D:\xData\Erft_1984_06_Qmax_Skos\Batch\")
 
                     Call Button_New_Click(sender, e)
 

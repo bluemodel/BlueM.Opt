@@ -220,9 +220,14 @@ Public Class Controller
                 End If
                 'erfolgreich evaluierte Individuen wurden bereits über Event verarbeitet
 
+                'Abbruchkriterium für die Qualitätsprüfung
+                'If CES1.Children(i_Child).PrimObjectives(0) < 1372.82 Then
+                If CES1.Children(i_Child).PrimObjectives(0) < 1372.82 Then
+                    Me.myMonitor.LogAppend("Generation: " & Me.CES_i_gen & "   Child: " & i_Child)
+                    Exit Sub
+                End If
+
             Next
-            '^ ENDE der Child Schleife
-            'xxxxxxxxxxxxxxxxxxxxxxx
 
             'Generation hochzählen
             Me.myProgress.iGen = CES_i_gen + 1
@@ -267,11 +272,6 @@ Public Class Controller
             End If
             ' ^ ENDE Selectionsprozess
             'xxxxxxxxxxxxxxxxxxxxxxxxx
-
-            'Abbruchkriterium für die Qualitätsprüfung
-            If CES1.Parents(0).PrimObjectives(0) < 1372.82 Then
-                Exit Sub
-            End If
 
             'Stop?
             If (Me.stopped) Then Exit Sub
