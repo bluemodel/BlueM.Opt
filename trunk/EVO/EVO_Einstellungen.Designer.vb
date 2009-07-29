@@ -2106,14 +2106,14 @@ Partial Class EVO_Einstellungen
     Private WithEvents PES_Checkbox_isTournamentSelection As System.Windows.Forms.CheckBox
     Private WithEvents PES_Combo_DnMutation As System.Windows.Forms.ComboBox
     Private WithEvents CES_Label_OptModus As System.Windows.Forms.Label
-    Private WithEvents CES_Combo_Selection As System.Windows.Forms.ComboBox
+    Friend WithEvents CES_Combo_Selection As System.Windows.Forms.ComboBox
     Private WithEvents Combo_CES_IniValues As System.Windows.Forms.ComboBox
-    Private WithEvents CES_Combo_Reproduction As System.Windows.Forms.ComboBox
-    Private WithEvents CES_Combo_Mutation As System.Windows.Forms.ComboBox
+    Friend WithEvents CES_Combo_Reproduction As System.Windows.Forms.ComboBox
+    Friend WithEvents CES_Combo_Mutation As System.Windows.Forms.ComboBox
     Private WithEvents GroupBoxCES As System.Windows.Forms.GroupBox
-    Private WithEvents CES_Numeric_n_Children As System.Windows.Forms.NumericUpDown
-    Private WithEvents CES_Numeric_n_Parents As System.Windows.Forms.NumericUpDown
-    Private WithEvents CES_Numeric_n_Generations As System.Windows.Forms.NumericUpDown
+    Friend WithEvents CES_Numeric_n_Children As System.Windows.Forms.NumericUpDown
+    Friend WithEvents CES_Numeric_n_Parents As System.Windows.Forms.NumericUpDown
+    Friend WithEvents CES_Numeric_n_Generations As System.Windows.Forms.NumericUpDown
     Private WithEvents CES_Numeric_n_member_SecPop As System.Windows.Forms.NumericUpDown
     Private WithEvents CES_Numeric_n_exchange_SecPop As System.Windows.Forms.NumericUpDown
     Private WithEvents Label_CES_NMembersSecPop As System.Windows.Forms.Label

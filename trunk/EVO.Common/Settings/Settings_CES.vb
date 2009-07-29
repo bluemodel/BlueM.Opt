@@ -7,7 +7,7 @@ Public Class Settings_CES
     Public n_Parents As Integer             'Anzahl der Eltern
     Public n_Children As Integer            'Anzahl der Kinder
     Public OptStrategie As EVO_STRATEGIE    '"plus" oder "minus" Strategie
-    Public OptReprodOp As CES_REPRODOP      'Reprofuktionaoperator
+    Public OptReprodOp As CES_REPRODOP      'Reproduktionaoperator
     Public k_Value As Integer               'Anzahl der Schnittpunkte
     Public OptMutOperator As CES_MUTATION   'Mutationsoperator
     Public pr_MutRate As Integer            'Definiert die Wahrscheinlichkeit der Mutationsrate in %

@@ -1959,23 +1959,28 @@ Partial Class Form1
     Private Sub BachModeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
 
         Dim n_cycles As Integer = 1
-        Dim ReprodItems As String
-        Dim MutItems As String
+        Dim ReprodItem As evo.Common.Constants.CES_REPRODOP
+        Dim MutItem As evo.Common.Constants.CES_MUTATION
 
         Dim i As Integer
-        For i = 1 to n_cycles
-            For Each ReprodItems In [Enum].GetNames(GetType(EVO.Common.Constants.CES_REPRODOP))
-                For Each MutItems In [Enum].GetNames(GetType(EVO.Common.CES_MUTATION))
-                    MsgBox(ReprodItems & " and " & MutItems)
+        For i = 1 To n_cycles
+            For Each ReprodItem In System.Enum.GetValues(GetType(EVO.Common.Constants.CES_REPRODOP))
+                For Each MutItem In System.Enum.GetValues(GetType(EVO.Common.Constants.CES_MUTATION))
+                    'MsgBox(ReprodItems & " and " & MutItems)
 
-                    'Call Button_New_Click(sender, e)
+                    ComboBox_Anwendung.SelectedItem = ANW_BLUEM
+                    ComboBox_Datensatz.Items.Add("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
+                    ComboBox_Datensatz.SelectedItem = "D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL"
+                    ComboBox_Methode.SelectedItem = METH_CES
 
-                    'ComboBox_Anwendung.SelectedItem = ANW_BLUEM
-                    'ComboBox_Datensatz.Items.Add("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
-                    'ComboBox_Datensatz.SelectedItem = "D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL"
-                    'ComboBox_Methode.SelectedItem = METH_CES
+                    Me.EVO_Einstellungen1.CES_Combo_Reproduction.SelectedItem = ReprodItem
+                    Me.EVO_Einstellungen1.CES_Combo_Mutation.SelectedItem = MutItem
 
-                    'Call STARTEN_Button_Click(sender, e)
+                    Call STARTEN_Button_Click(sender, e)
+
+                    'Qualität wird im Controler geprüft dann Stopp Button
+
+                    Call Button_New_Click(sender, e)
 
                 Next
             Next
