@@ -23,7 +23,7 @@ namespace IHWB.EVO.MetaEvo
         int number_objectives;   //Anzahl Objectivefunctionwerte (inkl. primary objectives !!!)
 
         //### Konstruktor ###
-        public Networkmanager(ref EVO.Common.Individuum_MetaEvo individuum_input, ref EVO.Common.EVO_Settings settings_input, ref EVO.Common.Problem prob_input)
+        public Networkmanager(ref EVO.Common.Individuum_MetaEvo individuum_input, ref EVO.Common.Settings settings_input, ref EVO.Common.Problem prob_input)
         {
             number_optparas = individuum_input.get_optparas().Length;
             number_constraints = individuum_input.Constraints.Length;
@@ -81,7 +81,7 @@ namespace IHWB.EVO.MetaEvo
         }
 
         //(ok)Datenbank erzeugen
-        private void DB_init(ref EVO.Common.EVO_Settings settings_input)   
+        private void DB_init(ref EVO.Common.Settings settings_input)   
         {
             //Datenbank
             myCommand.CommandText = "CREATE DATABASE IF NOT EXISTS " + settings_input.MetaEvo.MySQL_Database;
@@ -237,7 +237,7 @@ namespace IHWB.EVO.MetaEvo
         }
 
         //(ok)Datenbank löschen
-        public void DB_delete(ref EVO.Common.EVO_Settings settings_input)
+        public void DB_delete(ref EVO.Common.Settings settings_input)
         {
             myCommand.CommandText = "DROP DATABASE IF EXISTS " + settings_input.MetaEvo.MySQL_Database;
             myCommand.Connection.Open();
