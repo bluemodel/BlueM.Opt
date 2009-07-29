@@ -103,12 +103,14 @@ Partial Public Class Monitor
     Public Sub savelog()
 
         Dim sw As StreamWriter
-        Dim SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Dim jetzt = DateTime.Now
 
+        Dim SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         'Dialog(einrichten)
         SaveFileDialog1.Filter = "Text-Dateien (*.txt)|*.txt"
-        SaveFileDialog1.FileName = "ApplicationLog_" + jetzt.Year.ToString + jetzt.Month.ToString + jetzt.Day.ToString + "_" + jetzt.Hour.ToString + jetzt.Minute.ToString + jetzt.Second.ToString + ".txt"
+        SaveFileDialog1.FileName = "ApplicationLog_" + jetzt.Year.ToString + _
+            jetzt.Month.ToString + jetzt.Day.ToString + "_" + jetzt.Hour.ToString + _
+            jetzt.Minute.ToString + jetzt.Second.ToString + ".txt"
         SaveFileDialog1.DefaultExt = "txt"
         SaveFileDialog1.Title = "Log speichern"
         SaveFileDialog1.InitialDirectory = CurDir()
@@ -120,6 +122,23 @@ Partial Public Class Monitor
             sw.Flush()
             sw.Close()
         End If
+
+    End Sub
+
+
+    Public Sub savelog(ByRef Path As String)
+
+        Dim sw As StreamWriter
+        Dim jetzt = DateTime.Now
+
+        sw = File.CreateText(Path & "ApplicationLog_" + jetzt.Year.ToString + _
+            jetzt.Month.ToString + jetzt.Day.ToString + "_" + jetzt.Hour.ToString + _
+            jetzt.Minute.ToString + jetzt.Second.ToString + ".txt")
+        sw.Write(Me.TextBox_Log.Text)
+        sw.Flush()
+        sw.Close()
+
+
     End Sub
 
 #End Region 'Public Methoden

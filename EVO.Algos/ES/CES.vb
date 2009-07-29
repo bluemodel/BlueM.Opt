@@ -142,9 +142,9 @@ Public Class CES
         'If (Settings.CES.OptReprodOp <> CES_REPRODOP.Uniform_Crossover And CES_REPRODOP.Order_Crossover And CES_REPRODOP.Part_Mapped_Cross) Then
         '    Throw New Exception("Typ der Reproduction ist nicht richtig!")
         'End If
-        If (Settings.CES.OptMutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch) Then
-            Throw New Exception("Typ der Mutation ist nicht richtig!")
-        End If
+        'If (Settings.CES.OptMutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch) Then
+        '    Throw New Exception("Typ der Mutation ist nicht richtig!")
+        'End If
         If (Settings.CES.n_MemberSecondPop < 1) Then
             Throw New Exception("Die Zahl der Mitglieder der sekundären Population ist kleiner 1!")
         End If
