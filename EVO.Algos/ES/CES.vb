@@ -655,9 +655,9 @@ Public Class CES
                     Case CES_MUTATION.RND_Switch
                         'Verändert zufällig ein gen des Paths
                         Call MutOp_RND_Switch(Children(i).Path)
-                    Case CES_MUTATION.Dyn_Switch
-                        'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
-                        Call MutOp_Dyn_Switch(Children(i).Path, count)
+                        'Case CES_MUTATION.Dyn_Switch
+                        '    'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
+                        '    Call MutOp_Dyn_Switch(Children(i).Path, count)
                 End Select
                 count += 1
             Loop While is_nullvariante(Children(i).Path) = True And Not count >= 1000

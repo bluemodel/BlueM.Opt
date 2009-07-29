@@ -81,7 +81,7 @@ Public Module Constants
     'Mutationsoperator
     Public Enum CES_MUTATION as Integer
         RND_Switch = 1
-        Dyn_Switch = 2
+        'Dyn_Switch = 2
     End Enum
 
     'Option zur Erzeugung der Eltern

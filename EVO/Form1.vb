@@ -1964,7 +1964,7 @@ Partial Class Form1
 
     Private Sub BachModeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
 
-        Dim n_cycles As Integer = 1
+        Dim n_cycles As Integer = 5
         Dim ReprodItem As evo.Common.Constants.CES_REPRODOP
         Dim MutItem As evo.Common.Constants.CES_MUTATION
 
@@ -1984,6 +1984,9 @@ Partial Class Form1
 
                     'Settings ändern
                     Me.mSettings.CES.OptReprodOp = ReprodItem
+                    If ReprodItem = CES_REPRODOP.k_Point_Crossover Then
+                        Me.mSettings.CES.k_Value = 3
+                    End If
                     Me.mSettings.CES.OptMutOperator = MutItem
 
                     'Verhindern, dass die Settings neu eingelesen werden
@@ -1998,7 +2001,7 @@ Partial Class Form1
                     Call STARTEN_Button_Click(sender, e)
 
                     'Qualität wird im Controler geprüft dann Stopp Button
-                    Call Monitor1.savelog("D:\xData\Erft_1984_06_Qmax_Skos\Batch\")
+                    Call Monitor1.savelog("D:\xData\Erft_1984_06_Qmax_Skos\Batch\" & Me.mSettings.CES.OptReprodOp.ToString & " ")
 
                     Call Button_New_Click(sender, e)
 
