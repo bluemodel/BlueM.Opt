@@ -4,7 +4,7 @@ Public Class Controller
     Implements EVO.IController
 
     Private myProblem As EVO.Common.Problem
-    Private mySettings As EVO.Common.EVO_Settings
+    Private mySettings As EVO.Common.Settings
     Private myProgress As EVO.Common.Progress
     Private myMonitor As EVO.Diagramm.Monitor
     Private myHauptDiagramm As EVO.Diagramm.Hauptdiagramm
@@ -14,7 +14,7 @@ Public Class Controller
 
     Private stopped As Boolean
 
-    Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.EVO_Settings, ByRef inputProgress As Common.Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
+    Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.Settings, ByRef inputProgress As Common.Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
         Me.myProgress = inputProgress
@@ -103,9 +103,9 @@ Public Class Controller
             '2. OptParameterwert variieren
             If (Anz_SensiPara > 1) Then
                 Select Case Me.mySettings.SensiPlot.Selected_SensiType
-                    Case Common.EVO_Settings.SensiPlot_Settings.SensiType.normaldistribution
+                    Case Common.Settings_Sensiplot.SensiType.normaldistribution
                         Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Xn = Rnd()
-                    Case Common.EVO_Settings.SensiPlot_Settings.SensiType.discrete
+                    Case Common.Settings_Sensiplot.SensiType.discrete
                         Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Xn = i / (Me.mySettings.SensiPlot.Num_Steps - 1)
                 End Select
             End If
@@ -119,9 +119,9 @@ Public Class Controller
 
                 '1. OptParameterwert variieren
                 Select Case Me.mySettings.SensiPlot.Selected_SensiType
-                    Case Common.EVO_Settings.SensiPlot_Settings.SensiType.normaldistribution
+                    Case Common.Settings_Sensiplot.SensiType.normaldistribution
                         Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(0)).Xn = Rnd()
-                    Case Common.EVO_Settings.SensiPlot_Settings.SensiType.discrete
+                    Case Common.Settings_Sensiplot.SensiType.discrete
                         Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(0)).Xn = j / (Me.mySettings.SensiPlot.Num_Steps - 1)
                 End Select
 

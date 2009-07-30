@@ -40,7 +40,7 @@ Public Class TSP
     End Enum
 
     'Settings
-    Private mySettings As Common.EVO_Settings.TSP_Settings
+    Private mySettings As Common.Settings_TSP
 
     Public ListOfCities(,) As Object
 
@@ -63,7 +63,7 @@ Public Class TSP
 
     '******************************** Initialisierung *************************************
 
-    Public Sub TSP_Initialize(ByRef mySettingsInput As Common.EVO_Settings.TSP_Settings)
+    Public Sub TSP_Initialize(ByRef mySettingsInput As Common.Settings_TSP)
 
         mySettings = mySettingsInput
 
@@ -76,17 +76,17 @@ Public Class TSP
 
         Select Case mySettings.Problem
 
-            Case common.EnProblem.circle
+            Case Common.EnProblem.circle
                 Dim Radius As Integer = 45
                 Dim factor As Double = (Math.PI * 2) / mySettings.n_Cities
-                For i = 0 To mysettings.n_Cities - 1
+                For i = 0 To mySettings.n_Cities - 1
                     ListOfCities(i, 0) = i + 1
                     ListOfCities(i, 1) = Math.Cos(i * factor) * Radius + 50
                     ListOfCities(i, 2) = Math.Sin(i * factor) * Radius + 65
                 Next
                 circumference = 2 * Math.PI * Radius
 
-            Case common.EnProblem.random
+            Case Common.EnProblem.random
                 Dim lowerb As Integer = 2
                 Dim upperb1 As Integer = 98
                 Dim upperb2 As Integer = 128

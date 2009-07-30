@@ -7,7 +7,7 @@ Public Class Controller
     Implements EVO.IController
 
     Private myProblem As EVO.Common.Problem
-    Private mySettings As EVO.Common.EVO_Settings
+    Private mySettings As EVO.Common.Settings
     Private myProgress As EVO.Common.Progress 'TODO: Verlaufsanzeige für H&J
     Private myMonitor As EVO.Diagramm.Monitor
     Private myHauptDiagramm As EVO.Diagramm.Hauptdiagramm
@@ -28,7 +28,7 @@ Public Class Controller
     ''' <param name="inputProgress"></param>
     ''' <param name="inputHptDiagramm"></param>
     Public Sub Init(ByRef inputProblem As Common.Problem, _
-                    ByRef inputSettings As Common.EVO_Settings, _
+                    ByRef inputSettings As Common.Settings, _
                     ByRef inputProgress As Common.Progress, _
                     ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
 
@@ -83,7 +83,7 @@ Public Class Controller
         Dim Rueckschritte As Long
         Dim serie As Steema.TeeChart.Styles.Series
 
-        Dim HookJeeves As New EVO.HookeAndJeeves.HookeAndJeeves(Me.myProblem.NumOptParams, Me.mySettings.HookJeeves.DnStart, Me.mySettings.HookJeeves.DnFinish)
+        Dim HookJeeves As New EVO.HookeAndJeeves.HookeAndJeeves(Me.myProblem.NumOptParams, Me.mySettings.HookeJeeves.DnStart, Me.mySettings.HookeJeeves.DnFinish)
 
         Me.stopped = False
 

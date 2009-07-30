@@ -60,7 +60,7 @@ Public MustInherit Class Sim
     Protected mProblem As EVO.Common.Problem
 
     'Die Einstellungen
-    Protected mSettings As EVO.Common.EVO_Settings
+    Protected mSettings As EVO.Common.Settings
 
     Protected Structure Aktuell
         Public OptPara() As Double
@@ -215,7 +215,7 @@ Public MustInherit Class Sim
         'Je nach Problem weitere Vorbereitungen treffen
         Select Case Me.mProblem.Method
 
-            Case Common.METH_PES, Common.METH_MetaEvo, Common.METH_SENSIPLOT
+            Case Common.METH_PES, Common.METH_METAEVO, Common.METH_SENSIPLOT
                 'nix
 
             Case Common.METH_CES, Common.METH_HYBRID
@@ -251,7 +251,7 @@ Public MustInherit Class Sim
     ''' Einstellungen setzen
     ''' </summary>
     ''' <param name="settings">Die Einstellungen</param>
-    Public Sub setSettings(ByRef settings As EVO.Common.EVO_Settings)
+    Public Sub setSettings(ByRef settings As EVO.Common.Settings)
 
         'Settings speichern
         Me.mSettings = settings
@@ -528,7 +528,7 @@ Public MustInherit Class Sim
                             Call Me.PREPARE_Evaluation_CES(inds(n_ind_Run))
 
                             'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                            'TODO: Christoph: Dies ist die einzige Stelle im Sim, an der die EVO_Settings benötigt werden. Kann man das nicht umgehen?
+                            'TODO: Christoph: Dies ist die einzige Stelle im Sim, an der die Settings benötigt werden. Kann man das nicht umgehen?
                             If (Me.mProblem.Method = METH_HYBRID _
                                 And Me.mSettings.CES.ty_Hybrid = HYBRID_TYPE.Mixed_Integer) Then
                                 If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(inds(n_ind_Run), EVO.Common.Individuum_CES).Get_All_Loc_Elem)) Then
@@ -628,7 +628,7 @@ Public MustInherit Class Sim
         End If
 
         OptTimePara.Stop()
-        'EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation dauerte:   " & OptTimePara.Elapsed.Hours & "h  " & OptTimePara.Elapsed.Minutes & "m  " & OptTimePara.Elapsed.Seconds & "s     " & OptTimePara.Elapsed.Seconds & "ms")
+        'EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation dauerte:   " & OptTimePara.Elapsed.Hours & "h  " & OptTimePara.Elapsed.Minutes & "m  " & OptTimePara.Elapsed.Seconds & "s     " & OptTimePara.Elapsed & "ms")
 
         Return isOK
 

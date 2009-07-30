@@ -13,7 +13,7 @@ Public Class Controller
     Implements IController
 
     Private myProblem As EVO.Common.Problem
-    Private mySettings As EVO.Common.EVO_Settings
+    Private mySettings As EVO.Common.Settings
     Private myProgress As EVO.Common.Progress
     Private myMonitor As EVO.Diagramm.Monitor
     Private myHauptDiagramm As EVO.Diagramm.Hauptdiagramm
@@ -46,7 +46,7 @@ Public Class Controller
     ''' <param name="inputProgress"></param>
     ''' <param name="inputHptDiagramm"></param>
     Public Sub Init(ByRef inputProblem As EVO.Common.Problem, _
-                    ByRef inputSettings As EVO.Common.EVO_Settings, _
+                    ByRef inputSettings As EVO.Common.Settings, _
                     ByRef inputProgress As EVO.Common.Progress, _
                     ByRef inputHptDiagramm As EVO.Diagramm.Hauptdiagramm) Implements IController.Init
 
@@ -167,7 +167,7 @@ Public Class Controller
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         For i_ch = 0 To CES1.mSettings.CES.n_Children - 1
             'Das Dn wird gesetzt
-            If Me.mySettings.PES.Schrittweite.is_DnVektor = False Then
+            If Me.mySettings.PES.Schrittweite.isDnVektor = False Then
                 CES1.Children(i_ch).CES_Dn = Me.mySettings.PES.Schrittweite.DnStart
             End If
             For i_loc = 0 To CES1.ModSett.n_Locations - 1
@@ -203,15 +203,14 @@ Public Class Controller
             OptTimeParaPerGen.Start()
 
             'Individuen mit Multithreading evaluieren
+            '****************************************
             isOK = Sim1.Evaluate(CES1.Children, True)
+            '****************************************
 
             OptTimeParaPerGen.Stop()
             EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation " & Me.CES_i_gen & " dauerte:   " & OptTimeParaPerGen.Elapsed.Hours & "h  " & OptTimeParaPerGen.Elapsed.Minutes & "m  " & OptTimeParaPerGen.Elapsed.Seconds & "s     " & OptTimeParaPerGen.Elapsed.Seconds & "ms")
             TimePerGeneration(Me.CES_i_gen + 1) = OptTimeParaPerGen.Elapsed
             TimePerGeneration(0) += OptTimeParaPerGen.Elapsed
-
-            'Stop?
-            If (Me.stopped) Then Exit Sub
 
             'Evaluierte Individuen verarbeiten
             For i_Child As Integer = 0 To CES1.Children.Length - 1
@@ -221,9 +220,14 @@ Public Class Controller
                 End If
                 'erfolgreich evaluierte Individuen wurden bereits über Event verarbeitet
 
+                'Abbruchkriterium für die Qualitätsprüfung
+                'If CES1.Children(i_Child).PrimObjectives(0) < 1372.82 Then
+                If CES1.Children(i_Child).PrimObjectives(0) < 1372.82 Then
+                    Me.myMonitor.LogAppend("Generation: " & Me.CES_i_gen & "   Child: " & i_Child)
+                    Exit Sub
+                End If
+
             Next
-            '^ ENDE der Child Schleife
-            'xxxxxxxxxxxxxxxxxxxxxxx
 
             'Generation hochzählen
             Me.myProgress.iGen = CES_i_gen + 1
@@ -268,6 +272,9 @@ Public Class Controller
             End If
             ' ^ ENDE Selectionsprozess
             'xxxxxxxxxxxxxxxxxxxxxxxxx
+
+            'Stop?
+            If (Me.stopped) Then Exit Sub
 
             'REPRODUKTION und MUTATION Nicht wenn Testmodus
             'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -342,7 +349,7 @@ Public Class Controller
         For i_Child = 0 To CES1.Children.GetUpperBound(0)
 
             'Das Dn des Child mutieren
-            If Me.mySettings.PES.Schrittweite.is_DnVektor = False Then
+            If Me.mySettings.PES.Schrittweite.isDnVektor = False Then
                 Dim PESX As EVO.ES.PES
                 PESX = New EVO.ES.PES
                 Call PESX.PesInitialise(Me.mySettings, Me.myProblem)
@@ -385,7 +392,7 @@ Public Class Controller
                             For m = 0 To CES1.Children(i_Child).Loc(i_loc).PES_OptPara.GetUpperBound(0)
                                 CES1.Children(i_Child).Loc(i_loc).PES_OptPara(m).Dn = CES1.mSettings.PES.Schrittweite.DnStart
                                 'Falls zufällige Startwerte
-                                If CES1.mSettings.PES.OptStartparameter = Common.Constants.EVO_STARTPARAMETER.Zufall Then
+                                If CES1.mSettings.PES.Startparameter = Common.Constants.EVO_STARTPARAMETER.Zufall Then
                                     Randomize()
                                     CES1.Children(i_Child).Loc(i_loc).PES_OptPara(m).Xn = Rnd()
                                 End If
@@ -822,7 +829,7 @@ Public Class Controller
 
             End With
 
-            If (Me.mySettings.PES.Schrittweite.is_DnVektor) Then
+            If (Me.mySettings.PES.Schrittweite.isDnVektor) Then
 
                 'Bei PES-Schrittweitenvektor eine Linie für jeden Parameter
                 ReDim Me.Line_Dn(Me.myProblem.List_OptParameter_Save.Length - 1)
@@ -844,7 +851,7 @@ Public Class Controller
                 line.Pointer.Pen.Visible = False
             Next
 
-        End if
+        End If
 
         'Hypervolumen
         '------------
@@ -909,7 +916,7 @@ Public Class Controller
                 'HYBRID:
                 '-------
                 If (ind.OptParameter.Length > 0) Then
-                    If (Me.mySettings.PES.Schrittweite.is_DnVektor) Then
+                    If (Me.mySettings.PES.Schrittweite.isDnVektor) Then
                         'Bei Schrittweitenvektor mehrere Linien
                         For i = 0 To ind.OptParameter.Length - 1
                             'Parameter zuordnen
@@ -927,17 +934,17 @@ Public Class Controller
                 End If
 
             Case METH_PES
-                    'PES
-                    '---
-                    If (Me.mySettings.PES.Schrittweite.is_DnVektor) Then
-                        'Bei Schrittweitenvektor mehrere Linien
-                        For i = 0 To ind.OptParameter.Length - 1
-                            Me.Line_Dn(i).Add(durchlauf, ind.OptParameter(i).Dn, durchlauf.ToString)
-                        Next
-                    Else
-                        'Ansonsten nur eine Schrittweite
-                        Me.Line_Dn(0).Add(durchlauf, ind.OptParameter(0).Dn, durchlauf.ToString)
-                    End If
+                'PES
+                '---
+                If (Me.mySettings.PES.Schrittweite.isDnVektor) Then
+                    'Bei Schrittweitenvektor mehrere Linien
+                    For i = 0 To ind.OptParameter.Length - 1
+                        Me.Line_Dn(i).Add(durchlauf, ind.OptParameter(i).Dn, durchlauf.ToString)
+                    Next
+                Else
+                    'Ansonsten nur eine Schrittweite
+                    Me.Line_Dn(0).Add(durchlauf, ind.OptParameter(0).Dn, durchlauf.ToString)
+                End If
 
         End Select
 

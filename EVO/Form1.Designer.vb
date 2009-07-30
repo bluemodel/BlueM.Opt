@@ -71,6 +71,7 @@ Partial Class Form1
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
+        Me.BachModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         MenuItem_Info = New System.Windows.Forms.ToolStripMenuItem
@@ -97,7 +98,7 @@ Partial Class Form1
         '
         'MenuItem_Tools
         '
-        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen})
+        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen, Me.BachModeToolStripMenuItem})
         MenuItem_Tools.Name = "MenuItem_Tools"
         MenuItem_Tools.Size = New System.Drawing.Size(44, 20)
         MenuItem_Tools.Text = "Tools"
@@ -464,6 +465,12 @@ Partial Class Form1
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(244, 707)
         Me.EVO_Einstellungen1.TabIndex = 2
         '
+        'BachModeToolStripMenuItem
+        '
+        Me.BachModeToolStripMenuItem.Name = "BachModeToolStripMenuItem"
+        Me.BachModeToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+        Me.BachModeToolStripMenuItem.Text = "Batch Mode"
+        '
         'Form1
         '
         Me.AcceptButton = Me.Button_Start
@@ -532,4 +539,5 @@ Partial Class Form1
     Private WithEvents ToolStripButton_Monitor As System.Windows.Forms.ToolStripButton
     Private WithEvents ToolStripMenuItem_SettingsSave As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents BachModeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class
