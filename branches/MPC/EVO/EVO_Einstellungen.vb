@@ -61,34 +61,7 @@ Public Class EVO_Einstellungen
 
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        Me.isInitializing = False
-
-    End Sub
-
-    ''' <summary>
-    ''' Alle Standard-Settings setzen
-    ''' </summary>
-    Public Sub setStandard_All()
-
-        Me.isInitializing = True
-        Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
-        Call Me.msettings.CES.setStandard(METH_CES)
-        Call Me.msettings.HookJeeves.setStandard()
-        Call Me.msettings.MetaEvo.setStandard()
-        Call Me.msettings.DDS.setStandard()
-        Call Me.msettings.SensiPlot.setStandard()
-        Call Me.msettings.TSP.setStandard()
-
-        'Call Me.writeForm()
-        Me.isInitializing = False
-
-    End Sub
-
-    Public Sub setSettings(ByRef settings As EVO.Common.EVO_Settings)
-
-        Me.isInitializing = True
-
-        Me.msettings = settings
+        Me.msettings = New Common.EVO_Settings()
 
         'Comboboxen füllen
         Call Me.InitComboboxes()
@@ -97,12 +70,27 @@ Public Class EVO_Einstellungen
 
     End Sub
 
+    ''' <summary>
+    ''' Alle Standard-Settings setzen
+    ''' </summary>
+    Private Sub setStandard_All()
+
+        Call Me.msettings.PES.setStandard(EVO_MODUS.Single_Objective)
+        Call Me.msettings.CES.setStandard(METH_CES)
+        Call Me.msettings.HookJeeves.setStandard()
+        Call Me.msettings.MetaEvo.setStandard()
+        Call Me.msettings.DDS.setStandard()
+        Call Me.msettings.SensiPlot.setStandard()
+        Call Me.msettings.TSP.setStandard()
+
+    End Sub
 
     ''' <summary>
-    ''' UI zurücksetzen
+    ''' Settings zurücksetzen
     ''' </summary>
-    ''' <remarks></remarks>
-    Public Sub ResetUI()
+    Public Sub Reset()
+
+        Me.setStandard_All()
 
         'Alle TabPages entfernen
         Call Me.TabControl1.TabPages.Clear()
@@ -130,7 +118,7 @@ Public Class EVO_Einstellungen
         'Problem speichern
         Me.mProblem = prob
 
-        'EVO_Einstellungen zurücksetzen
+        'Settings zurücksetzen
         Me.isSaved = False
 
         'Anzeige je nach Methode anpassen
@@ -189,7 +177,7 @@ Public Class EVO_Einstellungen
 
         End Select
 
-        'Werte in Form1 schreiben
+        'Werte in Form schreiben
         Call Me.writeForm()
 
         'Alle TabPages aktivieren
@@ -619,9 +607,9 @@ Public Class EVO_Einstellungen
         End With
 
 
-        Select Case Me.msettings.General.Method
+        Select Case Me.mProblem.Method
 
-            Case "METH_PES", "METH_HYBRID"
+            Case METH_PES, METH_HYBRID
                 'PES
                 '---
                 With Me.msettings.PES
@@ -663,7 +651,7 @@ Public Class EVO_Einstellungen
 
 
 
-            Case "METH_CES", "METH_HYBRID"
+            Case METH_CES, METH_HYBRID
                 'CES
                 '---
                 With Me.msettings.CES
@@ -697,7 +685,7 @@ Public Class EVO_Einstellungen
                 End With
 
 
-            Case "HookJeeves"
+            Case METH_HOOKJEEVES
                 'Hook and Jeeves
                 '---------------
                 With Me.msettings.HookJeeves
@@ -709,7 +697,7 @@ Public Class EVO_Einstellungen
                 End With
 
 
-            Case "METH_MetaEvo"
+            Case METH_MetaEvo
                 'MetaEvo
                 '---------------
                 With Me.msettings.MetaEvo
@@ -728,7 +716,7 @@ Public Class EVO_Einstellungen
                 End With
 
 
-            Case "METH_DDS"
+            Case METH_DDS
                 'DDS
                 '---------------
                 With Me.msettings.DDS
@@ -740,7 +728,7 @@ Public Class EVO_Einstellungen
                 End With
 
 
-            Case "METH_SENSIPLOT"
+            Case METH_SENSIPLOT
                 'SensiPlot
                 '--------------
                 With Me.msettings.SensiPlot
@@ -783,7 +771,7 @@ Public Class EVO_Einstellungen
 
                 End With
 
-
+            Case METH_TSP
                 'TSP
                 '---
                 With Me.msettings.TSP

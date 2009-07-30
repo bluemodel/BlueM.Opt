@@ -23,19 +23,11 @@ Public Class EVO_Settings
     Public Structure General_Settings
         <System.ComponentModel.DefaultValueAttribute(True)> _
         Public useMultithreading As Boolean
-        Public useMPC As Boolean
-        Public Application As String
-        Public Dataset As String
-        Public Method As String
         <System.ComponentModel.DefaultValueAttribute(False)> _
         Public drawOnlyCurrentGeneration As Boolean
         Public Sub setStandard()
             Me.useMultithreading = True
             Me.drawOnlyCurrentGeneration = True
-            Me.useMPC = False
-            Me.Application = ""
-            Me.Dataset = ""
-            Me.Method = ""
         End Sub
     End Structure
 
@@ -288,21 +280,6 @@ Public Class EVO_Settings
 
     End Structure
 
-    Public Structure MPC_Settings
-        Public Problempfad As String        'Pfad zum Problem
-        Public Problemname As String        'Dateiname des Problems
-        Public Inflowpfad As String         'Zuflüsse (Inflow-Datei)
-        Public Ausgabepfad As String        'In welchem Ordner die Ausgaben erzeugt werden sollen
-        Public SteuerungsAdaption As TimeSpan 'In welchen Abständen die Steuerung aktualisiert werden soll
-        Public SteuerungsSchritt As TimeSpan 'In welchen Abständen eine Steuerung erfolgt
-        Public MPC_Round As Integer         'Wie oft MPC schon gelaufen ist
-        Public Vorhersage As TimeSpan       'Welcher Zeitraum zur Vorhersage herangezogen werden soll 
-        Public BackupVorhersage As String   'Welches Verfahren genutzt wird, falls keine Daten zur Vorhersage bekannt sind
-        Public Start As DateTime            'Wann die Berechnung der Steuerung gestartet werden soll
-        Public Ende As DateTime             'Wann die Berechnung der Steuerung enden soll
-
-    End Structure
-
     Public Structure MetaEvo_Settings
 
         Public Role As String                       'Was stellt dieser PC da: Single PC, Network Server, Network Client
@@ -406,7 +383,6 @@ Public Class EVO_Settings
     Public CES As CES_Settings
     Public HookJeeves As HookJeeves_Settings
     Public MetaEvo As MetaEvo_Settings
-    Public MPC As MPC_Settings
     Public DDS As DDS_Settings
     Public SensiPlot As SensiPlot_Settings
     Public TSP As TSP_Settings
