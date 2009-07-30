@@ -24,7 +24,7 @@ Public Class CES
     Private mProblem As EVO.Common.Problem
 
     'Die Settings für alles aus dem Form
-    Public mSettings As EVO_Settings             'TODO: sollte private sein!
+    Public mSettings As Settings             'TODO: sollte private sein!
 
     'Modell Setting
     Public Structure ModSettings
@@ -93,7 +93,7 @@ Public Class CES
 
     'Initialisierung der PES
     '***********************
-    Public Sub CESInitialise(ByRef settings As EVO_Settings, ByRef prob As EVO.Common.Problem, ByVal AnzVerzweig As Integer)
+    Public Sub CESInitialise(ByRef settings As Settings, ByRef prob As EVO.Common.Problem, ByVal AnzVerzweig As Integer)
 
         'Problem speichern
         Me.mProblem = prob
@@ -115,7 +115,7 @@ Public Class CES
     'Schritt 1: FORM SETTINGS
     'Function Form SETTINGS übergibt Optionen für Evolutionsstrategie und Prüft die eingestellten Optionen
     '***************************************************************************************************
-    Private Sub CES_Form_Settings(ByRef Settings As EVO_Settings)
+    Private Sub CES_Form_Settings(ByRef Settings As Settings)
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -142,9 +142,9 @@ Public Class CES
         'If (Settings.CES.OptReprodOp <> CES_REPRODOP.Uniform_Crossover And CES_REPRODOP.Order_Crossover And CES_REPRODOP.Part_Mapped_Cross) Then
         '    Throw New Exception("Typ der Reproduction ist nicht richtig!")
         'End If
-        If (Settings.CES.OptMutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch) Then
-            Throw New Exception("Typ der Mutation ist nicht richtig!")
-        End If
+        'If (Settings.CES.OptMutOperator <> CES_MUTATION.RND_Switch And CES_MUTATION.Dyn_Switch) Then
+        '    Throw New Exception("Typ der Mutation ist nicht richtig!")
+        'End If
         If (Settings.CES.n_MemberSecondPop < 1) Then
             Throw New Exception("Die Zahl der Mitglieder der sekundären Population ist kleiner 1!")
         End If
@@ -324,7 +324,7 @@ Public Class CES
                     '***************************************************************************************************
                     For m = 0 To Children(i).Loc(j).PES_OptPara.GetUpperBound(0)
                         Children(i).Loc(j).PES_OptPara(m).Dn = mSettings.PES.Schrittweite.DnStart
-                        If mSettings.PES.OptStartparameter = EVO_STARTPARAMETER.Zufall Then
+                        If mSettings.PES.Startparameter = EVO_STARTPARAMETER.Zufall Then
                             Randomize()
                             Children(i).Loc(j).PES_OptPara(m).Xn = Rnd()
                         End If
@@ -655,9 +655,9 @@ Public Class CES
                     Case CES_MUTATION.RND_Switch
                         'Verändert zufällig ein gen des Paths
                         Call MutOp_RND_Switch(Children(i).Path)
-                    Case CES_MUTATION.Dyn_Switch
-                        'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
-                        Call MutOp_Dyn_Switch(Children(i).Path, count)
+                        'Case CES_MUTATION.Dyn_Switch
+                        '    'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
+                        '    Call MutOp_Dyn_Switch(Children(i).Path, count)
                 End Select
                 count += 1
             Loop While is_nullvariante(Children(i).Path) = True And Not count >= 1000

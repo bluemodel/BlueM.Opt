@@ -39,8 +39,8 @@ Public Module Constants
     Public Const METH_CES As String = "CES"
     Public Const METH_HYBRID As String = "HYBRID"
     Public Const METH_SENSIPLOT As String = "SensiPlot"
-    Public Const METH_HOOKJEEVES As String = "Hooke & Jeeves"
-    Public Const METH_MetaEvo As String = "MetaEvo"
+    Public Const METH_HOOKEJEEVES As String = "Hooke & Jeeves"
+    Public Const METH_METAEVO As String = "MetaEvo"
     Public Const METH_DDS As String = "DDS"
     Public Const METH_TSP As String = "TSP"
 
@@ -81,7 +81,7 @@ Public Module Constants
     'Mutationsoperator
     Public Enum CES_MUTATION as Integer
         RND_Switch = 1
-        Dyn_Switch = 2
+        'Dyn_Switch = 2
     End Enum
 
     'Option zur Erzeugung der Eltern

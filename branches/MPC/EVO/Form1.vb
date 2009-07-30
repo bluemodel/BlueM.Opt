@@ -28,8 +28,6 @@ Partial Public Class Form1
 
 #Region "Eigenschaften"
 
-    Private mSettings As EVO.Common.EVO_Settings
-
     Public BatchMode As Boolean
     Public BatchCounter As Integer
 
@@ -44,6 +42,9 @@ Partial Public Class Form1
 
     'Problem
     Public mProblem As EVO.Common.Problem
+
+    'Settings
+    Private mSettings As EVO.Common.Settings
 
     'Progress
     Private mProgress As EVO.Common.Progress
@@ -123,7 +124,7 @@ Partial Public Class Form1
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Methode.Items.Clear()
-        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_MetaEvo, METH_SENSIPLOT, METH_HOOKJEEVES, METH_DDS})
+        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_METAEVO, METH_SENSIPLOT, METH_HOOKEJEEVES, METH_DDS})
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'Einstellungen
@@ -215,7 +216,7 @@ Partial Public Class Form1
 
         'Dialog einrichten
         OpenFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
-        OpenFileDialog1.FileName = "EVO_Settings.xml"
+        OpenFileDialog1.FileName = "Settings.xml"
         OpenFileDialog1.Title = "Einstellungsdatei auswählen"
         If (Not IsNothing(Sim1)) Then
             OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
@@ -226,7 +227,7 @@ Partial Public Class Form1
         'Dialog anzeigen
         If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
 
-            'EVO_Settings aus Datei laden
+            'Settings aus Datei laden
             Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName)
 
         End If
@@ -239,7 +240,7 @@ Partial Public Class Form1
 
         'Dialog einrichten
         SaveFileDialog1.Filter = "XML-Dateien (*.xml)|*.xml"
-        SaveFileDialog1.FileName = "EVO_Settings.xml"
+        SaveFileDialog1.FileName = "Settings.xml"
         SaveFileDialog1.DefaultExt = "xml"
         SaveFileDialog1.Title = "Einstellungsdatei speichern"
         If (Not IsNothing(Sim1)) Then
@@ -306,8 +307,8 @@ Partial Public Class Form1
             Me.ToolStripButton_Scatterplot.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
 
-            'EVO_Settings zurücksetzen
-            Me.EVO_Einstellungen1.isSaved = False
+            'Settings zurücksetzen
+            Call Me.EVO_Einstellungen1.Reset()
 
             'Multithreading standardmäßig verbieten
             Me.EVO_Einstellungen1.MultithreadingAllowed = False
@@ -362,7 +363,7 @@ Partial Public Class Form1
                     'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
                     Me.IsInitializing = True
                     Call Me.ComboBox_Methode.Items.Clear()
-                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_MetaEvo, METH_HOOKJEEVES, METH_DDS})
+                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_METAEVO, METH_HOOKEJEEVES, METH_DDS})
                     Me.IsInitializing = False
 
 
@@ -684,7 +685,7 @@ Partial Public Class Form1
                     'TODO: Progress mit Standardwerten initialisieren
 
 
-                Case METH_HOOKJEEVES
+                Case METH_HOOKEJEEVES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Kontrolle: Nur SO möglich!
@@ -733,19 +734,19 @@ Partial Public Class Form1
                     '-------------------------------------------
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     If Not (Me.mProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
-                        Call EVO_Einstellungen1.setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
+                        Call EVO_Einstellungen1.CES_setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
                     End If
 
                     'TODO: Progress mit Standardwerten initialisieren
 
-                Case METH_MetaEvo
+                Case METH_METAEVO
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Ergebnis-Buttons
                     Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                     'Progress mit Standardwerten initialisieren
-                    Call Me.mProgress.Initialize(1, 1, Me.EVO_Einstellungen1.Settings.MetaEvo.NumberGenerations, Me.EVO_Einstellungen1.Settings.MetaEvo.PopulationSize)
+                    Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.getSettings.MetaEvo.NumberGenerations, EVO_Einstellungen1.getSettings.MetaEvo.PopulationSize)
 
                 Case METH_TSP
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -905,20 +906,20 @@ Partial Public Class Form1
             Me.GroupBox_Anwendung.Enabled = False
 
             'Settings aus EVO_Einstellungen holen 
-            Me.mSettings = Me.EVO_Einstellungen1.Settings
+            Me.mSettings = Me.EVO_Einstellungen1.getSettings
 
             'Settings in temp-Verzeichnis speichern
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
-            Me.EVO_Einstellungen1.saveSettings(dir & "EVO_Settings.xml")
+            Me.EVO_Einstellungen1.saveSettings(dir & "Settings.xml")
 
             'Event auslösen (für MPC)
             RaiseEvent Startbuttonpressed()
 
-            'EVO_Settings deaktivieren
+            'Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()
 
-            'EVO_Settings an Hauptdiagramm übergeben
+            'Settings an Hauptdiagramm übergeben
             Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
 
             'Diagramm vorbereiten und initialisieren
@@ -950,11 +951,11 @@ Partial Public Class Form1
                             'ES-Controller initialisieren und starten
                             controller = New EVO.ES.Controller()
 
-                        Case METH_MetaEvo
+                        Case METH_METAEVO
                             'MetaEVO-Controller initialisieren und starten
                             controller = New EVO.MetaEvo.Controller()
 
-                        Case METH_HOOKJEEVES
+                        Case METH_HOOKEJEEVES
                             'HJ-Controller initialisieren und starten
                             controller = New EVO.HookeAndJeeves.Controller()
 
@@ -976,7 +977,7 @@ Partial Public Class Form1
                             'ES-Controller instanzieren
                             controller = New EVO.ES.Controller()
 
-                        Case METH_HOOKJEEVES
+                        Case METH_HOOKEJEEVES
                             'HJ-Controller instanzieren
                             controller = New EVO.HookeAndJeeves.Controller()
 
@@ -984,7 +985,7 @@ Partial Public Class Form1
                             'DDS-Controller instanzieren
                             controller = New modelEAU.DDS.Controller()
 
-                        Case METH_MetaEvo
+                        Case METH_METAEVO
                             'MetaEVO-Controller instanzieren
                             controller = New EVO.MetaEvo.Controller()
 
@@ -1028,7 +1029,6 @@ Partial Public Class Form1
                 'Event auslösen 
                 RaiseEvent OptimisationReady()
             Else
-                'MsgBox("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
                 EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms")
             End If
 
@@ -1235,11 +1235,11 @@ Partial Public Class Form1
                                     Achse.Maximum = Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf + 1
                                 End If
 
-                            ElseIf (Me.mProblem.Method = METH_MetaEvo) Then
+                            ElseIf (Me.mProblem.Method = METH_METAEVO) Then
                                 'Bei MetaEvo:
                                 Achse.Maximum = Me.mSettings.MetaEvo.NumberGenerations * Me.mSettings.MetaEvo.ChildrenPerParent * Me.mSettings.MetaEvo.PopulationSize
 
-                            ElseIf (Me.mProblem.Method = METH_HOOKJEEVES) Then
+                            ElseIf (Me.mProblem.Method = METH_HOOKEJEEVES) Then
                                 'Bei Hooke & Jeeves:
                                 Achse.Automatic = True
 
@@ -2005,4 +2005,53 @@ Partial Public Class Form1
     Protected Overrides Sub Finalize()
         MyBase.Finalize()
     End Sub
+
+    Private Sub BachModeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
+
+        Dim n_cycles As Integer = 5
+        Dim ReprodItem As EVO.Common.Constants.CES_REPRODOP
+        Dim MutItem As EVO.Common.Constants.CES_MUTATION
+
+        Dim i As Integer
+        For i = 1 To n_cycles
+            For Each ReprodItem In System.Enum.GetValues(GetType(EVO.Common.Constants.CES_REPRODOP))
+                For Each MutItem In System.Enum.GetValues(GetType(EVO.Common.Constants.CES_MUTATION))
+                    'MsgBox(ReprodItems & " and " & MutItems)
+
+                    ComboBox_Anwendung.SelectedItem = ANW_BLUEM
+                    ComboBox_Datensatz.Items.Add("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
+                    ComboBox_Datensatz.SelectedItem = "D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL"
+                    ComboBox_Methode.SelectedItem = METH_CES
+
+                    'Settings holen
+                    Me.mSettings = EVO_Einstellungen1.getSettings
+
+                    'Settings ändern
+                    Me.mSettings.CES.OptReprodOp = ReprodItem
+                    If ReprodItem = CES_REPRODOP.k_Point_Crossover Then
+                        Me.mSettings.CES.k_Value = 3
+                    End If
+                    Me.mSettings.CES.OptMutOperator = MutItem
+
+                    'Verhindern, dass die Settings neu eingelesen werden
+                    Me.EVO_Einstellungen1.isSaved = True
+
+                    Call Monitor1.SelectTabLog()
+                    Call Monitor1.Show()
+
+                    Monitor1.LogAppend("ReprodOperator: " & Me.mSettings.CES.OptReprodOp.ToString)
+                    Monitor1.LogAppend("MutOperator: " & Me.mSettings.CES.OptMutOperator.ToString)
+
+                    Call STARTEN_Button_Click(sender, e)
+
+                    'Qualität wird im Controler geprüft dann Stopp Button
+                    Call Monitor1.savelog("D:\xData\Erft_1984_06_Qmax_Skos\Batch\" & Me.mSettings.CES.OptReprodOp.ToString & " ")
+
+                    Call Button_New_Click(sender, e)
+
+                Next
+            Next
+        Next
+    End Sub
+
 End Class

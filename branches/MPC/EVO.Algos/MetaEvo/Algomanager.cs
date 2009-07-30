@@ -9,7 +9,7 @@ namespace IHWB.EVO.MetaEvo
 {
     class Algomanager
     {
-        EVO.Common.EVO_Settings settings;
+        EVO.Common.Settings settings;
         public EVO.Common.Individuum_MetaEvo[] genpool;
         EVO.Common.Individuum_MetaEvo[] wastepool;
         EVO.Diagramm.Monitor monitor1;
@@ -26,7 +26,7 @@ namespace IHWB.EVO.MetaEvo
         private Steema.TeeChart.Styles.Line Line_evo_avg;
         private Steema.TeeChart.Styles.Line Line_evo_threshold;
 
-        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.EVO_Settings settings_input, int individuumnumber_input) 
+        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.Settings settings_input, int individuumnumber_input) 
         {
             settings = settings_input;
             monitor1 = EVO.Diagramm.Monitor.getInstance();

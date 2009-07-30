@@ -51,21 +51,20 @@
   <ItemGroup>
     <Compile Include="Constants.vb" />
     <Compile Include="Constraintfunction.vb" />
-    <Compile Include="EVO_Settings.vb" />
     <Compile Include="FileHelper.vb" />
-    <Compile Include="Individuum.vb">
+    <Compile Include="Individuum\Individuum.vb">
     </Compile>
-    <Compile Include="Individuum_CES.vb" />
-    <Compile Include="Individuum_MetaEvo.vb" />
-    <Compile Include="Individuum_PES.vb" />
+    <Compile Include="Individuum\Individuum_CES.vb" />
+    <Compile Include="Individuum\Individuum_MetaEvo.vb" />
+    <Compile Include="Individuum\Individuum_PES.vb" />
     <Compile Include="Locations.vb" />
     <Compile Include="Modellparameter.vb" />
-    <Compile Include="ObjectiveFunction_Aggregate.vb" />
-    <Compile Include="ObjectiveFunction_IHA.vb" />
-    <Compile Include="ObjectiveFunction_Series.vb" />
-    <Compile Include="ObjectiveFunction_SKos.vb" />
-    <Compile Include="ObjectiveFunction_ValueFromSeries.vb" />
-    <Compile Include="Objectivefunction_Value.vb" />
+    <Compile Include="ObjectiveFunctions\ObjectiveFunction_Aggregate.vb" />
+    <Compile Include="ObjectiveFunctions\ObjectiveFunction_IHA.vb" />
+    <Compile Include="ObjectiveFunctions\ObjectiveFunction_Series.vb" />
+    <Compile Include="ObjectiveFunctions\ObjectiveFunction_SKos.vb" />
+    <Compile Include="ObjectiveFunctions\ObjectiveFunction_ValueFromSeries.vb" />
+    <Compile Include="ObjectiveFunctions\Objectivefunction_Value.vb" />
     <Compile Include="Problem.vb" />
     <Compile Include="OptParameter.vb" />
     <Compile Include="Progress.vb" />
@@ -85,7 +84,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ObjectiveFunction.vb" />
+    <Compile Include="ObjectiveFunctions\ObjectiveFunction.vb" />
+    <Compile Include="Settings\Settings.vb" />
+    <Compile Include="Settings\Settings_CES.vb" />
+    <Compile Include="Settings\Settings_DDS.vb" />
+    <Compile Include="Settings\Settings_HookeJeeves.vb" />
+    <Compile Include="Settings\Settings_MetaEvo.vb" />
+    <Compile Include="Settings\Settings_PES.vb" />
+    <Compile Include="Settings\Settings_Sensiplot.vb" />
+    <Compile Include="Settings\Settings_TSP.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

@@ -14,8 +14,8 @@
     '*******************************************************************************
     '*******************************************************************************
 
-    'lokale Referenz auf EVO_Settings
-    Private mSettings As EVO.Common.EVO_Settings
+    'lokale Referenz auf Settings
+    Private mSettings As EVO.Common.Settings
 
     'Das Problem
     Private mProblem As EVO.Common.Problem
@@ -102,8 +102,8 @@
     ''' <summary>
     ''' Settings setzen
     ''' </summary>
-    ''' <param name="settings">EVO_Settings</param>
-    Public Sub setSettings(ByRef settings As EVO.Common.EVO_Settings)
+    ''' <param name="settings">Settings</param>
+    Public Sub setSettings(ByRef settings As EVO.Common.Settings)
 
         'Settings übergeben
         Me.mSettings = settings
@@ -138,7 +138,7 @@
                     Call serie.Add(runde * Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf + gen * Me.mSettings.PES.n_Nachf + nachf, ind.PrimObjectives(0), ind.ID.ToString(), Farbe)
                 Case EVO.Common.METH_HYBRID, EVO.Common.METH_CES
                     Call serie.Add(runde * Me.mSettings.CES.n_Generations * Me.mSettings.CES.n_Children + gen * Me.mSettings.CES.n_Children + nachf, ind.PrimObjectives(0), ind.ID.ToString(), Farbe)
-                Case EVO.Common.METH_MetaEvo
+                Case EVO.Common.METH_METAEVO
                     Call serie.Add(runde * Me.mSettings.MetaEvo.NumberGenerations * Me.mSettings.MetaEvo.PopulationSize + gen * Me.mSettings.MetaEvo.PopulationSize + nachf, ind.PrimObjectives(0), ind.ID.ToString(), Farbe)
                 Case Else
                     Throw New Exception("Für diese Methode Single Objective zeichnen nicht definiert")

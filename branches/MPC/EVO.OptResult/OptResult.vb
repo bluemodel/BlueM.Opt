@@ -296,7 +296,7 @@ Public Class OptResult
         Call Me.db_prepare()
         'Methodenspezifische Anpassungen
         Select Case Me.mProblem.Method
-            Case EVO.Common.METH_PES, EVO.Common.METH_MetaEvo, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_DDS
+            Case EVO.Common.METH_PES, EVO.Common.METH_METAEVO, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_HOOKEJEEVES, EVO.Common.METH_DDS
                 Call Me.db_prepare_PES()
             Case EVO.Common.METH_CES
                 Call Me.db_prepare_CES()
@@ -695,7 +695,7 @@ Public Class OptResult
             Me.db_path = sourceFile
 
             Select Case Me.mProblem.Method
-                Case EVO.Common.METH_PES, EVO.Common.METH_HOOKJEEVES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_MetaEvo
+                Case EVO.Common.METH_PES, EVO.Common.METH_HOOKEJEEVES, EVO.Common.METH_SENSIPLOT, EVO.Common.METH_METAEVO
                     Call db_getIndividuen_PES()
 
                 Case EVO.Common.METH_CES, EVO.Common.METH_HYBRID

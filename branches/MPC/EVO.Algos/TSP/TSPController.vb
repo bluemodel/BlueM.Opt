@@ -4,7 +4,7 @@
     Private myHauptDiagramm As EVO.Diagramm.Hauptdiagramm
     Private myMonitor As EVO.Diagramm.Monitor
     Private myProblem As EVO.Common.Problem
-    Private mySettings As EVO.Common.EVO_Settings
+    Private mySettings As EVO.Common.Settings
     Private myProgress As EVO.Common.Progress
 
     Private TSP1 As TSP
@@ -18,7 +18,7 @@
     ''' <param name="inputProgress"></param>
     ''' <param name="inputHptDiagramm"></param>
     ''' <remarks></remarks>
-    Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.EVO_Settings, ByRef inputProgress As Common.Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
+    Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.Settings, ByRef inputProgress As Common.Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
         Me.myProgress = inputProgress

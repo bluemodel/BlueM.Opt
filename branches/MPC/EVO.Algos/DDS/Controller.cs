@@ -10,7 +10,7 @@ namespace modelEAU.DDS
     public class Controller : IHWB.EVO.IController
     {
         private IHWB.EVO.Common.Problem mProblem;
-        private IHWB.EVO.Common.EVO_Settings mSettings;
+        private IHWB.EVO.Common.Settings mSettings;
         private IHWB.EVO.Common.Progress mProgress;
         private IHWB.EVO.Diagramm.Monitor mMonitor; //z.Zt. nicht benutzt
         private IHWB.EVO.Diagramm.Hauptdiagramm Hauptdiagramm1;
@@ -28,7 +28,7 @@ namespace modelEAU.DDS
         /// <param name="inputSettings">die Einstellungen</param>
         /// <param name="inputProgress">der Verlauf</param>
         /// <param name="inputHauptdiagramm">das Hauptdiagramm</param>
-        public void Init(ref IHWB.EVO.Common.Problem inputProblem, ref IHWB.EVO.Common.EVO_Settings inputSettings, ref IHWB.EVO.Common.Progress inputProgress, ref IHWB.EVO.Diagramm.Hauptdiagramm inputHauptdiagramm)
+        public void Init(ref IHWB.EVO.Common.Problem inputProblem, ref IHWB.EVO.Common.Settings inputSettings, ref IHWB.EVO.Common.Progress inputProgress, ref IHWB.EVO.Diagramm.Hauptdiagramm inputHauptdiagramm)
         {
             //Objekte übergeben
             this.mProblem = inputProblem;
