@@ -381,3 +381,15 @@ Public MustInherit Class Individuum
 #End Region 'Methoden
 
 End Class
+
+''' <summary>
+''' Vergleicht Individuen anhand ihrer Dominated-Property
+''' </summary>
+Public Class IndComparerDominated 
+    Implements IComparer(Of Individuum)
+
+    Public Function Compare(ByVal x As Individuum, ByVal y As Individuum) As Integer Implements System.Collections.Generic.IComparer(Of Individuum).Compare
+        Return x.Dominated.CompareTo(y.Dominated)
+    End Function
+
+End Class

@@ -91,7 +91,7 @@ namespace IHWB.EVO.MetaEvo
             this.monitor1.LogAppend("Controller: Task: " + prob.Datensatz);
 
             //Progress Initialisieren
-            progress1.Initialize(1, 1, (short)settings.MetaEvo.NumberGenerations, (short)(settings.MetaEvo.ChildsPerParent * settings.MetaEvo.PopulationSize));
+            progress1.Initialize(1, 1, (short)settings.MetaEvo.NumberGenerations, (short)(settings.MetaEvo.ChildrenPerParent * settings.MetaEvo.PopulationSize));
 
             switch (this.role)
             {
@@ -140,7 +140,7 @@ namespace IHWB.EVO.MetaEvo
                     //Info-Datenbank füllen
                     networkmanager.DB_set_info("Datensatz", "" + prob.Datensatz);
                     networkmanager.DB_set_info("Individuen im Genpool", "" + settings.MetaEvo.PopulationSize);
-                    networkmanager.DB_set_info("Individuen / Generation", "" + settings.MetaEvo.ChildsPerParent * settings.MetaEvo.PopulationSize);
+                    networkmanager.DB_set_info("Individuen / Generation", "" + settings.MetaEvo.ChildrenPerParent * settings.MetaEvo.PopulationSize);
                     networkmanager.DB_set_info("Anzahl der Ergebnisse", "" + settings.MetaEvo.NumberResults);
                     networkmanager.DB_set_info("Generation", "Initialisierung");
                     start_network_server();
@@ -238,7 +238,7 @@ namespace IHWB.EVO.MetaEvo
                     //Genpool speichern
                     algomanager.set_genpool(ref generation);
 
-                    generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent * this.settings.MetaEvo.PopulationSize];
+                    generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildrenPerParent * this.settings.MetaEvo.PopulationSize];
 
                     mePC.status = "generate Individuums";
                 }
@@ -365,7 +365,7 @@ namespace IHWB.EVO.MetaEvo
                     //Genpool speichern
                     algomanager.set_genpool(ref generation);
 
-                    generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent * this.settings.MetaEvo.PopulationSize];
+                    generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildrenPerParent * this.settings.MetaEvo.PopulationSize];
 
                     mePC.status = "generate Individuums";
                 }
@@ -578,7 +578,7 @@ namespace IHWB.EVO.MetaEvo
                     {
                         algomanager.set_genpool(ref generation);
 
-                        generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildsPerParent * this.settings.MetaEvo.PopulationSize];
+                        generation = new EVO.Common.Individuum_MetaEvo[this.settings.MetaEvo.ChildrenPerParent * this.settings.MetaEvo.PopulationSize];
                         meServer.set_AlsoInDB("generate Individuums", -1, -1);
                     }
                     else

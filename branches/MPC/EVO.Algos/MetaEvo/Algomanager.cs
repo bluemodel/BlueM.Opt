@@ -656,7 +656,7 @@ namespace IHWB.EVO.MetaEvo
                 algos.algofeedbackarray[0].number_individuals_for_nextGen = settings.MetaEvo.NumberResults;
                 //Neuen Genpool und Generation wegen Lösungsreduzierung
                 EVO.Common.Individuum_MetaEvo[] genpool2 = new IHWB.EVO.Common.Individuum_MetaEvo[settings.MetaEvo.NumberResults];
-                EVO.Common.Individuum_MetaEvo[] new_generation_input2 = new IHWB.EVO.Common.Individuum_MetaEvo[settings.MetaEvo.NumberResults * settings.MetaEvo.ChildsPerParent];
+                EVO.Common.Individuum_MetaEvo[] new_generation_input2 = new IHWB.EVO.Common.Individuum_MetaEvo[settings.MetaEvo.NumberResults * settings.MetaEvo.ChildrenPerParent];
                 copy_true_to(ref genpool, ref genpool2);
                 copy_some_to(ref new_generation_input, ref new_generation_input2);
                 genpool = genpool2;

@@ -42,6 +42,7 @@ Public Module Constants
     Public Const METH_HOOKJEEVES As String = "Hooke & Jeeves"
     Public Const METH_MetaEvo As String = "MetaEvo"
     Public Const METH_DDS As String = "DDS"
+    Public Const METH_TSP As String = "TSP"
 
     'Lösungs- / Entscheidungsraum
     Public Enum SPACE As Integer
@@ -68,10 +69,13 @@ Public Module Constants
     End Enum
 
     'Reproduktionsoperator
-    Public Enum CES_REPRODOP as Integer
-        Selt_Rand_Uniform = 1
-        Order_Crossover = 2
-        Part_Mapped_Cross = 3
+    Public Enum CES_REPRODOP As Integer
+        One_Point_Crossover = 1
+        Two_Point_Crossover = 2
+        k_Point_Crossover = 3
+        Uniform_Crossover = 4
+        'Order_Crossover = 3
+        'Part_Mapped_Cross = 4
     End Enum
 
     'Mutationsoperator
@@ -166,6 +170,24 @@ Public Module Constants
     Public Enum EVO_RICHTUNG As Integer
         Minimierung = 1
         Maximierung = -1
+    End Enum
+
+    'TSP Enums
+    Enum EnReprodOperator
+        Order_Crossover_OX = 1
+        Partially_Mapped_Crossover_PMX = 2
+    End Enum
+
+    Enum EnMutOperator
+        Inversion_SIM = 1
+        Translocation_3_Opt = 2
+        Translocation_n_Opt = 3
+        Exchange_Mutation_EM = 4
+    End Enum
+
+    Enum EnProblem
+        circle = 0
+        random = 1
     End Enum
 
 End Module
