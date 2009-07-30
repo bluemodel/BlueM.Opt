@@ -27,7 +27,7 @@ Partial Class EVO_Einstellungen
         Dim Label_CES_MutationRate As System.Windows.Forms.Label
         Dim Label_CES_Reproduction As System.Windows.Forms.Label
         Dim Label_CES_NExchangeSecPop As System.Windows.Forms.Label
-        Dim Label_CES_NChilds As System.Windows.Forms.Label
+        Dim Label_CES_NChildren As System.Windows.Forms.Label
         Dim Label_CES_NParents As System.Windows.Forms.Label
         Dim Label_CES_NGenerations As System.Windows.Forms.Label
         Dim Label_CES_Mutation As System.Windows.Forms.Label
@@ -65,7 +65,12 @@ Partial Class EVO_Einstellungen
         Dim Label_Meta5 As System.Windows.Forms.Label
         Dim Label_Meta10 As System.Windows.Forms.Label
         Dim GroupBox_Diagramm As System.Windows.Forms.GroupBox
+        Dim Label_CES_k_Value As System.Windows.Forms.Label
+        Me.CheckBox_drawOnlyCurrentGen = New System.Windows.Forms.CheckBox
         Me.TabControl1 = New System.Windows.Forms.TabControl
+        Me.TabPage_General = New System.Windows.Forms.TabPage
+        Me.GroupBox_Sim = New System.Windows.Forms.GroupBox
+        Me.CheckBox_useMultithreading = New System.Windows.Forms.CheckBox
         Me.TabPage_PES = New System.Windows.Forms.TabPage
         Me.Label_OptModusValue = New System.Windows.Forms.Label
         Me.ComboOptStrategie = New System.Windows.Forms.ComboBox
@@ -116,7 +121,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBoxCES = New System.Windows.Forms.GroupBox
         Me.Numeric_CES_MutRate = New System.Windows.Forms.NumericUpDown
         Me.Combo_CES_Reproduction = New System.Windows.Forms.ComboBox
-        Me.Numeric_CES_n_childs = New System.Windows.Forms.NumericUpDown
+        Me.Numeric_CES_n_Children = New System.Windows.Forms.NumericUpDown
         Me.Numeric_CES_n_Parents = New System.Windows.Forms.NumericUpDown
         Me.Combo_CES_Mutation = New System.Windows.Forms.ComboBox
         Me.Numeric_CES_n_Generations = New System.Windows.Forms.NumericUpDown
@@ -157,12 +162,24 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_ListBox_Objectives = New System.Windows.Forms.ListBox
         Me.SensiPlot_Label_OptParameter = New System.Windows.Forms.Label
         Me.SensiPlot_ListBox_OptParameter = New System.Windows.Forms.ListBox
+        Me.TabPage_TSP = New System.Windows.Forms.TabPage
+        Me.TSP_ComboBox_prob_instance = New System.Windows.Forms.ComboBox
+        Me.TSP_Label_Instance = New System.Windows.Forms.Label
+        Me.TSP_ComboBox_Mutationoperator = New System.Windows.Forms.ComboBox
+        Me.TSP_Label_Mutationoperator = New System.Windows.Forms.Label
+        Me.TSP_Label_Reproductionoperator = New System.Windows.Forms.Label
+        Me.TSP_ComboBox_Reproductionoperator = New System.Windows.Forms.ComboBox
+        Me.TSP_Numeric_n_generations = New System.Windows.Forms.NumericUpDown
+        Me.TSP_Label_n_generations = New System.Windows.Forms.Label
+        Me.TSP_Numeric_n_children = New System.Windows.Forms.NumericUpDown
+        Me.TSP_Label_n_children = New System.Windows.Forms.Label
+        Me.TSP_Numeric_n_parents = New System.Windows.Forms.NumericUpDown
+        Me.TSP_Label_n_parents = New System.Windows.Forms.Label
+        Me.TSP_Numeric_n_cities = New System.Windows.Forms.NumericUpDown
+        Me.TSP_Label_n_cities = New System.Windows.Forms.Label
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Me.TabPage_General = New System.Windows.Forms.TabPage
-        Me.GroupBox_Sim = New System.Windows.Forms.GroupBox
-        Me.CheckBox_useMultithreading = New System.Windows.Forms.CheckBox
-        Me.CheckBox_drawOnlyCurrentGen = New System.Windows.Forms.CheckBox
+        Me.Numeric_CES_k_Value = New System.Windows.Forms.NumericUpDown
         Label_CES_MemSize = New System.Windows.Forms.Label
         Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
         Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
@@ -171,7 +188,7 @@ Partial Class EVO_Einstellungen
         Label_CES_MutationRate = New System.Windows.Forms.Label
         Label_CES_Reproduction = New System.Windows.Forms.Label
         Label_CES_NExchangeSecPop = New System.Windows.Forms.Label
-        Label_CES_NChilds = New System.Windows.Forms.Label
+        Label_CES_NChildren = New System.Windows.Forms.Label
         Label_CES_NParents = New System.Windows.Forms.Label
         Label_CES_NGenerations = New System.Windows.Forms.Label
         Label_CES_Mutation = New System.Windows.Forms.Label
@@ -209,7 +226,11 @@ Partial Class EVO_Einstellungen
         Label_Meta5 = New System.Windows.Forms.Label
         Label_Meta10 = New System.Windows.Forms.Label
         GroupBox_Diagramm = New System.Windows.Forms.GroupBox
+        Label_CES_k_Value = New System.Windows.Forms.Label
+        GroupBox_Diagramm.SuspendLayout()
         Me.TabControl1.SuspendLayout()
+        Me.TabPage_General.SuspendLayout()
+        Me.GroupBox_Sim.SuspendLayout()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Generationen.SuspendLayout()
@@ -235,7 +256,7 @@ Partial Class EVO_Einstellungen
         CType(Me.Numeric_CES_NExchange_SecPop_PES, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBoxCES.SuspendLayout()
         CType(Me.Numeric_CES_MutRate, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Numeric_CES_n_childs, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Numeric_CES_n_Children, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_CES_n_Parents, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Numeric_CES_n_Generations, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_HookeJeeves.SuspendLayout()
@@ -256,10 +277,13 @@ Partial Class EVO_Einstellungen
         Me.TabPage_SensiPlot.SuspendLayout()
         CType(Me.SensiPlot_NumericUpDown_NumSteps, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SensiPlot_GroupBox_Modus.SuspendLayout()
+        Me.TabPage_TSP.SuspendLayout()
+        CType(Me.TSP_Numeric_n_generations, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TSP_Numeric_n_children, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Einstellungen.SuspendLayout()
-        Me.TabPage_General.SuspendLayout()
-        Me.GroupBox_Sim.SuspendLayout()
-        GroupBox_Diagramm.SuspendLayout()
+        CType(Me.Numeric_CES_k_Value, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Label_CES_MemSize
@@ -309,7 +333,7 @@ Partial Class EVO_Einstellungen
         'Label_CES_MutationRate
         '
         Label_CES_MutationRate.AutoSize = True
-        Label_CES_MutationRate.Location = New System.Drawing.Point(3, 181)
+        Label_CES_MutationRate.Location = New System.Drawing.Point(3, 207)
         Label_CES_MutationRate.Name = "Label_CES_MutationRate"
         Label_CES_MutationRate.Size = New System.Drawing.Size(77, 13)
         Label_CES_MutationRate.TabIndex = 48
@@ -333,14 +357,14 @@ Partial Class EVO_Einstellungen
         Label_CES_NExchangeSecPop.TabIndex = 46
         Label_CES_NExchangeSecPop.Text = "Exchange with SecPop:"
         '
-        'Label_CES_NChilds
+        'Label_CES_NChildren
         '
-        Label_CES_NChilds.AutoSize = True
-        Label_CES_NChilds.Location = New System.Drawing.Point(2, 74)
-        Label_CES_NChilds.Name = "Label_CES_NChilds"
-        Label_CES_NChilds.Size = New System.Drawing.Size(90, 13)
-        Label_CES_NChilds.TabIndex = 2
-        Label_CES_NChilds.Text = "Number of Childs:"
+        Label_CES_NChildren.AutoSize = True
+        Label_CES_NChildren.Location = New System.Drawing.Point(2, 74)
+        Label_CES_NChildren.Name = "Label_CES_NChildren"
+        Label_CES_NChildren.Size = New System.Drawing.Size(90, 13)
+        Label_CES_NChildren.TabIndex = 2
+        Label_CES_NChildren.Text = "Number of Children:"
         '
         'Label_CES_NParents
         '
@@ -363,7 +387,7 @@ Partial Class EVO_Einstellungen
         'Label_CES_Mutation
         '
         Label_CES_Mutation.AutoSize = True
-        Label_CES_Mutation.Location = New System.Drawing.Point(3, 154)
+        Label_CES_Mutation.Location = New System.Drawing.Point(3, 180)
         Label_CES_Mutation.Name = "Label_CES_Mutation"
         Label_CES_Mutation.Size = New System.Drawing.Size(51, 13)
         Label_CES_Mutation.TabIndex = 3
@@ -664,6 +688,27 @@ Partial Class EVO_Einstellungen
         Label_Meta10.TabIndex = 51
         Label_Meta10.Text = "Number of parents:" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(1:3 Children)"
         '
+        'GroupBox_Diagramm
+        '
+        GroupBox_Diagramm.Controls.Add(Me.CheckBox_drawOnlyCurrentGen)
+        GroupBox_Diagramm.Location = New System.Drawing.Point(6, 65)
+        GroupBox_Diagramm.Name = "GroupBox_Diagramm"
+        GroupBox_Diagramm.Size = New System.Drawing.Size(209, 62)
+        GroupBox_Diagramm.TabIndex = 4
+        GroupBox_Diagramm.TabStop = False
+        GroupBox_Diagramm.Text = "Diagramm"
+        '
+        'CheckBox_drawOnlyCurrentGen
+        '
+        Me.CheckBox_drawOnlyCurrentGen.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox_drawOnlyCurrentGen.Location = New System.Drawing.Point(6, 19)
+        Me.CheckBox_drawOnlyCurrentGen.Name = "CheckBox_drawOnlyCurrentGen"
+        Me.CheckBox_drawOnlyCurrentGen.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckBox_drawOnlyCurrentGen.Size = New System.Drawing.Size(197, 37)
+        Me.CheckBox_drawOnlyCurrentGen.TabIndex = 1
+        Me.CheckBox_drawOnlyCurrentGen.Text = "Nur die aktuelle Generation anzeigen:"
+        Me.CheckBox_drawOnlyCurrentGen.UseVisualStyleBackColor = True
+        '
         'TabControl1
         '
         Me.TabControl1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -675,6 +720,7 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_MetaEvo)
         Me.TabControl1.Controls.Add(Me.TabPage_DDS)
         Me.TabControl1.Controls.Add(Me.TabPage_SensiPlot)
+        Me.TabControl1.Controls.Add(Me.TabPage_TSP)
         Me.TabControl1.Location = New System.Drawing.Point(2, 16)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
@@ -682,6 +728,39 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.SelectedIndex = 0
         Me.TabControl1.Size = New System.Drawing.Size(229, 694)
         Me.TabControl1.TabIndex = 1
+        '
+        'TabPage_General
+        '
+        Me.TabPage_General.Controls.Add(GroupBox_Diagramm)
+        Me.TabPage_General.Controls.Add(Me.GroupBox_Sim)
+        Me.TabPage_General.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_General.Name = "TabPage_General"
+        Me.TabPage_General.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_General.Size = New System.Drawing.Size(221, 668)
+        Me.TabPage_General.TabIndex = 6
+        Me.TabPage_General.Text = "General"
+        Me.TabPage_General.UseVisualStyleBackColor = True
+        '
+        'GroupBox_Sim
+        '
+        Me.GroupBox_Sim.Controls.Add(Me.CheckBox_useMultithreading)
+        Me.GroupBox_Sim.Location = New System.Drawing.Point(6, 6)
+        Me.GroupBox_Sim.Name = "GroupBox_Sim"
+        Me.GroupBox_Sim.Size = New System.Drawing.Size(209, 53)
+        Me.GroupBox_Sim.TabIndex = 3
+        Me.GroupBox_Sim.TabStop = False
+        Me.GroupBox_Sim.Text = "Simulationen"
+        '
+        'CheckBox_useMultithreading
+        '
+        Me.CheckBox_useMultithreading.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox_useMultithreading.Location = New System.Drawing.Point(6, 20)
+        Me.CheckBox_useMultithreading.Name = "CheckBox_useMultithreading"
+        Me.CheckBox_useMultithreading.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckBox_useMultithreading.Size = New System.Drawing.Size(197, 24)
+        Me.CheckBox_useMultithreading.TabIndex = 0
+        Me.CheckBox_useMultithreading.Text = "Multithreading benutzen:"
+        Me.CheckBox_useMultithreading.UseVisualStyleBackColor = True
         '
         'TabPage_PES
         '
@@ -1053,7 +1132,7 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_CES_UseSecPop_CES.AutoSize = True
         Me.CheckBox_CES_UseSecPop_CES.Checked = True
         Me.CheckBox_CES_UseSecPop_CES.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox_CES_UseSecPop_CES.Location = New System.Drawing.Point(4, 280)
+        Me.CheckBox_CES_UseSecPop_CES.Location = New System.Drawing.Point(4, 312)
         Me.CheckBox_CES_UseSecPop_CES.Name = "CheckBox_CES_UseSecPop_CES"
         Me.CheckBox_CES_UseSecPop_CES.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.CheckBox_CES_UseSecPop_CES.Size = New System.Drawing.Size(150, 17)
@@ -1068,7 +1147,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_CES_SecPop.Controls.Add(Me.Label_CES_NMembersSecPop)
         Me.GroupBox_CES_SecPop.Controls.Add(Me.Numeric_CES_n_exchange_SecPop)
         Me.GroupBox_CES_SecPop.Controls.Add(Me.Numeric_CES_n_member_SecPop)
-        Me.GroupBox_CES_SecPop.Location = New System.Drawing.Point(4, 303)
+        Me.GroupBox_CES_SecPop.Location = New System.Drawing.Point(4, 335)
         Me.GroupBox_CES_SecPop.Name = "GroupBox_CES_SecPop"
         Me.GroupBox_CES_SecPop.Size = New System.Drawing.Size(200, 81)
         Me.GroupBox_CES_SecPop.TabIndex = 13
@@ -1129,7 +1208,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_CES_Hybrid.Controls.Add(Me.Combo_CES_HybridType)
         Me.GroupBox_CES_Hybrid.Controls.Add(Label_CES_MemRank)
         Me.GroupBox_CES_Hybrid.Controls.Add(Label_CES_Hybrid_Type)
-        Me.GroupBox_CES_Hybrid.Location = New System.Drawing.Point(4, 413)
+        Me.GroupBox_CES_Hybrid.Location = New System.Drawing.Point(4, 445)
         Me.GroupBox_CES_Hybrid.Name = "GroupBox_CES_Hybrid"
         Me.GroupBox_CES_Hybrid.Size = New System.Drawing.Size(200, 217)
         Me.GroupBox_CES_Hybrid.TabIndex = 12
@@ -1211,7 +1290,7 @@ Partial Class EVO_Einstellungen
         'CheckBox_CES_RealOptimisation
         '
         Me.CheckBox_CES_RealOptimisation.AutoSize = True
-        Me.CheckBox_CES_RealOptimisation.Location = New System.Drawing.Point(4, 390)
+        Me.CheckBox_CES_RealOptimisation.Location = New System.Drawing.Point(4, 422)
         Me.CheckBox_CES_RealOptimisation.Name = "CheckBox_CES_RealOptimisation"
         Me.CheckBox_CES_RealOptimisation.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.CheckBox_CES_RealOptimisation.Size = New System.Drawing.Size(154, 17)
@@ -1221,23 +1300,25 @@ Partial Class EVO_Einstellungen
         '
         'GroupBoxCES
         '
+        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_k_Value)
+        Me.GroupBoxCES.Controls.Add(Label_CES_k_Value)
         Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_MutRate)
         Me.GroupBoxCES.Controls.Add(Label_CES_MutationRate)
         Me.GroupBoxCES.Controls.Add(Me.Combo_CES_Reproduction)
         Me.GroupBoxCES.Controls.Add(Label_CES_Reproduction)
-        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_childs)
+        Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_Children)
         Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_Parents)
         Me.GroupBoxCES.Controls.Add(Me.Combo_CES_Mutation)
         Me.GroupBoxCES.Controls.Add(Me.Numeric_CES_n_Generations)
         Me.GroupBoxCES.Controls.Add(Me.Combo_CES_Selection)
-        Me.GroupBoxCES.Controls.Add(Label_CES_NChilds)
+        Me.GroupBoxCES.Controls.Add(Label_CES_NChildren)
         Me.GroupBoxCES.Controls.Add(Label_CES_NParents)
         Me.GroupBoxCES.Controls.Add(Label_CES_NGenerations)
         Me.GroupBoxCES.Controls.Add(Label_CES_Mutation)
         Me.GroupBoxCES.Controls.Add(Label_CES_Selection)
         Me.GroupBoxCES.Location = New System.Drawing.Point(4, 69)
         Me.GroupBoxCES.Name = "GroupBoxCES"
-        Me.GroupBoxCES.Size = New System.Drawing.Size(200, 205)
+        Me.GroupBoxCES.Size = New System.Drawing.Size(200, 237)
         Me.GroupBoxCES.TabIndex = 9
         Me.GroupBoxCES.TabStop = False
         Me.GroupBoxCES.Text = "Mixed Integer Evolution Strategy"
@@ -1245,7 +1326,7 @@ Partial Class EVO_Einstellungen
         'Numeric_CES_MutRate
         '
         Me.Numeric_CES_MutRate.Increment = New Decimal(New Integer() {5, 0, 0, 0})
-        Me.Numeric_CES_MutRate.Location = New System.Drawing.Point(139, 178)
+        Me.Numeric_CES_MutRate.Location = New System.Drawing.Point(139, 204)
         Me.Numeric_CES_MutRate.Name = "Numeric_CES_MutRate"
         Me.Numeric_CES_MutRate.Size = New System.Drawing.Size(53, 20)
         Me.Numeric_CES_MutRate.TabIndex = 49
@@ -1261,16 +1342,16 @@ Partial Class EVO_Einstellungen
         Me.Combo_CES_Reproduction.Size = New System.Drawing.Size(123, 21)
         Me.Combo_CES_Reproduction.TabIndex = 8
         '
-        'Numeric_CES_n_childs
+        'Numeric_CES_n_Children
         '
-        Me.Numeric_CES_n_childs.Location = New System.Drawing.Point(139, 72)
-        Me.Numeric_CES_n_childs.Maximum = New Decimal(New Integer() {1000000000, 0, 0, 0})
-        Me.Numeric_CES_n_childs.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.Numeric_CES_n_childs.Name = "Numeric_CES_n_childs"
-        Me.Numeric_CES_n_childs.Size = New System.Drawing.Size(53, 20)
-        Me.Numeric_CES_n_childs.TabIndex = 5
-        Me.Numeric_CES_n_childs.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Numeric_CES_n_childs.Value = New Decimal(New Integer() {15, 0, 0, 0})
+        Me.Numeric_CES_n_Children.Location = New System.Drawing.Point(139, 72)
+        Me.Numeric_CES_n_Children.Maximum = New Decimal(New Integer() {1000000000, 0, 0, 0})
+        Me.Numeric_CES_n_Children.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.Numeric_CES_n_Children.Name = "Numeric_CES_n_Children"
+        Me.Numeric_CES_n_Children.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_n_Children.TabIndex = 5
+        Me.Numeric_CES_n_Children.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_n_Children.Value = New Decimal(New Integer() {15, 0, 0, 0})
         '
         'Numeric_CES_n_Parents
         '
@@ -1287,7 +1368,7 @@ Partial Class EVO_Einstellungen
         '
         Me.Combo_CES_Mutation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.Combo_CES_Mutation.FormattingEnabled = True
-        Me.Combo_CES_Mutation.Location = New System.Drawing.Point(69, 151)
+        Me.Combo_CES_Mutation.Location = New System.Drawing.Point(69, 177)
         Me.Combo_CES_Mutation.Name = "Combo_CES_Mutation"
         Me.Combo_CES_Mutation.Size = New System.Drawing.Size(123, 21)
         Me.Combo_CES_Mutation.TabIndex = 7
@@ -1715,6 +1796,167 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_ListBox_OptParameter.Size = New System.Drawing.Size(209, 173)
         Me.SensiPlot_ListBox_OptParameter.TabIndex = 3
         '
+        'TabPage_TSP
+        '
+        Me.TabPage_TSP.Controls.Add(Me.TSP_ComboBox_prob_instance)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Label_Instance)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_ComboBox_Mutationoperator)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Label_Mutationoperator)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Label_Reproductionoperator)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_ComboBox_Reproductionoperator)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Numeric_n_generations)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Label_n_generations)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Numeric_n_children)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Label_n_children)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Numeric_n_parents)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Label_n_parents)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Numeric_n_cities)
+        Me.TabPage_TSP.Controls.Add(Me.TSP_Label_n_cities)
+        Me.TabPage_TSP.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_TSP.Name = "TabPage_TSP"
+        Me.TabPage_TSP.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_TSP.Size = New System.Drawing.Size(221, 668)
+        Me.TabPage_TSP.TabIndex = 7
+        Me.TabPage_TSP.Text = "TSP"
+        Me.TabPage_TSP.UseVisualStyleBackColor = True
+        '
+        'TSP_ComboBox_prob_instance
+        '
+        Me.TSP_ComboBox_prob_instance.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.TSP_ComboBox_prob_instance.FormattingEnabled = True
+        Me.TSP_ComboBox_prob_instance.Items.AddRange(New Object() {"Random", "Circle"})
+        Me.TSP_ComboBox_prob_instance.Location = New System.Drawing.Point(105, 39)
+        Me.TSP_ComboBox_prob_instance.Name = "TSP_ComboBox_prob_instance"
+        Me.TSP_ComboBox_prob_instance.Size = New System.Drawing.Size(110, 21)
+        Me.TSP_ComboBox_prob_instance.TabIndex = 57
+        '
+        'TSP_Label_Instance
+        '
+        Me.TSP_Label_Instance.AutoSize = True
+        Me.TSP_Label_Instance.Location = New System.Drawing.Point(10, 42)
+        Me.TSP_Label_Instance.Name = "TSP_Label_Instance"
+        Me.TSP_Label_Instance.Size = New System.Drawing.Size(92, 13)
+        Me.TSP_Label_Instance.TabIndex = 56
+        Me.TSP_Label_Instance.Text = "Problem Instance:"
+        '
+        'TSP_ComboBox_Mutationoperator
+        '
+        Me.TSP_ComboBox_Mutationoperator.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.TSP_ComboBox_Mutationoperator.FormattingEnabled = True
+        Me.TSP_ComboBox_Mutationoperator.Items.AddRange(New Object() {"Local Optimizer", "Global Optimizer", "Both"})
+        Me.TSP_ComboBox_Mutationoperator.Location = New System.Drawing.Point(81, 189)
+        Me.TSP_ComboBox_Mutationoperator.Name = "TSP_ComboBox_Mutationoperator"
+        Me.TSP_ComboBox_Mutationoperator.Size = New System.Drawing.Size(134, 21)
+        Me.TSP_ComboBox_Mutationoperator.TabIndex = 57
+        '
+        'TSP_Label_Mutationoperator
+        '
+        Me.TSP_Label_Mutationoperator.AutoSize = True
+        Me.TSP_Label_Mutationoperator.Location = New System.Drawing.Point(10, 192)
+        Me.TSP_Label_Mutationoperator.Name = "TSP_Label_Mutationoperator"
+        Me.TSP_Label_Mutationoperator.Size = New System.Drawing.Size(68, 13)
+        Me.TSP_Label_Mutationoperator.TabIndex = 56
+        Me.TSP_Label_Mutationoperator.Text = "MutationOp.:"
+        '
+        'TSP_Label_Reproductionoperator
+        '
+        Me.TSP_Label_Reproductionoperator.AutoSize = True
+        Me.TSP_Label_Reproductionoperator.Location = New System.Drawing.Point(10, 165)
+        Me.TSP_Label_Reproductionoperator.Name = "TSP_Label_Reproductionoperator"
+        Me.TSP_Label_Reproductionoperator.Size = New System.Drawing.Size(62, 13)
+        Me.TSP_Label_Reproductionoperator.TabIndex = 55
+        Me.TSP_Label_Reproductionoperator.Text = "ReprodOp.:"
+        '
+        'TSP_ComboBox_Reproductionoperator
+        '
+        Me.TSP_ComboBox_Reproductionoperator.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.TSP_ComboBox_Reproductionoperator.FormattingEnabled = True
+        Me.TSP_ComboBox_Reproductionoperator.Items.AddRange(New Object() {"PMX", "OX"})
+        Me.TSP_ComboBox_Reproductionoperator.Location = New System.Drawing.Point(81, 162)
+        Me.TSP_ComboBox_Reproductionoperator.Name = "TSP_ComboBox_Reproductionoperator"
+        Me.TSP_ComboBox_Reproductionoperator.Size = New System.Drawing.Size(134, 21)
+        Me.TSP_ComboBox_Reproductionoperator.TabIndex = 54
+        '
+        'TSP_Numeric_n_generations
+        '
+        Me.TSP_Numeric_n_generations.Location = New System.Drawing.Point(125, 136)
+        Me.TSP_Numeric_n_generations.Maximum = New Decimal(New Integer() {-1981284353, -1966660860, 0, 0})
+        Me.TSP_Numeric_n_generations.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.TSP_Numeric_n_generations.Name = "TSP_Numeric_n_generations"
+        Me.TSP_Numeric_n_generations.Size = New System.Drawing.Size(90, 20)
+        Me.TSP_Numeric_n_generations.TabIndex = 11
+        Me.TSP_Numeric_n_generations.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TSP_Numeric_n_generations.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'TSP_Label_n_generations
+        '
+        Me.TSP_Label_n_generations.AutoSize = True
+        Me.TSP_Label_n_generations.Location = New System.Drawing.Point(10, 138)
+        Me.TSP_Label_n_generations.Name = "TSP_Label_n_generations"
+        Me.TSP_Label_n_generations.Size = New System.Drawing.Size(99, 13)
+        Me.TSP_Label_n_generations.TabIndex = 10
+        Me.TSP_Label_n_generations.Text = "No. of Generations:"
+        '
+        'TSP_Numeric_n_children
+        '
+        Me.TSP_Numeric_n_children.Location = New System.Drawing.Point(125, 110)
+        Me.TSP_Numeric_n_children.Maximum = New Decimal(New Integer() {-727379968, 232, 0, 0})
+        Me.TSP_Numeric_n_children.Minimum = New Decimal(New Integer() {7, 0, 0, 0})
+        Me.TSP_Numeric_n_children.Name = "TSP_Numeric_n_children"
+        Me.TSP_Numeric_n_children.Size = New System.Drawing.Size(90, 20)
+        Me.TSP_Numeric_n_children.TabIndex = 9
+        Me.TSP_Numeric_n_children.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TSP_Numeric_n_children.Value = New Decimal(New Integer() {7, 0, 0, 0})
+        '
+        'TSP_Label_n_children
+        '
+        Me.TSP_Label_n_children.AutoSize = True
+        Me.TSP_Label_n_children.Location = New System.Drawing.Point(10, 112)
+        Me.TSP_Label_n_children.Name = "TSP_Label_n_children"
+        Me.TSP_Label_n_children.Size = New System.Drawing.Size(80, 13)
+        Me.TSP_Label_n_children.TabIndex = 8
+        Me.TSP_Label_n_children.Text = "No. of Children:"
+        '
+        'TSP_Numeric_n_parents
+        '
+        Me.TSP_Numeric_n_parents.Location = New System.Drawing.Point(125, 84)
+        Me.TSP_Numeric_n_parents.Maximum = New Decimal(New Integer() {1410065408, 2, 0, 0})
+        Me.TSP_Numeric_n_parents.Minimum = New Decimal(New Integer() {3, 0, 0, 0})
+        Me.TSP_Numeric_n_parents.Name = "TSP_Numeric_n_parents"
+        Me.TSP_Numeric_n_parents.Size = New System.Drawing.Size(90, 20)
+        Me.TSP_Numeric_n_parents.TabIndex = 7
+        Me.TSP_Numeric_n_parents.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TSP_Numeric_n_parents.Value = New Decimal(New Integer() {3, 0, 0, 0})
+        '
+        'TSP_Label_n_parents
+        '
+        Me.TSP_Label_n_parents.AutoSize = True
+        Me.TSP_Label_n_parents.Location = New System.Drawing.Point(10, 86)
+        Me.TSP_Label_n_parents.Name = "TSP_Label_n_parents"
+        Me.TSP_Label_n_parents.Size = New System.Drawing.Size(78, 13)
+        Me.TSP_Label_n_parents.TabIndex = 6
+        Me.TSP_Label_n_parents.Text = "No. of Parents:"
+        '
+        'TSP_Numeric_n_cities
+        '
+        Me.TSP_Numeric_n_cities.Location = New System.Drawing.Point(162, 13)
+        Me.TSP_Numeric_n_cities.Maximum = New Decimal(New Integer() {1215752192, 23, 0, 0})
+        Me.TSP_Numeric_n_cities.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.TSP_Numeric_n_cities.Name = "TSP_Numeric_n_cities"
+        Me.TSP_Numeric_n_cities.Size = New System.Drawing.Size(53, 20)
+        Me.TSP_Numeric_n_cities.TabIndex = 5
+        Me.TSP_Numeric_n_cities.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.TSP_Numeric_n_cities.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'TSP_Label_n_cities
+        '
+        Me.TSP_Label_n_cities.AutoSize = True
+        Me.TSP_Label_n_cities.Location = New System.Drawing.Point(10, 15)
+        Me.TSP_Label_n_cities.Name = "TSP_Label_n_cities"
+        Me.TSP_Label_n_cities.Size = New System.Drawing.Size(67, 13)
+        Me.TSP_Label_n_cities.TabIndex = 0
+        Me.TSP_Label_n_cities.Text = "No. of Cities:"
+        '
         'GroupBox_Einstellungen
         '
         Me.GroupBox_Einstellungen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -1727,66 +1969,34 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Einstellungen:"
         '
-        'TabPage_General
+        'Numeric_CES_k_Value
         '
-        Me.TabPage_General.Controls.Add(GroupBox_Diagramm)
-        Me.TabPage_General.Controls.Add(Me.GroupBox_Sim)
-        Me.TabPage_General.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_General.Name = "TabPage_General"
-        Me.TabPage_General.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_General.Size = New System.Drawing.Size(221, 668)
-        Me.TabPage_General.TabIndex = 6
-        Me.TabPage_General.Text = "General"
-        Me.TabPage_General.UseVisualStyleBackColor = True
+        Me.Numeric_CES_k_Value.Enabled = False
+        Me.Numeric_CES_k_Value.Location = New System.Drawing.Point(138, 151)
+        Me.Numeric_CES_k_Value.Name = "Numeric_CES_k_Value"
+        Me.Numeric_CES_k_Value.Size = New System.Drawing.Size(53, 20)
+        Me.Numeric_CES_k_Value.TabIndex = 51
+        Me.Numeric_CES_k_Value.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Numeric_CES_k_Value.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
-        'GroupBox_Sim
+        'Label_CES_k_Value
         '
-        Me.GroupBox_Sim.Controls.Add(Me.CheckBox_useMultithreading)
-        Me.GroupBox_Sim.Location = New System.Drawing.Point(6, 6)
-        Me.GroupBox_Sim.Name = "GroupBox_Sim"
-        Me.GroupBox_Sim.Size = New System.Drawing.Size(209, 53)
-        Me.GroupBox_Sim.TabIndex = 3
-        Me.GroupBox_Sim.TabStop = False
-        Me.GroupBox_Sim.Text = "Simulationen"
-        '
-        'CheckBox_useMultithreading
-        '
-        Me.CheckBox_useMultithreading.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBox_useMultithreading.Location = New System.Drawing.Point(6, 20)
-        Me.CheckBox_useMultithreading.Name = "CheckBox_useMultithreading"
-        Me.CheckBox_useMultithreading.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CheckBox_useMultithreading.Size = New System.Drawing.Size(197, 24)
-        Me.CheckBox_useMultithreading.TabIndex = 0
-        Me.CheckBox_useMultithreading.Text = "Multithreading benutzen:"
-        Me.CheckBox_useMultithreading.UseVisualStyleBackColor = True
-        '
-        'GroupBox_Diagramm
-        '
-        GroupBox_Diagramm.Controls.Add(Me.CheckBox_drawOnlyCurrentGen)
-        GroupBox_Diagramm.Location = New System.Drawing.Point(6, 65)
-        GroupBox_Diagramm.Name = "GroupBox_Diagramm"
-        GroupBox_Diagramm.Size = New System.Drawing.Size(209, 62)
-        GroupBox_Diagramm.TabIndex = 4
-        GroupBox_Diagramm.TabStop = False
-        GroupBox_Diagramm.Text = "Diagramm"
-        '
-        'CheckBox_drawOnlyCurrentGen
-        '
-        Me.CheckBox_drawOnlyCurrentGen.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBox_drawOnlyCurrentGen.Location = New System.Drawing.Point(6, 19)
-        Me.CheckBox_drawOnlyCurrentGen.Name = "CheckBox_drawOnlyCurrentGen"
-        Me.CheckBox_drawOnlyCurrentGen.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CheckBox_drawOnlyCurrentGen.Size = New System.Drawing.Size(197, 37)
-        Me.CheckBox_drawOnlyCurrentGen.TabIndex = 1
-        Me.CheckBox_drawOnlyCurrentGen.Text = "Nur die aktuelle Generation anzeigen:"
-        Me.CheckBox_drawOnlyCurrentGen.UseVisualStyleBackColor = True
+        Label_CES_k_Value.AutoSize = True
+        Label_CES_k_Value.Location = New System.Drawing.Point(2, 154)
+        Label_CES_k_Value.Name = "Label_CES_k_Value"
+        Label_CES_k_Value.Size = New System.Drawing.Size(107, 13)
+        Label_CES_k_Value.TabIndex = 50
+        Label_CES_k_Value.Text = "k-Value (No Of Cuts):"
         '
         'EVO_Einstellungen
         '
         Me.Controls.Add(Me.GroupBox_Einstellungen)
         Me.Name = "EVO_Einstellungen"
         Me.Size = New System.Drawing.Size(244, 753)
+        GroupBox_Diagramm.ResumeLayout(False)
         Me.TabControl1.ResumeLayout(False)
+        Me.TabPage_General.ResumeLayout(False)
+        Me.GroupBox_Sim.ResumeLayout(False)
         Me.TabPage_PES.ResumeLayout(False)
         Me.TabPage_PES.PerformLayout()
         CType(Me.TextDeltaStart, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1821,7 +2031,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBoxCES.ResumeLayout(False)
         Me.GroupBoxCES.PerformLayout()
         CType(Me.Numeric_CES_MutRate, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Numeric_CES_n_childs, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Numeric_CES_n_Children, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_CES_n_Parents, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.Numeric_CES_n_Generations, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_HookeJeeves.ResumeLayout(False)
@@ -1851,10 +2061,14 @@ Partial Class EVO_Einstellungen
         CType(Me.SensiPlot_NumericUpDown_NumSteps, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SensiPlot_GroupBox_Modus.ResumeLayout(False)
         Me.SensiPlot_GroupBox_Modus.PerformLayout()
+        Me.TabPage_TSP.ResumeLayout(False)
+        Me.TabPage_TSP.PerformLayout()
+        CType(Me.TSP_Numeric_n_generations, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TSP_Numeric_n_children, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
-        Me.TabPage_General.ResumeLayout(False)
-        Me.GroupBox_Sim.ResumeLayout(False)
-        GroupBox_Diagramm.ResumeLayout(False)
+        CType(Me.Numeric_CES_k_Value, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1897,7 +2111,7 @@ Partial Class EVO_Einstellungen
     Private WithEvents Combo_CES_Reproduction As System.Windows.Forms.ComboBox
     Private WithEvents Combo_CES_Mutation As System.Windows.Forms.ComboBox
     Private WithEvents GroupBoxCES As System.Windows.Forms.GroupBox
-    Private WithEvents Numeric_CES_n_childs As System.Windows.Forms.NumericUpDown
+    Private WithEvents Numeric_CES_n_Children As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_CES_n_Parents As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_CES_n_Generations As System.Windows.Forms.NumericUpDown
     Private WithEvents Numeric_CES_n_member_SecPop As System.Windows.Forms.NumericUpDown
@@ -1956,4 +2170,20 @@ Partial Class EVO_Einstellungen
     Private WithEvents CheckBox_useMultithreading As System.Windows.Forms.CheckBox
     Private WithEvents TabPage_General As System.Windows.Forms.TabPage
     Private WithEvents CheckBox_drawOnlyCurrentGen As System.Windows.Forms.CheckBox
+    Private WithEvents TabPage_TSP As System.Windows.Forms.TabPage
+    Friend WithEvents TSP_Label_n_cities As System.Windows.Forms.Label
+    Private WithEvents TSP_Numeric_n_generations As System.Windows.Forms.NumericUpDown
+    Friend WithEvents TSP_Label_n_generations As System.Windows.Forms.Label
+    Private WithEvents TSP_Numeric_n_children As System.Windows.Forms.NumericUpDown
+    Friend WithEvents TSP_Label_n_children As System.Windows.Forms.Label
+    Private WithEvents TSP_Numeric_n_parents As System.Windows.Forms.NumericUpDown
+    Friend WithEvents TSP_Label_n_parents As System.Windows.Forms.Label
+    Private WithEvents TSP_Numeric_n_cities As System.Windows.Forms.NumericUpDown
+    Private WithEvents TSP_ComboBox_Mutationoperator As System.Windows.Forms.ComboBox
+    Friend WithEvents TSP_Label_Mutationoperator As System.Windows.Forms.Label
+    Friend WithEvents TSP_Label_Reproductionoperator As System.Windows.Forms.Label
+    Private WithEvents TSP_ComboBox_Reproductionoperator As System.Windows.Forms.ComboBox
+    Private WithEvents TSP_ComboBox_prob_instance As System.Windows.Forms.ComboBox
+    Friend WithEvents TSP_Label_Instance As System.Windows.Forms.Label
+    Private WithEvents Numeric_CES_k_Value As System.Windows.Forms.NumericUpDown
 End Class

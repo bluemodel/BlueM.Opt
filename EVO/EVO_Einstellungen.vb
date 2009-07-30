@@ -77,6 +77,8 @@ Public Class EVO_Einstellungen
         Call Me.msettings.MetaEvo.setStandard()
         Call Me.msettings.DDS.setStandard()
         Call Me.msettings.SensiPlot.setStandard()
+        Call Me.msettings.TSP.setStandard()
+
         'Call Me.writeForm()
         Me.isInitializing = False
 
@@ -178,6 +180,12 @@ Public Class EVO_Einstellungen
 
                 'Tabpage anzeigen
                 Me.TabControl1.TabPages.Add(Me.TabPage_SensiPlot)
+
+
+            Case METH_TSP
+
+                'Tabpage anzeigen
+                Me.TabControl1.TabPages.Add(Me.TabPage_TSP)
 
         End Select
 
@@ -349,6 +357,12 @@ Public Class EVO_Einstellungen
         Me.Combo_CES_HybridType.DataSource = System.Enum.GetValues(GetType(HYBRID_TYPE))
         Me.Combo_CES_MemStrategy.DataSource = System.Enum.GetValues(GetType(MEMORY_STRATEGY))
 
+        'TSP
+        '---
+        Me.TSP_ComboBox_prob_instance.DataSource = System.Enum.GetValues(GetType(EnProblem))
+        Me.TSP_ComboBox_Reproductionoperator.DataSource = System.Enum.GetValues(GetType(EnReprodOperator))
+        Me.TSP_ComboBox_Mutationoperator.DataSource = System.Enum.GetValues(GetType(EnMutOperator))
+
     End Sub
 
     Private Sub FILLCOMBO_POPPENALTY(ByRef Cntrl As System.Windows.Forms.ComboBox)
@@ -437,9 +451,10 @@ Public Class EVO_Einstellungen
                     ' = me.Combo_CES_IniValues.SelectedItem
                     .n_Generations = Me.Numeric_CES_n_Generations.Value
                     .n_Parents = Me.Numeric_CES_n_Parents.Value
-                    .n_Childs = Me.Numeric_CES_n_childs.Value
+                    .n_Children = Me.Numeric_CES_n_Children.Value
                     .OptStrategie = Me.Combo_CES_Selection.SelectedItem
                     .OptReprodOp = Me.Combo_CES_Reproduction.SelectedItem
+                    .k_Value = Me.Numeric_CES_k_Value.Value
                     .OptMutOperator = Me.Combo_CES_Mutation.SelectedItem
                     .pr_MutRate = Me.Numeric_CES_MutRate.Value
                     .is_SecPop = Me.CheckBox_CES_UseSecPop_CES.Checked
@@ -527,6 +542,18 @@ Public Class EVO_Einstellungen
                     .show_Wave = Me.SensiPlot_CheckBox_wave.Checked
 
                 End With
+
+                'TSP
+                '---
+                With Me.msettings.TSP
+                    .n_Cities = Me.TSP_Numeric_n_cities.Value
+                    .Problem = Me.TSP_ComboBox_prob_instance.SelectedItem
+                    .n_Parents = Me.TSP_Numeric_n_parents.Value
+                    .n_Children = Me.TSP_Numeric_n_children.Value
+                    .n_Gen = Me.TSP_Numeric_n_generations.Value
+                    .ReprodOperator = Me.TSP_ComboBox_Reproductionoperator.SelectedItem
+                    .MutOperator = Me.TSP_ComboBox_Mutationoperator.SelectedItem
+                End With
         End Select
 
     End Sub
@@ -555,7 +582,7 @@ Public Class EVO_Einstellungen
                     Me.TextAnzEltern.Enabled = True
                     Me.LabelAnzEltern.Text = "Maximal Zahl der Eltern:"
 
-                    'Childs
+                    'Children
                     Me.TextAnzNachf.Text = 1
                     Me.TextAnzNachf.Enabled = False
 
@@ -570,7 +597,7 @@ Public Class EVO_Einstellungen
                     Me.TextAnzEltern.Enabled = True
                     Me.LabelAnzEltern.Text = "Anzahl der Eltern:"
 
-                    'Childs
+                    'Children
                     Me.TextAnzNachf.Text = 15
                     Me.TextAnzNachf.Enabled = True
 
@@ -591,7 +618,7 @@ Public Class EVO_Einstellungen
             Me.CheckBox_drawOnlyCurrentGen.Checked = .drawOnlyCurrentGeneration
         End With
 
-        
+
         Select Case Me.msettings.General.Method
 
             Case "METH_PES", "METH_HYBRID"
@@ -635,7 +662,7 @@ Public Class EVO_Einstellungen
                 End With
 
 
-                
+
             Case "METH_CES", "METH_HYBRID"
                 'CES
                 '---
@@ -646,7 +673,8 @@ Public Class EVO_Einstellungen
                     'me.Combo_CES_IniValues.SelectedItem = .
                     Me.Numeric_CES_n_Generations.Value = .n_Generations
                     Me.Numeric_CES_n_Parents.Value = .n_Parents
-                    Me.Numeric_CES_n_childs.Value = .n_Childs
+                    Me.Numeric_CES_n_Children.Value = .n_Children
+                    Me.Numeric_CES_k_Value.Value = .k_Value
                     Me.Combo_CES_Selection.SelectedItem = .OptStrategie
                     Me.Combo_CES_Reproduction.SelectedItem = .OptReprodOp
                     Me.Combo_CES_Mutation.SelectedItem = .OptMutOperator
@@ -668,7 +696,7 @@ Public Class EVO_Einstellungen
 
                 End With
 
-                
+
             Case "HookJeeves"
                 'Hook and Jeeves
                 '---------------
@@ -680,7 +708,7 @@ Public Class EVO_Einstellungen
 
                 End With
 
-                
+
             Case "METH_MetaEvo"
                 'MetaEvo
                 '---------------
@@ -699,7 +727,7 @@ Public Class EVO_Einstellungen
 
                 End With
 
-                
+
             Case "METH_DDS"
                 'DDS
                 '---------------
@@ -711,7 +739,7 @@ Public Class EVO_Einstellungen
 
                 End With
 
-                
+
             Case "METH_SENSIPLOT"
                 'SensiPlot
                 '--------------
@@ -754,6 +782,20 @@ Public Class EVO_Einstellungen
                     Me.SensiPlot_CheckBox_wave.Checked = .show_Wave
 
                 End With
+
+
+                'TSP
+                '---
+                With Me.msettings.TSP
+                    Me.TSP_Numeric_n_cities.Value = .n_Cities
+                    Me.TSP_ComboBox_prob_instance.SelectedItem = .Problem
+                    Me.TSP_Numeric_n_parents.Value = .n_Parents
+                    Me.TSP_Numeric_n_children.Value = .n_Children
+                    Me.TSP_Numeric_n_generations.Value = .n_Gen
+                    Me.TSP_ComboBox_Reproductionoperator.SelectedItem = .ReprodOperator
+                    Me.TSP_ComboBox_Mutationoperator.SelectedItem = .MutOperator
+                End With
+
         End Select
 
         Call Application.DoEvents()
@@ -762,12 +804,12 @@ Public Class EVO_Einstellungen
 
     'Settings für TestModus
     '**********************
-    Public Sub setTestModus(ByVal Modus As CES_T_MODUS, ByVal Path() As Integer, ByVal nGen As Integer, ByVal nParents As Integer, ByVal NChilds As Integer)
+    Public Sub setTestModus(ByVal Modus As CES_T_MODUS, ByVal Path() As Integer, ByVal nGen As Integer, ByVal nParents As Integer, ByVal NChildren As Integer)
 
         Dim i As Integer
         Dim PathStr As String
 
-        If NChilds = 1 Then
+        If NChildren = 1 Then
             PathStr = "   Path: "
             For i = 0 To Path.GetUpperBound(0)
                 PathStr = PathStr & Path(i) & " "
@@ -775,15 +817,15 @@ Public Class EVO_Einstellungen
             PathStr = PathStr.TrimEnd
         Else
             PathStr = "   n_combi: "
-            PathStr = PathStr & NChilds
+            PathStr = PathStr & NChildren
         End If
 
         Me.Label_CES_OptModus.Text = "Modus: " & Modus.ToString & PathStr
         Me.Numeric_CES_n_Generations.Value = nGen
         Me.Numeric_CES_n_Parents.Minimum = 1
         Me.Numeric_CES_n_Parents.Value = nParents
-        Me.Numeric_CES_n_childs.Minimum = 1
-        Me.Numeric_CES_n_childs.Value = NChilds
+        Me.Numeric_CES_n_Children.Minimum = 1
+        Me.Numeric_CES_n_Children.Value = NChildren
 
     End Sub
 
@@ -826,6 +868,12 @@ Public Class EVO_Einstellungen
     '******************************************
     Private Sub setStandard_SensiPlot()
         Call Me.msettings.SensiPlot.setStandard()
+    End Sub
+
+    'Standardeinstellungen setzen für TSP
+    '************************************
+    Private Sub setStandard_TSP()
+        Call Me.msettings.TSP.setStandard()
     End Sub
 
     'Speichern der EVO_Settings in einer XML-Datei
@@ -976,4 +1024,18 @@ Public Class EVO_Einstellungen
 
 #End Region 'Methoden
 
+    Private Sub TSP_Numeric_n_children_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TSP_Numeric_n_children.ValueChanged
+
+    End Sub
+
+    Private Sub Combo_CES_Reproduction_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Combo_CES_Reproduction.SelectedIndexChanged
+
+        If Me.Combo_CES_Reproduction.SelectedItem = EVO.Common.CES_REPRODOP.k_Point_Crossover Then
+            Me.Numeric_CES_k_Value.Enabled = True
+            Me.Numeric_CES_k_Value.Value = 3
+        Else
+            Me.Numeric_CES_k_Value.Enabled = False
+            Me.Numeric_CES_k_Value.Value = 0
+        End If
+    End Sub
 End Class

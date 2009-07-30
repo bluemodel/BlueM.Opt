@@ -93,7 +93,7 @@ Partial Public Class Form1
     ''' <summary>
     ''' Formular zurücksetzen
     ''' </summary>
-	Public Sub INI()
+    Public Sub INI()
 
         Me.IsInitializing = True
 
@@ -124,9 +124,9 @@ Partial Public Class Form1
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'Einstellungen
-		Me.mSettings = New EVO.Common.EVO_Settings()
-		Me.EVO_Einstellungen1.setSettings(Me.mSettings)
-		Me.EVO_Einstellungen1.setStandard_All()	 '#MPC#
+        Me.mSettings = New EVO.Common.EVO_Settings()
+        Me.EVO_Einstellungen1.setSettings(Me.mSettings)
+        Me.EVO_Einstellungen1.setStandard_All()  '#MPC#
         Me.EVO_Einstellungen1.ResetUI()
 
         'Monitor zurücksetzen
@@ -163,7 +163,7 @@ Partial Public Class Form1
     ''' <summary>
     ''' Button New geklickt
     ''' </summary>
-	Public Sub Button_New_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_New.Click
+    Public Sub Button_New_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_New.Click
         'Controller stoppen
         If (Me.StopOptimization()) Then
             'Formular zurücksetzen
@@ -262,13 +262,13 @@ Partial Public Class Form1
 
     'Anwendung wurde ausgewählt
     '**************************
-	Public Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
-		If (Not Me.IsInitializing) Then
-			Me.mSettings.General.Application = ComboBox_Anwendung.SelectedItem
-			INI_App_ohneEvent()
-		End If
-	End Sub
-	Public Sub INI_App_ohneEvent()
+    Public Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
+        If (Not Me.IsInitializing) Then
+            Me.mSettings.General.Application = ComboBox_Anwendung.SelectedItem
+            INI_App_ohneEvent()
+        End If
+    End Sub
+    Public Sub INI_App_ohneEvent()
 
         If (Me.IsInitializing = True) Then
 
@@ -312,7 +312,7 @@ Partial Public Class Form1
                 'Mauszeiger busy
                 Cursor = Cursors.WaitCursor
 
-				Me.Anwendung = Me.mSettings.General.Application
+                Me.Anwendung = Me.mSettings.General.Application
 
                 Select Case Me.Anwendung
 
@@ -367,7 +367,14 @@ Partial Public Class Form1
 
                         'HACK: bei TSP Datensatz und Methode nicht notwendig, Abkürzung:
                         'Start-Button aktivieren (keine Methodenauswahl erforderlich)
-                        Button_Start.Enabled = True
+                        'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
+                        Me.IsInitializing = True
+                        Call Me.ComboBox_Methode.Items.Clear()
+                        Call Me.ComboBox_Methode.Items.Add(METH_TSP)
+                        Me.IsInitializing = False
+                        Me.ComboBox_Methode.Enabled = True
+                        Me.ComboBox_Methode.SelectedIndex = 0
+                        'Button_Start.Enabled = True
 
                 End Select
 
@@ -394,11 +401,11 @@ Partial Public Class Form1
             'Mauszeiger wieder normal
             Cursor = Cursors.Default
 
-			If (Me.mSettings.General.useMPC) Then
-				INI_Datensatz_ohneEvent()
-        End If
+            If (Me.mSettings.General.useMPC) Then
+                INI_Datensatz_ohneEvent()
+            End If
 
-		End If
+        End If
 
     End Sub
 
@@ -440,19 +447,19 @@ Partial Public Class Form1
                 'Simulationsanwendungen:
                 '-----------------------
 
-	            'Browse-Button aktivieren
-	            Me.Button_BrowseDatensatz.Enabled = True
-	
-	            'zuletzt benutzten Datensatz setzen?
-	            If (Me.ComboBox_Datensatz.Items.Count > 0) Then
-	                'obersten (zuletzt genutzten) Datensatz auswählen
-	                pfad = Me.ComboBox_Datensatz.Items(0)
-					Me.mSettings.General.Dataset = pfad
-	                'Datensatz setzen
-	                Cursor = Cursors.WaitCursor
-	                Call Sim1.setDatensatz(pfad)
-	                Cursor = Cursors.Default
-	            End If
+                'Browse-Button aktivieren
+                Me.Button_BrowseDatensatz.Enabled = True
+
+                'zuletzt benutzten Datensatz setzen?
+                If (Me.ComboBox_Datensatz.Items.Count > 0) Then
+                    'obersten (zuletzt genutzten) Datensatz auswählen
+                    pfad = Me.ComboBox_Datensatz.Items(0)
+                    Me.mSettings.General.Dataset = pfad
+                    'Datensatz setzen
+                    Cursor = Cursors.WaitCursor
+                    Call Sim1.setDatensatz(pfad)
+                    Cursor = Cursors.Default
+                End If
 
         End Select
 
@@ -524,7 +531,7 @@ Partial Public Class Form1
         If (DiagResult = Windows.Forms.DialogResult.OK) Then
 
             pfad = OpenFileDialog1.FileName
-			Me.mSettings.General.Dataset = pfad
+            Me.mSettings.General.Dataset = pfad
 
             'Datensatz setzen
             Call Sim1.setDatensatz(pfad)
@@ -540,11 +547,11 @@ Partial Public Class Form1
 
             'Datensatzanzeige aktualisieren
             Call Me.Datensatz_populateCombo()
-			Me.mSettings.General.Dataset = pfad
+            Me.mSettings.General.Dataset = pfad
 
             'Methodenauswahl wieder zurücksetzen 
             '(Der Benutzer muss zuerst Ini neu ausführen!)
-			Me.mSettings.General.Method = ""
+            Me.mSettings.General.Method = ""
 
         End If
 
@@ -564,23 +571,23 @@ Partial Public Class Form1
     'Datensatz wurde ausgewählt
     '**************************
     Private Sub INI_Datensatz(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Datensatz.SelectedIndexChanged
-		If (Not Me.IsInitializing) Then
-			Me.mSettings.General.Dataset = Me.ComboBox_Datensatz.SelectedItem
-			INI_Datensatz_ohneEvent()
-		End If
-	End Sub
+        If (Not Me.IsInitializing) Then
+            Me.mSettings.General.Dataset = Me.ComboBox_Datensatz.SelectedItem
+            INI_Datensatz_ohneEvent()
+        End If
+    End Sub
 
-	Public Sub INI_Datensatz_ohneEvent()
+    Public Sub INI_Datensatz_ohneEvent()
 
         If (Me.IsInitializing = True) Then
 
             Exit Sub
 
         Else
-			If (Me.mSettings.General.useMPC) Then
+            If (Me.mSettings.General.useMPC) Then
                 Me.mSettings.General.Dataset = Me.mSettings.MPC.Problempfad + Me.mSettings.MPC.Problemname + ".inp"
-				Me.ComboBox_Datensatz.SelectedItem = Me.mSettings.General.Dataset
-			End If
+                Me.ComboBox_Datensatz.SelectedItem = Me.mSettings.General.Dataset
+            End If
 
             'Zurücksetzen
             '------------
@@ -598,7 +605,7 @@ Partial Public Class Form1
                 Case ANW_TESTPROBLEME
 
                     'Testproblem setzen
-					Testprobleme1.setTestproblem(Me.mSettings.General.Dataset)
+                    Testprobleme1.setTestproblem(Me.mSettings.General.Dataset)
 
                     'Tooltip anzeigen
                     Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
@@ -606,10 +613,10 @@ Partial Public Class Form1
                 Case Else '(Alle Sim-Anwendungen)
 
                     'Datensatz setzen
-					Call Sim1.setDatensatz(Me.mSettings.General.Dataset)
+                    Call Sim1.setDatensatz(Me.mSettings.General.Dataset)
 
                     'Tooltip anzeigen
-					Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Me.mSettings.General.Dataset)
+                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Me.mSettings.General.Dataset)
 
             End Select
 
@@ -617,7 +624,7 @@ Partial Public Class Form1
             '-------------------------------------------
             Me.Label_Methode.Enabled = True
             Me.ComboBox_Methode.Enabled = True
-			'Me.mSettings.General.Method = "" 'Fehler für MPC wenn auf "" gesetzt - alternativ settings noch einmal nach INI_Datensatz_ohneEvent() im MPC-Controller neu setzen
+            'Me.mSettings.General.Method = "" 'Fehler für MPC wenn auf "" gesetzt - alternativ settings noch einmal nach INI_Datensatz_ohneEvent() im MPC-Controller neu setzen
 
             'Progress zurücksetzen
             Call Me.mProgress.Initialize()
@@ -629,29 +636,29 @@ Partial Public Class Form1
     'Methode wurde ausgewählt
     '************************
     Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Methode.SelectedIndexChanged
-		If (Not Me.IsInitializing) Then
-			Me.mSettings.General.Method = Me.ComboBox_Methode.SelectedItem
-			INI_Method_ohneEvent()
-		End If
-	End Sub
+        If (Not Me.IsInitializing) Then
+            Me.mSettings.General.Method = Me.ComboBox_Methode.SelectedItem
+            INI_Method_ohneEvent()
+        End If
+    End Sub
 
-	Public Sub INI_Method_ohneEvent()
+    Public Sub INI_Method_ohneEvent()
 
-		If (Me.IsInitializing = True Or Me.mSettings.General.Method = "") Then
+        If (Me.IsInitializing = True Or Me.mSettings.General.Method = "") Then
 
             Exit Sub
 
         Else
 
-			Try  ' "fehler beim setzen der methode: Die Eingabezeichenfolge hat das falsche Format" nach swmm fehler 68
+            Try  ' "fehler beim setzen der methode: Die Eingabezeichenfolge hat das falsche Format" nach swmm fehler 68
 
                 'Mauszeiger busy
                 Cursor = Cursors.WaitCursor
 
                 'Problem initialisieren
                 '======================
-				Call Me.INI_Problem(Me.mSettings.General.Method)
-				Call Me.EVO_Einstellungen1.Initialise(Me.mProblem)
+                Call Me.INI_Problem(Me.mSettings.General.Method)
+                Call Me.EVO_Einstellungen1.Initialise(Me.mProblem)
 
                 'Methodenspezifische Vorbereitungen
                 '(zunächst alles deaktivieren, danach je nach Methode aktivieren)
@@ -749,7 +756,10 @@ Partial Public Class Form1
                         Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                         'Progress mit Standardwerten initialisieren
-						Call Me.mProgress.Initialize(1, 1, Me.mSettings.MetaEvo.NumberGenerations, Me.mSettings.MetaEvo.PopulationSize)
+                        Call Me.mProgress.Initialize(1, 1, Me.mSettings.MetaEvo.NumberGenerations, Me.mSettings.MetaEvo.PopulationSize)
+
+                    Case METH_TSP
+                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                 End Select
 
@@ -816,7 +826,7 @@ Partial Public Class Form1
 
         'Problem an EVO_Einstellungen übergeben
         '--------------------------------------
-		'Call Me.EVO_Einstellungen1.Initialise(Me.mProblem) #MPC#
+        'Call Me.EVO_Einstellungen1.Initialise(Me.mProblem) #MPC#
 
         'Individuumsklasse mit Problem initialisieren
         '--------------------------------------------
@@ -842,11 +852,11 @@ Partial Public Class Form1
     'XXXXXXXXXXXXXXXXXXXXXXXXXX
 
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
-		STARTEN_Button_Click_ohneEvent()
-	End Sub
+        STARTEN_Button_Click_ohneEvent()
+    End Sub
 
 
-	Public Sub STARTEN_Button_Click_ohneEvent()
+    Public Sub STARTEN_Button_Click_ohneEvent()
 
         'Stoppuhr
         Dim AllOptTime As New Stopwatch
@@ -859,7 +869,7 @@ Partial Public Class Form1
             Me.Button_Start.Text = "Continue"
 
             'Bei Multithreading muss Sim explizit pausiert werden
-			If (Me.mSettings.General.useMultithreading) Then
+            If (Me.mSettings.General.useMultithreading) Then
                 Me.Sim1.isPause = True
             End If
 
@@ -875,7 +885,7 @@ Partial Public Class Form1
             Me.Button_Start.Text = "Pause"
 
             'Bei Multithreading muss Sim explizit wieder gestartet werden
-			If (Me.mSettings.General.useMultithreading) Then
+            If (Me.mSettings.General.useMultithreading) Then
                 Me.Sim1.isPause = False
             End If
 
@@ -909,32 +919,32 @@ Partial Public Class Form1
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
 
-			'Settings-Weiche für MPC
-			If (Not Me.mSettings.General.useMPC) Then
-				Call Me.EVO_Einstellungen1.readForm()
-			ElseIf ((Me.mSettings.General.useMPC) And (Me.mSettings.MPC.MPC_Round = 0)) Then
-				Call Me.EVO_Einstellungen1.readForm()
+            'Settings-Weiche für MPC
+            If (Not Me.mSettings.General.useMPC) Then
+                Call Me.EVO_Einstellungen1.readForm()
+            ElseIf ((Me.mSettings.General.useMPC) And (Me.mSettings.MPC.MPC_Round = 0)) Then
+                Call Me.EVO_Einstellungen1.readForm()
 
-				'Event für MPC auslösen
-				RaiseEvent Startbuttonpressed()
-			End If
+                'Event für MPC auslösen
+                RaiseEvent Startbuttonpressed()
+            End If
 
             'EVO_Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()
 
             'EVO_Settings an Hauptdiagramm übergeben
-			Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
+            Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
 
             'Diagramm vorbereiten und initialisieren
             Call Me.PrepareDiagramm()
 
             Select Case Anwendung
 
-				'Sim-Anwendungen
+                'Sim-Anwendungen
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
                     'Settings an Sim1 übergeben
-					Call Me.Sim1.setSettings(Me.mSettings)
+                    Call Me.Sim1.setSettings(Me.mSettings)
 
                     'Multithreading vorbereiten
                     Call Me.Sim1.prepareMultithreading()
@@ -969,7 +979,7 @@ Partial Public Class Form1
                     End Select
 
                     'Controller für Sim initialisieren und starten
-					Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Sim1)
                     Call controller.Start()
 
@@ -997,7 +1007,7 @@ Partial Public Class Form1
                     End Select
 
                     'Controller für Testproblem initialisieren und starten
-					Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Testprobleme1)
                     Call controller.Start()
 
@@ -1028,15 +1038,15 @@ Partial Public Class Form1
             'Ausgabe der Optimierungszeit
             AllOptTime.Stop()
 
-			If (Me.mSettings.General.useMPC) Then
-				'Event für MPC auslösen 
-				RaiseEvent OptimisationReady()
-			Else
-            'MsgBox("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
-            EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms")
-        End If
+            If (Me.mSettings.General.useMPC) Then
+                'Event für MPC auslösen 
+                RaiseEvent OptimisationReady()
+            Else
+                'MsgBox("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms", MsgBoxStyle.Information)
+                EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Seconds & "ms")
+            End If
 
-		End If
+        End If
 
     End Sub
 
@@ -1149,7 +1159,7 @@ Partial Public Class Form1
                     Case METH_SENSIPLOT 'SensiPlot
                         'XXXXXXXXXXXXXXXXXXXXXXXXX
 
-						If (Me.mSettings.SensiPlot.Selected_OptParameters.GetLength(0) = 1) Then
+                        If (Me.mSettings.SensiPlot.Selected_OptParameters.GetLength(0) = 1) Then
 
                             '1 OptParameter:
                             '---------------
@@ -1157,12 +1167,12 @@ Partial Public Class Form1
                             'Achsen:
                             '-------
                             'X-Achse = QWert
-							Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung
+                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = OptParameter
-							Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -1170,7 +1180,7 @@ Partial Public Class Form1
                             'Achsenzuordnung
                             'BUG 327!
                             For i = 0 To Me.mProblem.NumObjectives - 1
-								If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
+                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexX = i
                                     Exit For 'Abbruch
                                 End If
@@ -1185,17 +1195,17 @@ Partial Public Class Form1
                             'Achsen:
                             '-------
                             'X-Achse = OptParameter1
-							Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = Objective
-							Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung
+                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Z-Achse = OptParameter2
-							Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(1)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(1)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -1204,7 +1214,7 @@ Partial Public Class Form1
                             'BUG 327!
                             Me.Hauptdiagramm1.ZielIndexX = -1
                             For i = 0 To Me.mProblem.NumObjectives - 1
-								If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
+                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexY = i
                                     Exit For 'Abbruch
                                 End If
@@ -1233,15 +1243,15 @@ Partial Public Class Form1
                             Achse.Automatic = False
                             If (Me.mProblem.Method = METH_PES) Then
                                 'Bei PES:
-								If (Me.mSettings.PES.Pop.is_POPUL) Then
-									Achse.Maximum = Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf * Me.mSettings.PES.Pop.n_Runden + 1
+                                If (Me.mSettings.PES.Pop.is_POPUL) Then
+                                    Achse.Maximum = Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf * Me.mSettings.PES.Pop.n_Runden + 1
                                 Else
-									Achse.Maximum = Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf + 1
+                                    Achse.Maximum = Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf + 1
                                 End If
 
                             ElseIf (Me.mProblem.Method = METH_MetaEvo) Then
                                 'Bei MetaEvo:
-								Achse.Maximum = Me.mSettings.MetaEvo.NumberGenerations * Me.mSettings.MetaEvo.ChildsPerParent * Me.mSettings.MetaEvo.PopulationSize
+                                Achse.Maximum = Me.mSettings.MetaEvo.NumberGenerations * Me.mSettings.MetaEvo.ChildrenPerParent * Me.mSettings.MetaEvo.PopulationSize
 
                             ElseIf (Me.mProblem.Method = METH_HOOKJEEVES) Then
                                 'Bei Hooke & Jeeves:
@@ -1253,7 +1263,7 @@ Partial Public Class Form1
 
                             Else
                                 'Bei CES etc.:
-								Achse.Maximum = Me.mSettings.CES.n_Childs * Me.mSettings.CES.n_Generations
+                                Achse.Maximum = Me.mSettings.CES.n_Children * Me.mSettings.CES.n_Generations
                             End If
 
                             Achsen.Add(Achse)
@@ -1967,7 +1977,7 @@ Partial Public Class Form1
                 Call Me.controller.Stoppen()
                 Me.controller = Nothing
                 'bei Multithreading Sim explizit stoppen
-				If (Me.mSettings.General.useMultithreading) Then
+                If (Me.mSettings.General.useMultithreading) Then
                     Me.Sim1.isStopped = True
                 End If
             Else
@@ -2006,7 +2016,7 @@ Partial Public Class Form1
 
 #End Region 'Methoden
 
-	Protected Overrides Sub Finalize()
-		MyBase.Finalize()
-	End Sub
+    Protected Overrides Sub Finalize()
+        MyBase.Finalize()
+    End Sub
 End Class

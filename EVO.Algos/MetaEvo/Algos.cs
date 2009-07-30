@@ -35,7 +35,7 @@ namespace IHWB.EVO.MetaEvo
         {
             individuum_id = individuum_id_input;
             monitor1 = monitor_input;
-            ChildsPerParent = settings_input.MetaEvo.ChildsPerParent;
+            ChildsPerParent = settings_input.MetaEvo.ChildrenPerParent;
             populationsize = settings_input.MetaEvo.PopulationSize;
             HJ_minimumstepsize = settings_input.MetaEvo.HJStepsize;
             settings = settings_input;
