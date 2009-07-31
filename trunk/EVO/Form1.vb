@@ -2020,7 +2020,7 @@ Partial Public Class Form1
 
     Private Sub Start_CES_BatchMode(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
 
-        Dim n_cycles As Integer = 5
+        Dim n_cycles As Integer = 50
         Dim ReprodItem As EVO.Common.Constants.CES_REPRODOP
         Dim MutItem As EVO.Common.Constants.CES_MUTATION
 
@@ -2034,24 +2034,27 @@ Partial Public Class Form1
                     Call Me.INI_Datensatz("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
                     Call Me.INI_Method(METH_CES)
 
-                    'Settings holen
-                    Me.mSettings = EVO_Einstellungen1.getSettings
-
                     'BatchMode einschalten
                     Me.mSettings.General.BatchMode = True
 
                     'Settings ändern
-                    Me.mSettings.CES.OptReprodOp = ReprodItem
-                    If ReprodItem = CES_REPRODOP.k_Point_Crossover Then
-                        Me.mSettings.CES.k_Value = 3
-                    End If
-                    Me.mSettings.CES.OptMutOperator = MutItem
+                    'Me.mSettings.CES.OptReprodOp = ReprodItem
+                    Me.EVO_Einstellungen1.CES_Combo_Reproduction.SelectedItem = ReprodItem
+                    'If ReprodItem = CES_REPRODOP.k_Point_Crossover Then
+                    '    'Me.mSettings.CES.k_Value = 3
+                    '    Me.EVO_Einstellungen1.CES_Numeric_k_Value.Value = 3
+                    'End If
+                    'Me.mSettings.CES.OptMutOperator = MutItem
+                    Me.EVO_Einstellungen1.CES_Combo_Mutation.SelectedItem = MutItem
 
                     'Verhindern, dass die Settings neu eingelesen werden
-                    Me.EVO_Einstellungen1.isSaved = True
+                    'Me.EVO_Einstellungen1.isSaved = True
 
                     Call Monitor1.SelectTabLog()
                     Call Monitor1.Show()
+
+                    'Settings holen
+                    Me.mSettings = EVO_Einstellungen1.getSettings
 
                     Monitor1.LogAppend("ReprodOperator: " & Me.mSettings.CES.OptReprodOp.ToString)
                     Monitor1.LogAppend("MutOperator: " & Me.mSettings.CES.OptMutOperator.ToString)
@@ -2066,6 +2069,7 @@ Partial Public Class Form1
                 Next
             Next
         Next
+
     End Sub
 
 #End Region 'Methoden

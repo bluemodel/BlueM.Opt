@@ -2108,8 +2108,8 @@ Partial Class EVO_Einstellungen
     Private WithEvents CES_Label_OptModus As System.Windows.Forms.Label
     Private WithEvents CES_Combo_Selection As System.Windows.Forms.ComboBox
     Private WithEvents Combo_CES_IniValues As System.Windows.Forms.ComboBox
-    Private WithEvents CES_Combo_Reproduction As System.Windows.Forms.ComboBox
-    Private WithEvents CES_Combo_Mutation As System.Windows.Forms.ComboBox
+    Friend WithEvents CES_Combo_Reproduction As System.Windows.Forms.ComboBox
+    Friend WithEvents CES_Combo_Mutation As System.Windows.Forms.ComboBox
     Private WithEvents GroupBoxCES As System.Windows.Forms.GroupBox
     Private WithEvents CES_Numeric_n_Children As System.Windows.Forms.NumericUpDown
     Private WithEvents CES_Numeric_n_Parents As System.Windows.Forms.NumericUpDown
@@ -2185,5 +2185,5 @@ Partial Class EVO_Einstellungen
     Private WithEvents TSP_ComboBox_Reproductionoperator As System.Windows.Forms.ComboBox
     Private WithEvents TSP_ComboBox_prob_instance As System.Windows.Forms.ComboBox
     Private WithEvents TSP_Label_Instance As System.Windows.Forms.Label
-    Private WithEvents CES_Numeric_k_Value As System.Windows.Forms.NumericUpDown
+    Friend WithEvents CES_Numeric_k_Value As System.Windows.Forms.NumericUpDown
 End Class
