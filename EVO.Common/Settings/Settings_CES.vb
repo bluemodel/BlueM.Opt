@@ -36,13 +36,13 @@ Public Class Settings_CES
             Case METH_CES
 
                 'CES
-                Me.n_Generations = 500
-                Me.n_Parents = 5
+                Me.n_Generations = 100
+                Me.n_Parents = 4
                 Me.n_Children = 15
                 Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
                 Me.OptReprodOp = CES_REPRODOP.Uniform_Crossover
                 Me.OptMutOperator = CES_MUTATION.RND_Switch
-                Me.pr_MutRate = 25
+                Me.pr_MutRate = 10
 
                 Me.is_SecPop = True
                 Me.is_SecPopRestriction = True
@@ -69,7 +69,7 @@ Public Class Settings_CES
                 Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
                 Me.OptReprodOp = CES_REPRODOP.Uniform_Crossover
                 Me.OptMutOperator = CES_MUTATION.RND_Switch
-                Me.pr_MutRate = 25
+                Me.pr_MutRate = 10
 
                 Me.is_SecPop = True
                 Me.is_SecPopRestriction = True
