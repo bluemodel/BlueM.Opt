@@ -247,6 +247,25 @@ Public Class OptResult
 
     End Function
 
+    'Beste Lösung zurückgeben
+    '************************
+    Public Function getBestSolution() As Common.Individuum
+
+        Dim i As Integer
+        Dim bestInd As Common.Individuum
+
+        bestInd = Solutions(0)
+
+        For i = 1 To Solutions.Length - 1
+            If (Math.Abs(Solutions(i).PrimObjectives(0)) < Math.Abs(bestInd.PrimObjectives(0))) Then
+                bestInd = Solutions(i)
+            End If
+        Next
+
+        Return bestInd
+
+    End Function
+
 #End Region 'Ergebnisspeicher
 
 #Region "Ergebnisdatenbank"
