@@ -23,15 +23,64 @@ Partial Class Monitor
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Monitor))
-        Me.Diag = New IHWB.EVO.Diagramm.Diagramm
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_Diagramm = New System.Windows.Forms.TabPage
         Me.TabPage_Log = New System.Windows.Forms.TabPage
         Me.TextBox_Log = New System.Windows.Forms.TextBox
+        Me.Diag = New IHWB.EVO.Diagramm.Diagramm
         Me.TabControl1.SuspendLayout()
         Me.TabPage_Diagramm.SuspendLayout()
         Me.TabPage_Log.SuspendLayout()
         Me.SuspendLayout()
+        '
+        'TabControl1
+        '
+        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TabControl1.Controls.Add(Me.TabPage_Diagramm)
+        Me.TabControl1.Controls.Add(Me.TabPage_Log)
+        Me.TabControl1.Location = New System.Drawing.Point(0, 2)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(496, 465)
+        Me.TabControl1.TabIndex = 9
+        '
+        'TabPage_Diagramm
+        '
+        Me.TabPage_Diagramm.Controls.Add(Me.Diag)
+        Me.TabPage_Diagramm.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_Diagramm.Name = "TabPage_Diagramm"
+        Me.TabPage_Diagramm.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_Diagramm.Size = New System.Drawing.Size(488, 439)
+        Me.TabPage_Diagramm.TabIndex = 0
+        Me.TabPage_Diagramm.Text = "Diagramm"
+        Me.TabPage_Diagramm.UseVisualStyleBackColor = True
+        '
+        'TabPage_Log
+        '
+        Me.TabPage_Log.Controls.Add(Me.TextBox_Log)
+        Me.TabPage_Log.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_Log.Name = "TabPage_Log"
+        Me.TabPage_Log.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_Log.Size = New System.Drawing.Size(488, 439)
+        Me.TabPage_Log.TabIndex = 1
+        Me.TabPage_Log.Text = "Log"
+        Me.TabPage_Log.UseVisualStyleBackColor = True
+        '
+        'TextBox_Log
+        '
+        Me.TextBox_Log.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TextBox_Log.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBox_Log.Location = New System.Drawing.Point(6, 6)
+        Me.TextBox_Log.Multiline = True
+        Me.TextBox_Log.Name = "TextBox_Log"
+        Me.TextBox_Log.ReadOnly = True
+        Me.TextBox_Log.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.TextBox_Log.Size = New System.Drawing.Size(476, 427)
+        Me.TextBox_Log.TabIndex = 0
         '
         'Diag
         '
@@ -95,55 +144,6 @@ Partial Class Monitor
         Me.Diag.Size = New System.Drawing.Size(488, 439)
         Me.Diag.TabIndex = 8
         '
-        'TabControl1
-        '
-        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TabControl1.Controls.Add(Me.TabPage_Diagramm)
-        Me.TabControl1.Controls.Add(Me.TabPage_Log)
-        Me.TabControl1.Location = New System.Drawing.Point(0, 2)
-        Me.TabControl1.Name = "TabControl1"
-        Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(496, 465)
-        Me.TabControl1.TabIndex = 9
-        '
-        'TabPage_Diagramm
-        '
-        Me.TabPage_Diagramm.Controls.Add(Me.Diag)
-        Me.TabPage_Diagramm.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_Diagramm.Name = "TabPage_Diagramm"
-        Me.TabPage_Diagramm.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_Diagramm.Size = New System.Drawing.Size(488, 439)
-        Me.TabPage_Diagramm.TabIndex = 0
-        Me.TabPage_Diagramm.Text = "Diagramm"
-        Me.TabPage_Diagramm.UseVisualStyleBackColor = True
-        '
-        'TabPage_Log
-        '
-        Me.TabPage_Log.Controls.Add(Me.TextBox_Log)
-        Me.TabPage_Log.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_Log.Name = "TabPage_Log"
-        Me.TabPage_Log.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_Log.Size = New System.Drawing.Size(488, 439)
-        Me.TabPage_Log.TabIndex = 1
-        Me.TabPage_Log.Text = "Log"
-        Me.TabPage_Log.UseVisualStyleBackColor = True
-        '
-        'TextBox_Log
-        '
-        Me.TextBox_Log.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TextBox_Log.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBox_Log.Location = New System.Drawing.Point(6, 6)
-        Me.TextBox_Log.Multiline = True
-        Me.TextBox_Log.Name = "TextBox_Log"
-        Me.TextBox_Log.ReadOnly = True
-        Me.TextBox_Log.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.TextBox_Log.Size = New System.Drawing.Size(476, 427)
-        Me.TextBox_Log.TabIndex = 0
-        '
         'Monitor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -152,7 +152,7 @@ Partial Class Monitor
         Me.Controls.Add(Me.TabControl1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Monitor"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "BlueM.Opt Monitor"
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage_Diagramm.ResumeLayout(False)
