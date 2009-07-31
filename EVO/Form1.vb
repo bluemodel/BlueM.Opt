@@ -91,6 +91,8 @@ Partial Public Class Form1
 
         'Monitor zuweisen
         Me.Monitor1 = EVO.Diagramm.Monitor.getInstance()
+		'Monitor zentrieren
+        Me.Monitor1.Location = New Drawing.Point(Me.Location.X + Me.Width / 2 - Me.Monitor1.Width / 2, Me.Location.Y + Me.Height / 2 - Me.Monitor1.Height / 2)
 
         'Formular initialisieren
         Call Me.INI()
@@ -137,7 +139,6 @@ Partial Public Class Form1
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'Einstellungen
-
         Me.EVO_Einstellungen1.Reset()
 
         'Monitor zurücksetzen
