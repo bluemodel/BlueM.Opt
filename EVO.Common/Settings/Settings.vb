@@ -23,9 +23,13 @@ Public Class Settings
     Public Structure General_Settings
         Public useMultithreading As Boolean
         Public drawOnlyCurrentGeneration As Boolean
+        Public BatchMode As Boolean
+        Public BatchCounter As Integer
         Public Sub setStandard()
             Me.useMultithreading = True
             Me.drawOnlyCurrentGeneration = False
+            Me.BatchMode = False
+            Me.BatchCounter = 0
         End Sub
     End Structure
 

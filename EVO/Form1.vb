@@ -28,12 +28,15 @@ Partial Public Class Form1
 
 #Region "Eigenschaften"
 
-    Public BatchMode As Boolean
-    Public BatchCounter As Integer
+    ''' <summary>
+    ''' Wird im BatchMode ausgelöst, sobald die Settings eingelesen wurden (kurz vor Start)
+    ''' </summary>
+    Public Event SettingsSaved()
 
-    'MPC-Events
-    Public Event Startbuttonpressed()
-    Public Event OptimisationReady()
+    ''' <summary>
+    ''' Wird im BatchMode ausgelöst, sobald die Optimierung beendet ist
+    ''' </summary>
+    Public Event OptimizationReady()
 
     Private IsInitializing As Boolean  'Gibt an, ob das Formular bereits fertig geladen wurde(beim Laden werden sämtliche Events ausgelöst)
 
@@ -917,8 +920,11 @@ Partial Public Class Form1
             Me.EVO_Einstellungen1.saveSettings(dir & "Settings.xml")
             Me.EVO_Einstellungen1.isSaved = True
 
-            'Event auslösen (für MPC)
-            RaiseEvent Startbuttonpressed()
+            'Event auslösen (BatchMode)
+            If (Me.mSettings.General.BatchMode) Then
+                Me.mSettings.General.BatchCounter += 1
+                RaiseEvent SettingsSaved()
+            End If
 
             'Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()
@@ -1029,11 +1035,12 @@ Partial Public Class Form1
             'Ausgabe der Optimierungszeit
             AllOptTime.Stop()
 
-            If (Me.BatchMode) Then
+            If (Me.mSettings.General.BatchMode) Then
                 'Event auslösen 
-                RaiseEvent OptimisationReady()
+                RaiseEvent OptimizationReady()
             Else
-            	EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Milliseconds & "ms")
+                'MsgBox("Optimierung beendet!", MsgBoxStyle.Information, "BlueM.Opt")
+                Me.Monitor1.LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Milliseconds & "ms")
             End If
 
         End If
@@ -2004,13 +2011,7 @@ Partial Public Class Form1
         End If
     End Sub
 
-#End Region 'Methoden
-
-    Protected Overrides Sub Finalize()
-        MyBase.Finalize()
-    End Sub
-
-    Private Sub BachModeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
+    Private Sub Start_CES_BatchMode(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
 
         Dim n_cycles As Integer = 5
         Dim ReprodItem As EVO.Common.Constants.CES_REPRODOP
@@ -2022,13 +2023,15 @@ Partial Public Class Form1
                 For Each MutItem In System.Enum.GetValues(GetType(EVO.Common.Constants.CES_MUTATION))
                     'MsgBox(ReprodItems & " and " & MutItems)
 
-                    ComboBox_Anwendung.SelectedItem = ANW_BLUEM
-                    ComboBox_Datensatz.Items.Add("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
-                    ComboBox_Datensatz.SelectedItem = "D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL"
-                    ComboBox_Methode.SelectedItem = METH_CES
+                    Me.INI_App(ANW_BLUEM)
+                    Me.INI_Datensatz("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
+                    Me.INI_Method(METH_CES)
 
                     'Settings holen
                     Me.mSettings = EVO_Einstellungen1.getSettings
+
+                    'BatchMode einschalten
+                    Me.mSettings.General.BatchMode = True
 
                     'Settings ändern
                     Me.mSettings.CES.OptReprodOp = ReprodItem
@@ -2046,9 +2049,9 @@ Partial Public Class Form1
                     Monitor1.LogAppend("ReprodOperator: " & Me.mSettings.CES.OptReprodOp.ToString)
                     Monitor1.LogAppend("MutOperator: " & Me.mSettings.CES.OptMutOperator.ToString)
 
-                    Call STARTEN_Button_Click(sender, e)
+                    Call STARTEN()
 
-                    'Qualität wird im Controler geprüft dann Stopp Button
+                    'Qualität wird im Controller geprüft dann Stop Button
                     Call Monitor1.savelog("D:\xData\Erft_1984_06_Qmax_Skos\Batch\" & Me.mSettings.CES.OptReprodOp.ToString & " ")
 
                     Call Button_New_Click(sender, e)
@@ -2057,5 +2060,7 @@ Partial Public Class Form1
             Next
         Next
     End Sub
+
+#End Region 'Methoden
 
 End Class
