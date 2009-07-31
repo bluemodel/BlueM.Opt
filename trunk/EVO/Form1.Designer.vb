@@ -36,6 +36,7 @@ Partial Class Form1
         Dim ToolStripSeparator7 As System.Windows.Forms.ToolStripSeparator
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem
+        Me.BachModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripMenuItem_Help = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripMenuItem_About = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
@@ -71,7 +72,6 @@ Partial Class Form1
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
-        Me.BachModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
         MenuItem_Info = New System.Windows.Forms.ToolStripMenuItem
@@ -109,6 +109,12 @@ Partial Class Form1
         Me.MenuItem_DatensatzZurücksetzen.Name = "MenuItem_DatensatzZurücksetzen"
         Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(200, 22)
         Me.MenuItem_DatensatzZurücksetzen.Text = "Datensatz zurücksetzen"
+        '
+        'BachModeToolStripMenuItem
+        '
+        Me.BachModeToolStripMenuItem.Name = "BachModeToolStripMenuItem"
+        Me.BachModeToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+        Me.BachModeToolStripMenuItem.Text = "CES Batch Mode"
         '
         'MenuItem_Info
         '
@@ -464,12 +470,6 @@ Partial Class Form1
         Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(244, 707)
         Me.EVO_Einstellungen1.TabIndex = 2
-        '
-        'BachModeToolStripMenuItem
-        '
-        Me.BachModeToolStripMenuItem.Name = "BachModeToolStripMenuItem"
-        Me.BachModeToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
-        Me.BachModeToolStripMenuItem.Text = "Batch Mode"
         '
         'Form1
         '
