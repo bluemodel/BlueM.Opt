@@ -29,6 +29,12 @@ Partial Public Class Form1
 #Region "Eigenschaften"
 
     ''' <summary>
+    ''' Gibt an, ob Batch-Mode verwendet wird
+    ''' </summary>
+    ''' <remarks>Einstellung wird kurz vor Start auch in Settings.General geschreiben</remarks>
+    Public BatchMode As Boolean
+
+    ''' <summary>
     ''' Wird im BatchMode ausgelöst, sobald die Settings eingelesen wurden (kurz vor Start)
     ''' </summary>
     Public Event SettingsSaved()
@@ -921,7 +927,8 @@ Partial Public Class Form1
             Me.EVO_Einstellungen1.isSaved = True
 
             'Event auslösen (BatchMode)
-            If (Me.mSettings.General.BatchMode) Then
+            If (Me.BatchMode) Then
+                Me.mSettings.General.BatchMode = True
                 Me.mSettings.General.BatchCounter += 1
                 RaiseEvent SettingsSaved()
             End If
@@ -2023,9 +2030,9 @@ Partial Public Class Form1
                 For Each MutItem In System.Enum.GetValues(GetType(EVO.Common.Constants.CES_MUTATION))
                     'MsgBox(ReprodItems & " and " & MutItems)
 
-                    Me.INI_App(ANW_BLUEM)
-                    Me.INI_Datensatz("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
-                    Me.INI_Method(METH_CES)
+                    Call Me.INI_App(ANW_BLUEM)
+                    Call Me.INI_Datensatz("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
+                    Call Me.INI_Method(METH_CES)
 
                     'Settings holen
                     Me.mSettings = EVO_Einstellungen1.getSettings
@@ -2049,7 +2056,7 @@ Partial Public Class Form1
                     Monitor1.LogAppend("ReprodOperator: " & Me.mSettings.CES.OptReprodOp.ToString)
                     Monitor1.LogAppend("MutOperator: " & Me.mSettings.CES.OptMutOperator.ToString)
 
-                    Call STARTEN()
+                    Call Me.STARTEN()
 
                     'Qualität wird im Controller geprüft dann Stop Button
                     Call Monitor1.savelog("D:\xData\Erft_1984_06_Qmax_Skos\Batch\" & Me.mSettings.CES.OptReprodOp.ToString & " ")
