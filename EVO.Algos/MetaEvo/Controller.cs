@@ -799,6 +799,7 @@ namespace IHWB.EVO.MetaEvo
                     meClient.set_AlsoInDB("calculating", -1, -1);
 
                     //für Event Registrieren und Simulieren
+                    //('evaluate_multi_4client_Event' wird ausgeführt, sobald das Event 'sim.IndividuumEvaluated' auslöst
                     sim.IndividuumEvaluated += new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4client_Event);
                     evaluate_success = sim.Evaluate(ref generation_tmp, false);
                     sim.IndividuumEvaluated -= new IHWB.EVO.Apps.Sim.IndividuumEvaluatedEventHandler(this.evaluate_multi_4client_Event);

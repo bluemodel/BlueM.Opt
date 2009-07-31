@@ -68,8 +68,8 @@ Partial Class Form1
         Me.ToolStripButton_Monitor = New System.Windows.Forms.ToolStripButton
         Me.ToolStripButton_Scatterplot = New System.Windows.Forms.ToolStripButton
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip
-        Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
         Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
+        Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         Me.BachModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         MenuStrip1 = New System.Windows.Forms.MenuStrip
@@ -421,6 +421,16 @@ Partial Class Form1
         Me.StatusStrip1.TabIndex = 20
         Me.StatusStrip1.Text = "StatusStrip1"
         '
+        'EVO_Opt_Verlauf1
+        '
+        Me.EVO_Opt_Verlauf1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(241, 739)
+        Me.EVO_Opt_Verlauf1.MinimumSize = New System.Drawing.Size(464, 76)
+        Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
+        Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(478, 79)
+        Me.EVO_Opt_Verlauf1.TabIndex = 6
+        '
         'Hauptdiagramm1
         '
         Me.Hauptdiagramm1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -444,16 +454,6 @@ Partial Class Form1
         '
         '
         Me.Hauptdiagramm1.Walls.View3D = False
-        '
-        'EVO_Opt_Verlauf1
-        '
-        Me.EVO_Opt_Verlauf1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(241, 739)
-        Me.EVO_Opt_Verlauf1.MinimumSize = New System.Drawing.Size(464, 76)
-        Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
-        Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(478, 79)
-        Me.EVO_Opt_Verlauf1.TabIndex = 6
         '
         'EVO_Einstellungen1
         '
@@ -506,7 +506,7 @@ Partial Class Form1
 
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
-    Private WithEvents EVO_Einstellungen1 As IHWB.EVO.EVO_Einstellungen
+    Public WithEvents EVO_Einstellungen1 As IHWB.EVO.EVO_Einstellungen
     Private WithEvents Label_Datensatz As System.Windows.Forms.Label
     Private WithEvents GroupBox_Anwendung As System.Windows.Forms.GroupBox
     Private WithEvents ComboBox_Anwendung As System.Windows.Forms.ComboBox

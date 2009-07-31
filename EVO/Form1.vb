@@ -23,18 +23,25 @@ Imports IHWB.EVO.Common.Constants
 ''' <summary>
 ''' Main Window
 ''' </summary>
-Partial Class Form1
+Partial Public Class Form1
     Inherits System.Windows.Forms.Form
 
 #Region "Eigenschaften"
 
-    Private IsInitializing As Boolean
+    Public BatchMode As Boolean
+    Public BatchCounter As Integer
+
+    'MPC-Events
+    Public Event Startbuttonpressed()
+    Public Event OptimisationReady()
+
+    Private IsInitializing As Boolean  'Gibt an, ob das Formular bereits fertig geladen wurde(beim Laden werden sämtliche Events ausgelöst)
 
     'Anwendung
     Private Anwendung As String
 
     'Problem
-    Private mProblem As EVO.Common.Problem
+    Public mProblem As EVO.Common.Problem
 
     'Settings
     Private mSettings As EVO.Common.Settings
@@ -44,7 +51,7 @@ Partial Class Form1
 
     'Apps
     Private Testprobleme1 As EVO.Apps.Testprobleme
-    Private WithEvents Sim1 As EVO.Apps.Sim
+    Public WithEvents Sim1 As EVO.Apps.Sim
 
     'Controller
     Private controller As EVO.IController
@@ -70,7 +77,6 @@ Partial Class Form1
     'Form1 laden
     '***********
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
-
         'XP-look
         System.Windows.Forms.Application.EnableVisualStyles()
 
@@ -91,7 +97,7 @@ Partial Class Form1
     ''' <summary>
     ''' Formular zurücksetzen
     ''' </summary>
-    Private Sub INI()
+    Public Sub INI()
 
         Me.IsInitializing = True
 
@@ -122,6 +128,7 @@ Partial Class Form1
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'Einstellungen
+
         Me.EVO_Einstellungen1.Reset()
 
         'Monitor zurücksetzen
@@ -257,140 +264,147 @@ Partial Class Form1
 
     'Anwendung wurde ausgewählt
     '**************************
-    Private Sub INI_App(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
-
-        If (Me.IsInitializing = True) Then
-
-            Exit Sub
-
-        Else
-
-            Try
-
-                'Diagramm zurücksetzen
-                Call Me.Hauptdiagramm1.Reset()
-
-                'Alles deaktivieren, danach je nach Anwendung aktivieren
-                '-------------------------------------------------------
-
-                'Sim1 zerstören
-                Me.Sim1 = Nothing
-
-                'Start Button deaktivieren
-                Me.Button_Start.Enabled = False
-
-                'Datensatz-Reset deaktivieren
-                Me.MenuItem_DatensatzZurücksetzen.Enabled = False
-
-                'Methodenauswahl deaktivieren
-                Me.Label_Methode.Enabled = False
-                Me.ComboBox_Methode.Enabled = False
-
-                'Toolbar-Buttons
-                Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
-                Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
-                Me.ToolStripButton_Scatterplot.Enabled = False
-                Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
-
-                'Settings zurücksetzen
-                Call Me.EVO_Einstellungen1.Reset()
-
-                'Multithreading standardmäßig verbieten
-                Me.EVO_Einstellungen1.MultithreadingAllowed = False
-
-                'Mauszeiger busy
-                Cursor = Cursors.WaitCursor
-
-                Me.Anwendung = ComboBox_Anwendung.SelectedItem
-
-                Select Case Me.Anwendung
-
-                    Case "" 'Keine Anwendung ausgewählt
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'nix
-
-                    Case ANW_BLUEM 'Anwendung BlueM
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Objekt der Klasse BlueM initialisieren
-                        Sim1 = New EVO.Apps.BlueM()
-
-
-                    Case ANW_SMUSI 'Anwendung Smusi
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Objekt der Klasse Smusi initialisieren
-                        Sim1 = New EVO.Apps.Smusi()
-
-
-                    Case ANW_SCAN 'Anwendung S:CAN
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Objekt der Klasse Scan initialisieren
-                        Sim1 = New EVO.Apps.Scan()
-
-
-                    Case ANW_SWMM   'Anwendung SWMM
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Objekt der Klasse SWMM initialisieren
-                        Sim1 = New EVO.Apps.SWMM()
-
-
-                    Case ANW_TESTPROBLEME 'Anwendung Testprobleme
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Testprobleme instanzieren
-                        Testprobleme1 = New EVO.Apps.Testprobleme()
-
-                        'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
-                        Me.IsInitializing = True
-                        Call Me.ComboBox_Methode.Items.Clear()
-                        Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_METAEVO, METH_HOOKEJEEVES, METH_DDS})
-                        Me.IsInitializing = False
-
-
-                    Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'HACK: bei TSP Datensatz und Methode nicht notwendig, Abkürzung:
-                        'Start-Button aktivieren (keine Methodenauswahl erforderlich)
-                        'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
-                        Me.IsInitializing = True
-                        Call Me.ComboBox_Methode.Items.Clear()
-                        Call Me.ComboBox_Methode.Items.Add(METH_TSP)
-                        Me.IsInitializing = False
-                        Me.ComboBox_Methode.Enabled = True
-                        Me.ComboBox_Methode.SelectedIndex = 0
-                        'Button_Start.Enabled = True
-
-                End Select
-
-                'Bei Sim-Anwendungen ggf. Multithreading-Option aktivieren
-                If (Not IsNothing(Me.Sim1)) Then
-                    If (Me.Sim1.MultithreadingSupported) Then
-                        Me.EVO_Einstellungen1.MultithreadingAllowed = True
-                    End If
-                End If
-
-                'Datensatz UI aktivieren
-                Call Me.Datensatz_initUI()
-
-                'Progress zurücksetzen
-                Call Me.mProgress.Initialize()
-
-            Catch ex As Exception
-
-                MsgBox("Fehler beim Initialisieren der Anwendung:" & eol & ex.Message, MsgBoxStyle.Critical)
-                Me.ComboBox_Anwendung.SelectedIndex = 0
-
-            End Try
-
-            'Mauszeiger wieder normal
-            Cursor = Cursors.Default
-
+    Private Sub Combo_App_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
+        If (Not Me.IsInitializing) Then
+            Call Me.INI_App(ComboBox_Anwendung.SelectedItem)
         End If
+    End Sub
+
+    ''' <summary>
+    ''' Anwendung initialisieren
+    ''' </summary>
+    ''' <param name="selectedAnwendung">zu setzende Anwendung</param>
+    Public Sub INI_App(ByVal selectedAnwendung As String)
+
+        Try
+            'Falls Anwendung von ausserhalb gesetzt wurde
+            Me.IsInitializing = True
+            Me.ComboBox_Anwendung.SelectedItem = selectedAnwendung
+            Me.IsInitializing = False
+
+            'Diagramm zurücksetzen
+            Call Me.Hauptdiagramm1.Reset()
+
+            'Alles deaktivieren, danach je nach Anwendung aktivieren
+            '-------------------------------------------------------
+
+            'Sim1 zerstören
+            Me.Sim1 = Nothing
+
+            'Start Button deaktivieren
+            Me.Button_Start.Enabled = False
+
+            'Datensatz-Reset deaktivieren
+            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
+
+            'Methodenauswahl deaktivieren
+            Me.Label_Methode.Enabled = False
+            Me.ComboBox_Methode.Enabled = False
+
+            'Toolbar-Buttons
+            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
+            Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
+            Me.ToolStripButton_Scatterplot.Enabled = False
+            Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
+
+            'Settings zurücksetzen
+            Call Me.EVO_Einstellungen1.Reset()
+
+            'Multithreading standardmäßig verbieten
+            Me.EVO_Einstellungen1.MultithreadingAllowed = False
+
+            'Mauszeiger busy
+            Cursor = Cursors.WaitCursor
+
+            'Ausgewählte Anwendung speichern
+            Me.Anwendung = selectedAnwendung
+
+            Select Case Me.Anwendung
+
+                Case "" 'Keine Anwendung ausgewählt
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'nix
+
+                Case ANW_BLUEM 'Anwendung BlueM
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Objekt der Klasse BlueM initialisieren
+                    Sim1 = New EVO.Apps.BlueM()
+
+
+                Case ANW_SMUSI 'Anwendung Smusi
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Objekt der Klasse Smusi initialisieren
+                    Sim1 = New EVO.Apps.Smusi()
+
+
+                Case ANW_SCAN 'Anwendung S:CAN
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Objekt der Klasse Scan initialisieren
+                    Sim1 = New EVO.Apps.Scan()
+
+
+                Case ANW_SWMM   'Anwendung SWMM
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Objekt der Klasse SWMM initialisieren
+                    Sim1 = New EVO.Apps.SWMM()
+
+
+                Case ANW_TESTPROBLEME 'Anwendung Testprobleme
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Testprobleme instanzieren
+                    Testprobleme1 = New EVO.Apps.Testprobleme()
+
+                    'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
+                    Me.IsInitializing = True
+                    Call Me.ComboBox_Methode.Items.Clear()
+                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_METAEVO, METH_HOOKEJEEVES, METH_DDS})
+                    Me.IsInitializing = False
+
+
+                Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'HACK: bei TSP Datensatz und Methode nicht notwendig, Abkürzung:
+                    'Start-Button aktivieren (keine Methodenauswahl erforderlich)
+                    'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
+                    Me.IsInitializing = True
+                    Call Me.ComboBox_Methode.Items.Clear()
+                    Call Me.ComboBox_Methode.Items.Add(METH_TSP)
+                    Me.IsInitializing = False
+                    Me.ComboBox_Methode.Enabled = True
+                    Me.ComboBox_Methode.SelectedIndex = 0
+                    'Button_Start.Enabled = True
+
+            End Select
+
+            'Bei Sim-Anwendungen ggf. Multithreading-Option aktivieren
+            If (Not IsNothing(Me.Sim1)) Then
+                If (Me.Sim1.MultithreadingSupported) Then
+                    Me.EVO_Einstellungen1.MultithreadingAllowed = True
+                End If
+            End If
+
+            'Datensatz UI aktivieren
+            Call Me.Datensatz_initUI()
+
+            'Progress zurücksetzen
+            Call Me.mProgress.Initialize()
+
+        Catch ex As Exception
+
+            MsgBox("Fehler beim Initialisieren der Anwendung:" & eol & ex.Message, MsgBoxStyle.Critical)
+            Me.ComboBox_Anwendung.SelectedIndex = 0
+
+        End Try
+
+        'Mauszeiger wieder normal
+        Cursor = Cursors.Default
 
     End Sub
 
@@ -439,7 +453,6 @@ Partial Class Form1
                 If (Me.ComboBox_Datensatz.Items.Count > 0) Then
                     'obersten (zuletzt genutzten) Datensatz auswählen
                     pfad = Me.ComboBox_Datensatz.Items(0)
-                    Me.ComboBox_Datensatz.SelectedItem = pfad
                     'Datensatz setzen
                     Cursor = Cursors.WaitCursor
                     Call Sim1.setDatensatz(pfad)
@@ -518,20 +531,7 @@ Partial Class Form1
             pfad = OpenFileDialog1.FileName
 
             'Datensatz setzen
-            Call Sim1.setDatensatz(pfad)
-
-            'Benutzereinstellungen aktualisieren
-            If (My.Settings.MRUSimDatensaetze.Contains(pfad)) Then
-                My.Settings.MRUSimDatensaetze.Remove(pfad)
-            End If
-            My.Settings.MRUSimDatensaetze.Add(pfad)
-
-            'Benutzereinstellungen speichern
-            Call My.Settings.Save()
-
-            'Datensatzanzeige aktualisieren
-            Call Me.Datensatz_populateCombo()
-            Me.ComboBox_Datensatz.SelectedItem = pfad
+            Call Me.INI_Datensatz(pfad)
 
             'Methodenauswahl wieder zurücksetzen 
             '(Der Benutzer muss zuerst Ini neu ausführen!)
@@ -554,204 +554,230 @@ Partial Class Form1
 
     'Datensatz wurde ausgewählt
     '**************************
-    Private Sub INI_Datensatz(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Datensatz.SelectedIndexChanged
-
-        If (Me.IsInitializing = True) Then
-
-            Exit Sub
-
-        Else
-
-            'Zurücksetzen
-            '------------
-
-            'Tooltip
-            Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
-
-            'Datensatz-Reset
-            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
-
-            'gewählten Datensatz an Anwendung übergeben
-            '------------------------------------------
-            Select Case Me.Anwendung
-
-                Case ANW_TESTPROBLEME
-
-                    'Testproblem setzen
-                    Testprobleme1.setTestproblem(Me.ComboBox_Datensatz.SelectedItem)
-
-                    'Tooltip anzeigen
-                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
-
-                Case Else '(Alle Sim-Anwendungen)
-
-                    'Datensatz setzen
-                    Call Sim1.setDatensatz(Me.ComboBox_Datensatz.SelectedItem)
-
-                    'Tooltip anzeigen
-                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Me.ComboBox_Datensatz.SelectedItem)
-
-            End Select
-
-            'Methodenauswahl aktivieren und zurücksetzen
-            '-------------------------------------------
-            Me.Label_Methode.Enabled = True
-            Me.ComboBox_Methode.Enabled = True
-            Me.ComboBox_Methode.SelectedItem = ""
-
-            'Progress zurücksetzen
-            Call Me.mProgress.Initialize()
-
+    Private Sub Combo_Datensatz_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Datensatz.SelectedIndexChanged
+        If (Not Me.IsInitializing) Then
+            Call Me.INI_Datensatz(Me.ComboBox_Datensatz.SelectedItem)
         End If
+    End Sub
+
+    ''' <summary>
+    ''' Datensatz setzen
+    ''' </summary>
+    ''' <param name="selectedDatensatz">Pfad zum Datensatz</param>
+    Public Sub INI_Datensatz(ByVal selectedDatensatz As String)
+
+        'Zurücksetzen
+        '------------
+
+        'Tooltip
+        Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
+
+        'Datensatz-Reset
+        Me.MenuItem_DatensatzZurücksetzen.Enabled = False
+
+        'gewählten Datensatz an Anwendung übergeben
+        '------------------------------------------
+        Select Case Me.Anwendung
+
+            Case ANW_TESTPROBLEME
+
+                'Testproblem setzen
+                Testprobleme1.setTestproblem(selectedDatensatz)
+
+                'Tooltip anzeigen
+                Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
+
+            Case Else '(Alle Sim-Anwendungen)
+
+                'Benutzereinstellungen aktualisieren
+                If (My.Settings.MRUSimDatensaetze.Contains(selectedDatensatz)) Then
+                    My.Settings.MRUSimDatensaetze.Remove(selectedDatensatz)
+                End If
+                My.Settings.MRUSimDatensaetze.Add(selectedDatensatz)
+                'Benutzereinstellungen speichern
+                Call My.Settings.Save()
+
+                'Datensatz Combobox aktualisieren
+                Call Me.Datensatz_populateCombo()
+
+                'Auswahl setzen (falls von ausserhalb)
+                Me.IsInitializing = True
+                Me.ComboBox_Datensatz.SelectedItem = selectedDatensatz
+                Me.IsInitializing = False
+
+                'Datensatz setzen
+                Call Sim1.setDatensatz(selectedDatensatz)
+
+                'Tooltip anzeigen
+                Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, selectedDatensatz)
+
+        End Select
+
+        'Methodenauswahl aktivieren und zurücksetzen
+        '-------------------------------------------
+        Me.Label_Methode.Enabled = True
+        Me.ComboBox_Methode.Enabled = True
+        Me.IsInitializing = True
+        Me.ComboBox_Methode.SelectedItem = ""
+        Me.IsInitializing = False
+
+        'Progress zurücksetzen
+        Call Me.mProgress.Initialize()
 
     End Sub
 
     'Methode wurde ausgewählt
     '************************
-    Private Sub INI_Method(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Methode.SelectedIndexChanged
-
-        If (Me.IsInitializing = True Or Me.ComboBox_Methode.SelectedItem = "") Then
-
-            Exit Sub
-
-        Else
-
-            Try
-
-                'Mauszeiger busy
-                Cursor = Cursors.WaitCursor
-
-                'Problem initialisieren
-                '======================
-                Call Me.INI_Problem(Me.ComboBox_Methode.SelectedItem)
-
-                'Methodenspezifische Vorbereitungen
-                '(zunächst alles deaktivieren, danach je nach Methode aktivieren)
-                '================================================================
-
-                'Diagramm zurücksetzen
-                Me.Hauptdiagramm1.Reset()
-
-                'Start Button deaktivieren
-                Me.Button_Start.Enabled = False
-
-                'Toolbar-Buttons deaktivieren
-                Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
-                Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
-                Me.ToolStripButton_Scatterplot.Enabled = False
-
-                Select Case Me.mProblem.Method
-
-                    Case METH_SENSIPLOT 'Methode SensiPlot
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Monitor deaktivieren
-                        Me.ToolStripButton_Monitor.Checked = False
-
-                        'TODO: Progress initialisieren
-
-
-                    Case METH_PES 'Methode PES
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Ergebnis-Buttons
-                        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
-
-                        'TODO: Progress mit Standardwerten initialisieren
-
-
-                    Case METH_HOOKEJEEVES
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Kontrolle: Nur SO möglich!
-                        If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
-                            Throw New Exception("Methode von Hooke und Jeeves erlaubt nur Single-Objective Optimierung!")
-                        End If
-
-                        'Ergebnis-Buttons
-                        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
-
-                        'TODO: Progress mit Standardwerten initialisieren
-
-                    Case METH_DDS
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Kontrolle: Nur SO möglich!
-                        If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
-                            Throw New Exception("Methode DDS erlaubt nur Single-Objective Optimierung!")
-                        End If
-
-                        'Ergebnis-Buttons
-                        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
-
-                        'TODO: Progress mit Standardwerten initialisieren
-
-
-                    Case METH_CES, METH_HYBRID 'Methode CES und HYBRID
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Funktioniert nur bei BlueM!
-                        If (Not Anwendung = ANW_BLUEM) Then
-                            Throw New Exception("CES/HYBRID funktioniert bisher nur mit BlueM!")
-                        End If
-
-                        'Ergebnis-Buttons
-                        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
-
-                        If (Me.mProblem.Method = METH_HYBRID) Then
-
-                            'Original ModellParameter schreiben
-                            Call Sim1.Write_ModellParameter()
-
-                        End If
-
-                        'ggf. EVO_Einstellungen Testmodus einrichten
-                        '-------------------------------------------
-                        'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
-                        If Not (Me.mProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
-                            Call EVO_Einstellungen1.CES_setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
-                        End If
-
-                        'TODO: Progress mit Standardwerten initialisieren
-
-                    Case METH_METAEVO
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                        'Ergebnis-Buttons
-                        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
-
-                        'Progress mit Standardwerten initialisieren
-                        Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.getSettings.MetaEvo.NumberGenerations, EVO_Einstellungen1.getSettings.MetaEvo.PopulationSize)
-
-                    Case METH_TSP
-                        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                End Select
-
-                'Toolbar-Buttons aktivieren
-                Me.ToolStripSplitButton_Diagramm.Enabled = True
-                Me.ToolStripSplitButton_ErgebnisDB.Enabled = True
-                Me.ToolStripSplitButton_Settings.Enabled = True
-
-                'IniMethod OK -> Start Button aktivieren
-                Me.Button_Start.Enabled = True
-
-                If (Me.Anwendung <> ANW_TESTPROBLEME) Then
-                    'Datensatz-Reset aktivieren
-                    Me.MenuItem_DatensatzZurücksetzen.Enabled = True
-                End If
-
-            Catch ex As Exception
-
-                MsgBox("Fehler beim Setzen der Methode:" & eol & ex.Message, MsgBoxStyle.Critical)
-                Me.ComboBox_Methode.SelectedIndex = 0
-
-            End Try
-
-            'Mauszeiger wieder normal
-            Cursor = Cursors.Default
-
+    Private Sub Combo_Method_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Methode.SelectedIndexChanged
+        If (Not Me.IsInitializing) Then
+            INI_Method(Me.ComboBox_Methode.SelectedItem)
         End If
+    End Sub
+
+    ''' <summary>
+    ''' Methode setzen
+    ''' </summary>
+    ''' <param name="selectedMethod">zu setzende Methode (Algorithmus)</param>
+    Public Sub INI_Method(ByVal selectedMethod As String)
+
+        Try
+            'Falls von ausserhalb gesetzt
+            Me.IsInitializing = True
+            Me.ComboBox_Methode.SelectedItem = selectedMethod
+            Me.IsInitializing = False
+
+            'Mauszeiger busy
+            Cursor = Cursors.WaitCursor
+
+            'Problem initialisieren
+            '======================
+            Call Me.INI_Problem(selectedMethod)
+
+            'Methodenspezifische Vorbereitungen
+            '(zunächst alles deaktivieren, danach je nach Methode aktivieren)
+            '================================================================
+
+            'Diagramm zurücksetzen
+            Me.Hauptdiagramm1.Reset()
+
+            'Start Button deaktivieren
+            Me.Button_Start.Enabled = False
+
+            'Toolbar-Buttons deaktivieren
+            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
+            Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
+            Me.ToolStripButton_Scatterplot.Enabled = False
+
+            Select Case Me.mProblem.Method
+
+                Case METH_SENSIPLOT 'Methode SensiPlot
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Monitor deaktivieren
+                    Me.ToolStripButton_Monitor.Checked = False
+
+                    'TODO: Progress initialisieren
+
+
+                Case METH_PES 'Methode PES
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Ergebnis-Buttons
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+
+                    'TODO: Progress mit Standardwerten initialisieren
+
+
+                Case METH_HOOKEJEEVES
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Kontrolle: Nur SO möglich!
+                    If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
+                        Throw New Exception("Methode von Hooke und Jeeves erlaubt nur Single-Objective Optimierung!")
+                    End If
+
+                    'Ergebnis-Buttons
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+
+                    'TODO: Progress mit Standardwerten initialisieren
+
+                Case METH_DDS
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Kontrolle: Nur SO möglich!
+                    If (Me.mProblem.Modus = EVO_MODUS.Multi_Objective) Then
+                        Throw New Exception("Methode DDS erlaubt nur Single-Objective Optimierung!")
+                    End If
+
+                    'Ergebnis-Buttons
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+
+                    'TODO: Progress mit Standardwerten initialisieren
+
+
+                Case METH_CES, METH_HYBRID 'Methode CES und HYBRID
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Funktioniert nur bei BlueM!
+                    If (Not Anwendung = ANW_BLUEM) Then
+                        Throw New Exception("CES/HYBRID funktioniert bisher nur mit BlueM!")
+                    End If
+
+                    'Ergebnis-Buttons
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+
+                    If (Me.mProblem.Method = METH_HYBRID) Then
+
+                        'Original ModellParameter schreiben
+                        Call Sim1.Write_ModellParameter()
+
+                    End If
+
+                    'ggf. EVO_Einstellungen Testmodus einrichten
+                    '-------------------------------------------
+                    'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
+                    If Not (Me.mProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
+                        Call EVO_Einstellungen1.CES_setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
+                    End If
+
+                    'TODO: Progress mit Standardwerten initialisieren
+
+                Case METH_METAEVO
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'Ergebnis-Buttons
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+
+                    'Progress mit Standardwerten initialisieren
+                    Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.getSettings.MetaEvo.NumberGenerations, EVO_Einstellungen1.getSettings.MetaEvo.PopulationSize)
+
+                Case METH_TSP
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+            End Select
+
+            'Toolbar-Buttons aktivieren
+            Me.ToolStripSplitButton_Diagramm.Enabled = True
+            Me.ToolStripSplitButton_ErgebnisDB.Enabled = True
+            Me.ToolStripSplitButton_Settings.Enabled = True
+
+            'IniMethod OK -> Start Button aktivieren
+            Me.Button_Start.Enabled = True
+
+            If (Me.Anwendung <> ANW_TESTPROBLEME) Then
+                'Datensatz-Reset aktivieren
+                Me.MenuItem_DatensatzZurücksetzen.Enabled = True
+            End If
+
+        Catch ex As Exception
+
+            MsgBox("Fehler beim Setzen der Methode:" & eol & ex.Message, MsgBoxStyle.Critical)
+            Me.ComboBox_Methode.SelectedIndex = 0
+
+        End Try
+
+        'Mauszeiger wieder normal
+        Cursor = Cursors.Default
 
     End Sub
 
@@ -817,6 +843,13 @@ Partial Class Form1
     'XXXXXXXXXXXXXXXXXXXXXXXXXX
 
     Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
+        Call Me.STARTEN()
+    End Sub
+
+    ''' <summary>
+    ''' Startet die Optimierung
+    ''' </summary>
+    Public Sub STARTEN()
 
         'Stoppuhr
         Dim AllOptTime As New Stopwatch
@@ -875,13 +908,17 @@ Partial Class Form1
             'Anwendungs-Groupbox deaktivieren
             Me.GroupBox_Anwendung.Enabled = False
 
-            'Settings speichern (in Me.mSettings sowie in Datei)
+            'Settings aus EVO_Einstellungen holen 
             Me.mSettings = Me.EVO_Einstellungen1.getSettings
-            Me.EVO_Einstellungen1.isSaved = True
 
+            'Settings in temp-Verzeichnis speichern
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
-            Call Me.EVO_Einstellungen1.saveSettings(dir & "Settings.xml")
+            Me.EVO_Einstellungen1.saveSettings(dir & "Settings.xml")
+            Me.EVO_Einstellungen1.isSaved = True
+
+            'Event auslösen (für MPC)
+            RaiseEvent Startbuttonpressed()
 
             'Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()
@@ -894,6 +931,7 @@ Partial Class Form1
 
             Select Case Anwendung
 
+                'Sim-Anwendungen
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
                     'Settings an Sim1 übergeben
@@ -966,7 +1004,6 @@ Partial Class Form1
 
 
                 Case ANW_TSP
-
                     'TSP-Controller instanzieren
                     controller = New EVO.TSP.TSPController()
 
@@ -991,7 +1028,14 @@ Partial Class Form1
 
             'Ausgabe der Optimierungszeit
             AllOptTime.Stop()
-            EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Milliseconds & "ms")
+
+            If (Me.BatchMode) Then
+                'Event auslösen 
+                RaiseEvent OptimisationReady()
+            Else
+            	EVO.Diagramm.Monitor.getInstance().LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Milliseconds & "ms")
+            End If
+
         End If
 
     End Sub
@@ -1105,7 +1149,7 @@ Partial Class Form1
                     Case METH_SENSIPLOT 'SensiPlot
                         'XXXXXXXXXXXXXXXXXXXXXXXXX
 
-                        If (Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_OptParameters.GetLength(0) = 1) Then
+                        If (Me.mSettings.SensiPlot.Selected_OptParameters.GetLength(0) = 1) Then
 
                             '1 OptParameter:
                             '---------------
@@ -1113,12 +1157,12 @@ Partial Class Form1
                             'Achsen:
                             '-------
                             'X-Achse = QWert
-                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_Objective).Bezeichnung
+                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = OptParameter
-                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -1126,7 +1170,7 @@ Partial Class Form1
                             'Achsenzuordnung
                             'BUG 327!
                             For i = 0 To Me.mProblem.NumObjectives - 1
-                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
+                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexX = i
                                     Exit For 'Abbruch
                                 End If
@@ -1141,17 +1185,17 @@ Partial Class Form1
                             'Achsen:
                             '-------
                             'X-Achse = OptParameter1
-                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Y-Achse = Objective
-                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_Objective).Bezeichnung
+                            Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Z-Achse = OptParameter2
-                            Achse.Title = Me.mProblem.List_OptParameter(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_OptParameters(1)).Bezeichnung
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(1)).Bezeichnung
                             Achse.Automatic = True
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
@@ -1160,7 +1204,7 @@ Partial Class Form1
                             'BUG 327!
                             Me.Hauptdiagramm1.ZielIndexX = -1
                             For i = 0 To Me.mProblem.NumObjectives - 1
-                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.EVO_Einstellungen1.getSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
+                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexY = i
                                     Exit For 'Abbruch
                                 End If
@@ -1189,15 +1233,15 @@ Partial Class Form1
                             Achse.Automatic = False
                             If (Me.mProblem.Method = METH_PES) Then
                                 'Bei PES:
-                                If (EVO_Einstellungen1.getSettings.PES.Pop.is_POPUL) Then
-                                    Achse.Maximum = EVO_Einstellungen1.getSettings.PES.n_Gen * EVO_Einstellungen1.getSettings.PES.n_Nachf * EVO_Einstellungen1.getSettings.PES.Pop.n_Runden + 1
+                                If (Me.mSettings.PES.Pop.is_POPUL) Then
+                                    Achse.Maximum = Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf * Me.mSettings.PES.Pop.n_Runden + 1
                                 Else
-                                    Achse.Maximum = EVO_Einstellungen1.getSettings.PES.n_Gen * EVO_Einstellungen1.getSettings.PES.n_Nachf + 1
+                                    Achse.Maximum = Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf + 1
                                 End If
 
                             ElseIf (Me.mProblem.Method = METH_METAEVO) Then
                                 'Bei MetaEvo:
-                                Achse.Maximum = EVO_Einstellungen1.getSettings.MetaEvo.NumberGenerations * EVO_Einstellungen1.getSettings.MetaEvo.ChildrenPerParent * EVO_Einstellungen1.getSettings.MetaEvo.PopulationSize
+                                Achse.Maximum = Me.mSettings.MetaEvo.NumberGenerations * Me.mSettings.MetaEvo.ChildrenPerParent * Me.mSettings.MetaEvo.PopulationSize
 
                             ElseIf (Me.mProblem.Method = METH_HOOKEJEEVES) Then
                                 'Bei Hooke & Jeeves:
@@ -1209,7 +1253,7 @@ Partial Class Form1
 
                             Else
                                 'Bei CES etc.:
-                                Achse.Maximum = EVO_Einstellungen1.getSettings.CES.n_Children * EVO_Einstellungen1.getSettings.CES.n_Generations
+                                Achse.Maximum = Me.mSettings.CES.n_Children * Me.mSettings.CES.n_Generations
                             End If
 
                             Achsen.Add(Achse)
@@ -1962,11 +2006,15 @@ Partial Class Form1
 
 #End Region 'Methoden
 
+    Protected Overrides Sub Finalize()
+        MyBase.Finalize()
+    End Sub
+
     Private Sub BachModeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
 
         Dim n_cycles As Integer = 5
-        Dim ReprodItem As evo.Common.Constants.CES_REPRODOP
-        Dim MutItem As evo.Common.Constants.CES_MUTATION
+        Dim ReprodItem As EVO.Common.Constants.CES_REPRODOP
+        Dim MutItem As EVO.Common.Constants.CES_MUTATION
 
         Dim i As Integer
         For i = 1 To n_cycles

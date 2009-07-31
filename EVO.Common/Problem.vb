@@ -341,9 +341,9 @@ Public Class Problem
     Private Sub Read_OPT()
 
         'Format:
-        '*|--------------|-------|-----------|--------|--------|-----------|
-        '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |
-        '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|
+        '*|--------------|-------|-----------|--------|--------|-----------|----------|-----------|
+        '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |  Objekt  | Zeitpunkt |
+        '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|-<------>-|-<------->-|
 
         Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_OPT
 
@@ -386,6 +386,12 @@ Public Class Problem
                 If (i > 0 And Not array(6).Trim() = "") Then
                     Me.List_OptParameter(i).Beziehung = Common.Constants.getBeziehung(array(6).Trim())
                 End If
+                Try
+                    List_OptParameter(i).Objekt = array(7).Trim()
+                    List_OptParameter(i).Zeitpunkt = Convert.ToInt32(array(8).Trim())
+                Catch ex As Exception
+
+                End Try
                 'Eingelesenen Startwert setzen
                 List_OptParameter(i).RWert = List_OptParameter(i).StartWert
                 i += 1
