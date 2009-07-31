@@ -2019,6 +2019,13 @@ Partial Public Class Form1
         End If
     End Sub
 
+    ''' <summary>
+    ''' Notwendig, damit das Form geschlossen wird, kA warum
+    ''' </summary>
+    Protected Overrides Sub Finalize()
+        MyBase.Finalize()
+    End Sub
+
     Private Sub Start_CES_BatchMode(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
 
         Dim n_cycles As Integer = 50
