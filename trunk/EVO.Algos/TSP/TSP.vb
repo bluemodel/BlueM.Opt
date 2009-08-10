@@ -69,7 +69,7 @@ Public Class TSP
 
         Dim i As Integer
 
-        ReDim ListOfCities(mySettings.n_Cities - 1, 2)
+        ReDim ListOfCities(mySettings.N_Cities - 1, 2)
         'Dim Problem As String = "Circle"
 
         Randomize()
@@ -78,8 +78,8 @@ Public Class TSP
 
             Case Common.EnProblem.circle
                 Dim Radius As Integer = 45
-                Dim factor As Double = (Math.PI * 2) / mySettings.n_Cities
-                For i = 0 To mySettings.n_Cities - 1
+                Dim factor As Double = (Math.PI * 2) / mySettings.N_Cities
+                For i = 0 To mySettings.N_Cities - 1
                     ListOfCities(i, 0) = i + 1
                     ListOfCities(i, 1) = Math.Cos(i * factor) * Radius + 50
                     ListOfCities(i, 2) = Math.Sin(i * factor) * Radius + 65
@@ -90,7 +90,7 @@ Public Class TSP
                 Dim lowerb As Integer = 2
                 Dim upperb1 As Integer = 98
                 Dim upperb2 As Integer = 128
-                For i = 0 To mySettings.n_Cities - 1
+                For i = 0 To mySettings.N_Cities - 1
                     ListOfCities(i, 0) = i + 1
                     ListOfCities(i, 1) = CInt(Int((upperb1 - lowerb + 1) * Rnd() + lowerb))
                     ListOfCities(i, 2) = CInt(Int((upperb2 - lowerb + 1) * Rnd() + lowerb))
@@ -109,13 +109,13 @@ Public Class TSP
     'Dimensionieren des ChildStructs
     Public Sub Dim_Children()
         Dim i As Integer
-        ReDim ChildrenList(mySettings.n_Children - 1)
+        ReDim ChildrenList(mySettings.N_Children - 1)
 
-        For i = 0 To mySettings.n_Children - 1
+        For i = 0 To mySettings.N_Children - 1
             ChildrenList(i).No = i + 1
             ChildrenList(i).Penalty = 999999999999999999
-            ReDim ChildrenList(i).Image(mySettings.n_Cities - 1, 2)
-            ReDim ChildrenList(i).Path(mySettings.n_Cities - 1)
+            ReDim ChildrenList(i).Image(mySettings.N_Cities - 1, 2)
+            ReDim ChildrenList(i).Path(mySettings.N_Cities - 1)
         Next
 
     End Sub
@@ -124,13 +124,13 @@ Public Class TSP
     Public Sub Dim_Parents_TSP()
         Dim i As Integer
 
-        ReDim ParentList(mySettings.n_Parents - 1)
+        ReDim ParentList(mySettings.N_Parents - 1)
 
-        For i = 0 To mySettings.n_Parents - 1
+        For i = 0 To mySettings.N_Parents - 1
             ParentList(i).No = i + 1
             ParentList(i).Penalty = 999999999999999999
-            ReDim ParentList(i).Image(mySettings.n_Cities - 1, 2)
-            ReDim ParentList(i).Path(mySettings.n_Cities - 1)
+            ReDim ParentList(i).Image(mySettings.N_Cities - 1, 2)
+            ReDim ParentList(i).Path(mySettings.N_Cities - 1)
         Next
 
     End Sub
@@ -140,10 +140,10 @@ Public Class TSP
         Dim i, j As Integer
         Dim tmp As Integer
         Dim lowerb As Integer = 1
-        Dim upperb As Integer = mySettings.n_Cities
+        Dim upperb As Integer = mySettings.N_Cities
         Randomize()
 
-        For i = 0 To mySettings.n_Children - 1
+        For i = 0 To mySettings.N_Children - 1
             For j = 0 To ChildrenList(i).Path.GetUpperBound(0)
                 Do
                     'Randomize() nicht vergessen
@@ -161,9 +161,9 @@ Public Class TSP
     Public Sub Cities_according_ChildPath()
         Dim i, j As Integer
 
-        For i = 0 To mySettings.n_Children - 1
-            ReDim ChildrenList(i).Image(mySettings.n_Cities - 1, 2)
-            For j = 0 To mySettings.n_Cities - 1
+        For i = 0 To mySettings.N_Children - 1
+            ReDim ChildrenList(i).Image(mySettings.N_Cities - 1, 2)
+            For j = 0 To mySettings.N_Cities - 1
                 ChildrenList(i).Image(j, 0) = ListOfCities(ChildrenList(i).Path(j) - 1, 0)
                 ChildrenList(i).Image(j, 1) = ListOfCities(ChildrenList(i).Path(j) - 1, 1)
                 ChildrenList(i).Image(j, 2) = ListOfCities(ChildrenList(i).Path(j) - 1, 2)
@@ -179,11 +179,11 @@ Public Class TSP
         Dim distanceX As Double
         Dim distanceY As Double
 
-        For i = 0 To mySettings.n_Children - 1
+        For i = 0 To mySettings.N_Children - 1
             distance = 0
             distanceX = 0
             distanceY = 0
-            For j = 0 To mySettings.n_Cities - 2
+            For j = 0 To mySettings.N_Cities - 2
                 ChildrenList(i).Penalty = 999999999999999999
                 distanceX = (ChildrenList(i).Image(j, 1) - ChildrenList(i).Image(j + 1, 1))
                 distanceX = distanceX * distanceX
@@ -191,9 +191,9 @@ Public Class TSP
                 distanceY = distanceY * distanceY
                 distance = distance + Math.Sqrt(distanceX + distanceY)
             Next j
-            distanceX = (ChildrenList(i).Image(0, 1) - ChildrenList(i).Image(mySettings.n_Cities - 1, 1))
+            distanceX = (ChildrenList(i).Image(0, 1) - ChildrenList(i).Image(mySettings.N_Cities - 1, 1))
             distanceX = distanceX * distanceX
-            distanceY = (ChildrenList(i).Image(0, 2) - ChildrenList(i).Image(mySettings.n_Cities - 1, 2))
+            distanceY = (ChildrenList(i).Image(0, 2) - ChildrenList(i).Image(mySettings.N_Cities - 1, 2))
             distanceY = distanceY * distanceY
             distance = distance + Math.Sqrt(distanceX + distanceY)
             ChildrenList(i).Penalty = distance
@@ -206,7 +206,7 @@ Public Class TSP
         Dim i, j As Integer
 
         If mySettings.Strategy = Common.EVO_STRATEGIE.Komma_Strategie Then
-            For i = 0 To mySettings.n_Parents - 1
+            For i = 0 To mySettings.N_Parents - 1
                 ParentList(i).Penalty = ChildrenList(i).Penalty
                 Array.Copy(ChildrenList(i).Image, ParentList(i).Image, ChildrenList(i).Image.Length)
                 Array.Copy(ChildrenList(i).Path, ParentList(i).Path, ChildrenList(i).Path.Length)
@@ -214,7 +214,7 @@ Public Class TSP
 
         ElseIf mySettings.Strategy = Common.EVO_STRATEGIE.Plus_Strategie Then
             j = 0
-            For i = 0 To mySettings.n_Parents - 1
+            For i = 0 To mySettings.N_Parents - 1
                 If ParentList(i).Penalty < ChildrenList(j).Penalty Then
                     j -= 1
                 Else
@@ -232,11 +232,11 @@ Public Class TSP
     Public Sub Reset_Children()
         Dim i As Integer
 
-        For i = 0 To mySettings.n_Children - 1
+        For i = 0 To mySettings.N_Children - 1
             ChildrenList(i).No = i + 1
             ChildrenList(i).Penalty = 999999999999999999
             Array.Clear(ChildrenList(i).Path, 0, ChildrenList(i).Path.GetLength(0))
-            ReDim ChildrenList(i).Image(mySettings.n_Cities, 2)
+            ReDim ChildrenList(i).Image(mySettings.N_Cities, 2)
         Next
 
     End Sub
@@ -247,36 +247,36 @@ Public Class TSP
     Public Sub Reproduction_Control()
         Dim i As Integer
         Dim x, y As Integer
-        Dim Einzelkind(mySettings.n_Cities - 1) As Integer
+        Dim Einzelkind(mySettings.N_Cities - 1) As Integer
 
         Select Case mySettings.ReprodOperator
             'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
             Case Common.EnReprodOperator.Order_Crossover_OX
                 x = 0
                 y = 1
-                For i = 0 To mySettings.n_Children - 2 Step 2
+                For i = 0 To mySettings.N_Children - 2 Step 2
                     Call ReprodOp_OX(ParentList(x).Path, ParentList(y).Path, ChildrenList(i).Path, ChildrenList(i + 1).Path)
                     x += 1
                     y += 1
-                    If x = mySettings.n_Parents - 1 Then x = 0
-                    If y = mySettings.n_Parents - 1 Then y = 0
+                    If x = mySettings.N_Parents - 1 Then x = 0
+                    If y = mySettings.N_Parents - 1 Then y = 0
                 Next i
-                If Even_Number(mySettings.n_Children) = False Then
-                    Call ReprodOp_OX(ParentList(x).Path, ParentList(y).Path, ChildrenList(mySettings.n_Children - 1).Path, Einzelkind)
+                If Even_Number(mySettings.N_Children) = False Then
+                    Call ReprodOp_OX(ParentList(x).Path, ParentList(y).Path, ChildrenList(mySettings.N_Children - 1).Path, Einzelkind)
                 End If
 
             Case Common.EnReprodOperator.Partially_Mapped_Crossover_PMX
                 x = 0
                 y = 1
-                For i = 0 To mySettings.n_Children - 2 Step 2
+                For i = 0 To mySettings.N_Children - 2 Step 2
                     Call ReprodOp_PMX(ParentList(x).Path, ParentList(y).Path, ChildrenList(i).Path, ChildrenList(i + 1).Path)
                     x += 1
                     y += 1
-                    If x = mySettings.n_Parents - 1 Then x = 0
-                    If y = mySettings.n_Parents - 1 Then y = 0
+                    If x = mySettings.N_Parents - 1 Then x = 0
+                    If y = mySettings.N_Parents - 1 Then y = 0
                 Next i
-                If Even_Number(mySettings.n_Children) = False Then
-                    Call ReprodOp_PMX(ParentList(x).Path, ParentList(y).Path, ChildrenList(mySettings.n_Children - 1).Path, Einzelkind)
+                If Even_Number(mySettings.N_Children) = False Then
+                    Call ReprodOp_PMX(ParentList(x).Path, ParentList(y).Path, ChildrenList(mySettings.N_Children - 1).Path, Einzelkind)
                 End If
         End Select
 
@@ -300,7 +300,7 @@ Public Class TSP
         Next
         'Auffüllen des Paths Teil 3 des Child A mit dem anderen Elter beginnend bei 0
         x = 0
-        For i = CutPoint(1) + 1 To mySettings.n_Cities - 1
+        For i = CutPoint(1) + 1 To mySettings.N_Cities - 1
             If Is_No_OK(ParPath_B(x), ChildPath_A) Then
                 ChildPath_A(i) = ParPath_B(x)
             Else
@@ -310,7 +310,7 @@ Public Class TSP
         Next
         'Auffüllen des Paths Teil 3 des Child B mit dem anderen Elter beginnend bei 0
         y = 0
-        For i = CutPoint(1) + 1 To mySettings.n_Cities - 1
+        For i = CutPoint(1) + 1 To mySettings.N_Cities - 1
             If Is_No_OK(ParPath_A(y), ChildPath_B) Then
                 ChildPath_B(i) = ParPath_A(y)
             Else
@@ -387,7 +387,7 @@ Public Class TSP
         Next i
 
         'Auffüllen des Paths Teil 3 des Child A und B mit dem anderen Elter beginnend bei 0
-        For i = CutPoint(1) + 1 To mySettings.n_Cities - 1
+        For i = CutPoint(1) + 1 To mySettings.N_Cities - 1
             'für Child A
             If Is_No_OK(ParPath_A(i), ChildPath_A) Then
                 ChildPath_A(i) = ParPath_A(i)
@@ -421,24 +421,24 @@ Public Class TSP
         Dim i As Integer
 
         Select Case mySettings.MutOperator
-            Case common.EnMutOperator.Inversion_SIM
-                For i = 0 To mySettings.n_Children - 1
+            Case Common.EnMutOperator.Inversion_SIM
+                For i = 0 To mySettings.N_Children - 1
                     Call MutOp_SIM(ChildrenList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
-            Case common.EnMutOperator.Translocation_3_Opt
-                For i = 0 To mySettings.n_Children - 1
+            Case Common.EnMutOperator.Translocation_3_Opt
+                For i = 0 To mySettings.N_Children - 1
                     Call MutOp_3_opt(ChildrenList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
-            Case common.EnMutOperator.Translocation_n_Opt
-                For i = 0 To mySettings.n_Children - 1
+            Case Common.EnMutOperator.Translocation_n_Opt
+                For i = 0 To mySettings.N_Children - 1
                     Call MutOp_n_opt(ChildrenList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
 
-            Case common.EnMutOperator.Exchange_Mutation_EM
-                For i = 0 To mySettings.n_Children - 1
+            Case Common.EnMutOperator.Exchange_Mutation_EM
+                For i = 0 To mySettings.N_Children - 1
                     Call MutOp_EM(ChildrenList(i).Path)
                 Next
         End Select
@@ -486,7 +486,7 @@ Public Class TSP
         Dim SubPath(2)() As Integer
         ReDim SubPath(0)(CutPoint(0))
         ReDim SubPath(1)(CutPoint(1) - CutPoint(0) - 1)
-        ReDim SubPath(2)(mySettings.n_Cities - CutPoint(1) - 2)
+        ReDim SubPath(2)(mySettings.N_Cities - CutPoint(1) - 2)
 
         j = SubPath(0).GetLength(0) + SubPath(1).GetLength(0) + SubPath(2).GetLength(0)
 
@@ -502,7 +502,7 @@ Public Class TSP
             x += 1
         Next
         x = 0
-        For i = CutPoint(1) + 1 To mySettings.n_Cities - 1
+        For i = CutPoint(1) + 1 To mySettings.N_Cities - 1
             SubPath(2)(x) = Path(i)
             x += 1
         Next
@@ -550,7 +550,7 @@ Public Class TSP
             ReDim SubPath(i)(CutPoint(i) - CutPoint(i - 1) - 1)
         Next
         'ReDim SubPath(1)(CutPoint(1) - CutPoint(0) - 1)
-        ReDim SubPath(n_SP - 1)(mySettings.n_Cities - CutPoint(n_SP - 2) - 2)
+        ReDim SubPath(n_SP - 1)(mySettings.N_Cities - CutPoint(n_SP - 2) - 2)
 
         'Kopieren der Substrings
         x = 0
@@ -566,7 +566,7 @@ Public Class TSP
             Next
         Next
         x = 0
-        For i = CutPoint(n_SP - 2) + 1 To mySettings.n_Cities - 1
+        For i = CutPoint(n_SP - 2) + 1 To mySettings.N_Cities - 1
             SubPath(n_SP - 1)(x) = Path(i)
             x += 1
         Next
@@ -607,9 +607,9 @@ Public Class TSP
         Dim Point1, Point2 As Integer
         Dim Swap As Integer
         Dim lowerb As Integer = 1
-        Dim upperbo As Integer = mySettings.n_Cities - 2
+        Dim upperbo As Integer = mySettings.N_Cities - 2
 
-        n_trans = Math.Round(mySettings.n_Cities * TransRate / 100)
+        n_trans = Math.Round(mySettings.N_Cities * TransRate / 100)
 
         For i = 0 To n_trans
             Point1 = CInt(Int((upperbo - lowerb + 1) * Rnd() + lowerb))
@@ -682,8 +682,8 @@ Public Class TSP
 
         Dim i As Integer
         Dim lowerb As Integer = 0
-        Dim upperb As Integer = mySettings.n_Cities - 2
-                
+        Dim upperb As Integer = mySettings.N_Cities - 2
+
         For i = 0 To CutPoint.GetUpperBound(0)
             CutPoint(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
         Next

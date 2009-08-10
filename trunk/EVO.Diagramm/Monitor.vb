@@ -138,7 +138,6 @@ Partial Public Class Monitor
         sw.Flush()
         sw.Close()
 
-
     End Sub
 
 #End Region 'Public Methoden

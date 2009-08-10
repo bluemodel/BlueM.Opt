@@ -81,7 +81,7 @@ namespace IHWB.EVO.MetaEvo
         }
 
         //(ok)Datenbank erzeugen
-        private void DB_init(ref EVO.Common.Settings settings_input)   
+        private void DB_init(ref EVO.Common.Settings settings_input)
         {
             //Datenbank
             myCommand.CommandText = "CREATE DATABASE IF NOT EXISTS " + settings_input.MetaEvo.MySQL_Database;

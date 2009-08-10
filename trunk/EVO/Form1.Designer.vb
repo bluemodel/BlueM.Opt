@@ -466,7 +466,6 @@ Partial Class Form1
         Me.EVO_Einstellungen1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.EVO_Einstellungen1.Location = New System.Drawing.Point(4, 148)
-        Me.EVO_Einstellungen1.MultithreadingAllowed = False
         Me.EVO_Einstellungen1.Name = "EVO_Einstellungen1"
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(244, 707)
         Me.EVO_Einstellungen1.TabIndex = 2
