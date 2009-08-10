@@ -22,7 +22,7 @@ Partial Class MDBImportDialog
     'Das Bearbeiten mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim GroupBox_Hauptdiagramm As System.Windows.Forms.GroupBox
+        Dim GroupBox_Zielfunktionen As System.Windows.Forms.GroupBox
         Dim Label_XAchse As System.Windows.Forms.Label
         Dim Label_YAchse As System.Windows.Forms.Label
         Dim Label_ZAchse As System.Windows.Forms.Label
@@ -36,29 +36,32 @@ Partial Class MDBImportDialog
         Me.ComboBox_SekPop = New System.Windows.Forms.ComboBox
         Me.GroupBox_SekPop = New System.Windows.Forms.GroupBox
         Me.CheckBox_Hypervol = New System.Windows.Forms.CheckBox
-        GroupBox_Hauptdiagramm = New System.Windows.Forms.GroupBox
+        GroupBox_Zielfunktionen = New System.Windows.Forms.GroupBox
         Label_XAchse = New System.Windows.Forms.Label
         Label_YAchse = New System.Windows.Forms.Label
         Label_ZAchse = New System.Windows.Forms.Label
         Label_SekPop = New System.Windows.Forms.Label
-        GroupBox_Hauptdiagramm.SuspendLayout()
+        GroupBox_Zielfunktionen.SuspendLayout()
         Me.GroupBox_SekPop.SuspendLayout()
         Me.SuspendLayout()
         '
-        'GroupBox_Hauptdiagramm
+        'GroupBox_Zielfunktionen
         '
-        GroupBox_Hauptdiagramm.Controls.Add(Label_XAchse)
-        GroupBox_Hauptdiagramm.Controls.Add(Label_YAchse)
-        GroupBox_Hauptdiagramm.Controls.Add(Label_ZAchse)
-        GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_ZieleX)
-        GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_ZieleY)
-        GroupBox_Hauptdiagramm.Controls.Add(Me.ListBox_ZieleZ)
-        GroupBox_Hauptdiagramm.Location = New System.Drawing.Point(12, 12)
-        GroupBox_Hauptdiagramm.Name = "GroupBox_Hauptdiagramm"
-        GroupBox_Hauptdiagramm.Size = New System.Drawing.Size(418, 236)
-        GroupBox_Hauptdiagramm.TabIndex = 10
-        GroupBox_Hauptdiagramm.TabStop = False
-        GroupBox_Hauptdiagramm.Text = "Hauptdiagramm"
+        GroupBox_Zielfunktionen.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        GroupBox_Zielfunktionen.Controls.Add(Label_XAchse)
+        GroupBox_Zielfunktionen.Controls.Add(Label_YAchse)
+        GroupBox_Zielfunktionen.Controls.Add(Label_ZAchse)
+        GroupBox_Zielfunktionen.Controls.Add(Me.ListBox_ZieleX)
+        GroupBox_Zielfunktionen.Controls.Add(Me.ListBox_ZieleY)
+        GroupBox_Zielfunktionen.Controls.Add(Me.ListBox_ZieleZ)
+        GroupBox_Zielfunktionen.Location = New System.Drawing.Point(12, 12)
+        GroupBox_Zielfunktionen.Name = "GroupBox_Zielfunktionen"
+        GroupBox_Zielfunktionen.Size = New System.Drawing.Size(418, 224)
+        GroupBox_Zielfunktionen.TabIndex = 10
+        GroupBox_Zielfunktionen.TabStop = False
+        GroupBox_Zielfunktionen.Text = "Zielfunktionen (für Hauptdiagramm)"
         '
         'Label_XAchse
         '
@@ -71,6 +74,8 @@ Partial Class MDBImportDialog
         '
         'Label_YAchse
         '
+        Label_YAchse.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Label_YAchse.AutoSize = True
         Label_YAchse.Location = New System.Drawing.Point(141, 21)
         Label_YAchse.Name = "Label_YAchse"
@@ -80,6 +85,7 @@ Partial Class MDBImportDialog
         '
         'Label_ZAchse
         '
+        Label_ZAchse.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Label_ZAchse.AutoSize = True
         Label_ZAchse.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Label_ZAchse.Location = New System.Drawing.Point(277, 21)
@@ -90,26 +96,33 @@ Partial Class MDBImportDialog
         '
         'ListBox_ZieleX
         '
+        Me.ListBox_ZieleX.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.ListBox_ZieleX.FormattingEnabled = True
         Me.ListBox_ZieleX.Location = New System.Drawing.Point(9, 41)
         Me.ListBox_ZieleX.Name = "ListBox_ZieleX"
-        Me.ListBox_ZieleX.Size = New System.Drawing.Size(130, 186)
+        Me.ListBox_ZieleX.Size = New System.Drawing.Size(130, 173)
         Me.ListBox_ZieleX.TabIndex = 5
         '
         'ListBox_ZieleY
         '
+        Me.ListBox_ZieleY.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ListBox_ZieleY.FormattingEnabled = True
         Me.ListBox_ZieleY.Location = New System.Drawing.Point(144, 41)
         Me.ListBox_ZieleY.Name = "ListBox_ZieleY"
-        Me.ListBox_ZieleY.Size = New System.Drawing.Size(130, 186)
+        Me.ListBox_ZieleY.Size = New System.Drawing.Size(130, 173)
         Me.ListBox_ZieleY.TabIndex = 10
         '
         'ListBox_ZieleZ
         '
+        Me.ListBox_ZieleZ.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ListBox_ZieleZ.FormattingEnabled = True
         Me.ListBox_ZieleZ.Location = New System.Drawing.Point(280, 41)
         Me.ListBox_ZieleZ.Name = "ListBox_ZieleZ"
-        Me.ListBox_ZieleZ.Size = New System.Drawing.Size(130, 186)
+        Me.ListBox_ZieleZ.Size = New System.Drawing.Size(130, 173)
         Me.ListBox_ZieleZ.TabIndex = 13
         '
         'Label_SekPop
@@ -123,9 +136,9 @@ Partial Class MDBImportDialog
         '
         'OK_Button
         '
-        Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.OK_Button.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.OK_Button.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.OK_Button.Location = New System.Drawing.Point(291, 303)
+        Me.OK_Button.Location = New System.Drawing.Point(290, 292)
         Me.OK_Button.Name = "OK_Button"
         Me.OK_Button.Size = New System.Drawing.Size(67, 23)
         Me.OK_Button.TabIndex = 0
@@ -133,9 +146,9 @@ Partial Class MDBImportDialog
         '
         'Cancel_Button
         '
-        Me.Cancel_Button.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.Cancel_Button.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Cancel_Button.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Cancel_Button.Location = New System.Drawing.Point(364, 303)
+        Me.Cancel_Button.Location = New System.Drawing.Point(363, 292)
         Me.Cancel_Button.Name = "Cancel_Button"
         Me.Cancel_Button.Size = New System.Drawing.Size(67, 23)
         Me.Cancel_Button.TabIndex = 1
@@ -153,10 +166,11 @@ Partial Class MDBImportDialog
         '
         'GroupBox_SekPop
         '
+        Me.GroupBox_SekPop.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox_SekPop.Controls.Add(Me.CheckBox_Hypervol)
         Me.GroupBox_SekPop.Controls.Add(Label_SekPop)
         Me.GroupBox_SekPop.Controls.Add(Me.ComboBox_SekPop)
-        Me.GroupBox_SekPop.Location = New System.Drawing.Point(12, 254)
+        Me.GroupBox_SekPop.Location = New System.Drawing.Point(12, 242)
         Me.GroupBox_SekPop.Name = "GroupBox_SekPop"
         Me.GroupBox_SekPop.Size = New System.Drawing.Size(175, 73)
         Me.GroupBox_SekPop.TabIndex = 15
@@ -178,18 +192,18 @@ Partial Class MDBImportDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(443, 338)
+        Me.ClientSize = New System.Drawing.Size(443, 327)
         Me.Controls.Add(Me.GroupBox_SekPop)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OK_Button)
-        Me.Controls.Add(GroupBox_Hauptdiagramm)
+        Me.Controls.Add(GroupBox_Zielfunktionen)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "MDBImportDialog"
         Me.Text = "Optimierungsergebnis laden"
-        GroupBox_Hauptdiagramm.ResumeLayout(False)
-        GroupBox_Hauptdiagramm.PerformLayout()
+        GroupBox_Zielfunktionen.ResumeLayout(False)
+        GroupBox_Zielfunktionen.PerformLayout()
         Me.GroupBox_SekPop.ResumeLayout(False)
         Me.GroupBox_SekPop.PerformLayout()
         Me.ResumeLayout(False)

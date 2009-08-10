@@ -55,7 +55,7 @@ Public Class ScatterplotDialog
         End Get
     End Property
 
-    Public Sub New(ByRef prob As EVO.Common.Problem, ByVal _RefResultExists As Boolean)
+    Public Sub New(ByRef prob As EVO.Common.Problem, Optional ByVal _refResultExists As Boolean = False)
 
         ' This call is required by the Windows Form Designer.
         Me.isInitializing = True
@@ -67,7 +67,8 @@ Public Class ScatterplotDialog
         'Problem speichern
         Me.mProblem = prob
 
-        Me.RefResultExists = _RefResultExists
+        'Optionen speichern
+        Me.RefResultExists = _refResultExists
 
     End Sub
 

@@ -1925,7 +1925,7 @@ Partial Public Class Form1
 
         Dim diagresult As DialogResult
         Dim sourceFile As String
-        Dim isOK As Boolean
+        Dim loadOptparameters, isOK As Boolean
 
         'Datei-öffnen Dialog anzeigen
         Me.OpenFileDialog1.Filter = "Access-Datenbanken (*.mdb)|*.mdb"
@@ -1938,13 +1938,22 @@ Partial Public Class Form1
 
             sourceFile = Me.OpenFileDialog1.FileName
 
+            'Abfrage
+            diagresult = MsgBox("Sollen auch die OptParameter-Werte des Vergleichsergebnisses geladen werden?" & eol & "(Dazu muss die OptParameter-Definition beider Ergebnisse identisch sein!)", MsgBoxStyle.YesNo, "Vergleichsergebnis laden")
+
+            If (diagresult = Windows.Forms.DialogResult.Yes) Then
+                loadOptparameters = True
+            Else
+                loadOptparameters = False
+            End If
+
             'Cursor Wait
             Cursor = Cursors.WaitCursor
 
             'Daten einlesen
             '==============
             Sim1.OptResultRef = New EVO.OptResult.OptResult(Me.Sim1.Datensatz, Me.mProblem, False)
-            isOK = Sim1.OptResultRef.db_load(sourceFile)
+            isOK = Sim1.OptResultRef.db_load(sourceFile, loadOptparameters)
 
             If (isOK) Then
 
