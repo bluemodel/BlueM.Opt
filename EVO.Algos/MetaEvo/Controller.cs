@@ -117,7 +117,7 @@ namespace IHWB.EVO.MetaEvo
                     algomanager = new Algomanager(ref prob, ref settings, individuumnumber);
 
                     //### Hauptprogramm ###
-                    if (settings.General.useMultithreading) start_single_pc_multithreading();
+                    if (settings.General.UseMultithreading) start_single_pc_multithreading();
                     else start_single_pc();
                     break;
 
@@ -153,7 +153,7 @@ namespace IHWB.EVO.MetaEvo
                     //Individuum-Speicher des Clients ausschalten
                     if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Sim)
                     {
-                        sim.StoreIndividuals = false; 
+                        sim.StoreIndividuals = false;
                     }
 
                     //### Hauptprogramm ###
@@ -164,7 +164,7 @@ namespace IHWB.EVO.MetaEvo
                     meClient = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
                     clienttmp = new double[5];
 
-                    if (settings.General.useMultithreading) start_network_client_multithreading();
+                    if (settings.General.UseMultithreading) start_network_client_multithreading();
                     else start_network_client();
                     break;
             }
@@ -195,7 +195,7 @@ namespace IHWB.EVO.MetaEvo
                 {
                     double max = this.prob.List_OptParameter[j].Max;
                     double min = this.prob.List_OptParameter[j].Min;
-                    random[j] = min + (max - min)*((double)randomizer.Next(0, 1000)/1000);
+                    random[j] = min + (max - min) * ((double)randomizer.Next(0, 1000) / 1000);
                 }
                 generation_input[k].set_optparas(random);
                 generation_input[k].set_status("raw");
@@ -342,7 +342,7 @@ namespace IHWB.EVO.MetaEvo
         #region Single PC mit Multithreading
         private bool start_single_pc_multithreading()
         {
-            Client mePC = new Client(); 
+            Client mePC = new Client();
             mePC.status = "Init Genpool";
             settings.MetaEvo.CurrentGeneration = 1;
 
@@ -386,7 +386,7 @@ namespace IHWB.EVO.MetaEvo
                     this.monitor1.LogAppend("Controller: Individuums for Generation " + settings.MetaEvo.CurrentGeneration + ": Simulating Individuums...");
                     progress1.iNachf = 0;
                     //Simulieren
-                    
+
                     if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
                     {
                         for (int i = 0; i < generation.Length; i++)
@@ -470,7 +470,7 @@ namespace IHWB.EVO.MetaEvo
 
                     else
                     {
-                        mePC.status = "generate Individuums";                         
+                        mePC.status = "generate Individuums";
                     }
 
                     if (settings.MetaEvo.OpMode != "Local Optimizer")
@@ -482,7 +482,7 @@ namespace IHWB.EVO.MetaEvo
                         catch { }
                     }
                 }
-                #endregion     
+                #endregion
             }
 
             progress1.iGen = progress1.NGen;
@@ -554,7 +554,7 @@ namespace IHWB.EVO.MetaEvo
         #region Network Server
         private bool start_network_server()
         {
-            Client meServer = new Client(); 
+            Client meServer = new Client();
             meServer = networkmanager.Network_Init_Client_Object(Dns.GetHostName());
             meServer.status = "Init Genpool";
             settings.MetaEvo.CurrentGeneration = 1;
@@ -573,7 +573,7 @@ namespace IHWB.EVO.MetaEvo
 
                     //Von den Clients ausrechnen lassen
                     this.monitor1.LogAppend("Controller: Calculate Genpool by Clients");
-                    MessageBox.Show("Wait for Clients to register for calculation. Press ok to start","MetaEvo - Networkmanager");
+                    MessageBox.Show("Wait for Clients to register for calculation. Press ok to start", "MetaEvo - Networkmanager");
                     if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1, ref progress1, ref this.stopped))
                     {
                         algomanager.set_genpool(ref generation);
@@ -679,7 +679,7 @@ namespace IHWB.EVO.MetaEvo
                         meServer.set_AlsoInDB("generate Individuums", -1, -1);
                     }
                 }
-                #endregion  
+                #endregion
             }
 
             progress1.iGen = progress1.NGen;

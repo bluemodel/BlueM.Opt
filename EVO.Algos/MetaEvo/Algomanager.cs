@@ -26,7 +26,7 @@ namespace IHWB.EVO.MetaEvo
         private Steema.TeeChart.Styles.Line Line_evo_avg;
         private Steema.TeeChart.Styles.Line Line_evo_threshold;
 
-        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.Settings settings_input, int individuumnumber_input) 
+        public Algomanager(ref EVO.Common.Problem prob_input, ref EVO.Common.Settings settings_input, int individuumnumber_input)
         {
             settings = settings_input;
             monitor1 = EVO.Diagramm.Monitor.getInstance();
@@ -76,7 +76,7 @@ namespace IHWB.EVO.MetaEvo
                 //Solutionvolume zeichnen
                 this.updateMonitor();
 
-                for (int i = 0; i < genpool.Length; i++ )
+                for (int i = 0; i < genpool.Length; i++)
                 {
                     if (genpool[i].feedbackdata[2, 0] != 50) difference2genpool++;
                 }
@@ -89,9 +89,9 @@ namespace IHWB.EVO.MetaEvo
                     localcounter2 = 0;
                     localcounter = difference2genpool;
                 }
-                this.monitor1.LogAppend("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
+                this.monitor1.LogAppend("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
             }
-            
+
             else if ((settings.MetaEvo.OpMode == "Both") || (settings.MetaEvo.OpMode == "Global Optimizer"))
             {
                 //0. Vorbereitung
@@ -126,8 +126,8 @@ namespace IHWB.EVO.MetaEvo
                 //4.3.Sortieren
                 //quicksort(ref wastepool, kriterium, 0, wastepool.Length - 1); //Nötig??
                 quicksort(ref genpool, kriterium, 0, genpool.Length - 1);
-                this.monitor1.LogAppend("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
-                
+                this.monitor1.LogAppend("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+
                 //5.Solutionvolume berechnen (Reihenfolge im IF wichtig, da immer das solutionvolume berechnet werden soll)
                 if ((solutionvolume.calculate(ref genpool)) && (settings.MetaEvo.OpMode == "Both"))
                 {
@@ -661,10 +661,10 @@ namespace IHWB.EVO.MetaEvo
                 copy_some_to(ref new_generation_input, ref new_generation_input2);
                 genpool = genpool2;
                 new_generation_input = new_generation_input2;
-                this.monitor1.LogAppend("Algo Manager: Genpool for local Optimization: \r\n" + this.generationinfo(ref genpool) + "\r\n"); 
-                    
+                this.monitor1.LogAppend("Algo Manager: Genpool for local Optimization: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+
             }
-            
+
             for (int i = 0; i < genpool.Length; i++)
             {
                 genpool[i].set_generator(-1);

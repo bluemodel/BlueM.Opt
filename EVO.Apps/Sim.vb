@@ -438,7 +438,7 @@ Public MustInherit Class Sim
 
                 'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                 If (Me.mProblem.Method = METH_HYBRID _
-                    And Me.mSettings.CES.ty_Hybrid = HYBRID_TYPE.Mixed_Integer) Then
+                    And Me.mSettings.CES.HybridType = HYBRID_TYPE.Mixed_Integer) Then
                     If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(ind, EVO.Common.Individuum_CES).Get_All_Loc_Elem)) Then
                         Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
                     End If
@@ -494,7 +494,7 @@ Public MustInherit Class Sim
 
         ReDim isOK(n_individuals - 1)
 
-        If (Me.mSettings.General.useMultithreading) Then
+        If (Me.mSettings.General.UseMultithreading) Then
 
             'Mit Multithreading
             '==================
@@ -528,7 +528,7 @@ Public MustInherit Class Sim
                             'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
                             'TODO: Christoph: Dies ist die einzige Stelle im Sim, an der die Settings benötigt werden. Kann man das nicht umgehen?
                             If (Me.mProblem.Method = METH_HYBRID _
-                                And Me.mSettings.CES.ty_Hybrid = HYBRID_TYPE.Mixed_Integer) Then
+                                And Me.mSettings.CES.HybridType = HYBRID_TYPE.Mixed_Integer) Then
                                 If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(inds(n_ind_Run), EVO.Common.Individuum_CES).Get_All_Loc_Elem)) Then
                                     Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
                                 End If
@@ -950,7 +950,7 @@ Handler:
         Get
 
             'Wenn Multithreading ausgeschaltet ist, nur 1 Thread benutzen
-            If (Not Me.mSettings.General.useMultithreading) Then
+            If (Not Me.mSettings.General.UseMultithreading) Then
                 Return 1
             End If
 

@@ -57,7 +57,7 @@ Public Class Controller
         SimReihen = New Collection()
 
         'Parameter
-        Anz_SensiPara = Me.mySettings.SensiPlot.Selected_OptParameters.GetLength(0)
+        Anz_SensiPara = Me.mySettings.SensiPlot.Selected_OptParameters.Count
 
         'Anzahl Simulationen
         If (Anz_SensiPara = 1) Then
@@ -185,7 +185,7 @@ Public Class Controller
                     End If
 
                     'Simulationsergebnis in Wave laden
-                    If (Me.mySettings.SensiPlot.show_Wave) Then
+                    If (Me.mySettings.SensiPlot.Show_Wave) Then
                         'SimReihe auslesen
                         SimReihe = Sim1.SimErgebnis.Reihen(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
                         'Lösungs-ID an Titel anhängen
@@ -204,7 +204,7 @@ Public Class Controller
         'Wave Diagramm anzeigen:
         'TODO: ggf. Referenzreihe der Objectivefunction anzeigen
         '-----------------------
-        If (Me.mySettings.SensiPlot.show_Wave) Then
+        If (Me.mySettings.SensiPlot.Show_Wave) Then
             Wave1 = New Wave.Wave()
             For Each zre As Wave.Zeitreihe In SimReihen
                 Wave1.Import_Series(zre)

@@ -106,15 +106,15 @@ namespace modelEAU.DDS
                 Ini_Parameter[i] = this.mProblem.List_OptParameter[i].Xn;
             }
 
-            if (this.mSettings.DDS.optStartparameter)
+            if (this.mSettings.DDS.RandomStartparameters)
             {
                 //Zufällige Startparameter
-                DDS.initialize(this.mSettings.DDS.r_val, this.mSettings.DDS.maxiter, this.mProblem.NumOptParams);
+                DDS.initialize(this.mSettings.DDS.R_val, this.mSettings.DDS.MaxIter, this.mProblem.NumOptParams);
             }
             else
             {
                 //Vorgegebene Startparameter
-                DDS.initialize(this.mSettings.DDS.r_val, this.mSettings.DDS.maxiter, this.mProblem.NumOptParams, Ini_Parameter);
+                DDS.initialize(this.mSettings.DDS.R_val, this.mSettings.DDS.MaxIter, this.mProblem.NumOptParams, Ini_Parameter);
             }
 
             //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

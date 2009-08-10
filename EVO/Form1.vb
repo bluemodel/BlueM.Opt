@@ -16,9 +16,9 @@
 Option Strict Off 'allows permissive type semantics. explicit narrowing conversions are not required 
 
 Imports System.IO
+Imports System.Xml
+Imports System.Xml.Serialization
 Imports IHWB.EVO.Common.Constants
-'Imports System.management
-
 
 ''' <summary>
 ''' Main Window
@@ -28,16 +28,12 @@ Partial Public Class Form1
 
 #Region "Eigenschaften"
 
-    ''' <summary>
-    ''' Gibt an, ob Batch-Mode verwendet wird
-    ''' </summary>
-    ''' <remarks>Einstellung wird kurz vor Start auch in Settings.General geschreiben</remarks>
-    Public BatchMode As Boolean
+    Public BatchCounter as Integer
 
     ''' <summary>
     ''' Wird im BatchMode ausgelöst, sobald die Settings eingelesen wurden (kurz vor Start)
     ''' </summary>
-    Public Event SettingsSaved()
+    Public Event OptimizationStarted()
 
     ''' <summary>
     ''' Wird im BatchMode ausgelöst, sobald die Optimierung beendet ist
@@ -94,6 +90,9 @@ Partial Public Class Form1
 		'Monitor zentrieren
         Me.Monitor1.Location = New Drawing.Point(Me.Location.X + Me.Width / 2 - Me.Monitor1.Width / 2, Me.Location.Y + Me.Height / 2 - Me.Monitor1.Height / 2)
 
+        'BatchCounter initialisieren
+        Me.BatchCounter = 0
+
         'Formular initialisieren
         Call Me.INI()
 
@@ -139,7 +138,9 @@ Partial Public Class Form1
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'Einstellungen
-        Me.EVO_Einstellungen1.Reset()
+        Me.mSettings = New Common.Settings()
+        Me.EVO_Einstellungen1.Reset() 'für Neustart wichtig
+        Me.EVO_Einstellungen1.setSettings(Me.mSettings)
 
         'Monitor zurücksetzen
         Me.Monitor1.Reset()
@@ -238,7 +239,7 @@ Partial Public Class Form1
         If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
 
             'Settings aus Datei laden
-            Call EVO_Einstellungen1.loadSettings(OpenFileDialog1.FileName)
+            Call Me.loadSettings(OpenFileDialog1.FileName)
 
         End If
 
@@ -261,11 +262,80 @@ Partial Public Class Form1
 
         'Dialog anzeigen
         If (SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
-            Call EVO_Einstellungen1.saveSettings(SaveFileDialog1.FileName)
+            Call Me.saveSettings(SaveFileDialog1.FileName)
         End If
     End Sub
 
 #End Region 'UI
+
+#Region "Settings-IO"
+
+    ''' <summary>
+    ''' Speichern der Settings in einer XML-Datei
+    ''' </summary>
+    ''' <param name="filename">Pfad zur XML-Datei</param>
+    Public Sub saveSettings(ByVal filename As String)
+
+        Dim writer As StreamWriter
+        Dim serializer As XmlSerializer
+
+        'Streamwriter öffnen
+        writer = New StreamWriter(filename)
+
+        serializer = New XmlSerializer(GetType(Common.Settings), New XmlRootAttribute("Settings"))
+        serializer.Serialize(writer, Me.mSettings)
+
+        writer.Close()
+
+    End Sub
+
+    'Laden der Settings aus einer XML-Datei
+    '**************************************
+    Public Sub loadSettings(ByVal filename As String)
+
+        Dim serializer As New XmlSerializer(GetType(Common.Settings))
+
+        AddHandler serializer.UnknownElement, AddressOf serializerUnknownElement
+        AddHandler serializer.UnknownAttribute, AddressOf serializerUnknownAttribute
+
+        'Filestream öffnen
+        Dim fs As New FileStream(filename, FileMode.Open)
+
+        Try
+            'Deserialisieren
+            'TODO: XmlDeserializationEvents ms-help://MS.VSCC.v90/MS.MSDNQTR.v90.en/fxref_system.xml/html/e0657840-5678-bf57-6e7a-1bd93b2b27d1.htm
+            Me.mSettings = CType(serializer.Deserialize(fs), Common.Settings)
+
+            'Geladene Settings überall neu setzen
+            Me.EVO_Einstellungen1.setSettings(Me.mSettings)
+            Me.Hauptdiagramm1.setSettings(Me.mSettings)
+            If (Not IsNothing(Me.Sim1)) Then
+                Me.Sim1.setSettings(Me.mSettings)
+            End If
+
+        Catch e As Exception
+            MsgBox("Fehler beim Einlesen der Einstellungen!" & eol & e.Message, MsgBoxStyle.Exclamation)
+
+        Finally
+            fs.Close()
+
+        End Try
+
+    End Sub
+
+    'Fehlerbehandlung Serialisierung
+    '*******************************
+    Private Sub serializerUnknownElement(ByVal sender As Object, ByVal e As XmlElementEventArgs)
+        MsgBox("Fehler beim Einlesen der Einstellungen:" & eol _
+            & "Das Element '" & e.Element.Name & "' ist unbekannt!", MsgBoxStyle.Exclamation)
+    End Sub
+
+    Private Sub serializerUnknownAttribute(ByVal sender As Object, ByVal e As XmlAttributeEventArgs)
+        MsgBox("Fehler beim Einlesen der Einstellungen:" & eol _
+            & "Das Attribut '" & e.Attr.Name & "' ist unbekannt!", MsgBoxStyle.Exclamation)
+    End Sub
+
+#End Region 'Settings-IO
 
 #Region "Initialisierung der Anwendungen"
 
@@ -317,11 +387,8 @@ Partial Public Class Form1
             Me.ToolStripButton_Scatterplot.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
 
-            'Settings zurücksetzen
-            Call Me.EVO_Einstellungen1.Reset()
-
             'Multithreading standardmäßig verbieten
-            Me.EVO_Einstellungen1.MultithreadingAllowed = False
+            Me.mSettings.General.MultithreadingAllowed = False
 
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
@@ -396,7 +463,7 @@ Partial Public Class Form1
             'Bei Sim-Anwendungen ggf. Multithreading-Option aktivieren
             If (Not IsNothing(Me.Sim1)) Then
                 If (Me.Sim1.MultithreadingSupported) Then
-                    Me.EVO_Einstellungen1.MultithreadingAllowed = True
+                    Me.mSettings.General.MultithreadingAllowed = True
                 End If
             End If
 
@@ -412,6 +479,9 @@ Partial Public Class Form1
             Me.ComboBox_Anwendung.SelectedIndex = 0
 
         End Try
+
+        'wegen verändertem Setting MultithreadingAllowed
+        Call Me.EVO_Einstellungen1.refreshForm()
 
         'Mauszeiger wieder normal
         Cursor = Cursors.Default
@@ -743,11 +813,12 @@ Partial Public Class Form1
 
                     End If
 
-                    'ggf. EVO_Einstellungen Testmodus einrichten
-                    '-------------------------------------------
+                    'ggf. Testmodus einrichten
+                    '-------------------------
                     'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
                     If Not (Me.mProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
-                        Call EVO_Einstellungen1.CES_setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
+                        Call Me.mSettings.CES.setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
+                        Call Me.EVO_Einstellungen1.refreshForm()
                     End If
 
                     'TODO: Progress mit Standardwerten initialisieren
@@ -759,7 +830,7 @@ Partial Public Class Form1
                     Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                     'Progress mit Standardwerten initialisieren
-                    Call Me.mProgress.Initialize(1, 1, EVO_Einstellungen1.getSettings.MetaEvo.NumberGenerations, EVO_Einstellungen1.getSettings.MetaEvo.PopulationSize)
+                    Call Me.mProgress.Initialize(1, 1, mSettings.MetaEvo.NumberGenerations, mSettings.MetaEvo.PopulationSize)
 
                 Case METH_TSP
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -827,7 +898,7 @@ Partial Public Class Form1
 
         'Problem an EVO_Einstellungen übergeben
         '--------------------------------------
-        Call Me.EVO_Einstellungen1.Initialise(Me.mProblem)
+        Call Me.EVO_Einstellungen1.setProblem(Me.mProblem)
 
         'Individuumsklasse mit Problem initialisieren
         '--------------------------------------------
@@ -843,6 +914,10 @@ Partial Public Class Form1
         Me.Monitor1.SelectTabLog()
         Me.Monitor1.Show()
 
+    End Sub
+
+    Public Sub setBatchMode(ByVal _batchmode As Boolean)
+        Me.mSettings.General.BatchMode = _batchmode
     End Sub
 
 #End Region 'Initialisierung der Anwendungen
@@ -872,7 +947,7 @@ Partial Public Class Form1
             Me.Button_Start.Text = "Continue"
 
             'Bei Multithreading muss Sim explizit pausiert werden
-            If (Me.mSettings.General.useMultithreading) Then
+            If (Me.mSettings.General.UseMultithreading) Then
                 Me.Sim1.isPause = True
             End If
 
@@ -888,7 +963,7 @@ Partial Public Class Form1
             Me.Button_Start.Text = "Pause"
 
             'Bei Multithreading muss Sim explizit wieder gestartet werden
-            If (Me.mSettings.General.useMultithreading) Then
+            If (Me.mSettings.General.UseMultithreading) Then
                 Me.Sim1.isPause = False
             End If
 
@@ -918,20 +993,15 @@ Partial Public Class Form1
             'Anwendungs-Groupbox deaktivieren
             Me.GroupBox_Anwendung.Enabled = False
 
-            'Settings aus EVO_Einstellungen holen 
-            Me.mSettings = Me.EVO_Einstellungen1.getSettings
-
             'Settings in temp-Verzeichnis speichern
             Dim dir As String
             dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
-            Me.EVO_Einstellungen1.saveSettings(dir & "Settings.xml")
-            Me.EVO_Einstellungen1.isSaved = True
+            Me.saveSettings(dir & "Settings.xml")
 
             'Event auslösen (BatchMode)
-            If (Me.BatchMode) Then
-                Me.mSettings.General.BatchMode = True
-                Me.mSettings.General.BatchCounter += 1
-                RaiseEvent SettingsSaved()
+            If (Me.mSettings.General.BatchMode) Then
+                Me.BatchCounter += 1
+                RaiseEvent OptimizationStarted()
             End If
 
             'Settings deaktivieren
@@ -1047,7 +1117,7 @@ Partial Public Class Form1
                 'Event auslösen 
                 RaiseEvent OptimizationReady()
             Else
-                'MsgBox("Optimierung beendet!", MsgBoxStyle.Information, "BlueM.Opt")
+                MsgBox("Optimierung beendet!", MsgBoxStyle.Information, "BlueM.Opt")
                 Me.Monitor1.LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Milliseconds & "ms")
             End If
 
@@ -1164,7 +1234,7 @@ Partial Public Class Form1
                     Case METH_SENSIPLOT 'SensiPlot
                         'XXXXXXXXXXXXXXXXXXXXXXXXX
 
-                        If (Me.mSettings.SensiPlot.Selected_OptParameters.GetLength(0) = 1) Then
+                        If (Me.mSettings.SensiPlot.Selected_OptParameters.Count = 1) Then
 
                             '1 OptParameter:
                             '---------------
@@ -1248,10 +1318,10 @@ Partial Public Class Form1
                             Achse.Automatic = False
                             If (Me.mProblem.Method = METH_PES) Then
                                 'Bei PES:
-                                If (Me.mSettings.PES.Pop.is_POPUL) Then
-                                    Achse.Maximum = Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf * Me.mSettings.PES.Pop.n_Runden + 1
+                                If (Me.mSettings.PES.Pop.Is_POPUL) Then
+                                    Achse.Maximum = Me.mSettings.PES.N_Gen * Me.mSettings.PES.N_Nachf * Me.mSettings.PES.Pop.N_Runden + 1
                                 Else
-                                    Achse.Maximum = Me.mSettings.PES.n_Gen * Me.mSettings.PES.n_Nachf + 1
+                                    Achse.Maximum = Me.mSettings.PES.N_Gen * Me.mSettings.PES.N_Nachf + 1
                                 End If
 
                             ElseIf (Me.mProblem.Method = METH_METAEVO) Then
@@ -1268,7 +1338,7 @@ Partial Public Class Form1
 
                             Else
                                 'Bei CES etc.:
-                                Achse.Maximum = Me.mSettings.CES.n_Children * Me.mSettings.CES.n_Generations
+                                Achse.Maximum = Me.mSettings.CES.N_Children * Me.mSettings.CES.N_Generations
                             End If
 
                             Achsen.Add(Achse)
@@ -1982,7 +2052,7 @@ Partial Public Class Form1
                 Call Me.controller.Stoppen()
                 Me.controller = Nothing
                 'bei Multithreading Sim explizit stoppen
-                If (Me.mSettings.General.useMultithreading) Then
+                If (Me.mSettings.General.UseMultithreading) Then
                     Me.Sim1.isStopped = True
                 End If
             Else
@@ -2046,23 +2116,14 @@ Partial Public Class Form1
                     Me.mSettings.General.BatchMode = True
 
                     'Settings ändern
-                    'Me.mSettings.CES.OptReprodOp = ReprodItem
-                    Me.EVO_Einstellungen1.CES_Combo_Reproduction.SelectedItem = ReprodItem
-                    'If ReprodItem = CES_REPRODOP.k_Point_Crossover Then
-                    '    'Me.mSettings.CES.k_Value = 3
-                    '    Me.EVO_Einstellungen1.CES_Numeric_k_Value.Value = 3
-                    'End If
-                    'Me.mSettings.CES.OptMutOperator = MutItem
-                    Me.EVO_Einstellungen1.CES_Combo_Mutation.SelectedItem = MutItem
+                    Me.mSettings.CES.OptReprodOp = ReprodItem
+                    Me.mSettings.CES.OptMutOperator = MutItem
 
-                    'Verhindern, dass die Settings neu eingelesen werden
-                    'Me.EVO_Einstellungen1.isSaved = True
+                    'Neue Settings ins Form schreiben (optional)
+                    Call Me.EVO_Einstellungen1.refreshForm()
 
                     Call Monitor1.SelectTabLog()
                     Call Monitor1.Show()
-
-                    'Settings holen
-                    Me.mSettings = EVO_Einstellungen1.getSettings
 
                     Monitor1.LogAppend("ReprodOperator: " & Me.mSettings.CES.OptReprodOp.ToString)
                     Monitor1.LogAppend("MutOperator: " & Me.mSettings.CES.OptMutOperator.ToString)

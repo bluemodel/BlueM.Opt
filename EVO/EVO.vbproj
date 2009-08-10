@@ -235,6 +235,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Application\app.config" />
+    <None Include="My Project\DataSources\IHWB.EVO.Common.Settings+Settings_General.datasource" />
+    <None Include="My Project\DataSources\IHWB.EVO.Common.Settings_CES.datasource" />
+    <None Include="My Project\DataSources\IHWB.EVO.Common.Settings_DDS.datasource" />
+    <None Include="My Project\DataSources\IHWB.EVO.Common.Settings_HookeJeeves.datasource" />
+    <None Include="My Project\DataSources\IHWB.EVO.Common.Settings_MetaEvo.datasource" />
+    <None Include="My Project\DataSources\IHWB.EVO.Common.Settings_PES+Settings_Pop.datasource" />
+    <None Include="My Project\DataSources\IHWB.EVO.Common.Settings_PES+Settings_Schrittweite.datasource" />
+    <None Include="My Project\DataSources\IHWB.EVO.Common.Settings_PES.datasource" />
+    <None Include="My Project\DataSources\IHWB.EVO.Common.Settings_Sensiplot.datasource" />
+    <None Include="My Project\DataSources\IHWB.EVO.Common.Settings_TSP.datasource" />
     <None Include="My Project\Settings.settings">
       <CustomToolNamespace>My</CustomToolNamespace>
       <Generator>SettingsSingleFileGenerator</Generator>
