@@ -42,9 +42,17 @@ Public Class OptResult
     'Array von ausgewählten Lösungen
     Private selSolutionIDs() As Integer
 
+    ''' <summary>
+    ''' Zeigt an, ob auch die Optparameter-Werte im OptResult enthalten sind
+    ''' </summary>
+    Public holdsOptparameters As Boolean
+
     'Konstruktor
     '***********
     Public Sub New(ByVal Datensatzname As String, ByRef prob As EVO.Common.Problem, Optional ByVal createNewMdb As Boolean = True)
+
+        'Standardmäßig mit Optparametern
+        Me.holdsOptparameters = True
 
         'Datensatzname speichern
         Me.Datensatz = Datensatzname
@@ -134,7 +142,7 @@ Public Class OptResult
             End If
         Next
 
-        Throw New Exception("Konnte Lösung nicht identifizieren!")
+        Throw New Exception("Konnte Lösung mit der ID " & ID & " nicht identifizieren!")
 
     End Function
 
@@ -603,7 +611,7 @@ Public Class OptResult
 
     'SekPop aus DB lesen
     '*******************
-    Private Function db_getSekPop(ByVal igen As Integer) As Struct_SekPop
+    Private Function db_getSekPop(ByVal iGen As Integer) As Struct_SekPop
 
         Dim i As Integer
         Dim q As String
@@ -614,7 +622,7 @@ Public Class OptResult
 
         Call db_connect()
 
-        q = "SELECT Sim_ID FROM SekPop WHERE Generation = " & igen
+        q = "SELECT Sim_ID FROM SekPop WHERE Generation = " & iGen
 
         adapter = New OleDbDataAdapter(q, db)
 
@@ -625,7 +633,7 @@ Public Class OptResult
 
         If (numrows > 0) Then
 
-            SekPop.iGen = igen
+            SekPop.iGen = iGen
             ReDim SekPop.SolutionIDs(numrows - 1)
 
             For i = 0 To numrows - 1
@@ -633,7 +641,7 @@ Public Class OptResult
             Next
 
         Else
-            Throw New Exception("Sekundäre Population nicht in DB vorhanden!")
+            Throw New Exception("Sekundäre Population der Generation " & iGen & " nicht in DB vorhanden!")
         End If
 
         Return SekPop
@@ -682,12 +690,16 @@ Public Class OptResult
     ''' Optimierungsergebnis aus einer DB einlesen
     ''' </summary>
     ''' <param name="sourceFile">Pfad zur mdb-Datei</param>
+    ''' <param name="loadOptParameters">Ob auch die OptParameter-Werte eingelesen werden sollen</param>
     ''' <returns>True if successful</returns>
     ''' <remarks>
-    ''' Das Optimierungsproblem (d.h. Feature Functions, OptParameter, Constraints), 
+    ''' Das Optimierungsproblem (d.h. ObjectiveFunctions, OptParameter, Constraints), 
     ''' ebenso wie die Methode, müssen mit der DB übereinstimmen!
     ''' </remarks>
-    Public Function db_load(ByVal sourceFile As String) As Boolean
+    Public Function db_load(ByVal sourceFile As String, Optional ByVal loadOptParameters As Boolean = True) As Boolean
+
+        'Optparameter gewünscht?
+        Me.holdsOptparameters = loadOptParameters
 
         Try
 
@@ -732,7 +744,13 @@ Public Class OptResult
 
         'Alle Lösungen aus DB lesen
         '--------------------------
-        q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
+        If (Me.holdsOptparameters) Then
+            'mit OptParameter
+            q = "SELECT Sim.ID, OptParameter.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
+        Else
+            'ohne OptParameter
+            q = "SELECT Sim.ID, QWerte.*, Constraints.* FROM (Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
+        End If
 
         adapter = New OleDbDataAdapter(q, db)
 
@@ -755,11 +773,13 @@ Public Class OptResult
                 '--
                 .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
 
-                'OptParameter
-                '------------
-                For j = 0 To Me.mProblem.NumOptParams - 1
-                    .OptParameter(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
-                Next
+                If (Me.holdsOptparameters) Then
+                    'OptParameter
+                    '------------
+                    For j = 0 To Me.mProblem.NumOptParams - 1
+                        .OptParameter(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
+                    Next
+                End If
 
                 'Constraints
                 '-----------
@@ -824,7 +844,7 @@ Public Class OptResult
 
                 'OptParameter
                 '------------
-                'TODO: OptParameter aus DB in Individuum_CES einlesen
+                'BUG 314: OptParameter aus DB in Individuum_CES einlesen?
 
                 'Constraints
                 '-----------

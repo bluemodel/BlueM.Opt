@@ -71,7 +71,8 @@ Partial Public Class Scatterplot
         Me.OptResultRef = optresref
 
         'Scatterplot-Dialog aufrufen
-        Dialog = New EVO.Diagramm.ScatterplotDialog(Me.mProblem, Not IsNothing(Me.OptResultRef))
+        Dim refResultExists As Boolean = Not IsNothing(Me.OptResultRef)
+        Dialog = New EVO.Diagramm.ScatterplotDialog(Me.mProblem, refResultExists)
         diagresult = Dialog.ShowDialog()
 
         If (diagresult = DialogResult.OK) Then
@@ -82,6 +83,14 @@ Partial Public Class Scatterplot
             Me.ShowRefResult = Dialog.ShowRefResult
             Me.ShowStartValue = Dialog.ShowStartValue
             Me.ShowIstWerte = Dialog.ShowIstWerte
+
+            If (Me.ShowRefResult And Me.ShownSpace = Common.SPACE.DecisionSpace)
+                If (Not Me.OptResultRef.holdsOptparameters)
+                    MsgBox("Das Vergleichsergebnis wurde ohne OptParameter geladen und kann daher nicht im Entscheidungsraum angezeigt werden!", MsgBoxStyle.Information, "Scatterplot-Matrix")
+                    Me.ShowRefResult = False
+                End If
+            End If
+            
 
             Application.DoEvents()
 
