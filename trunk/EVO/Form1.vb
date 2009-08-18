@@ -28,7 +28,7 @@ Partial Public Class Form1
 
 #Region "Eigenschaften"
 
-    Public BatchCounter as Integer
+    Public BatchCounter As Integer
 
     ''' <summary>
     ''' Wird im BatchMode ausgelöst, sobald die Settings eingelesen wurden (kurz vor Start)
@@ -87,7 +87,7 @@ Partial Public Class Form1
 
         'Monitor zuweisen
         Me.Monitor1 = EVO.Diagramm.Monitor.getInstance()
-		'Monitor zentrieren
+        'Monitor zentrieren
         Me.Monitor1.Location = New Drawing.Point(Me.Location.X + Me.Width / 2 - Me.Monitor1.Width / 2, Me.Location.Y + Me.Height / 2 - Me.Monitor1.Height / 2)
 
         'BatchCounter initialisieren
@@ -1022,8 +1022,8 @@ Partial Public Class Form1
                 'Sim-Anwendungen
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
-                    'Multithreading vorbereiten
-                    Call Me.Sim1.prepareMultithreading()
+                    'Simulationen vorbereiten
+                    Call Me.Sim1.prepareSimulation()
 
                     'Startwerte evaluieren
                     If (Me.mProblem.Method <> METH_SENSIPLOT) Then
@@ -1910,6 +1910,9 @@ Partial Public Class Form1
                     Me.Button_Start.Enabled = False
 
                 End If
+
+                'Simulationen vorbereiten (weil möglicherweise vorher noch nicht geschehen!)
+                Call Me.Sim1.prepareSimulation()
 
                 'Cursor Default
                 Cursor = Cursors.Default
