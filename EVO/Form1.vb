@@ -629,8 +629,7 @@ Partial Public Class Form1
     '**************************
     Private Sub Datensatz_reset(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_DatensatzZurücksetzen.Click
 
-        'Original ModellParameter schreiben
-        Call Sim1.Write_ModellParameter()
+        Call Sim1.resetDatensatz()
 
         MsgBox("Die Startwerte der Optimierungsparameter wurden in die Eingabedateien geschrieben.", MsgBoxStyle.Information, "Info")
 
