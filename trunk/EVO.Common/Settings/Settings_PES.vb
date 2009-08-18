@@ -417,8 +417,8 @@ Public Class Settings_PES
                 Me.Strategie = EVO_STRATEGIE.Plus_Strategie
                 Me.Startparameter = EVO_STARTPARAMETER.Original
 
+                Me.Schrittweite.DnMutation = EVO_DnMutation.Schwefel
                 Me.Schrittweite.DnStart = 0.1
-                Me.Schrittweite.IsDnVektor = False
                 Me.Schrittweite.IsDnVektor = False
                 Me.Schrittweite.DnC = 1.0
 
