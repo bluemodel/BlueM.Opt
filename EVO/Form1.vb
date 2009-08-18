@@ -460,8 +460,12 @@ Partial Public Class Form1
 
             End Select
 
-            'Bei Sim-Anwendungen ggf. Multithreading-Option aktivieren
+            'Bei Sim-Anwendungen
             If (Not IsNothing(Me.Sim1)) Then
+                'Settings an Sim1 übergeben
+                Call Me.Sim1.setSettings(Me.mSettings)
+
+                'ggf. Multithreading-Option aktivieren
                 If (Me.Sim1.MultithreadingSupported) Then
                     Me.mSettings.General.MultithreadingAllowed = True
                 End If
@@ -1017,9 +1021,6 @@ Partial Public Class Form1
 
                 'Sim-Anwendungen
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
-
-                    'Settings an Sim1 übergeben
-                    Call Me.Sim1.setSettings(Me.mSettings)
 
                     'Multithreading vorbereiten
                     Call Me.Sim1.prepareMultithreading()
