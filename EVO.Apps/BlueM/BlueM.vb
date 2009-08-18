@@ -96,11 +96,11 @@ Public Class BlueM
     End Sub
 
     ''' <summary>
-    ''' BlueM auf Multithreading vorbereiten
+    ''' BlueM.Sim Simulationen vorbereiten
     ''' </summary>
-    Public Overrides Sub prepareMultithreading()
+    Public Overrides Sub prepareSimulation()
 
-        Call MyBase.prepareMultithreading()
+        Call MyBase.prepareSimulation()
 
         'BlueM DLL instanzieren je nach Anzahl der Threads
         '-------------------------------------------------

@@ -86,11 +86,11 @@ Public Class SWMM
     End Sub
 
     ''' <summary>
-    ''' SWMM auf Multithreading vorbereiten
+    ''' SWMM Simulationen vorbereiten
     ''' </summary>
-    Public Overrides Sub prepareMultithreading()
+    Public Overrides Sub prepareSimulation()
 
-        Call MyBase.prepareMultithreading()
+        Call MyBase.prepareSimulation()
 
         'SWMM DLL instanzieren je nach Anzahl der Threads
         '------------------------------------------------

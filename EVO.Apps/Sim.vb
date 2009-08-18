@@ -167,9 +167,9 @@ Public MustInherit Class Sim
     End Sub
 
     ''' <summary>
-    ''' Die Anwendung auf Multithreading vorbereiten
+    ''' Die Sim-Anwendung für die Simulation vorbereiten
     ''' </summary>
-    Public Overridable Sub prepareMultithreading()
+    Public Overridable Sub prepareSimulation()
 
         'Datensätze für Multithreading kopieren
         Call Me.createThreadWorkDirs()
