@@ -145,9 +145,6 @@ Public MustInherit Class Sim
 
 #Region "Methoden"
 
-    'Methoden
-    '########
-
 #Region "Initialisierung"
 
     ''' <summary>
@@ -258,24 +255,18 @@ Public MustInherit Class Sim
 
     End Sub
 
-#End Region 'Initialisierung
-
-#Region "Eingabedateien lesen"
-
-    'Simulationsparameter einlesen
-    '*****************************
+    ''' <summary>
+    ''' Simulationsparameter einlesen
+    ''' </summary>
     Protected MustOverride Sub Read_SimParameter()
 
-    'Liest die Verzweigungen aus BlueM in ein Array ein
-    'Und Dimensioniert das Verzweigungsarray
-    '*******************************************************
+    ''' <summary>
+    ''' Liest die Verzweigungen aus BlueM in ein Array ein
+    ''' und dimensioniert das Verzweigungsarray
+    ''' </summary>
     Protected MustOverride Sub Read_Verzweigungen()
 
-#End Region 'Eingabedateien einlesen
-
-#Region "Prüfung der Eingabedateien"
-
-#End Region 'Prüfung der Eingabedateien
+#End Region 'Initialisierung
 
 #Region "Kombinatorik"
 
@@ -1111,6 +1102,46 @@ Handler:
     End Function
 
 #End Region  'Multithreading
+
+#Region "Misc"
+
+    ''' <summary>
+    ''' Setzt den Datensatz zurück, 
+    ''' indem die Startwerte der OptParameter 
+    ''' in die Eingabedateien des Original-Datensatzordners
+    ''' geschrieben werden
+    ''' </summary>
+    Public Sub resetDatensatz()
+
+        Dim tmp As String
+        Dim i As Integer
+
+        'Aktuelles Arbeitsverzeichnis merken
+        tmp = Me.WorkDir_Current
+
+        'Arbeitsverzeichnis auf Original-Verzeichnis setzen
+        Me.WorkDir_Current = Me.WorkDir_Original
+
+        'Parameterlisten zurücksetzen (nur bei CES erforderlich?!)
+        Call Me.mProblem.Reset_OptPara_and_ModPara()
+
+        'Startwerte der OptParameter setzen
+        For i = 0 To Me.mProblem.NumOptParams - 1
+            Me.Akt.OptPara(i) = Me.mProblem.List_OptParameter(i).StartWert
+        Next
+
+        'Modellparameter berechnen
+        Call Me.OptParameter_to_ModellParameter()
+
+        'Modellparameter schreiben
+        Call Me.Write_ModellParameter()
+
+        'Arbeitsverzeichnis zurücksetzen
+        Me.WorkDir_Current = tmp
+
+    End Sub
+
+#End Region 'Misc
 
 #End Region 'Methoden
 End Class
