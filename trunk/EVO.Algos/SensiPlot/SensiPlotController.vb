@@ -3,6 +3,15 @@
 Public Class SensiPlotController
     Implements EVO.IController
 
+    ''' <summary>
+    ''' Multithreading Support
+    ''' </summary>
+    Public ReadOnly Property MultithreadingSupported() As Boolean Implements IController.MultithreadingSupported
+        Get
+            Return False
+        End Get
+    End Property
+
     Private myProblem As EVO.Common.Problem
     Private mySettings As EVO.Common.Settings
     Private myProgress As EVO.Common.Progress

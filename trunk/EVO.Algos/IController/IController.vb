@@ -4,6 +4,11 @@
 Public Interface IController
 
     ''' <summary>
+    ''' Gibt an, ob der Algorithmus Multithreading unterstützt
+    ''' </summary>
+    ReadOnly Property MultithreadingSupported() As Boolean
+
+    ''' <summary>
     ''' Initialisiert den Controller und übergibt alle erforderlichen Objekte
     ''' </summary>
     ''' <param name="inputProblem">die Problemdefinition</param>
