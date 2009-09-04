@@ -87,7 +87,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controller.vb" />
+    <Compile Include="ESController.vb" />
     <Compile Include="Functions.vb" />
     <Compile Include="Hypervolumen.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

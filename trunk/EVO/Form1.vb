@@ -1033,23 +1033,23 @@ Partial Public Class Form1
 
                         Case METH_SENSIPLOT
                             'SensiPlot-Controller initialisieren und starten
-                            controller = New EVO.SensiPlot.Controller()
+                            controller = New EVO.SensiPlot.SensiPlotController()
 
                         Case METH_PES, METH_CES, METH_HYBRID
                             'ES-Controller initialisieren und starten
-                            controller = New EVO.ES.Controller()
+                            controller = New EVO.ES.ESController()
 
                         Case METH_METAEVO
                             'MetaEVO-Controller initialisieren und starten
-                            controller = New EVO.MetaEvo.Controller()
+                            controller = New EVO.MetaEvo.MetaEvoController()
 
                         Case METH_HOOKEJEEVES
                             'HJ-Controller initialisieren und starten
-                            controller = New EVO.HookeAndJeeves.Controller()
+                            controller = New EVO.HookeAndJeeves.HJController()
 
                         Case METH_DDS
                             'DDS-Controller initialisieren und starten
-                            controller = New modelEAU.DDS.Controller()
+                            controller = New modelEAU.DDS.DDSController()
 
                     End Select
 
@@ -1063,19 +1063,19 @@ Partial Public Class Form1
                     Select Case Me.mProblem.Method
                         Case METH_PES
                             'ES-Controller instanzieren
-                            controller = New EVO.ES.Controller()
+                            controller = New EVO.ES.ESController()
 
                         Case METH_HOOKEJEEVES
                             'HJ-Controller instanzieren
-                            controller = New EVO.HookeAndJeeves.Controller()
+                            controller = New EVO.HookeAndJeeves.HJController()
 
                         Case METH_DDS
                             'DDS-Controller instanzieren
-                            controller = New modelEAU.DDS.Controller()
+                            controller = New modelEAU.DDS.DDSController()
 
                         Case METH_METAEVO
                             'MetaEVO-Controller instanzieren
-                            controller = New EVO.MetaEvo.Controller()
+                            controller = New EVO.MetaEvo.MetaEvoController()
 
                         Case Else
                             Throw New Exception("Testprobleme können mit der Methode " & Me.mProblem.Method & " nicht ausgeführt werden!")

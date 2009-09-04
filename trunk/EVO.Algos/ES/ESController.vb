@@ -9,7 +9,7 @@ Imports System.Threading
 ''' <summary>
 ''' Kontrolliert den Ablauf der Evolutionsstrategie (PES, CES und HYBRID)
 ''' </summary>
-Public Class Controller
+Public Class ESController
     Implements IController
 
     Private myProblem As EVO.Common.Problem
@@ -25,7 +25,7 @@ Public Class Controller
     Private PES1 As PES
     Private CES1 As CES
 
-    Private stopped as Boolean
+    Private stopped As Boolean
 
     '**** CES-spezifische Sachen ****
     Private CES_i_gen As Integer 'ginge alternativ auch mit Me.myProgress.iGen

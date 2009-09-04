@@ -36,7 +36,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Controller.cs" />
+    <Compile Include="DDSController.cs" />
     <Compile Include="IDDS.cs" />
     <Compile Include="DDS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

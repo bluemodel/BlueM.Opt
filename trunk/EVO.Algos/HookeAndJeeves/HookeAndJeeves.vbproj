@@ -51,7 +51,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controller.vb" />
+    <Compile Include="HJController.vb" />
     <Compile Include="HookeAndJeeves.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

@@ -49,7 +49,7 @@
   <ItemGroup>
     <Compile Include="Algos.cs" />
     <Compile Include="Algomanager.cs" />
-    <Compile Include="Controller.cs" />
+    <Compile Include="MetaEvoController.cs" />
     <Compile Include="Network.cs" />
     <Compile Include="Networkmanager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

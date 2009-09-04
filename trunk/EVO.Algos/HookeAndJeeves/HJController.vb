@@ -3,7 +3,7 @@
 ''' <summary>
 ''' Controller für Hooke And Jeeves
 ''' </summary>
-Public Class Controller
+Public Class HJController
     Implements EVO.IController
 
     Private myProblem As EVO.Common.Problem
