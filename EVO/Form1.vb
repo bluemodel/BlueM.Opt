@@ -61,9 +61,46 @@ Partial Public Class Form1
     'Controller
     Private controller As EVO.IController
 
-    '**** Verschiedenes ****
-    Dim isrun As Boolean = False                        'Optimierung läuft
-    Dim ispause As Boolean = False                      'Optimierung ist pausiert
+    'Ablaufkontrolle
+    '---------------
+    Dim _isrun As Boolean = False
+    Dim _ispause As Boolean = False
+
+    ''' <summary>
+    ''' Optimierung läuft
+    ''' </summary>
+    Private Property isRun() As Boolean
+        Get
+            Return _isrun
+        End Get
+        Set(ByVal value As Boolean)
+            _isrun = value
+            If (Me.isRun) Then
+                Me.Button_Start.Text = "Pause"
+                Me.Button_Stop.Enabled = True
+            Else
+                Me.Button_Stop.Enabled = False
+                Me.Button_Start.Text = "Start"
+            End If
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Optimierung ist pausiert
+    ''' </summary>
+    Private Property isPause() As Boolean
+        Get
+            Return _ispause
+        End Get
+        Set(ByVal value As Boolean)
+            _ispause = value
+            If (Me.isPause) Then
+                Me.Button_Start.Text = "Continue"
+            Else
+                Me.Button_Start.Text = "Pause"
+            End If
+        End Set
+    End Property
 
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
@@ -178,7 +215,7 @@ Partial Public Class Form1
     ''' </summary>
     Private Sub Button_New_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_New.Click
         'Controller stoppen
-        If (Me.StopOptimization()) Then
+        If (Me.STOPPEN()) Then
             'Formular zurücksetzen
             Call Me.INI()
         End If
@@ -966,13 +1003,17 @@ Partial Public Class Form1
 
 #End Region 'Initialisierung der Anwendungen
 
-#Region "Start Button Pressed"
+#Region "Ablaufkontrolle"
 
-    'Start BUTTON wurde pressed
-    'XXXXXXXXXXXXXXXXXXXXXXXXXX
+    Private Sub Button_Start_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
 
-    Private Sub STARTEN_Button_Click(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles Button_Start.Click
-        Call Me.STARTEN()
+        If (Me.isRun) Then
+            'Pausieren/weiterlaufen lassen
+            Call Me.PAUSE()
+        Else
+            'Optimierung starten
+            Call Me.STARTEN()
+        End If
     End Sub
 
     ''' <summary>
@@ -984,136 +1025,146 @@ Partial Public Class Form1
         Dim AllOptTime As New Stopwatch
         AllOptTime.Start()
 
-        If (Me.isrun And Not Me.ispause) Then
-            'Optimierung pausieren
-            '---------------------
-            Me.ispause = True
-            Me.Button_Start.Text = "Continue"
+        'Optimierung starten
+        '-------------------
+        Me.isRun = True
 
-            'Bei Multithreading muss Sim explizit pausiert werden
-            If (Me.mSettings.General.UseMultithreading) Then
-                Me.Sim1.isPause = True
-            End If
+        'Monitor anzeigen
+        If (Me.ToolStripButton_Monitor.Checked) Then
+            Call Me.Monitor1.Show()
+        End If
 
-            Do While (Me.ispause)
-                System.Threading.Thread.Sleep(20)
-                Application.DoEvents()
-            Loop
+        'Ergebnis-Buttons
+        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
+        If (Not IsNothing(Sim1)) Then
+            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = True
+            Me.ToolStripButton_Scatterplot.Enabled = True
+            Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
+        End If
 
-        ElseIf (Me.isrun) Then
-            'Optimierung weiterlaufen lassen
-            '-------------------------------
-            Me.ispause = False
-            Me.Button_Start.Text = "Pause"
+        'Einstellungen-Buttons
+        Me.ToolStripMenuItem_SettingsLoad.Enabled = False
 
-            'Bei Multithreading muss Sim explizit wieder gestartet werden
-            If (Me.mSettings.General.UseMultithreading) Then
-                Me.Sim1.isPause = False
-            End If
+        'Anwendungs-Groupbox deaktivieren
+        Me.GroupBox_Anwendung.Enabled = False
 
-        Else
-            'Optimierung starten
-            '-------------------
-            Me.isrun = True
-            Me.Button_Start.Text = "Pause"
-            Me.Button_Stop.Enabled = True
+        'Settings in temp-Verzeichnis speichern
+        Dim dir As String
+        dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
+        Me.saveSettings(dir & "Settings.xml")
 
-            'Monitor anzeigen
-            If (Me.ToolStripButton_Monitor.Checked) Then
-                Call Me.Monitor1.Show()
-            End If
+        'Event auslösen (BatchMode)
+        If (Me.mSettings.General.BatchMode) Then
+            Me.BatchCounter += 1
+            RaiseEvent OptimizationStarted()
+        End If
 
-            'Ergebnis-Buttons
-            Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
-            If (Not IsNothing(Sim1)) Then
-                Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = True
-                Me.ToolStripButton_Scatterplot.Enabled = True
-                Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
-            End If
+        'Settings deaktivieren
+        Call Me.EVO_Einstellungen1.freeze()
 
-            'Einstellungen-Buttons
-            Me.ToolStripMenuItem_SettingsLoad.Enabled = False
+        'Settings an Hauptdiagramm übergeben
+        Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
 
-            'Anwendungs-Groupbox deaktivieren
-            Me.GroupBox_Anwendung.Enabled = False
+        'Diagramm vorbereiten und initialisieren
+        Call Me.PrepareDiagramm()
 
-            'Settings in temp-Verzeichnis speichern
-            Dim dir As String
-            dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
-            Me.saveSettings(dir & "Settings.xml")
+        Select Case Anwendung
 
-            'Event auslösen (BatchMode)
-            If (Me.mSettings.General.BatchMode) Then
-                Me.BatchCounter += 1
-                RaiseEvent OptimizationStarted()
-            End If
+            'Sim-Anwendungen
+            Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
-            'Settings deaktivieren
-            Call Me.EVO_Einstellungen1.freeze()
+                'Simulationen vorbereiten
+                Call Me.Sim1.prepareSimulation()
 
-            'Settings an Hauptdiagramm übergeben
-            Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
+                'Startwerte evaluieren
+                If (Me.mProblem.Method <> METH_SENSIPLOT) Then
+                    Call Me.evaluateStartwerte()
+                End If
 
-            'Diagramm vorbereiten und initialisieren
-            Call Me.PrepareDiagramm()
-
-            Select Case Anwendung
-
-                'Sim-Anwendungen
-                Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
-
-                    'Simulationen vorbereiten
-                    Call Me.Sim1.prepareSimulation()
-
-                    'Startwerte evaluieren
-                    If (Me.mProblem.Method <> METH_SENSIPLOT) Then
-                        Call Me.evaluateStartwerte()
-                    End If
-
-                    'Controller für Sim initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                    Call controller.InitApp(Me.Sim1)
-                    Call controller.Start()
+                'Controller für Sim initialisieren und starten
+                Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                Call controller.InitApp(Me.Sim1)
+                Call controller.Start()
 
                 'Testprobleme
-                Case ANW_TESTPROBLEME
+            Case ANW_TESTPROBLEME
 
-                    'Controller für Testproblem initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                    Call controller.InitApp(Me.Testprobleme1)
-                    Call controller.Start()
+                'Controller für Testproblem initialisieren und starten
+                Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                Call controller.InitApp(Me.Testprobleme1)
+                Call controller.Start()
 
                 'Traveling Salesman
-                Case ANW_TSP
+            Case ANW_TSP
 
-                    'Controller für TSP initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                    'Call controller.InitApp() bei TSP nicht benötigt
-                    Call controller.Start()
+                'Controller für TSP initialisieren und starten
+                Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                'Call controller.InitApp() bei TSP nicht benötigt
+                Call controller.Start()
 
-            End Select
+        End Select
 
-            ''Globale Fehlerbehandlung für Optimierungslauf:
-            'Catch ex As Exception
-            '    MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
-            'End Try
+        ''Globale Fehlerbehandlung für Optimierungslauf:
+        'Catch ex As Exception
+        '    MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
+        'End Try
 
-            'Optimierung beendet
-            '-------------------
-            Me.isrun = False
-            Me.Button_Start.Text = "Start"
-            Me.Button_Start.Enabled = False
-            Me.Button_Stop.Enabled = False
+        'Optimierung beendet
+        '-------------------
+        Me.isRun = False
 
-            'Ausgabe der Optimierungszeit
-            AllOptTime.Stop()
+        'nochmaligen Start verhindern
+        Me.Button_Start.Enabled = False
 
-            If (Me.mSettings.General.BatchMode) Then
-                'Event auslösen 
-                RaiseEvent OptimizationReady()
+        'Ausgabe der Optimierungszeit
+        AllOptTime.Stop()
+
+        If (Me.mSettings.General.BatchMode) Then
+            'Event auslösen 
+            RaiseEvent OptimizationReady()
+        Else
+            MsgBox("Optimierung beendet!", MsgBoxStyle.Information, "BlueM.Opt")
+            Me.Monitor1.LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Milliseconds & "ms")
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' Optimierung pausieren/weiterlaufen lassen
+    ''' </summary>
+    Private Sub PAUSE()
+
+        'nur wenn Optimierung läuft
+        If (Me.isRun) Then
+
+            If (Not Me.isPause) Then
+
+                'Optimierung pausieren
+                '---------------------
+                Me.isPause = True
+
+                'Bei Multithreading muss Sim explizit pausiert werden
+                If (Me.mSettings.General.UseMultithreading) Then
+                    Me.Sim1.isPause = True
+                End If
+
+                'Pausen Magic :-)
+                Do While (Me.isPause)
+                    System.Threading.Thread.Sleep(20)
+                    Application.DoEvents()
+                Loop
+
             Else
-                MsgBox("Optimierung beendet!", MsgBoxStyle.Information, "BlueM.Opt")
-                Me.Monitor1.LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Milliseconds & "ms")
+
+                'Optimierung weiterlaufen lassen
+                '-------------------------------
+                Me.isPause = False
+
+                'Bei Multithreading muss Sim explizit wieder gestartet werden
+                If (Me.mSettings.General.UseMultithreading) Then
+                    Me.Sim1.isPause = False
+                End If
+
             End If
 
         End If
@@ -1121,25 +1172,47 @@ Partial Public Class Form1
     End Sub
 
     ''' <summary>
-    ''' Die Startwerte der Optparameter evaluieren
+    ''' Stop-Button wurde geklickt
     ''' </summary>
-    ''' <remarks>nur für Sim-Anwendungen!</remarks>
-    Private Sub evaluateStartwerte()
-
-        Dim isOK As Boolean
-        Dim startind As EVO.Common.Individuum
-
-        startind = Me.mProblem.getIndividuumStart()
-
-        isOK = Sim1.Evaluate(startind) 'hier ohne multithreading
-        If (isOK) Then
-            Call Me.Hauptdiagramm1.ZeichneStartWert(startind)
-            My.Application.DoEvents()
-        End If
-
+    Private Sub Button_Stop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Stop.Click
+        'Optimierung stoppen
+        Call Me.STOPPEN()
     End Sub
 
-#End Region 'Start Button Pressed
+    ''' <summary>
+    ''' Die Optimierung stoppen (mit Abfragedialog)
+    ''' </summary>
+    ''' <returns>True wenn gestoppt</returns>
+    Private Function STOPPEN() As Boolean
+
+        Dim res As MsgBoxResult
+        If (Me.isRun And Not IsNothing(Me.controller)) Then
+
+            res = MsgBox("Optimierung wirklich abbrechen?", MsgBoxStyle.YesNo)
+
+            If (res = MsgBoxResult.Yes) Then
+                'Pause ausschalten, sonst läuft die immer weiter
+                Me.isPause = False
+                'Controller stoppen
+                Call Me.controller.Stoppen()
+                Me.controller = Nothing
+                'bei Multithreading Sim explizit stoppen
+                If (Me.mSettings.General.UseMultithreading) Then
+                    Me.Sim1.isStopped = True
+                End If
+
+                Me.isRun = False
+            Else
+                'doch nicht stoppen
+                Return False
+            End If
+
+        End If
+        Return True
+
+    End Function
+
+#End Region 'Ablaufkontrolle
 
 #Region "Diagrammfunktionen"
 
@@ -1539,6 +1612,12 @@ Partial Public Class Form1
         Dim SimSeries As New Collection                 'zu zeichnende Simulationsreihen
         Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
 
+        'BUG 379: Optimierung muss pausiert sein!
+        If (Me.isRun And Not Me.isPause) Then
+            MsgBox("Bitte die Optimierung zuerst pausieren, um ausgewählte Individuen auszuwerten!", MsgBoxStyle.Exclamation, "BlueM.Opt")
+            Exit Sub
+        End If
+
         'Wait cursor
         Cursor = Cursors.WaitCursor
 
@@ -1649,11 +1728,11 @@ Partial Public Class Form1
         Call Wave1.Show()
         If (Not IsNothing(Wave2)) Then Call Wave2.Show()
 
-        'Cursor
-        Cursor = Cursors.Default
-
         'Simulationsverzeichnis zurücksetzen
         Sim1.WorkDir_Current = WorkDir_Prev
+
+        'Cursor
+        Cursor = Cursors.Default
 
     End Sub
 
@@ -2042,45 +2121,20 @@ Partial Public Class Form1
 #End Region 'Ergebnisdatenbank
 
     ''' <summary>
-    ''' Die Optimierung stoppen
+    ''' Die Startwerte der Optparameter evaluieren
     ''' </summary>
-    ''' <returns>True wenn gestoppt</returns>
-    Private Function StopOptimization() As Boolean
+    ''' <remarks>nur für Sim-Anwendungen!</remarks>
+    Private Sub evaluateStartwerte()
 
-        Dim res As MsgBoxResult
-        If (Me.isrun And Not IsNothing(Me.controller)) Then
+        Dim isOK As Boolean
+        Dim startind As EVO.Common.Individuum
 
-            res = MsgBox("Optimierung wirklich abbrechen?", MsgBoxStyle.YesNo)
+        startind = Me.mProblem.getIndividuumStart()
 
-            If (res = MsgBoxResult.Yes) Then
-                'Pause ausschalten, sonst läuft die immer weiter
-                Me.ispause = False
-                'Controller stoppen
-                Call Me.controller.Stoppen()
-                Me.controller = Nothing
-                'bei Multithreading Sim explizit stoppen
-                If (Me.mSettings.General.UseMultithreading) Then
-                    Me.Sim1.isStopped = True
-                End If
-            Else
-                'doch nicht stoppen
-                Return False
-            End If
-
-        End If
-        Return True
-
-    End Function
-
-    ''' <summary>
-    ''' Stop-Button wurde geklickt
-    ''' </summary>
-    Private Sub Button_Stop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Stop.Click
-
-        'Optimierung stoppen
-        If (Me.StopOptimization()) Then
-            Me.Button_Stop.Enabled = False
-            Me.Button_Start.Text = "Start"
+        isOK = Sim1.Evaluate(startind) 'hier ohne multithreading
+        If (isOK) Then
+            Call Me.Hauptdiagramm1.ZeichneStartWert(startind)
+            My.Application.DoEvents()
         End If
 
     End Sub
@@ -2090,7 +2144,7 @@ Partial Public Class Form1
     ''' </summary>
     Private Sub Form1_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
         'Optimierung stoppen
-        If (Not Me.StopOptimization()) Then
+        If (Not Me.STOPPEN()) Then
             'FormClosing abbrechen
             e.Cancel = True
         End If
