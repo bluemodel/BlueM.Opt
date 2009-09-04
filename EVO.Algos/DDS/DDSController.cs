@@ -7,7 +7,7 @@ namespace modelEAU.DDS
     /// <summary>
     /// Kontrolliert den Ablauf des DDS
     /// </summary>
-    public class Controller : IHWB.EVO.IController
+    public class DDSController : IHWB.EVO.IController
     {
         private IHWB.EVO.Common.Problem mProblem;
         private IHWB.EVO.Common.Settings mSettings;

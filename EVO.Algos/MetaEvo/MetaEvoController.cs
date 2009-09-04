@@ -6,7 +6,7 @@ using System.Net;
 
 namespace IHWB.EVO.MetaEvo
 {
-    public class Controller : IHWB.EVO.IController
+    public class MetaEvoController : IHWB.EVO.IController
     {
         //### Variablen ###
         EVO.Apps.Sim sim;

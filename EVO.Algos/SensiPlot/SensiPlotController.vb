@@ -1,6 +1,6 @@
 ﻿Imports IHWB.EVO.Common.Constants
 
-Public Class Controller
+Public Class SensiPlotController
     Implements EVO.IController
 
     Private myProblem As EVO.Common.Problem
