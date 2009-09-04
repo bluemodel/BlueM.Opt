@@ -753,8 +753,11 @@ Partial Public Class Form1
 
             Select Case Me.mProblem.Method
 
-                Case METH_SENSIPLOT 'Methode SensiPlot
+                Case METH_SENSIPLOT
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'SensiPlot-Controller instanzieren
+                    Me.controller = New EVO.SensiPlot.SensiPlotController()
 
                     'Monitor deaktivieren
                     Me.ToolStripButton_Monitor.Checked = False
@@ -762,8 +765,11 @@ Partial Public Class Form1
                     'TODO: Progress initialisieren
 
 
-                Case METH_PES 'Methode PES
+                Case METH_PES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'ES-Controller instanzieren
+                    Me.controller = New EVO.ES.ESController()
 
                     'Ergebnis-Buttons
                     Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
@@ -779,10 +785,14 @@ Partial Public Class Form1
                         Throw New Exception("Methode von Hooke und Jeeves erlaubt nur Single-Objective Optimierung!")
                     End If
 
+                    'HJ-Controller instanzieren
+                    Me.controller = New EVO.HookeAndJeeves.HJController()
+
                     'Ergebnis-Buttons
                     Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                     'TODO: Progress mit Standardwerten initialisieren
+
 
                 Case METH_DDS
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -792,19 +802,25 @@ Partial Public Class Form1
                         Throw New Exception("Methode DDS erlaubt nur Single-Objective Optimierung!")
                     End If
 
+                    'DDS-Controller instanzieren
+                    Me.controller = New modelEAU.DDS.DDSController()
+
                     'Ergebnis-Buttons
                     Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                     'TODO: Progress mit Standardwerten initialisieren
 
 
-                Case METH_CES, METH_HYBRID 'Methode CES und HYBRID
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                Case METH_CES, METH_HYBRID
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Funktioniert nur bei BlueM!
+                    'Funktioniert nur bei BlueM.Sim!
                     If (Not Anwendung = ANW_BLUEM) Then
                         Throw New Exception("CES/HYBRID funktioniert bisher nur mit BlueM!")
                     End If
+
+                    'ES-Controller instanzieren
+                    Me.controller = New EVO.ES.ESController()
 
                     'Ergebnis-Buttons
                     Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
@@ -826,8 +842,12 @@ Partial Public Class Form1
 
                     'TODO: Progress mit Standardwerten initialisieren
 
+
                 Case METH_METAEVO
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'MetaEVO-Controller instanzieren
+                    Me.controller = New EVO.MetaEvo.MetaEvoController()
 
                     'Ergebnis-Buttons
                     Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
@@ -835,8 +855,14 @@ Partial Public Class Form1
                     'Progress mit Standardwerten initialisieren
                     Call Me.mProgress.Initialize(1, 1, mSettings.MetaEvo.NumberGenerations, mSettings.MetaEvo.PopulationSize)
 
+
                 Case METH_TSP
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'TSP-Controller instanzieren
+                    Me.controller = New EVO.TSP.TSPController()
+
+                    'TODO: Progress mit Standardwerten initialisieren
 
             End Select
 
@@ -853,10 +879,17 @@ Partial Public Class Form1
                 Me.MenuItem_DatensatzZurücksetzen.Enabled = True
             End If
 
+            'Multithreading-Option (de)aktivieren (Kombination ist maßgebend!)
+            Me.mSettings.General.MultithreadingAllowed = (Me.mSettings.General.MultithreadingAllowed And Me.controller.MultithreadingSupported)
+            Call Me.EVO_Einstellungen1.refreshForm()
+
         Catch ex As Exception
 
             MsgBox("Fehler beim Setzen der Methode:" & eol & ex.Message, MsgBoxStyle.Critical)
+            'Combobox zurücksetzen
+            Me.IsInitializing = True
             Me.ComboBox_Methode.SelectedIndex = 0
+            Me.IsInitializing = False
 
         End Try
 
@@ -876,28 +909,36 @@ Partial Public Class Form1
 
         'Problemdefinition
         '=================
-        If (Me.Anwendung <> ANW_TESTPROBLEME And Me.Anwendung <> ANW_TSP) Then
+        Select Case Me.Anwendung
 
-            'Bei allen Sim-Anwendungen
-            '-------------------------
+            Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
-            'WorkDir und Datensatz übergeben
-            Me.mProblem.WorkDir = Sim1.WorkDir_Original
-            Me.mProblem.Datensatz = Sim1.Datensatz
+                'Bei allen Sim-Anwendungen
+                '-----------------------------------------------------
 
-            'EVO-Eingabedateien einlesen
-            Call Me.mProblem.Read_InputFiles(Me.Sim1.SimStart, Me.Sim1.SimEnde)
+                'WorkDir und Datensatz übergeben
+                Me.mProblem.WorkDir = Sim1.WorkDir_Original
+                Me.mProblem.Datensatz = Sim1.Datensatz
 
-            'Problem an Sim-Objekt übergeben
-            Call Me.Sim1.setProblem(Me.mProblem)
+                'EVO-Eingabedateien einlesen
+                Call Me.mProblem.Read_InputFiles(Me.Sim1.SimStart, Me.Sim1.SimEnde)
 
-        ElseIf (Me.Anwendung = ANW_TESTPROBLEME) Then
+                'Problem an Sim-Objekt übergeben
+                Call Me.Sim1.setProblem(Me.mProblem)
 
-            'Bei Testproblemen definieren diese das Problem selbst
-            '-----------------------------------------------------
-            Call Testprobleme1.getProblem(Me.mProblem)
 
-        End If
+            Case ANW_TESTPROBLEME
+
+                'Bei Testproblemen definieren diese das Problem selbst
+                '-----------------------------------------------------
+                Call Testprobleme1.getProblem(Me.mProblem)
+
+
+            Case ANW_TSP
+
+                'nix zu tun
+
+        End Select
 
         'Problem an EVO_Einstellungen übergeben
         '--------------------------------------
@@ -1029,67 +1070,21 @@ Partial Public Class Form1
                         Call Me.evaluateStartwerte()
                     End If
 
-                    Select Case Me.mProblem.Method
-
-                        Case METH_SENSIPLOT
-                            'SensiPlot-Controller initialisieren und starten
-                            controller = New EVO.SensiPlot.SensiPlotController()
-
-                        Case METH_PES, METH_CES, METH_HYBRID
-                            'ES-Controller initialisieren und starten
-                            controller = New EVO.ES.ESController()
-
-                        Case METH_METAEVO
-                            'MetaEVO-Controller initialisieren und starten
-                            controller = New EVO.MetaEvo.MetaEvoController()
-
-                        Case METH_HOOKEJEEVES
-                            'HJ-Controller initialisieren und starten
-                            controller = New EVO.HookeAndJeeves.HJController()
-
-                        Case METH_DDS
-                            'DDS-Controller initialisieren und starten
-                            controller = New modelEAU.DDS.DDSController()
-
-                    End Select
-
                     'Controller für Sim initialisieren und starten
                     Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Sim1)
                     Call controller.Start()
 
+                'Testprobleme
                 Case ANW_TESTPROBLEME
-
-                    Select Case Me.mProblem.Method
-                        Case METH_PES
-                            'ES-Controller instanzieren
-                            controller = New EVO.ES.ESController()
-
-                        Case METH_HOOKEJEEVES
-                            'HJ-Controller instanzieren
-                            controller = New EVO.HookeAndJeeves.HJController()
-
-                        Case METH_DDS
-                            'DDS-Controller instanzieren
-                            controller = New modelEAU.DDS.DDSController()
-
-                        Case METH_METAEVO
-                            'MetaEVO-Controller instanzieren
-                            controller = New EVO.MetaEvo.MetaEvoController()
-
-                        Case Else
-                            Throw New Exception("Testprobleme können mit der Methode " & Me.mProblem.Method & " nicht ausgeführt werden!")
-                    End Select
 
                     'Controller für Testproblem initialisieren und starten
                     Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Testprobleme1)
                     Call controller.Start()
 
-
+                'Traveling Salesman
                 Case ANW_TSP
-                    'TSP-Controller instanzieren
-                    controller = New EVO.TSP.TSPController()
 
                     'Controller für TSP initialisieren und starten
                     Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)

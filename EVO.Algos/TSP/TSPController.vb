@@ -1,6 +1,15 @@
 ﻿Public Class TSPController
     Implements EVO.IController
 
+    ''' <summary>
+    ''' Multithreading Support
+    ''' </summary>
+    Public ReadOnly Property MultithreadingSupported() As Boolean Implements IController.MultithreadingSupported
+        Get
+            Return False
+        End Get
+    End Property
+
     Private myHauptDiagramm As EVO.Diagramm.Hauptdiagramm
     Private myMonitor As EVO.Diagramm.Monitor
     Private myProblem As EVO.Common.Problem

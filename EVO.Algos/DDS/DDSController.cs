@@ -9,6 +9,14 @@ namespace modelEAU.DDS
     /// </summary>
     public class DDSController : IHWB.EVO.IController
     {
+        /// <summary>
+        /// Multithreading Support
+        /// </summary>
+        public bool MultithreadingSupported
+        {
+            get {return false;}
+        }
+
         private IHWB.EVO.Common.Problem mProblem;
         private IHWB.EVO.Common.Settings mSettings;
         private IHWB.EVO.Common.Progress mProgress;

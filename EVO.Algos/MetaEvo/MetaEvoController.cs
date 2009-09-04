@@ -8,6 +8,14 @@ namespace IHWB.EVO.MetaEvo
 {
     public class MetaEvoController : IHWB.EVO.IController
     {
+        /// <summary>
+        /// Multithreading Support
+        /// </summary>
+        public bool MultithreadingSupported
+        {
+            get {return true;}
+        }
+
         //### Variablen ###
         EVO.Apps.Sim sim;
         EVO.Apps.Testprobleme testprobleme;
