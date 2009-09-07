@@ -517,7 +517,9 @@ Partial Public Class Form1
         Catch ex As Exception
 
             MsgBox("Fehler beim Initialisieren der Anwendung:" & eol & ex.Message, MsgBoxStyle.Critical)
+            Me.IsInitializing = True
             Me.ComboBox_Anwendung.SelectedIndex = 0
+            Me.IsInitializing = False
 
         End Try
 
