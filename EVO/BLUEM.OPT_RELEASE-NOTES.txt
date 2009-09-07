@@ -6,8 +6,12 @@ Autoren: Christoph Hübner, Felix Froehlich, Dirk Muschalla
 Website: http://130.83.196.220/bluem/wiki/index.php/BlueM.Opt
 ===============================================================
 
-Version 1.4
------------
+Version 1.5 (rxxxx - xxxx-xx)
+-----------------------------
+
+
+Version 1.4 (r1656 - 2009-09)
+-----------------------------
 NEW:
 * New format of the ZIE-file (Objective Functions) (bug 414)
   - Possibility of using simulation result values for objective functions
