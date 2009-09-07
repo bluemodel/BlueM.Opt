@@ -1,0 +1,56 @@
+Software Package BlueM
+Copyright © 2009 Technische Universität Darmstadt
+Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung (ihwb)
+Website: http://www.ihwb.tu-darmstadt.de/bluem/
+Contact: sekretariat@ihwb.tu-darmstadt.de
+
+§1 Copyright notice
+
+BlueM Copyright © 2009 Technische Universität Darmstadt
+Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung (ihwb)
+
+All rights are reserved.
+
+§2 Terms of use for BlueM
+
+The software BlueM is not being sold or surrendered to you, but is merely being placed at your disposal for simple 
+use pursuant to the terms of this end user licensing agreement.
+
+You are only permitted to use BlueM for teaching or research purposes. You are not permitted to use BlueM for 
+commercial purposes or for drafting of expert's reports.
+
+The BlueM logo must be positioned clearly visible and the origin of the software 
+(http://www.ihwb.tu-darmstadt.de/bluem/) must be clearly indicated on all screen presentations and results 
+produced using BlueM, whether they are presented in analogous or digital form.
+
+All brands and trademarks mentioned in BlueM and, subject to third-party proprietary rights where applicable, 
+shall be unconditionally subject to the respectively applicable intellectual property rights and proprietary 
+rights of the respectively registered owner.
+
+§3 Duplication
+
+Any other use, distribution or sale of the source code, therewith compiled programs or source code access data to 
+third parties is prohibited. The user must ensure that the unrightful duplication of the source code or therewith 
+compiled programs is impossible.
+
+§4 Modifications
+
+You are not permitted to modify the source code in the compiled version of BlueM, or to reverse engineer or 
+decompile BlueM, or parts thereof.
+
+Access to and permission to modify the source code requires a written agreement with ihwb. Source code 
+modifications and enhancements have to be freely provided to ihwb. Such changes and enhancements may subsequently 
+be used and distributed by ihwb.
+
+§5 Disclaimer
+
+The authors of BlueM accept no responsibility whatsoever for the up-to-datedness, correctness, completeness or 
+quality of the models, information, documentation and calculations provided.
+
+Liability claims against the authors of BlueM in respect of material or immaterial damage caused by the use or 
+non-use of the information offered or by defective or incomplete information are in principle excluded provided 
+that there is no evidence of culpable intent or gross negligence on the part of the authors.
+
+This disclaimer is to be regarded as part of BlueM. Should parts or individual passages of this text not, no 
+longer or not completely conform to the applicable legal status, the remaining parts of the document shall remain 
+unaffected by this in terms of their content and validity. 
