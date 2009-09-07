@@ -1,0 +1,15 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.header {
+	font-size: 26px;
+}
+
+.subheader {
+	font-size: 20px;
+}
+
+table th {
+	text-align:left;
+}
