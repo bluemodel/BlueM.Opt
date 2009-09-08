@@ -134,7 +134,7 @@ Public Class Scan
             Dim tmpWert As Double
 
             'Schleife über Zeitschritte
-            For i = 0 To zre.Length - 1
+            For i = 0 To input.Zeitreihen(0).Length - 1
                 tmpWert = 0
 
                 'Schleife über Wellenlängen
