@@ -7,6 +7,7 @@ Public Class Scan
 
     Private Parameter As Collection
     Private stoffe As String()
+    Private zeitreihen() As Wave.Zeitreihe
 
     ''' <summary>
     ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
@@ -16,9 +17,7 @@ Public Class Scan
         Get
             Dim exts As New Collections.Specialized.StringCollection()
 
-            exts.AddRange(New String() {"ALL", "WEL", "PAR"})
-
-            'TODO: Dateiendungen für SCAN-Datensatz
+            exts.AddRange(New String() {"SCAN", "WEL", "PAR"})
 
             Return exts
 
@@ -53,9 +52,6 @@ Public Class Scan
         Dim FiStr As FileStream
         Dim StrRead As StreamReader
         Dim StrReadSync As TextReader
-
-        'TODO: gehört folgendes zur Simulation oder eher zum Ergebnis Einlesen?
-        'ggf. nach SIM_Ergebnis_Lesen() verschieben
 
         'Parameter einlesen
         parameterdatei = Me.WorkDir_Current & Me.Datensatz & ".PAR"
@@ -102,6 +98,34 @@ Public Class Scan
             End If
         Next
 
+        'Berechnung
+        '----------
+        ReDim Me.zeitreihen(Me.stoffe.GetUpperBound(0) - 1)
+
+        'Schleife über Stoffe
+        For k = 1 To Me.stoffe.GetUpperBound(0)
+
+            Me.zeitreihen(k - 1) = New Wave.Zeitreihe(stoffe(k))
+
+            Dim tmpWert As Double
+
+            'Schleife über Zeitschritte
+            For i = 0 To input.Zeitreihen(0).Length - 1
+                tmpWert = 0
+
+                'Schleife über Wellenlängen
+                For j = 2 To input.Zeitreihen.GetUpperBound(0)
+                    tmpWert += input.Zeitreihen(j).YWerte(i) * Parameter(input.Zeitreihen(j).Title)(stoffe(k))
+                Next
+
+                tmpWert += Parameter("Konst")(stoffe(k))
+
+                Me.zeitreihen(k - 1).AddNode(input.Zeitreihen(0).XWerte(i), tmpWert)
+
+            Next
+
+        Next
+
         Return True
 
     End Function
@@ -122,34 +146,10 @@ Public Class Scan
     '----------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
-        'Berechnung
-        '----------
         Me.SimErgebnis.Clear()
 
-        'Schleife über Stoffe
-        For k = 1 To Me.stoffe.GetUpperBound(0)
-
-            Dim zre As New Wave.Zeitreihe(stoffe(k))
-
-            Dim tmpWert As Double
-
-            'Schleife über Zeitschritte
-            For i = 0 To input.Zeitreihen(0).Length - 1
-                tmpWert = 0
-
-                'Schleife über Wellenlängen
-                For j = 2 To input.Zeitreihen.GetUpperBound(0)
-                    tmpWert += input.Zeitreihen(j).YWerte(i) * Parameter(input.Zeitreihen(j).Title)(stoffe(k))
-                Next
-
-                tmpWert += Parameter("Konst")(stoffe(k))
-
-                zre.AddNode(input.Zeitreihen(0).XWerte(i), tmpWert)
-
-            Next
-
-            Me.SimErgebnis.Reihen.Add(zre.Title, zre)
-
+        For i = 0 To Me.zeitreihen.Length - 1
+            Me.SimErgebnis.Reihen.Add(Me.zeitreihen(i).Title, Me.zeitreihen(i))
         Next
 
     End Sub
