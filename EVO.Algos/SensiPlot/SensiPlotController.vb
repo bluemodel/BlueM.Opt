@@ -178,29 +178,30 @@ Public Class SensiPlotController
 
                     'Individuum in Sim evaluieren
                     isOK = Sim1.Evaluate(ind)
-                    'TODO: Fehlerbehandlung bei Simulationsfehler
 
                     'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
 
-                    'Diagramm aktualisieren
-                    If (Anz_SensiPara = 1) Then
-                        '1 Parameter
-                        serie = Me.myHauptDiagramm.getSeriesPoint("SensiPlot", "Orange")
-                        serie.Add(ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), n.ToString())
-                    Else
-                        '2 Parameter
-                        surface.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
-                        serie3D.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
-                    End If
+                    'Erfolgreich evaluiertes Individuum in Diagramm eintragen
+                    If (isOK) Then
+                        If (Anz_SensiPara = 1) Then
+                            '1 Parameter
+                            serie = Me.myHauptDiagramm.getSeriesPoint("SensiPlot", "Orange")
+                            serie.Add(ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), n.ToString())
+                        Else
+                            '2 Parameter
+                            surface.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
+                            serie3D.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
+                        End If
 
-                    'Simulationsergebnis in Wave laden
-                    If (Me.mySettings.SensiPlot.Show_Wave) Then
-                        'SimReihe auslesen
-                        SimReihe = Sim1.SimErgebnis.Reihen(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
-                        'Lösungs-ID an Titel anhängen
-                        SimReihe.Title += " (Lösung " & n.ToString() & ")"
-                        'SimReihe zu Collection hinzufügen
-                        SimReihen.Add(SimReihe)
+                        'Simulationsergebnis in Wave laden
+                        If (Me.mySettings.SensiPlot.Show_Wave) Then
+                            'SimReihe auslesen
+                            SimReihe = Sim1.SimErgebnis.Reihen(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
+                            'Lösungs-ID an Titel anhängen
+                            SimReihe.Title += " (Lösung " & n.ToString() & ")"
+                            'SimReihe zu Collection hinzufügen
+                            SimReihen.Add(SimReihe)
+                        End If
                     End If
 
                 End If
