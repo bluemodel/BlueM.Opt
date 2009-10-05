@@ -21,8 +21,8 @@ CHANGED:
 * Simulations are now always carried out in a temporary "Thread_N" folder
   (Exception: simulation of selected solutions for displaying results in Wave)
 
-Version 1.3
------------
+Version 1.3 (r1523 - 2009-05)
+-----------------------------
 NEW: 
 * Vor der Optimierung werden die Startwerte der Optparameter evaluiert (Bug 147)
 * Zielfunktionen unterstützen jetzt Zielgruppen (Bug 256)
