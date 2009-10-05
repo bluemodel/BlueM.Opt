@@ -49,7 +49,7 @@ Public Class Diagramm
     '*******************
     Public Sub TChartEdit(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.DoubleClick
         Try
-            Me.ShowEditor()
+            Call Steema.TeeChart.Editor.Show(Me)
         Catch ex As Exception
             MsgBox("Fehler in TeeChart!" & EVO.Common.eol & ex.Message, MsgBoxStyle.Critical)
         End Try
