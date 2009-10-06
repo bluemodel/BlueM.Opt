@@ -221,11 +221,18 @@ Public Class ESController
             TimePerGeneration(Me.CES_i_gen + 1) = OptTimeParaPerGen.Elapsed
             TimePerGeneration(0) += OptTimeParaPerGen.Elapsed
 
+            'Stop?
+            If (Me.stopped) Then Exit Sub
+
             'Evaluierte Individuen verarbeiten
             For i_Child As Integer = 0 To CES1.Children.Length - 1
 
                 If (Not isOK(i_Child)) Then
-                    Throw New Exception("Der Nachfahre mit der ID.: " & i_Child & " wurde nicht richtig Evaluiert! Die Simulation wurde mit Fehlern abgebrochen")
+                    'Simulationsfehler aufgetreten!
+                    Dim msg As String = "Der Nachfahre mit der ID " & CES1.Children(i_Child).ID & " wurde nicht richtig evaluiert! Die Simulation wurde mit Fehlern abgebrochen."
+                    MsgBox(msg, MsgBoxStyle.Critical, "ESController")
+                    'Abbruch!
+                    Exit Sub
                 End If
                 'erfolgreich evaluierte Individuen wurden bereits über Event verarbeitet
 
