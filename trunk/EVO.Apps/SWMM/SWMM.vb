@@ -323,8 +323,9 @@ Public Class SWMM
                   Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
                   Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
                   Dim KeyWord_Block As String, KeyWord_SimGr As String
-                    Dim NoSpalte As Short
+                  Dim NoSpalte As Short
                   Dim tmpValue As Double
+                  Dim blnValueAdded As Boolean
                   'Datei durchgehen und mit Block und Spaltenangabe aus obj den gesuchten Wert ermitteln
                   'und diesen dann in Sim_Ergebnis schreiben
                   Dim objValue As Common.Objectivefunction_Value
@@ -395,6 +396,7 @@ Public Class SWMM
                         Throw New Exception("Das Schluesselword für den Block ist ungueltig")
                   End Select
                   'Datei durchgehen und nach Schluesselwort suchen
+                  blnValueAdded = False
                   Do
                      KeyWord_SimGr = "  " & objValue.SimGr
                      Zeile = StrRead.ReadLine.ToString
@@ -404,10 +406,12 @@ Public Class SWMM
                            If (Zeile.StartsWith(KeyWord_SimGr)) Then
                               tmpValue = Convert.ToDouble(Zeile.Split(" ", options:=StringSplitOptions.RemoveEmptyEntries)(NoSpalte - 1), Common.Provider.FortranProvider)
                               Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                              blnValueAdded = True
                               Exit Do
                            End If
                         Loop Until StrRead.Peek() = -1
                      End If
+                     If blnValueAdded Then Exit Do
                   Loop Until StrRead.Peek() = -1
                   StrRead.Close()
                   FiStr.Close()
