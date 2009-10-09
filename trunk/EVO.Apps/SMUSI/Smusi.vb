@@ -265,33 +265,108 @@ Public Class Smusi
     '-------------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
-        Dim datei, element As String
+        Dim datei As String, DateiPfad As String, element As String, Zeile As String
         Dim ASCtmp As Wave.ASC
-        Dim elemente As New Collection()
-
-        'Einzulesende Dateien zusammenstellen
-        For Each feature As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-            element = feature.SimGr.Substring(0, 4)
-            If (Not elemente.Contains(element)) Then
-                elemente.Add(element, element)
-            End If
-        Next
-
+        Dim SpalteVon As Long, SpalteLen As Long, BezVon As Integer
+        Dim blnValueAdded As Boolean
+    
         'Altes SimErgebnis löschen
         Me.SimErgebnis.Clear()
 
-        'Dateien einlesen
-        For Each elem As String In elemente
-            datei = elem & "_WEL.ASC"
-            ASCtmp = New Wave.ASC(Me.WorkDir_Current & datei, True)
-            'Simulationsergebnis abspeichern
-            For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
-                Me.SimErgebnis.Reihen.Add(elem & "_" & zre.Title, zre)
-            Next
-            ASCtmp = Nothing
-        Next
+        'Neu Steffen
+        For Each obj As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+            'Unterscheidung nach ObjectiveType
+            Select Case obj.GetObjType
+               Case Common.ObjectiveFunction.ObjectiveType.Series
+                  element = obj.SimGr.Substring(0, 4)
+                  datei = element & "_WEL.ASC"
+                  ASCtmp = New Wave.ASC(Me.WorkDir_Current & datei, True)
+                  'Simulationsergebnis abspeichern
+                  For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
+                    Me.SimErgebnis.Reihen.Add(element & "_" & zre.Title, zre)
+                  Next
+                  ASCtmp = Nothing
+                  'Next
+               Case Common.ObjectiveFunction.ObjectiveType.Value
+                  'TODO: Umbauen, so dass Datei nicht jedes mal geoeffnet werden muss
+                  '.RPT-Datei oeffnen
+                  DateiPfad = WorkDir_Current & Datensatz & "." & obj.Datei
+                  Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
+                  Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+                  Dim KeyWord_Block As String
+                  Dim tmpValue As Double
+                  'Datei durchgehen und mit Block und Spaltenangabe aus obj den gesuchten Wert ermitteln
+                  'und diesen dann in Sim_Ergebnis schreiben
+                  Dim objValue As Common.Objectivefunction_Value
+                  objValue = obj
+                  Select Case objValue.Block
+                     Case "EntlVolumen"
+                        KeyWord_Block = "* Zulauf"
+                        Select Case objValue.Spalte
+                           Case "SumVol"
+                              SpalteVon = 116
+                              SpalteLen = 10
+                              BezVon = 3
+                           Case Else
+                              Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
+                        End Select
+                     Case "MaxAbfluss"
+                        KeyWord_Block = "* Maximal"
+                        Select Case objValue.Spalte
+                           Case "Qmax"
+                              SpalteVon = 22
+                              SpalteLen = 7
+                              BezVon = 3
+                           Case Else
+                              Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
+                        End Select
+                     Case "EntlFracht"
+                        KeyWord_Block = "* Schmutzfracht"
+                        Select Case objValue.Spalte
+                           Case "CSBspez"
+                              SpalteVon = 108
+                              SpalteLen = 5
+                              BezVon = 27
+                           Case Else
+                              Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
+                        End Select
+                     Case Else
+                        Throw New Exception("Das Schluesselword für den Block ist ungueltig")
+                  End Select
+                  'Datei durchgehen und nach Schluesselwort suchen
+                  blnValueAdded = False
+                  Do
+                     Zeile = Trim(StrRead.ReadLine.ToString)
+                     Debug.Print(Zeile)
+                     If (Zeile.StartsWith(KeyWord_Block)) Then
+                        Do
+                           Zeile = StrRead.ReadLine.ToString
+                           If (Trim(Zeile.Substring(BezVon, 4)) = obj.SimGr) Then
+                              tmpValue = Convert.ToDouble(Zeile.Substring(SpalteVon, SpalteLen))
+                              Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                              blnValueAdded = True
+                              Exit Do
+                           End If
+                        Loop Until StrRead.Peek() = -1
+                     End If
+                  If blnValueAdded Then Exit Do
+                  Loop Until StrRead.Peek() = -1
+                  StrRead.Close()
+                  FiStr.Close()
 
-        elemente = Nothing
+
+               Case Common.ObjectiveFunction.ObjectiveType.ValueFromSeries
+                  'TODO
+               Case Else
+                  'TODO
+            End Select
+         Next
+        'Ende neu Steffen
+
+        'Dateien einlesen
+
+
+        'elemente = Nothing
 
     End Sub
 
