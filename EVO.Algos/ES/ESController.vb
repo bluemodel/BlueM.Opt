@@ -510,7 +510,11 @@ Public Class ESController
         'Lösung im TeeChart einzeichnen und Dn zeichnen
         '==============================================
         If myProblem.CES_T_Modus = CES_T_MODUS.No_Test Then
-            Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Children(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Children(i_Child)))
+            If myProblem.Method = METH_CES Then
+                Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Children(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, Color.Orange)
+            ElseIf myProblem.Method = METH_HYBRID Then
+                Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Children(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, EVO.Diagramm.Diagramm.ColorManagement(ColorArray, CES1.Children(i_Child)))
+            End If
         Else
             Call Me.myHauptDiagramm.ZeichneIndividuum(CES1.Children(i_Child), 0, 0, Me.CES_i_gen, i_Child + 1, Color.Orange)
         End If
