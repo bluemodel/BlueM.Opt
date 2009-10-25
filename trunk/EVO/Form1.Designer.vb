@@ -69,8 +69,9 @@ Partial Class Form1
         Me.ToolStripButton_Monitor = New System.Windows.Forms.ToolStripButton
         Me.ToolStripButton_Scatterplot = New System.Windows.Forms.ToolStripButton
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip
-        Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.Hauptdiagramm1 = New IHWB.EVO.Diagramm.Hauptdiagramm
+        Me.Diagramm_Printstyle = New System.Windows.Forms.ToolStripMenuItem
+        Me.EVO_Opt_Verlauf1 = New IHWB.EVO.EVO_Opt_Verlauf
         Me.EVO_Einstellungen1 = New IHWB.EVO.EVO_Einstellungen
         MenuStrip1 = New System.Windows.Forms.MenuStrip
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem
@@ -98,7 +99,7 @@ Partial Class Form1
         '
         'MenuItem_Tools
         '
-        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen, Me.BachModeToolStripMenuItem})
+        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen, Me.BachModeToolStripMenuItem, Me.Diagramm_Printstyle})
         MenuItem_Tools.Name = "MenuItem_Tools"
         MenuItem_Tools.Size = New System.Drawing.Size(44, 20)
         MenuItem_Tools.Text = "Tools"
@@ -427,16 +428,6 @@ Partial Class Form1
         Me.StatusStrip1.TabIndex = 20
         Me.StatusStrip1.Text = "StatusStrip1"
         '
-        'EVO_Opt_Verlauf1
-        '
-        Me.EVO_Opt_Verlauf1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(241, 739)
-        Me.EVO_Opt_Verlauf1.MinimumSize = New System.Drawing.Size(464, 76)
-        Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
-        Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(478, 79)
-        Me.EVO_Opt_Verlauf1.TabIndex = 6
-        '
         'Hauptdiagramm1
         '
         Me.Hauptdiagramm1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -460,6 +451,22 @@ Partial Class Form1
         '
         '
         Me.Hauptdiagramm1.Walls.View3D = False
+        '
+        'Diagramm_Printstyle
+        '
+        Me.Diagramm_Printstyle.Name = "Diagramm_Printstyle"
+        Me.Diagramm_Printstyle.Size = New System.Drawing.Size(200, 22)
+        Me.Diagramm_Printstyle.Text = "Diagramm Printstyle"
+        '
+        'EVO_Opt_Verlauf1
+        '
+        Me.EVO_Opt_Verlauf1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.EVO_Opt_Verlauf1.Location = New System.Drawing.Point(241, 739)
+        Me.EVO_Opt_Verlauf1.MinimumSize = New System.Drawing.Size(464, 76)
+        Me.EVO_Opt_Verlauf1.Name = "EVO_Opt_Verlauf1"
+        Me.EVO_Opt_Verlauf1.Size = New System.Drawing.Size(478, 79)
+        Me.EVO_Opt_Verlauf1.TabIndex = 6
         '
         'EVO_Einstellungen1
         '
@@ -538,4 +545,5 @@ Partial Class Form1
     Private WithEvents ToolStripMenuItem_SettingsSave As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents BachModeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents Diagramm_Printstyle As System.Windows.Forms.ToolStripMenuItem
 End Class
