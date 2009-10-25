@@ -385,8 +385,12 @@ Public Class CES
         Dim Einzelkind_Dn_CES As Double
         'UPGRADE: Eltern werden nicht zufällig gewählt sondern immer in Top Down Reihenfolge
 
+        'Beim ersten Durchgang wird nur der Elter verwendet
+        Dim DoubleFirst As Boolean = True
+
         x = 0
         y = 1
+        If DoubleFirst then y = 0
 
         For i = 0 To mSettings.CES.N_Children - 2 Step 2
             Select Case mSettings.CES.OptReprodOp
@@ -406,6 +410,7 @@ Public Class CES
                     '    Call ReprodOp_Part_Mapped_Crossover(Parents(x).Path, Parents(y).Path, Children(i).Path, Children(i + 1).Path)
             End Select
             Call ReprodOp_Dn_Mitteln(Parents(x).CES_Dn, Parents(y).CES_Dn, Children(i).CES_Dn, Children(i + 1).CES_Dn)
+            If y = x and DoubleFirst then y =+ 1
             x += 1
             y += 1
             If x = mSettings.CES.N_Parents - 1 Then x = 0

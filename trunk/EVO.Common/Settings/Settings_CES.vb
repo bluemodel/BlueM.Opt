@@ -358,9 +358,9 @@ Public Class Settings_CES
             Case METH_CES
 
                 'CES
-                Me.N_Generations = 100
-                Me.N_Parents = 4
-                Me.N_Children = 15
+                Me.N_Generations = 10
+                Me.N_Parents = 5
+                Me.N_Children = 20
                 Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
                 Me.OptReprodOp = CES_REPRODOP.Uniform_Crossover
                 Me.OptMutOperator = CES_MUTATION.RND_Switch
