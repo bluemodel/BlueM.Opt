@@ -428,7 +428,7 @@ Public Class Settings_CES
             Next
             PathStr = PathStr.TrimEnd
         Else
-            PathStr = "   n_combi: "
+            PathStr = " n:"
             PathStr = PathStr & NChildren
         End If
 
