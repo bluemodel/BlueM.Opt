@@ -191,12 +191,6 @@ Partial Public Class Monitor
         End If
     End Sub
 
-    'Diagramm bearbeiten
-    '*******************
-    Private Sub Diag_DoubleClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Diag.DoubleClick
-        Call Me.Diag.ShowEditor()
-    End Sub
-
     'Form schließen
     '**************
     Private Sub Monitor_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
