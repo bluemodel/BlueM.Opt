@@ -7,6 +7,7 @@
         Public Name As String
         Public Schaltung(,) As String
         Public KostenTyp As Integer
+        Public Kosten As Double
         Public Bauwerke() As String
         Public TestModus As Integer
     End Structure

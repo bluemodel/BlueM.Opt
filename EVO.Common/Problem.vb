@@ -1050,11 +1050,12 @@ Public Class Problem
                     .Schaltung(2, 0) = array(7).Trim()
                     .Schaltung(2, 1) = array(8).Trim()
                     .KostenTyp = array(9).Trim()
-                    .Bauwerke(0) = array(10).Trim()
-                    .Bauwerke(1) = array(11).Trim()
-                    .Bauwerke(2) = array(12).Trim()
-                    .Bauwerke(3) = array(13).Trim()
-                    .TestModus = Convert.ToInt16(array(14).Trim())
+                    .Kosten = array(10).Trim()
+                    .Bauwerke(0) = array(11).Trim()
+                    .Bauwerke(1) = array(12).Trim()
+                    .Bauwerke(2) = array(13).Trim()
+                    .Bauwerke(3) = array(14).Trim()
+                    .TestModus = Convert.ToInt16(array(15).Trim())
                 End With
                 j += 1
             End If
