@@ -31,9 +31,9 @@ Public Class ObjectiveFunction_SKos
     Private mProblem As EVO.Common.Problem
 
     'Aktuelles Working Directory (wichtig bei Multithreading)
-    Public WorkDir_Current As String
-
     Public Akt_Elemente() As String
+    Public WorkDir_Current As String
+    Public Akt_Path() As Integer
 
     'Struktur welche Informationen der Transportstrecken enthält
     '***********************************************************
@@ -96,33 +96,46 @@ Public Class ObjectiveFunction_SKos
     '***************************************
     Private Function Calculate_Costs() As Double
 
+        Dim CostsFromCES As Boolean = True
+        '* defniert ob die Kosten aus der CES Datei berechnet werden
+
         Dim costs As Double = 0
-        Dim Elementliste(0, 1) As Object
-        Dim TRS_Array(,) As Object = {}
-        Dim TAL_Array(,) As Object = {}
-
-        'Bauwerksliste wird erstellt
-        Call create_Elementliste(Elementliste)
-
-        'Ermitteln der massgeblichen Größen aus den Dateien
-        Call Read_TAL(TAL_Array, Me.WorkDir_Current)
-        Call Read_TRS_Daten(TRS_Akt, Me.WorkDir_Current)
-
-        'Berechnen der Volumen Differenzen aus der Original TRS und der Aktuellen TRS
-        Call Calc_Volume(TRS_Orig, TRS_Akt)
-
-        'Kalkulieren der Kosten für jedes Bauwerk
-        Call Acquire_Costs(TAL_Array, TRS_Akt, Elementliste)
-
-        'Kosten aufsummieren
         Dim i, j As Integer
-        For i = 0 To Akt_Elemente.GetUpperBound(0)
-            For j = 0 To Elementliste.GetUpperBound(0)
-                If Elementliste(j, 0) = Akt_Elemente(i) Then
-                    costs = costs + Elementliste(j, 1)
-                End If
+    
+
+        If CostsFromCES Then
+
+            For i = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
+                costs += Me.mProblem.List_Locations(i).List_Massnahmen(Akt_Path(i)).Kosten
             Next
-        Next
+
+        Else
+            Dim Elementliste(0, 1) As Object
+            Dim TRS_Array(,) As Object = {}
+            Dim TAL_Array(,) As Object = {}
+
+            'Bauwerksliste wird erstellt
+            Call create_Elementliste(Elementliste)
+
+            'Ermitteln der massgeblichen Größen aus den Dateien
+            Call Read_TAL(TAL_Array, Me.WorkDir_Current)
+            Call Read_TRS_Daten(TRS_Akt, Me.WorkDir_Current)
+
+            'Berechnen der Volumen Differenzen aus der Original TRS und der Aktuellen TRS
+            Call Calc_Volume(TRS_Orig, TRS_Akt)
+
+            'Kalkulieren der Kosten für jedes Bauwerk
+            Call Acquire_Costs(TAL_Array, TRS_Akt, Elementliste)
+
+            'Kosten aufsummieren
+            For i = 0 To Akt_Elemente.GetUpperBound(0)
+                For j = 0 To Elementliste.GetUpperBound(0)
+                    If Elementliste(j, 0) = Akt_Elemente(i) Then
+                        costs = costs + Elementliste(j, 1)
+                    End If
+                Next
+            Next
+        End If
 
         Return costs
     End Function

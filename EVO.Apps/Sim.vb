@@ -664,6 +664,7 @@ Public MustInherit Class Sim
             If (obj.GetObjType = Common.ObjectiveFunction.ObjectiveType.SKos) Then
                 With CType(obj, Common.ObjectiveFunction_SKos)
                     .Akt_Elemente = CType(ind, Common.Individuum_CES).Get_All_Loc_Elem
+                    .Akt_Path = CType(ind, Common.Individuum_CES).Path
                     .WorkDir_Current = Me.WorkDir_Current
                 End With
                 Exit For
