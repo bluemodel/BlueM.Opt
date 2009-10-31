@@ -382,16 +382,28 @@ Public Class Problem
                 List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
                 List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Common.Provider.FortranProvider)
                 List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
-                'liegt eine Beziehung vor?
-                If (i > 0 And Not array(6).Trim() = "") Then
-                    Me.List_OptParameter(i).Beziehung = Common.Constants.getBeziehung(array(6).Trim())
-                End If
-                Try
-                    List_OptParameter(i).Objekt = array(7).Trim()
-                    List_OptParameter(i).Zeitpunkt = Convert.ToInt32(array(8).Trim())
-                Catch ex As Exception
 
-                End Try
+                'liegt eine Beziehung vor?
+                If (i > 0 And array.GetUpperBound(0) > 6) Then
+                    If Not array(6).Trim() = "" Then
+                        Me.List_OptParameter(i).Beziehung = Common.Constants.getBeziehung(array(6).Trim())
+                    End If
+                End If
+
+                'liegt ein Objekt vor?
+                If (i > 0 And array.GetUpperBound(0) > 7) Then
+                    If Not array(7).Trim() = "" Then
+                        Me.List_OptParameter(i).Objekt = array(7).Trim()
+                    End If
+                End If
+
+                'liegt ein Zeitpunkt vor?
+                If (i > 0 And array.GetUpperBound(0) > 8) Then
+                    If Not array(8).Trim() = "" Then
+                        Me.List_OptParameter(i).Zeitpunkt = Convert.ToInt32(array(8).Trim())
+                    End If
+                End If
+
                 'Eingelesenen Startwert setzen
                 List_OptParameter(i).RWert = List_OptParameter(i).StartWert
                 i += 1
