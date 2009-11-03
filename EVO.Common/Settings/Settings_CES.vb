@@ -375,7 +375,7 @@ Public Class Settings_CES
                 Me.RealOptEnabled = False
                 Me.HybridType = HYBRID_TYPE.Mixed_Integer
                 Me.Mem_Strategy = MEMORY_STRATEGY.C_This_Loc
-                Me.N_PES_MemSize = 500
+                Me.N_PES_MemSize = 50
 
                 Me.Is_PES_SecPop = False
                 Me.N_PES_MemSecPop = 50
