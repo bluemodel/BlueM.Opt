@@ -101,14 +101,14 @@ Public Class Settings_PES
     ''' <summary>
     ''' Ermittlung der Individuum-Eltern
     ''' </summary>
-    Public Property Reproduktion() As PES_REPRODOP
+    Public Property Reproduktionsop() As PES_REPRODOP
         Get
             Return _Reproduktionsoperator
         End Get
         Set(ByVal value As PES_REPRODOP)
             _Reproduktionsoperator = value
             'Diversity Tournament aktualisieren
-            Select Case Me.Reproduktion
+            Select Case Me.Reproduktionsop
                 Case PES_REPRODOP.XY_Diskret, PES_REPRODOP.XY_Mitteln, PES_REPRODOP.Neighbourhood, PES_REPRODOP.XY_Mitteln_Diskret
                     Me.Is_DiversityTournament = True
                 Case Else
@@ -132,7 +132,7 @@ Public Class Settings_PES
     ''' <summary>
     ''' Art der Mutation
     ''' </summary>
-    Public Property Mutation() As PES_MUTATIONSOP
+    Public Property Mutationsop() As PES_MUTATIONSOP
         Get
             Return _Mutationsoperator
         End Get
@@ -390,7 +390,7 @@ Public Class Settings_PES
                 Me.Strategie = EVO_STRATEGIE.Plus_Strategie
                 Me.Startparameter = EVO_STARTPARAMETER.Original
 
-                Me.Mutation = PES_MUTATIONSOP.Rechenberg
+                Me.Mutationsop = PES_MUTATIONSOP.Rechenberg
                 Me.SetMutation.DnStart = 0.1
                 Me.SetMutation.DnEpsilon = 0.001
                 Me.SetMutation.IsDnVektor = False
@@ -404,7 +404,7 @@ Public Class Settings_PES
                 Me.SekPop.Is_Begrenzung = False
                 Me.SekPop.N_MaxMembers = 0
 
-                Me.Reproduktion = PES_REPRODOP.XX_Mitteln_Diskret
+                Me.Reproduktionsop = PES_REPRODOP.XX_Mitteln_Diskret
                 Me.N_RekombXY = 3
                 Me.Is_DiversityTournament = False
 
@@ -420,7 +420,7 @@ Public Class Settings_PES
                 Me.Strategie = EVO_STRATEGIE.Plus_Strategie
                 Me.Startparameter = EVO_STARTPARAMETER.Original
 
-                Me.Mutation = PES_MUTATIONSOP.Rechenberg
+                Me.Mutationsop = PES_MUTATIONSOP.Rechenberg
                 Me.SetMutation.DnStart = 0.1
                 Me.SetMutation.IsDnVektor = False
                 Me.SetMutation.DnC = 1.0
@@ -433,7 +433,7 @@ Public Class Settings_PES
                 Me.SekPop.Is_Begrenzung = True
                 Me.SekPop.N_MaxMembers = 50
 
-                Me.Reproduktion = PES_REPRODOP.XX_Mitteln_Diskret
+                Me.Reproduktionsop = PES_REPRODOP.XX_Mitteln_Diskret
                 Me.N_RekombXY = 3
                 Me.Is_DiversityTournament = True
 
@@ -500,7 +500,7 @@ Public Class Settings_PES
 
     Public ReadOnly Property RecombXYEnabled() As Boolean
         Get
-            Select Case Me.Reproduktion
+            Select Case Me.Reproduktionsop
                 Case PES_REPRODOP.XY_Diskret, PES_REPRODOP.XY_Mitteln, PES_REPRODOP.Neighbourhood, PES_REPRODOP.XY_Mitteln_Diskret
                     Return True
                 Case Else
