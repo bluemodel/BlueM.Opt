@@ -11,7 +11,7 @@ Public Class Settings_PES
     Private _N_Eltern As Integer
     Private _N_Nachf As Integer
     Private _Reproduktionsoperator As PES_REPRODOP
-
+    Private _Mutationsoperator As PES_MUTATIONSOP
     Private _N_RekombXY As Integer
     Private _Is_DiversityTournament As Boolean
 
@@ -101,14 +101,14 @@ Public Class Settings_PES
     ''' <summary>
     ''' Ermittlung der Individuum-Eltern
     ''' </summary>
-    Public Property OptEltern() As PES_REPRODOP
+    Public Property Reproduktion() As PES_REPRODOP
         Get
             Return _Reproduktionsoperator
         End Get
         Set(ByVal value As PES_REPRODOP)
             _Reproduktionsoperator = value
             'Diversity Tournament aktualisieren
-            Select Case Me.OptEltern
+            Select Case Me.Reproduktion
                 Case PES_REPRODOP.XY_Diskret, PES_REPRODOP.XY_Mitteln, PES_REPRODOP.Neighbourhood, PES_REPRODOP.XY_Mitteln_Diskret
                     Me.Is_DiversityTournament = True
                 Case Else
@@ -130,6 +130,18 @@ Public Class Settings_PES
     End Property
 
     ''' <summary>
+    ''' Art der Mutation
+    ''' </summary>
+    Public Property Mutation() As PES_MUTATIONSOP
+        Get
+            Return _Mutationsoperator
+        End Get
+        Set(ByVal value As PES_MUTATIONSOP)
+            _Mutationsoperator = value
+        End Set
+    End Property
+
+    ''' <summary>
     ''' Vor der eigentlichen Auswahl eines Elter wird zunächst nach der besseren Diversität geschaut
     ''' </summary>
     Public Property Is_DiversityTournament() As Boolean
@@ -145,7 +157,7 @@ Public Class Settings_PES
 
     'Unterklassen
     '************
-    Public Mutation As Settings_Mutation
+    Public SetMutation As Settings_Mutation
     Public SekPop As Settings_SekPop
     Public Pop As Settings_Pop
 
@@ -153,7 +165,6 @@ Public Class Settings_PES
         Private _DnStart As Double
         Private _DnEpsilon As Double
         Private _IsDnVektor As Boolean
-        Private _DnMutation As PES_MUTATION
         Private _DnC As Double
 
         ''' <summary>
@@ -189,18 +200,6 @@ Public Class Settings_PES
             End Get
             Set(ByVal value As Boolean)
                 _IsDnVektor = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Art der Mutation
-        ''' </summary>
-        Public Property DnMutation() As PES_MUTATION
-            Get
-                Return _DnMutation
-            End Get
-            Set(ByVal value As PES_MUTATION)
-                _DnMutation = value
             End Set
         End Property
 
@@ -391,11 +390,11 @@ Public Class Settings_PES
                 Me.Strategie = EVO_STRATEGIE.Plus_Strategie
                 Me.Startparameter = EVO_STARTPARAMETER.Original
 
-                Me.Mutation.DnMutation = PES_MUTATION.Rechenberg
-                Me.Mutation.DnStart = 0.1
-                Me.Mutation.DnEpsilon = 0.001
-                Me.Mutation.IsDnVektor = False
-                Me.Mutation.DnC = 1.0
+                Me.Mutation = PES_MUTATIONSOP.Rechenberg
+                Me.SetMutation.DnStart = 0.1
+                Me.SetMutation.DnEpsilon = 0.001
+                Me.SetMutation.IsDnVektor = False
+                Me.SetMutation.DnC = 1.0
 
                 Me.N_Gen = 100
                 Me.N_Eltern = 3
@@ -405,7 +404,7 @@ Public Class Settings_PES
                 Me.SekPop.Is_Begrenzung = False
                 Me.SekPop.N_MaxMembers = 0
 
-                Me.OptEltern = PES_REPRODOP.XX_Mitteln_Diskret
+                Me.Reproduktion = PES_REPRODOP.XX_Mitteln_Diskret
                 Me.N_RekombXY = 3
                 Me.Is_DiversityTournament = False
 
@@ -421,10 +420,10 @@ Public Class Settings_PES
                 Me.Strategie = EVO_STRATEGIE.Plus_Strategie
                 Me.Startparameter = EVO_STARTPARAMETER.Original
 
-                Me.Mutation.DnMutation = PES_MUTATION.Rechenberg
-                Me.Mutation.DnStart = 0.1
-                Me.Mutation.IsDnVektor = False
-                Me.Mutation.DnC = 1.0
+                Me.Mutation = PES_MUTATIONSOP.Rechenberg
+                Me.SetMutation.DnStart = 0.1
+                Me.SetMutation.IsDnVektor = False
+                Me.SetMutation.DnC = 1.0
 
                 Me.N_Gen = 100
                 Me.N_Eltern = 15
@@ -434,7 +433,7 @@ Public Class Settings_PES
                 Me.SekPop.Is_Begrenzung = True
                 Me.SekPop.N_MaxMembers = 50
 
-                Me.OptEltern = PES_REPRODOP.XX_Mitteln_Diskret
+                Me.Reproduktion = PES_REPRODOP.XX_Mitteln_Diskret
                 Me.N_RekombXY = 3
                 Me.Is_DiversityTournament = True
 
@@ -447,7 +446,7 @@ Public Class Settings_PES
     End Sub
 
     Public Sub New()
-        Me.Mutation = New Settings_Mutation()
+        Me.SetMutation = New Settings_Mutation()
         Me.SekPop = New Settings_SekPop()
         Me.Pop = New Settings_Pop()
     End Sub
@@ -501,7 +500,7 @@ Public Class Settings_PES
 
     Public ReadOnly Property RecombXYEnabled() As Boolean
         Get
-            Select Case Me.OptEltern
+            Select Case Me.Reproduktion
                 Case PES_REPRODOP.XY_Diskret, PES_REPRODOP.XY_Mitteln, PES_REPRODOP.Neighbourhood, PES_REPRODOP.XY_Mitteln_Diskret
                     Return True
                 Case Else

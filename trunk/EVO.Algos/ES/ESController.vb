@@ -176,8 +176,8 @@ Public Class ESController
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         For i_ch = 0 To CES1.mSettings.CES.N_Children - 1
             'Das Dn wird gesetzt
-            If Me.mySettings.PES.Mutation.IsDnVektor = False Then
-                CES1.Children(i_ch).CES_Dn = Me.mySettings.PES.Mutation.DnStart
+            If Me.mySettings.PES.SetMutation.IsDnVektor = False Then
+                CES1.Children(i_ch).CES_Dn = Me.mySettings.PES.SetMutation.DnStart
             End If
             For i_loc = 0 To CES1.ModSett.n_Locations - 1
                 Call Sim1.Identify_Measures_Elements_Parameters(i_loc, CES1.Children(i_ch).Path(i_loc), CES1.Children(i_ch).Measures(i_loc), CES1.Children(i_ch).Loc(i_loc).Loc_Elem, CES1.Children(i_ch).Loc(i_loc).PES_OptPara)
@@ -364,7 +364,7 @@ Public Class ESController
         For i_Child = 0 To CES1.Children.GetUpperBound(0)
 
             'Das Dn des Child mutieren
-            If Me.mySettings.PES.Mutation.IsDnVektor = False Then
+            If Me.mySettings.PES.SetMutation.IsDnVektor = False Then
                 Dim PESX As EVO.ES.PES
                 PESX = New EVO.ES.PES
                 Call PESX.PesInitialise(Me.mySettings, Me.myProblem)
@@ -405,7 +405,7 @@ Public Class ESController
                             'Noch keine Eltern vorhanden (die Child Location bekommt neue - zufällige Werte oder original Parameter)
                             '*******************************************************************************************************
                             For m = 0 To CES1.Children(i_Child).Loc(i_loc).PES_OptPara.GetUpperBound(0)
-                                CES1.Children(i_Child).Loc(i_loc).PES_OptPara(m).Dn = CES1.mSettings.PES.Mutation.DnStart
+                                CES1.Children(i_Child).Loc(i_loc).PES_OptPara(m).Dn = CES1.mSettings.PES.SetMutation.DnStart
                                 'Falls zufällige Startwerte
                                 If CES1.mSettings.PES.Startparameter = Common.Constants.EVO_STARTPARAMETER.Zufall Then
                                     Randomize()
@@ -848,7 +848,7 @@ Public Class ESController
 
             End With
 
-            If (Me.mySettings.PES.Mutation.IsDnVektor) Then
+            If (Me.mySettings.PES.SetMutation.IsDnVektor) Then
 
                 'Bei PES-Schrittweitenvektor eine Linie für jeden Parameter
                 ReDim Me.Line_Dn(Me.myProblem.List_OptParameter_Save.Length - 1)
@@ -935,7 +935,7 @@ Public Class ESController
                 'HYBRID:
                 '-------
                 If (ind.OptParameter.Length > 0) Then
-                    If (Me.mySettings.PES.Mutation.IsDnVektor) Then
+                    If (Me.mySettings.PES.SetMutation.IsDnVektor) Then
                         'Bei Schrittweitenvektor mehrere Linien
                         For i = 0 To ind.OptParameter.Length - 1
                             'Parameter zuordnen
@@ -955,7 +955,7 @@ Public Class ESController
             Case METH_PES
                 'PES
                 '---
-                If (Me.mySettings.PES.Mutation.IsDnVektor) Then
+                If (Me.mySettings.PES.SetMutation.IsDnVektor) Then
                     'Bei Schrittweitenvektor mehrere Linien
                     For i = 0 To ind.OptParameter.Length - 1
                         Me.Line_Dn(i).Add(durchlauf, ind.OptParameter(i).Dn, durchlauf.ToString)

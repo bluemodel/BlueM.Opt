@@ -97,7 +97,7 @@ Public Module Constants
     End Enum
 
     'Option für die Mutation
-    Public Enum PES_MUTATION As Integer
+    Public Enum PES_MUTATIONSOP As Integer
         Rechenberg = 1
         Schwefel = 2
     End Enum

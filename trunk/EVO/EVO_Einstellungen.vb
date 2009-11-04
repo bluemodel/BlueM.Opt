@@ -43,7 +43,7 @@ Public Class EVO_Einstellungen
         'PES:
         Me.PES_Combo_Strategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
         Me.PES_Combo_Startparameter.DataSource = System.Enum.GetValues(GetType(EVO_STARTPARAMETER))
-        Me.PES_Combo_DnMutation.DataSource = System.Enum.GetValues(GetType(PES_MUTATION))
+        Me.PES_Combo_DnMutation.DataSource = System.Enum.GetValues(GetType(PES_MUTATIONSOP))
         Me.PES_Combo_OptEltern.DataSource = System.Enum.GetValues(GetType(PES_REPRODOP))
         Me.PES_Combo_PopEltern.DataSource = System.Enum.GetValues(GetType(EVO_POP_ELTERN))
         Me.PES_Combo_PopStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
@@ -105,7 +105,7 @@ Public Class EVO_Einstellungen
             Me.BindingSource_PES.Add(Me.mSettings.PES)
 
             Me.BindingSource_PES_Schrittweite.Clear()
-            Me.BindingSource_PES_Schrittweite.Add(Me.mSettings.PES.Mutation)
+            Me.BindingSource_PES_Schrittweite.Add(Me.mSettings.PES.SetMutation)
 
             Me.BindingSource_PES_SekPop.Clear()
             Me.BindingSource_PES_SekPop.Add(Me.mSettings.PES.SekPop)
