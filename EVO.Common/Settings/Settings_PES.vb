@@ -2,11 +2,158 @@ Imports System.Xml.Serialization
 
 Public Class Settings_PES
 
-    Public Class Settings_Schrittweite
+#Region "Eigenschaften"
+
+    Private _OptModus As EVO_MODUS
+    Private _Strategie As EVO_STRATEGIE
+    Private _Startparameter As EVO_STARTPARAMETER
+    Private _N_Gen As Integer
+    Private _N_Eltern As Integer
+    Private _N_Nachf As Integer
+    Private _Reproduktionsoperator As PES_REPRODOP
+
+    Private _N_RekombXY As Integer
+    Private _Is_DiversityTournament As Boolean
+
+#End Region 'Eigenschaften
+
+#Region "Properties"
+
+    ''' <summary>
+    ''' Single- oder Multi-Objective
+    ''' </summary>
+    Public Property OptModus() As EVO_MODUS
+        Get
+            Return _OptModus
+        End Get
+        Set(ByVal value As EVO_MODUS)
+            _OptModus = value
+            'Neuen Standardwert für PopPenalty setzen
+            Select Case _OptModus
+                Case EVO_MODUS.Single_Objective
+                    Me.Pop.PopPenalty = EVO_POP_PENALTY.Mittelwert
+                Case EVO_MODUS.Multi_Objective
+                    Me.Pop.PopPenalty = EVO_POP_PENALTY.Crowding
+            End Select
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Startparameter
+    ''' </summary>
+    Public Property Startparameter() As EVO_STARTPARAMETER
+        Get
+            Return _Startparameter
+        End Get
+        Set(ByVal value As EVO_STARTPARAMETER)
+            _Startparameter = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Typ der Evolutionsstrategie (+ oder ,)
+    ''' </summary>
+    Public Property Strategie() As EVO_STRATEGIE
+        Get
+            Return _Strategie
+        End Get
+        Set(ByVal value As EVO_STRATEGIE)
+            _Strategie = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Anzahl Generationen
+    ''' </summary>
+    Public Property N_Gen() As Integer
+        Get
+            Return _N_Gen
+        End Get
+        Set(ByVal value As Integer)
+            _N_Gen = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Anzahl Eltern
+    ''' </summary>
+    Public Property N_Eltern() As Integer
+        Get
+            Return _N_Eltern
+        End Get
+        Set(ByVal value As Integer)
+            _N_Eltern = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Anzahl Nachfahren
+    ''' </summary>
+    Public Property N_Nachf() As Integer
+        Get
+            Return _N_Nachf
+        End Get
+        Set(ByVal value As Integer)
+            _N_Nachf = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Ermittlung der Individuum-Eltern
+    ''' </summary>
+    Public Property OptEltern() As PES_REPRODOP
+        Get
+            Return _Reproduktionsoperator
+        End Get
+        Set(ByVal value As PES_REPRODOP)
+            _Reproduktionsoperator = value
+            'Diversity Tournament aktualisieren
+            Select Case Me.OptEltern
+                Case PES_REPRODOP.XY_Diskret, PES_REPRODOP.XY_Mitteln, PES_REPRODOP.Neighbourhood, PES_REPRODOP.XY_Mitteln_Diskret
+                    Me.Is_DiversityTournament = True
+                Case Else
+                    Me.Is_DiversityTournament = False
+            End Select
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' X/Y-Schema Rekombination
+    ''' </summary>
+    Public Property N_RekombXY() As Integer
+        Get
+            Return _N_RekombXY
+        End Get
+        Set(ByVal value As Integer)
+            _N_RekombXY = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Vor der eigentlichen Auswahl eines Elter wird zunächst nach der besseren Diversität geschaut
+    ''' </summary>
+    Public Property Is_DiversityTournament() As Boolean
+        Get
+            Return _Is_DiversityTournament
+        End Get
+        Set(ByVal value As Boolean)
+            _Is_DiversityTournament = value
+        End Set
+    End Property
+
+#End Region 'Properties
+
+    'Unterklassen
+    '************
+    Public Mutation As Settings_Mutation
+    Public SekPop As Settings_SekPop
+    Public Pop As Settings_Pop
+
+    Public Class Settings_Mutation
         Private _DnStart As Double
         Private _DnEpsilon As Double
         Private _IsDnVektor As Boolean
-        Private _DnMutation As EVO_DnMutation
+        Private _DnMutation As PES_MUTATION
         Private _DnC As Double
 
         ''' <summary>
@@ -48,11 +195,11 @@ Public Class Settings_PES
         ''' <summary>
         ''' Art der Mutation
         ''' </summary>
-        Public Property DnMutation() As EVO_DnMutation
+        Public Property DnMutation() As PES_MUTATION
             Get
                 Return _DnMutation
             End Get
-            Set(ByVal value As EVO_DnMutation)
+            Set(ByVal value As PES_MUTATION)
                 _DnMutation = value
             End Set
         End Property
@@ -227,149 +374,6 @@ Public Class Settings_PES
         End Property
     End Class
 
-#Region "Eigenschaften"
-
-    Private _OptModus As EVO_MODUS
-    Private _Strategie As EVO_STRATEGIE
-    Private _Startparameter As EVO_STARTPARAMETER
-    Private _N_Gen As Integer
-    Private _N_Eltern As Integer
-    Private _N_Nachf As Integer
-    Private _OptEltern As EVO_ELTERN
-    Private _N_RekombXY As Integer
-    Private _Is_DiversityTournament As Boolean
-
-#End Region 'Eigenschaften
-
-#Region "Properties"
-
-    ''' <summary>
-    ''' Single- oder Multi-Objective
-    ''' </summary>
-    Public Property OptModus() As EVO_MODUS
-        Get
-            Return _OptModus
-        End Get
-        Set(ByVal value As EVO_MODUS)
-            _OptModus = value
-            'Neuen Standardwert für PopPenalty setzen
-            Select Case _OptModus
-                Case EVO_MODUS.Single_Objective
-                    Me.Pop.PopPenalty = EVO_POP_PENALTY.Mittelwert
-                Case EVO_MODUS.Multi_Objective
-                    Me.Pop.PopPenalty = EVO_POP_PENALTY.Crowding
-            End Select
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' Startparameter
-    ''' </summary>
-    Public Property Startparameter() As EVO_STARTPARAMETER
-        Get
-            Return _Startparameter
-        End Get
-        Set(ByVal value As EVO_STARTPARAMETER)
-            _Startparameter = value
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' Typ der Evolutionsstrategie (+ oder ,)
-    ''' </summary>
-    Public Property Strategie() As EVO_STRATEGIE
-        Get
-            Return _Strategie
-        End Get
-        Set(ByVal value As EVO_STRATEGIE)
-            _Strategie = value
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' Anzahl Generationen
-    ''' </summary>
-    Public Property N_Gen() As Integer
-        Get
-            Return _N_Gen
-        End Get
-        Set(ByVal value As Integer)
-            _N_Gen = value
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' Anzahl Eltern
-    ''' </summary>
-    Public Property N_Eltern() As Integer
-        Get
-            Return _N_Eltern
-        End Get
-        Set(ByVal value As Integer)
-            _N_Eltern = value
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' Anzahl Nachfahren
-    ''' </summary>
-    Public Property N_Nachf() As Integer
-        Get
-            Return _N_Nachf
-        End Get
-        Set(ByVal value As Integer)
-            _N_Nachf = value
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' Ermittlung der Individuum-Eltern
-    ''' </summary>
-    Public Property OptEltern() As EVO_ELTERN
-        Get
-            Return _OptEltern
-        End Get
-        Set(ByVal value As EVO_ELTERN)
-            _OptEltern = value
-            'Diversity Tournament aktualisieren
-            Select Case Me.OptEltern
-                Case EVO_ELTERN.XY_Diskret, EVO_ELTERN.XY_Mitteln, EVO_ELTERN.Neighbourhood, EVO_ELTERN.XY_Mitteln_Diskret
-                    Me.Is_DiversityTournament = True
-                Case Else
-                    Me.Is_DiversityTournament = False
-            End Select
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' X/Y-Schema Rekombination
-    ''' </summary>
-    Public Property N_RekombXY() As Integer
-        Get
-            Return _N_RekombXY
-        End Get
-        Set(ByVal value As Integer)
-            _N_RekombXY = value
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' Vor der eigentlichen Auswahl eines Elter wird zunächst nach der besseren Diversität geschaut
-    ''' </summary>
-    Public Property Is_DiversityTournament() As Boolean
-        Get
-            Return _Is_DiversityTournament
-        End Get
-        Set(ByVal value As Boolean)
-            _Is_DiversityTournament = value
-        End Set
-    End Property
-
-    Public Schrittweite As Settings_Schrittweite
-    Public SekPop As Settings_SekPop
-    Public Pop As Settings_Pop
-
-#End Region 'Properties
 
 #Region "Methoden"
 
@@ -387,11 +391,11 @@ Public Class Settings_PES
                 Me.Strategie = EVO_STRATEGIE.Plus_Strategie
                 Me.Startparameter = EVO_STARTPARAMETER.Original
 
-                Me.Schrittweite.DnMutation = EVO_DnMutation.Rechenberg
-                Me.Schrittweite.DnStart = 0.1
-                Me.Schrittweite.DnEpsilon = 0.001
-                Me.Schrittweite.IsDnVektor = False
-                Me.Schrittweite.DnC = 1.0
+                Me.Mutation.DnMutation = PES_MUTATION.Rechenberg
+                Me.Mutation.DnStart = 0.1
+                Me.Mutation.DnEpsilon = 0.001
+                Me.Mutation.IsDnVektor = False
+                Me.Mutation.DnC = 1.0
 
                 Me.N_Gen = 100
                 Me.N_Eltern = 3
@@ -401,7 +405,7 @@ Public Class Settings_PES
                 Me.SekPop.Is_Begrenzung = False
                 Me.SekPop.N_MaxMembers = 0
 
-                Me.OptEltern = EVO_ELTERN.XX_Mitteln_Diskret
+                Me.OptEltern = PES_REPRODOP.XX_Mitteln_Diskret
                 Me.N_RekombXY = 3
                 Me.Is_DiversityTournament = False
 
@@ -417,10 +421,10 @@ Public Class Settings_PES
                 Me.Strategie = EVO_STRATEGIE.Plus_Strategie
                 Me.Startparameter = EVO_STARTPARAMETER.Original
 
-                Me.Schrittweite.DnMutation = EVO_DnMutation.Rechenberg
-                Me.Schrittweite.DnStart = 0.1
-                Me.Schrittweite.IsDnVektor = False
-                Me.Schrittweite.DnC = 1.0
+                Me.Mutation.DnMutation = PES_MUTATION.Rechenberg
+                Me.Mutation.DnStart = 0.1
+                Me.Mutation.IsDnVektor = False
+                Me.Mutation.DnC = 1.0
 
                 Me.N_Gen = 100
                 Me.N_Eltern = 15
@@ -430,7 +434,7 @@ Public Class Settings_PES
                 Me.SekPop.Is_Begrenzung = True
                 Me.SekPop.N_MaxMembers = 50
 
-                Me.OptEltern = EVO_ELTERN.XX_Mitteln_Diskret
+                Me.OptEltern = PES_REPRODOP.XX_Mitteln_Diskret
                 Me.N_RekombXY = 3
                 Me.Is_DiversityTournament = True
 
@@ -443,7 +447,7 @@ Public Class Settings_PES
     End Sub
 
     Public Sub New()
-        Me.Schrittweite = New Settings_Schrittweite()
+        Me.Mutation = New Settings_Mutation()
         Me.SekPop = New Settings_SekPop()
         Me.Pop = New Settings_Pop()
     End Sub
@@ -498,7 +502,7 @@ Public Class Settings_PES
     Public ReadOnly Property RecombXYEnabled() As Boolean
         Get
             Select Case Me.OptEltern
-                Case EVO_ELTERN.XY_Diskret, EVO_ELTERN.XY_Mitteln, EVO_ELTERN.Neighbourhood, EVO_ELTERN.XY_Mitteln_Diskret
+                Case PES_REPRODOP.XY_Diskret, PES_REPRODOP.XY_Mitteln, PES_REPRODOP.Neighbourhood, PES_REPRODOP.XY_Mitteln_Diskret
                     Return True
                 Case Else
                     Return False
