@@ -148,10 +148,10 @@ Public Class PES
             Throw New Exception("Ungültige Einstellung für 'Startparameter'!")
         End If
         'Schrittweite
-        If (Not System.Enum.IsDefined(GetType(PES_MUTATION), settings.PES.Mutation.DnMutation)) Then
+        If (Not System.Enum.IsDefined(GetType(PES_MUTATIONSOP), settings.PES.Mutation)) Then
             Throw New Exception("Ungültige Einstellung für 'Mutation'!")
         End If
-        If (settings.PES.Mutation.DnStart < 0) Then
+        If (settings.PES.SetMutation.DnStart < 0) Then
             Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
         End If
         'Generationen
@@ -168,10 +168,10 @@ Public Class PES
             Throw New Exception("Die Anzahl der Nachfahren ist kleiner 1!")
         End If
         'Eltern
-        If (Not System.Enum.IsDefined(GetType(PES_REPRODOP), settings.PES.OptEltern)) Then
+        If (Not System.Enum.IsDefined(GetType(PES_REPRODOP), settings.PES.Reproduktion)) Then
             Throw New Exception("Ungültige Einstellung für die Ermittlung der Eltern!")
         End If
-        If (settings.PES.OptModus = EVO_MODUS.Single_Objective And settings.PES.OptEltern = PES_REPRODOP.Neighbourhood) Then
+        If (settings.PES.OptModus = EVO_MODUS.Single_Objective And settings.PES.Reproduktion = PES_REPRODOP.Neighbourhood) Then
             Throw New Exception("Die Option 'Neighbourhood' für die Ermittlung der Eltern ist bei Single-Objective nicht zulässig!")
         End If
         If (settings.PES.N_RekombXY < 1) Then
@@ -245,7 +245,7 @@ Public Class PES
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
         If (mSettings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
             NDSorting = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_PES, mSettings.PES.N_Eltern + mSettings.PES.N_Nachf, "NDSorting")
-            If (mSettings.PES.OptEltern = PES_REPRODOP.Neighbourhood) Then
+            If (mSettings.PES.Reproduktion = PES_REPRODOP.Neighbourhood) Then
                 ReDim PenaltyDistance(mSettings.PES.N_Eltern - 1, mSettings.PES.N_Eltern - 1)
                 ReDim Distanceb(mSettings.PES.N_Eltern - 1)
             End If
@@ -319,7 +319,7 @@ Public Class PES
             End If
             AktPara(i) = Me.mProblem.List_OptParameter(i).Clone()
             'Startschrittweite übernehmen
-            AktPara(i).Dn = mSettings.PES.Mutation.DnStart
+            AktPara(i).Dn = mSettings.PES.SetMutation.DnStart
         Next
 
         Dim n, v, m As Integer
@@ -442,9 +442,9 @@ Public Class PES
         'MUTATIONSPROZESS
         '################
         'Mutieren der Ausgangswerte mit und ohne Vektor
-        If mSettings.PES.Mutation.IsDnVektor = False Then
+        If mSettings.PES.SetMutation.IsDnVektor = False Then
             Call CES_Xn_Mutation(CES_Dn)
-        ElseIf mSettings.PES.Mutation.IsDnVektor = True Then
+        ElseIf mSettings.PES.SetMutation.IsDnVektor = True Then
             Call EsMutation()
         End If
 
@@ -513,7 +513,7 @@ Public Class PES
         Dim TournamentElter1 As Integer
         Dim TournamentElter2 As Integer
 
-        Select Case mSettings.PES.OptEltern
+        Select Case mSettings.PES.Reproduktion
 
             Case PES_REPRODOP.Selektion 'Zufallswahl über alle Eltern
 
@@ -861,7 +861,7 @@ Public Class PES
 
         'Einheitliche Schrittweite
         '-------------------------
-        If (Not mSettings.PES.Mutation.IsDnVektor) Then
+        If (Not mSettings.PES.SetMutation.IsDnVektor) Then
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
@@ -893,7 +893,7 @@ Public Class PES
 
                     'Schrittweitenvektor
                     '-------------------
-                    If (mSettings.PES.Mutation.IsDnVektor) Then
+                    If (mSettings.PES.SetMutation.IsDnVektor) Then
                         '+/-1
                         expo = (2 * Int(Rnd() + 0.5) - 1)
                         'Schrittweite wird mutiert
@@ -943,20 +943,20 @@ Public Class PES
 
         'Einheitliche Schrittweite
         '-------------------------
-        If (Not mSettings.PES.Mutation.IsDnVektor) Then
-            If (mSettings.PES.Mutation.DnMutation = PES_MUTATION.Rechenberg) Then
+        If (Not mSettings.PES.SetMutation.IsDnVektor) Then
+            If (mSettings.PES.Mutation = PES_MUTATIONSOP.Rechenberg) Then
                 '+/-1
                 expo = (2 * Int(Rnd() + 0.5) - 1)
                 'Schrittweite wird mutiert
                 DnTemp(0) = AktPara(0).Dn * galpha ^ expo
-            ElseIf (mSettings.PES.Mutation.DnMutation = PES_MUTATION.Schwefel) Then
-                tau = mSettings.PES.Mutation.DnC / Math.Sqrt(Me.mProblem.NumOptParams)
+            ElseIf (mSettings.PES.Mutation = PES_MUTATIONSOP.Schwefel) Then
+                tau = mSettings.PES.SetMutation.DnC / Math.Sqrt(Me.mProblem.NumOptParams)
                 'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                 Z = Me.NormalDistributationRND(1.0, 0.0)
                 'Neue Schrittweite
                 DnTemp(0) = AktPara(0).Dn * Math.Exp(tau * Z)
                 'Mindestschrittweite muss eingehalten werden
-                If DnTemp(0) < mSettings.PES.Mutation.DnEpsilon Then DnTemp(0) = mSettings.PES.Mutation.DnEpsilon
+                If DnTemp(0) < mSettings.PES.SetMutation.DnEpsilon Then DnTemp(0) = mSettings.PES.SetMutation.DnEpsilon
             End If
             'Schrittweite für alle übernehmen
             For v = 1 To Me.mProblem.NumOptParams - 1
@@ -966,8 +966,8 @@ Public Class PES
 
         'Dn Vektor und Schwefel
         '----------------------
-        If (mSettings.PES.Mutation.IsDnVektor And mSettings.PES.Mutation.DnMutation = PES_MUTATION.Schwefel) Then
-            taufix = mSettings.PES.Mutation.DnC / Math.Sqrt(2 * Me.mProblem.NumOptParams)
+        If (mSettings.PES.SetMutation.IsDnVektor And mSettings.PES.Mutation = PES_MUTATIONSOP.Schwefel) Then
+            taufix = mSettings.PES.SetMutation.DnC / Math.Sqrt(2 * Me.mProblem.NumOptParams)
             ZFix = Me.NormalDistributationRND(1.0, 0.0)
         End If
 
@@ -990,31 +990,31 @@ Public Class PES
 
                 'Schrittweitenvektor
                 '-------------------
-                If (mSettings.PES.Mutation.IsDnVektor) Then
+                If (mSettings.PES.SetMutation.IsDnVektor) Then
 
-                    If (mSettings.PES.Mutation.DnMutation = PES_MUTATION.Rechenberg) Then
+                    If (mSettings.PES.Mutation = PES_MUTATIONSOP.Rechenberg) Then
                         '+/-1
                         expo = (2 * Int(Rnd() + 0.5) - 1)
                         'Schrittweite wird mutiert
                         DnTemp(v) = AktPara(v).Dn * galpha ^ expo
-                    ElseIf (mSettings.PES.Mutation.DnMutation = PES_MUTATION.Schwefel) Then
-                        tau = mSettings.PES.Mutation.DnC / Math.Sqrt(2 * Math.Sqrt(Me.mProblem.NumOptParams))
+                    ElseIf (mSettings.PES.Mutation = PES_MUTATIONSOP.Schwefel) Then
+                        tau = mSettings.PES.SetMutation.DnC / Math.Sqrt(2 * Math.Sqrt(Me.mProblem.NumOptParams))
                         'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                         Z = Me.NormalDistributationRND(1.0, 0.0)
                         'Neue Schrittweite
                         DnTemp(v) = AktPara(v).Dn * Math.Exp(taufix * ZFix + tau * Z)
                         'Mindestschrittweite muss eingehalten werden
-                        If DnTemp(v) < mSettings.PES.Mutation.DnEpsilon Then DnTemp(v) = mSettings.PES.Mutation.DnEpsilon
+                        If DnTemp(v) < mSettings.PES.SetMutation.DnEpsilon Then DnTemp(v) = mSettings.PES.SetMutation.DnEpsilon
                     End If
                 End If
 
                 'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
 
                 'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Me.mProblem.NumParams) * System.Math.Sin(6.2832 * Rnd())
-                If (mSettings.PES.Mutation.DnMutation = PES_MUTATION.Rechenberg) Then
+                If (mSettings.PES.Mutation = PES_MUTATIONSOP.Rechenberg) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
                     Z = Me.NormalDistributationRND(1 / Math.Sqrt(Me.mProblem.NumOptParams), 0.0)
-                ElseIf (mSettings.PES.Mutation.DnMutation = PES_MUTATION.Schwefel) Then
+                ElseIf (mSettings.PES.Mutation = PES_MUTATIONSOP.Schwefel) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
                     Z = Me.NormalDistributationRND(1.0, 0.0)
                 End If
@@ -1045,19 +1045,19 @@ Public Class PES
         Dim expo As Integer                  'Exponent für Schrittweite (+/-1)
         Dim tau As Double
 
-        If (mSettings.PES.Mutation.DnMutation = PES_MUTATION.Rechenberg) Then
+        If (mSettings.PES.Mutation = PES_MUTATIONSOP.Rechenberg) Then
             '+/-1
             expo = (2 * Int(Rnd() + 0.5) - 1)
             'Schrittweite wird mutiert
             DnTemp = Dn_CES * galpha ^ expo
-        ElseIf (mSettings.PES.Mutation.DnMutation = PES_MUTATION.Schwefel) Then
-            tau = mSettings.PES.Mutation.DnC / Math.Sqrt(Me.mProblem.NumOptParams)
+        ElseIf (mSettings.PES.Mutation = PES_MUTATIONSOP.Schwefel) Then
+            tau = mSettings.PES.SetMutation.DnC / Math.Sqrt(Me.mProblem.NumOptParams)
             'Normalverteilte Zufallszahl (SD = 1, mean = 0)
             Z = Me.NormalDistributationRND(1.0, 0.0)
             'Neue Schrittweite
             DnTemp = Dn_CES * Math.Exp(tau * Z)
             'Mindestschrittweite muss eingehalten werden
-            If DnTemp < mSettings.PES.Mutation.DnEpsilon Then DnTemp = mSettings.PES.Mutation.DnEpsilon
+            If DnTemp < mSettings.PES.SetMutation.DnEpsilon Then DnTemp = mSettings.PES.SetMutation.DnEpsilon
         End If
 
         Return DnTemp
@@ -1090,10 +1090,10 @@ Public Class PES
                 'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
 
                 'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Anz.Para) * System.Math.Sin(6.2832 * Rnd())
-                If (mSettings.PES.Mutation.DnMutation = PES_MUTATION.Rechenberg) Then
+                If (mSettings.PES.Mutation = PES_MUTATIONSOP.Rechenberg) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
                     Z = Me.NormalDistributationRND(1 / Math.Sqrt(Me.mProblem.NumOptParams), 0.0)
-                ElseIf (mSettings.PES.Mutation.DnMutation = PES_MUTATION.Schwefel) Then
+                ElseIf (mSettings.PES.Mutation = PES_MUTATIONSOP.Schwefel) Then
                     'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
                     Z = Me.NormalDistributationRND(1.0, 0.0)
                 End If
@@ -1472,7 +1472,7 @@ Public Class PES
 
             '6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
             '----------------------------------------------------------------------------
-            If (mSettings.PES.OptEltern = PES_REPRODOP.Neighbourhood) Then
+            If (mSettings.PES.Reproduktion = PES_REPRODOP.Neighbourhood) Then
                 Call Neighbourhood_AbstandsArray()
                 Call Neighbourhood_Crowding_Distance()
             End If
