@@ -931,100 +931,144 @@ Public Class PES
         Dim v, i As Integer
         Dim Z As Double
 
+        'Allgemeine Variablen
         Dim DnTemp() As Double             'Temporäre Schrittweiten für Nachkomme
         Dim XnTemp() As Double             'Temporäre Parameterwerte für Nachkomme
-        Dim expo As Integer                  'Exponent für Schrittweite (+/-1)
-        Dim tau As Double
-        Dim taufix As Double
-        Dim ZFix As Double
+        Dim expo As Integer                'Exponent für Schrittweite (+/-1)
 
         ReDim DnTemp(Me.mProblem.NumOptParams - 1)
         ReDim XnTemp(Me.mProblem.NumOptParams - 1)
 
-        'Einheitliche Schrittweite
-        '-------------------------
-        If (Not mSettings.PES.SetMutation.IsDnVektor) Then
-            If (mSettings.PES.Mutationsop = PES_MUTATIONSOP.Rechenberg) Then
-                '+/-1
-                expo = (2 * Int(Rnd() + 0.5) - 1)
-                'Schrittweite wird mutiert
-                DnTemp(0) = AktPara(0).Dn * galpha ^ expo
-            ElseIf (mSettings.PES.Mutationsop = PES_MUTATIONSOP.Schwefel) Then
-                tau = mSettings.PES.SetMutation.DnC / Math.Sqrt(Me.mProblem.NumOptParams)
-                'Normalverteilte Zufallszahl (SD = 1, mean = 0)
-                Z = Me.NormalDistributationRND(1.0, 0.0)
-                'Neue Schrittweite
-                DnTemp(0) = AktPara(0).Dn * Math.Exp(tau * Z)
-                'Mindestschrittweite muss eingehalten werden
-                If DnTemp(0) < mSettings.PES.SetMutation.DnEpsilon Then DnTemp(0) = mSettings.PES.SetMutation.DnEpsilon
-            End If
-            'Schrittweite für alle übernehmen
-            For v = 1 To Me.mProblem.NumOptParams - 1
-                DnTemp(v) = DnTemp(0)
-            Next v
-        End If
+        'Unterscheidung zwischen den Mutationsoperatoren
+        '***********************************************
+        Select Case mSettings.PES.Mutationsop
+            Case PES_MUTATIONSOP.Rechenberg
+                '*********************
+                'Rechenberg Mutation *
+                '*********************
+                'Vorbereitung falls kein Vektor
+                If Not mSettings.PES.SetMutation.IsDnVektor Then
+                    '+/-1
+                    expo = (2 * Int(Rnd() + 0.5) - 1)
+                    'Schrittweite wird mutiert
+                    DnTemp(0) = AktPara(0).Dn * galpha ^ expo
+                End If
 
-        'Dn Vektor und Schwefel
-        '----------------------
-        If (mSettings.PES.SetMutation.IsDnVektor And mSettings.PES.Mutationsop = PES_MUTATIONSOP.Schwefel) Then
-            taufix = mSettings.PES.SetMutation.DnC / Math.Sqrt(2 * Me.mProblem.NumOptParams)
-            ZFix = Me.NormalDistributationRND(1.0, 0.0)
-        End If
-
-        'Mutation
-        '--------
-        For v = 0 To Me.mProblem.NumOptParams - 1
-            i = 0
-            Do
-                i += 1
-                'Abbruchkriterium für abhängige Parameter
-                '----------------------------------------
-                If (i >= 1000) Then
-                    'Es konnte kein gültiger Parametersatz generiert werden!
-                    'Vermutlich ist die aktuelle Schrittweite nicht groß genug.
-                    'Elterwert des aktuellen Parameters auf aktuellen Wert 
-                    'des Parameters setzen, von dem der aktuelle Parameter abhängig ist
+                'Über alle Parameter
+                For v = 0 To Me.mProblem.NumOptParams - 1
                     i = 0
-                    AktPara(v).Xn = XnTemp(v - 1)
-                End If
+                    Do
+                        i += 1
+                        'Abbruchkriterium für abhängige Parameter
+                        '----------------------------------------
+                        If (i >= 1000) Then
+                            'Es konnte kein gültiger Parametersatz generiert werden! Vermutlich ist die aktuelle Schrittweite nicht groß genug.
+                            'Elterwert des aktuellen Parameters auf aktuellen Wert des Parameters setzen, von dem der aktuelle Parameter abhängig ist
+                            i = 0
+                            AktPara(v).Xn = XnTemp(v - 1)
+                        End If
 
-                'Schrittweitenvektor
-                '-------------------
-                If (mSettings.PES.SetMutation.IsDnVektor) Then
+                        'Schrittweitenvektor oder nicht
+                        '------------------------------
+                        If (mSettings.PES.SetMutation.IsDnVektor) Then
+                            '+/-1
+                            expo = (2 * Int(Rnd() + 0.5) - 1)
+                            'Schrittweite wird mutiert
+                            DnTemp(v) = AktPara(v).Dn * galpha ^ expo
+                        Else
+                            DnTemp(v) = DnTemp(0)
+                        End If
 
-                    If (mSettings.PES.Mutationsop = PES_MUTATIONSOP.Rechenberg) Then
-                        '+/-1
-                        expo = (2 * Int(Rnd() + 0.5) - 1)
-                        'Schrittweite wird mutiert
-                        DnTemp(v) = AktPara(v).Dn * galpha ^ expo
-                    ElseIf (mSettings.PES.Mutationsop = PES_MUTATIONSOP.Schwefel) Then
-                        tau = mSettings.PES.SetMutation.DnC / Math.Sqrt(2 * Math.Sqrt(Me.mProblem.NumOptParams))
-                        'Normalverteilte Zufallszahl (SD = 1, mean = 0)
-                        Z = Me.NormalDistributationRND(1.0, 0.0)
-                        'Neue Schrittweite
-                        DnTemp(v) = AktPara(v).Dn * Math.Exp(taufix * ZFix + tau * Z)
-                        'Mindestschrittweite muss eingehalten werden
-                        If DnTemp(v) < mSettings.PES.SetMutation.DnEpsilon Then DnTemp(v) = mSettings.PES.SetMutation.DnEpsilon
-                    End If
-                End If
+                        'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
+                        'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Me.mProblem.NumParams) * System.Math.Sin(6.2832 * Rnd())
+                        'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
+                        Z = Me.NormalDistributationRND(1 / Math.Sqrt(Me.mProblem.NumOptParams), 0.0)
 
-                'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
+                        'Mutation wird durchgeführt
+                        '**************************
+                        XnTemp(v) = AktPara(v).Xn + DnTemp(v) * Z
+                        'Restriktion für die mutierten Werte
+                    Loop While (XnTemp(v) < 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
+                Next v
 
-                'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Me.mProblem.NumParams) * System.Math.Sin(6.2832 * Rnd())
-                If (mSettings.PES.Mutationsop = PES_MUTATIONSOP.Rechenberg) Then
-                    'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
-                    Z = Me.NormalDistributationRND(1 / Math.Sqrt(Me.mProblem.NumOptParams), 0.0)
-                ElseIf (mSettings.PES.Mutationsop = PES_MUTATIONSOP.Schwefel) Then
-                    'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
+            Case PES_MUTATIONSOP.Schwefel
+                '*******************
+                'SCHWEFEL Mutation *
+                '*******************
+                Dim tau As Double
+                Dim taufix As Double
+                Dim ZFix As Double
+                'Vorbereitung falls kein Dn Vektor
+                If Not mSettings.PES.SetMutation.IsDnVektor Then
+                    tau = mSettings.PES.SetMutation.DnC / Math.Sqrt(Me.mProblem.NumOptParams)
+                    'Normalverteilte Zufallszahl (SD = 1, mean = 0)
                     Z = Me.NormalDistributationRND(1.0, 0.0)
+                    'Neue Schrittweite
+                    DnTemp(0) = AktPara(0).Dn * Math.Exp(tau * Z)
+                    'Mindestschrittweite muss eingehalten werden
+                    If DnTemp(0) < mSettings.PES.SetMutation.DnEpsilon Then DnTemp(0) = mSettings.PES.SetMutation.DnEpsilon
+
+                ElseIf mSettings.PES.SetMutation.IsDnVektor Then
+                    'mit Vektor
+                    taufix = mSettings.PES.SetMutation.DnC / Math.Sqrt(2 * Me.mProblem.NumOptParams)
+                    ZFix = Me.NormalDistributationRND(1.0, 0.0)
                 End If
-                'Mutation wird durchgeführt
-                XnTemp(v) = AktPara(v).Xn + DnTemp(v) * Z
 
-                'Restriktion für die mutierten Werte
-            Loop While (XnTemp(v) < 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
+                'Über alle Parameter
+                '*******************
+                For v = 0 To Me.mProblem.NumOptParams - 1
+                    i = 0
+                    Do
+                        i += 1
+                        'Abbruchkriterium für abhängige Parameter
+                        '----------------------------------------
+                        If (i >= 1000) Then
+                            'Es konnte kein gültiger Parametersatz generiert werden! Vermutlich ist die aktuelle Schrittweite nicht groß genug.
+                            'Elterwert des aktuellen Parameters auf aktuellen Wert des Parameters setzen, von dem der aktuelle Parameter abhängig ist
+                            i = 0
+                            AktPara(v).Xn = XnTemp(v - 1)
+                        End If
 
-        Next v
+                        'Schrittweitenvektor oder nicht
+                        '------------------------------
+                        If mSettings.PES.SetMutation.IsDnVektor Then
+                            tau = mSettings.PES.SetMutation.DnC / Math.Sqrt(2 * Math.Sqrt(Me.mProblem.NumOptParams))
+                            'Normalverteilte Zufallszahl (SD = 1, mean = 0)
+                            Z = Me.NormalDistributationRND(1.0, 0.0)
+                            'Neue Schrittweite
+                            DnTemp(v) = AktPara(v).Dn * Math.Exp(taufix * ZFix + tau * Z)
+                            'Mindestschrittweite muss eingehalten werden
+                            If DnTemp(v) < mSettings.PES.SetMutation.DnEpsilon Then DnTemp(v) = mSettings.PES.SetMutation.DnEpsilon
+                        Else
+                            DnTemp(v) = DnTemp(0)
+                        End If
+
+                        'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
+                        'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Me.mProblem.NumParams) * System.Math.Sin(6.2832 * Rnd())
+                        'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
+                        Z = Me.NormalDistributationRND(1.0, 0.0)
+
+                        'Mutation wird durchgeführt
+                        '**************************
+                        XnTemp(v) = AktPara(v).Xn + DnTemp(v) * Z
+                        'Restriktion für die mutierten Werte
+                    Loop While (XnTemp(v) < 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
+                Next v
+
+                'Case PES_MUTATIONSOP.Asymmetrisch
+                '    '************************
+                '    'Asymmetrische Mutation *
+                '    '************************
+                '    Dim Asym_z
+                '    Dim Asym_z() As
+                '    Dim Asym_t As Double = 1 / Math.Sqrt(2 * Math.sqrt(n))
+                '    Dim Asym_ts As Double = 1 / Math.Sqrt(2 * n)
+
+                '    DnTemp(v) = AktPara(v).Dn * Asym_z + zi
+
+
+        End Select
+
 
         'Mutierte Werte übernehmen
         '-------------------------
