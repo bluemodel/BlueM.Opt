@@ -323,7 +323,7 @@ Public Class CES
                     'Dem Child wird der Schrittweitenvektor zugewiesen und gegebenenfalls der Parameter zufällig gewählt
                     '***************************************************************************************************
                     For m = 0 To Children(i).Loc(j).PES_OptPara.GetUpperBound(0)
-                        Children(i).Loc(j).PES_OptPara(m).Dn = mSettings.PES.Schrittweite.DnStart
+                        Children(i).Loc(j).PES_OptPara(m).Dn = mSettings.PES.Mutation.DnStart
                         If mSettings.PES.Startparameter = EVO_STARTPARAMETER.Zufall Then
                             Randomize()
                             Children(i).Loc(j).PES_OptPara(m).Xn = Rnd()

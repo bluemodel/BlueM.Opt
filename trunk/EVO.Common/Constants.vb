@@ -85,7 +85,7 @@ Public Module Constants
     End Enum
 
     'Option zur Erzeugung der Eltern
-    Public Enum EVO_ELTERN As Integer
+    Public Enum PES_REPRODOP As Integer
         Selektion = 1                           'zufällige Selektion as Bestwertspeicher
         XX_Diskret = 2                          'Rekombination nach x/x-Schema, diskretes vertauschen der Gene
         XX_Mitteln = 3                          'Rekombination nach x/x-Schema, mittelwertbildung der Gene über y-Eltern
@@ -97,7 +97,7 @@ Public Module Constants
     End Enum
 
     'Option für die Mutation
-    Public Enum EVO_DnMutation As Integer
+    Public Enum PES_MUTATION As Integer
         Rechenberg = 1
         Schwefel = 2
     End Enum

@@ -884,7 +884,7 @@ Partial Class EVO_Einstellungen
         '
         'BindingSource_PES_Schrittweite
         '
-        Me.BindingSource_PES_Schrittweite.DataSource = GetType(IHWB.EVO.Common.Settings_PES.Settings_Schrittweite)
+        Me.BindingSource_PES_Schrittweite.DataSource = GetType(IHWB.EVO.Common.Settings_PES.Settings_Mutation)
         '
         'PES_Numeric_DnStart
         '
