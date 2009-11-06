@@ -133,18 +133,20 @@ Public Class Functions
 
         'Prüfen, ob die Population jetzt mit Mitgliedern aus der Sekundären Population aufgefüllt werden soll
         '----------------------------------------------------------------------------------------------------
-        If (iAktGen Mod NInteract) = 0 And isInteract Then
-            NFrontMember_aktuell = Pareto_Count_Front_Members(1, SekundärQb)
-            If NFrontMember_aktuell > NEltern Then
-                'Crowding Distance
-                Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
-                'Anzahl Eltern wird aus SekundärQb in den Bestwertspeicher kopiert
-                For i = 0 To NEltern - 1
-                    Best(i) = SekundärQb(i).Clone()
-                Next i
+
+        If NInteract > 0 And isInteract Then
+            If (iAktGen Mod NInteract) = 0 Then
+                NFrontMember_aktuell = Pareto_Count_Front_Members(1, SekundärQb)
+                If NFrontMember_aktuell > NEltern Then
+                    'Crowding Distance
+                    Call Pareto_Crowding_Distance_Sort(SekundärQb, 0, SekundärQb.GetUpperBound(0))
+                    'Anzahl Eltern wird aus SekundärQb in den Bestwertspeicher kopiert
+                    For i = 0 To NEltern - 1
+                        Best(i) = SekundärQb(i).Clone()
+                    Next i
+                End If
             End If
         End If
-
     End Sub
 
     'NON_DOMINATED_SORTING - Entscheidet welche Werte dominiert werden und welche nicht
