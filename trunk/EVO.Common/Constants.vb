@@ -100,6 +100,7 @@ Public Module Constants
     Public Enum PES_MUTATIONSOP As Integer
         Rechenberg = 1
         Schwefel = 2
+        'Asymmetrisch = 3
     End Enum
 
 

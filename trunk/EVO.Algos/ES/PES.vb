@@ -1,4 +1,5 @@
 Imports IHWB.EVO.Common
+Imports MathNet.Numerics
 
 Public Class PES
 
@@ -49,7 +50,6 @@ Public Class PES
     'Muss Public sein, da das Form hiermit die Schleifen kontrolliert
     Public PES_iAkt As Struct_iAkt
 
-    '---Anzahlen-----------
     '---PopElternwerte-----
     Private Xp(,,) As Double                'PopulationsElternwert der Variable
     Private Dp(,,) As Double                'PopulationsElternschrittweite
@@ -929,15 +929,16 @@ Public Class PES
     Public Sub EsMutation()
 
         Dim v, i As Integer
-        Dim Z As Double
 
         'Allgemeine Variablen
-        Dim DnTemp() As Double             'Temporäre Schrittweiten für Nachkomme
         Dim XnTemp() As Double             'Temporäre Parameterwerte für Nachkomme
+        Dim DnTemp() As Double             'Temporäre Schrittweiten für Nachkomme
+        Dim CTemp() As Double              'Temporäres Schiefemaß für Nachkomme
         Dim expo As Integer                'Exponent für Schrittweite (+/-1)
 
-        ReDim DnTemp(Me.mProblem.NumOptParams - 1)
         ReDim XnTemp(Me.mProblem.NumOptParams - 1)
+        ReDim DnTemp(Me.mProblem.NumOptParams - 1)
+        ReDim CTemp(Me.mProblem.NumOptParams - 1)
 
         'Unterscheidung zwischen den Mutationsoperatoren
         '***********************************************
@@ -946,6 +947,7 @@ Public Class PES
                 '*********************
                 'Rechenberg Mutation *
                 '*********************
+                Dim Z As Double
                 'Vorbereitung falls kein Vektor
                 If Not mSettings.PES.SetMutation.IsDnVektor Then
                     '+/-1
@@ -995,6 +997,7 @@ Public Class PES
                 '*******************
                 'SCHWEFEL Mutation *
                 '*******************
+                Dim Z As Double
                 Dim tau As Double
                 Dim taufix As Double
                 Dim ZFix As Double
@@ -1059,13 +1062,53 @@ Public Class PES
                 '    '************************
                 '    'Asymmetrische Mutation *
                 '    '************************
-                '    Dim Asym_z
-                '    Dim Asym_z() As
-                '    Dim Asym_t As Double = 1 / Math.Sqrt(2 * Math.sqrt(n))
-                '    Dim Asym_ts As Double = 1 / Math.Sqrt(2 * n)
 
-                '    DnTemp(v) = AktPara(v).Dn * Asym_z + zi
+                '    '1. Schrittweite
+                '    '---------------
+                '    Dim Tau As Double
+                '    Dim TauStrich As Double
 
+                '    Tau = 1 / Math.Sqrt(2 * Math.Sqrt(Me.mProblem.NumOptParams))
+                '    TauStrich = 1 / Math.Sqrt(2 * Me.mProblem.NumOptParams)
+
+                '    Dim z As Double
+                '    Dim zi(Me.mProblem.NumOptParams - 1) As Double
+
+                '    Dim LNV As New MathNet.Numerics.Distributions.LognormalDistribution
+                '    LNV.SetDistributionParameters(0, TauStrich)
+                '    'wurden hier die richtigen Werte eingesetzt?
+                '    z = LNV.NextDouble
+                '    'gilt z pro Generation oder pro Nachfahre?
+
+                '    LNV.SetDistributionParameters(0, Tau)
+
+                '    For v = 0 To Me.mProblem.NumOptParams - 1
+                '        zi(v) = LNV.NextDouble
+                '        DnTemp(v) = AktPara(v).Dn * z * zi(v)
+                '    Next
+
+                '    '2. Schiefemaß
+                '    '--------------
+                '    Dim NV As New MathNet.Numerics.Distributions.NormalDistribution
+                '    NV.SetDistributionParameters(0, TauStrich)
+                '    'wurden hier die richtigen Werte eingesetzt?
+                '    z = NV.NextDouble
+                '    'gilt z pro Generation oder pro Nachfahre?
+
+                '    NV.SetDistributionParameters(0, Tau)
+
+                '    For v = 0 To Me.mProblem.NumOptParams - 1
+                '        zi(v) = NV.NextDouble
+                '        CTemp(v) = AktPara(v).C + z + zi(v)
+                '    Next
+
+                '    Dim Random As New MathNet.Numerics.RandomSources.AdditiveLaggedFibonacciRandomSource
+                '    z = Random.NextDouble
+
+                '    '3. Parameter Mutation
+                '    '---------------------
+                '    'Der asymetrische Zufallszahlengenerator aus
+                '    '"Asymmetrische Evolutionsstrategien" Hildebrand 2001 ist nicht verfügbar.
 
         End Select
 
@@ -1158,7 +1201,8 @@ Public Class PES
 
     End Sub
 
-
+    'normalverteilte Zufallszahl für Schwefelmutation
+    '************************************************
     Public Function NormalDistributationRND(ByVal sd As Double, ByVal mean As Double) As Double
         Dim fac As Double
         Dim r As Double
