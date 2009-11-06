@@ -148,24 +148,39 @@ Partial Public Class Monitor
     ''' Setzt das Monitordiagramm zurück
     ''' </summary>
     Private Sub InitMonitorDiagramm()
-        Me.Diag.Reset()
-        Me.Diag.Aspect.View3D = False
-        Me.Diag.Aspect.ZOffset = 0
-        Me.Diag.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
-        Me.Diag.Axes.Bottom.MaximumOffset = 3
-        Me.Diag.Axes.Bottom.MinimumOffset = 3
-        Me.Diag.Axes.Left.MaximumOffset = 3
-        Me.Diag.Axes.Left.MinimumOffset = 3
-        Me.Diag.Axes.Right.Visible = False
-        Me.Diag.Axes.Top.Visible = False
-        Me.Diag.BackColor = System.Drawing.Color.Transparent
-        Me.Diag.Cursor = System.Windows.Forms.Cursors.Default
-        Me.Diag.Header.Visible = False
-        Me.Diag.Legend.Alignment = Steema.TeeChart.LegendAlignments.Bottom
-        Me.Diag.Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
-        Me.Diag.Location = New System.Drawing.Point(0, 0)
-        Me.Diag.Panel.Brush.Color = System.Drawing.Color.Transparent
-        Me.Diag.Panning.Allow = Steema.TeeChart.ScrollModes.None
+
+        With Me.Diag()
+            .Reset()
+            .Aspect.View3D = False
+            .Aspect.ZOffset = 0
+            .Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+            .Axes.Bottom.MaximumOffset = 3
+            .Axes.Bottom.MinimumOffset = 3
+            .Axes.Left.MaximumOffset = 3
+            .Axes.Left.MinimumOffset = 3
+            .Axes.Right.Visible = False
+            .Axes.Top.Visible = False
+            .Chart.Axes.Left.Ticks.Color = Drawing.Color.Black
+            .Chart.Axes.Right.Ticks.Color = Drawing.Color.Black
+            .Chart.Axes.Left.Ticks.Width = 1
+            .Chart.Axes.Right.Ticks.Width = 1
+            .BackColor = System.Drawing.Color.Transparent
+            .Cursor = System.Windows.Forms.Cursors.Default
+            .Header.Visible = False
+            '.Legend.Visible = False
+            .Legend.Alignment = Steema.TeeChart.LegendAlignments.Bottom
+            .Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
+            .Location = New System.Drawing.Point(0, 0)
+            .Panel.Brush.Color = System.Drawing.Color.Transparent
+            .Panel.Color = Drawing.Color.White
+            .Panel.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
+            .Panel.Bevel.Inner = Steema.TeeChart.Drawing.BevelStyles.None
+            'Farbverlauf am Rand das Chart
+            .Panel.Gradient.Visible = False
+            .Walls.Visible = False
+            .Panning.Allow = Steema.TeeChart.ScrollModes.None
+        End With
+
     End Sub
 
     ' This method demonstrates a pattern for making thread-safe

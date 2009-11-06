@@ -2204,47 +2204,6 @@ Partial Public Class Form1
 
     End Sub
 
-    Private Sub DiagrammFormatToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Diagramm_Printstyle.Click
-
-        'Tool für das nachträgliche Anpassen des Diagramms
-
-        With Me.Hauptdiagramm1
-
-            '.Clear()
-            '.Header.Text = "Traveling Salesman Problem"
-            .Aspect.View3D = False
-            .Legend.Visible = False
-
-            'Alles etwas schlichter
-            'Rahmenschattierung um das TeeChart Form
-            .Panel.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
-            .Panel.Bevel.Inner = Steema.TeeChart.Drawing.BevelStyles.None
-            'Farbverlauf am Rand das Chart
-            .Panel.Gradient.Visible = False
-            .Walls.Visible = False
-
-            'Printversion
-            .Header.Visible = False
-            .Panel.Color = Drawing.Color.White
-            .Chart.Axes.Left.Ticks.Color = Drawing.Color.Black
-            .Chart.Axes.Right.Ticks.Color = Drawing.Color.Black
-            .Chart.Axes.Left.Ticks.Width = 1
-            .Chart.Axes.Right.Ticks.Width = 1
-
-            ''Formatierung der Axen
-            ''.Chart.Axes.Bottom.Title.Caption = BlueM1.OptZieleListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            '.Chart.Axes.Bottom.Automatic = False
-            '.Chart.Axes.Bottom.Minimum = 0
-            '.Chart.Axes.Bottom.Maximum = 100
-            ''.Chart.Axes.Left.Title.Caption = BlueM1.OptParameterListe(0).Bezeichnung 'HACK: Beschriftung der Axen
-            '.Chart.Axes.Left.Automatic = False
-            '.Chart.Axes.Left.Minimum = 0
-            '.Chart.Axes.Left.Maximum = 130
-
-        End With
-
-    End Sub
-
 #End Region 'Methoden
 
 End Class
