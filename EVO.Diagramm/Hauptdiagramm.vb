@@ -37,11 +37,26 @@
 
         With Me
 
+            'Chartformatierung
+            '-----------------
             .Clear()
             .is3D = False
             .Header.Text = Titel
+            '.Header.Visible = False
             .Aspect.View3D = False
             .Legend.Visible = False
+            'Rahmenschattierung um das TeeChart Form---
+            .Panel.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
+            .Panel.Bevel.Inner = Steema.TeeChart.Drawing.BevelStyles.None
+            'Farbverlauf am Rand das Chart---
+            .Panel.Gradient.Visible = False
+            .Walls.Visible = False
+            '*Das Panel---
+            .Panel.Color = Drawing.Color.White
+            .Chart.Axes.Left.Ticks.Color = Drawing.Color.Black
+            .Chart.Axes.Right.Ticks.Color = Drawing.Color.Black
+            .Chart.Axes.Left.Ticks.Width = 1
+            .Chart.Axes.Right.Ticks.Width = 1
 
             'Formatierung der Axen
             '---------------------
