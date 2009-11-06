@@ -41,6 +41,8 @@ Public Class OptParameter
 
     'Schrittweite
     Public Dn As Double
+    'Schiefemaﬂ
+    Public C As Double
 
     'Beziehung
     Public Beziehung As Common.Constants.Beziehung
