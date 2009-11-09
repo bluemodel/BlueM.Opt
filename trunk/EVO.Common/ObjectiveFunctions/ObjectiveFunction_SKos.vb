@@ -437,8 +437,8 @@ Public Class ObjectiveFunction_SKos
                 For j = 0 To TAL_Array.GetUpperBound(0)
                     If Bauwerksliste(i, 0) = TAL_Array(j, 0) Then
                         Volumen = TAL_Array(j, 1)
-                        'Kalkulation: (Kosten €) = 9.0882 * (Volumen m³) + 396586
-                        Bauwerksliste(i, 1) = 9.1 * Volumen + 400000
+                        '=1925*POTENZ(H28;0,564)
+                        Bauwerksliste(i, 1) = 1925 * System.Math.Pow(Volumen, 0.564)
                         gefunden = True
                     End If
                 Next
