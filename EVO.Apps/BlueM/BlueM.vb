@@ -542,27 +542,29 @@ Public Class BlueM
         Dim x As Integer = 0
         Dim y As Integer = 0
 
-        Dim FoundA(VerzweigungsDatei.GetUpperBound(0)) As Boolean
+        'Dim FoundA(VerzweigungsDatei.GetUpperBound(0)) As Boolean
 
-        'Prüft ob jede Verzweigung einmal in der LocationList vorkommt
-        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
-            For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
-                For x = 0 To Me.mProblem.List_Locations(j).List_Massnahmen.GetUpperBound(0)
-                    For y = 0 To Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung.GetUpperBound(0)
-                        If VerzweigungsDatei(i, 0) = Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
-                            FoundA(i) = True
-                        End If
-                    Next
-                Next
-            Next
-        Next
+        ''Prüngung funzt aber deaktiviert, da sonst bestimmte Kombinationen in der CES
+        ''Datei nicht deaktiviert werden können --------------------------------------
+        ''Prüft ob jede Verzweigung einmal in der LocationList vorkommt
+        'For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+        '    For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
+        '        For x = 0 To Me.mProblem.List_Locations(j).List_Massnahmen.GetUpperBound(0)
+        '            For y = 0 To Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung.GetUpperBound(0)
+        '                If VerzweigungsDatei(i, 0) = Me.mProblem.List_Locations(j).List_Massnahmen(x).Schaltung(y, 0) And VerzweigungsDatei(i, 1) = "2" Then
+        '                    FoundA(i) = True
+        '                End If
+        '            Next
+        '        Next
+        '    Next
+        'Next
 
-        'Prüft ob die nicht vorkommenden Verzweigungen Verzweigungen anderer Art sind
-        For i = 0 To VerzweigungsDatei.GetUpperBound(0)
-            If Not VerzweigungsDatei(i, 1) = "2" And FoundA(i) = False Then
-                FoundA(i) = True
-            End If
-        Next
+        ''Prüft ob die nicht vorkommenden Verzweigungen Verzweigungen anderer Art sind
+        'For i = 0 To VerzweigungsDatei.GetUpperBound(0)
+        '    If Not VerzweigungsDatei(i, 1) = "2" And FoundA(i) = False Then
+        '        FoundA(i) = True
+        '    End If
+        'Next
 
         Dim FoundB As Boolean = True
         Dim TmpBool As Boolean = False
@@ -591,11 +593,11 @@ Public Class BlueM
         If FoundB = False Then
             Throw New Exception(".VER und .CES Dateien passen nicht zusammen! Eine Verzweigung in der VER Datei kommt in der CES Datei nicht vor und ist nicht nicht vom Typ Prozentsatz (Kennung 2)")
         Else
-            For i = 0 To FoundA.GetUpperBound(0)
-                If FoundA(i) = False Then
-                    Throw New Exception(".VER und .CES Dateien passen nicht zusammen! Eine in der CES Datei angegebene Verzeigung kommt in der VER Datei nicht vor.")
-                End If
-            Next
+            'For i = 0 To FoundA.GetUpperBound(0)
+            '    If FoundA(i) = False Then
+            '        Throw New Exception(".VER und .CES Dateien passen nicht zusammen! Eine in der CES Datei angegebene Verzeigung kommt in der VER Datei nicht vor.")
+            '    End If
+            'Next
         End If
 
     End Sub

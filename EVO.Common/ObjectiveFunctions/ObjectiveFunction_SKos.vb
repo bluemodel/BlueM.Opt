@@ -96,7 +96,7 @@ Public Class ObjectiveFunction_SKos
     '***************************************
     Private Function Calculate_Costs() As Double
 
-        Dim CostsFromCES As Boolean = True
+        Dim CostsFromCES As Boolean = False
         '* defniert ob die Kosten aus der CES Datei berechnet werden
 
         Dim costs As Double = 0
