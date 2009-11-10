@@ -658,11 +658,18 @@ Public MustInherit Class Sim
         'Simulationsergebnis einlesen
         Call SIM_Ergebnis_Lesen()
 
-        'HACK: SKos: Die Elemente werden an die Kostenkalkulation übergeben
+        'HACK: SKos und Ecology: Die Elemente werden an die Kalkulkulation übergeben
         ' und das aktuelle WorkDir wird gesetzt
         For Each obj As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-            If (obj.GetObjType = Common.ObjectiveFunction.ObjectiveType.SKos) Then
+            If obj.GetObjType = Common.ObjectiveFunction.ObjectiveType.SKos Then
                 With CType(obj, Common.ObjectiveFunction_SKos)
+                    .Akt_Elemente = CType(ind, Common.Individuum_CES).Get_All_Loc_Elem
+                    .Akt_Path = CType(ind, Common.Individuum_CES).Path
+                    .WorkDir_Current = Me.WorkDir_Current
+                End With
+                Exit For
+            ElseIf obj.GetObjType = Common.ObjectiveFunction.ObjectiveType.Ecology Then
+                With CType(obj, Common.ObjectiveFunction_Ecology)
                     .Akt_Elemente = CType(ind, Common.Individuum_CES).Get_All_Loc_Elem
                     .Akt_Path = CType(ind, Common.Individuum_CES).Path
                     .WorkDir_Current = Me.WorkDir_Current

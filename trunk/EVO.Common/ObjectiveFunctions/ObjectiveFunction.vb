@@ -31,6 +31,7 @@ Public MustInherit Class ObjectiveFunction
         IHA = 4
         Aggregate = 5
         SKos = 6
+        Ecology = 7
     End Enum
 
     ''' <summary>
