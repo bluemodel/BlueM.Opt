@@ -500,6 +500,7 @@ Public Class Problem
         Const AnzSpalten_ObjFIHA As Integer = 11                    'Anzahl Spalten IHA-Analyse in der ZIE-Datei
         Const AnzSpalten_ObjFAggregate As Integer = 4               'Anzahl Spalten Aggregierte Ziele in der ZIE-Datei
         Const AnzSpalten_ObjFSKos As Integer = 5                    'Anzahl Spalten SKos in der ZIE-Datei
+        Const AnzSpalten_ObjFEcology As Integer = 5                 'Anzahl Spalten SKos in der ZIE-Datei
 
         Dim i As Integer
         Dim Zeile As String
@@ -532,6 +533,8 @@ Public Class Problem
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.IHA
                 ElseIf Zeile.StartsWith("*SKos") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.SKos
+                ElseIf Zeile.StartsWith("*Ecology") Then
+                    currentObjectiveType = ObjectiveFunction.ObjectiveType.Ecology
                 ElseIf Zeile.StartsWith("*Aggregate") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.Aggregate
                 End If
@@ -758,6 +761,48 @@ Public Class Problem
                         Me.List_ObjectiveFunctions(i) = Objective_SKos
                         i += 1
 
+                    Case ObjectiveFunction.ObjectiveType.Ecology
+
+                        'Ecology
+                        '=================
+
+                        Dim Objective_Ecology As New Common.ObjectiveFunction_Ecology()
+
+                        'Kontrolle
+                        If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFEcology + 1) Then
+                            Throw New Exception("Block 'Ecology' in der ZIE-Datei hat die falsche Anzahl Spalten!")
+                        End If
+
+                        'Spalten einlesen
+                        With Objective_Ecology
+                            If (WerteArray(1).Trim().ToUpper() = "P") Then
+                                .isPrimObjective = True
+                            Else
+                                .isPrimObjective = False
+                            End If
+                            .Bezeichnung = WerteArray(2).Trim()
+                            .Gruppe = WerteArray(3).Trim()
+                            If (WerteArray(4).Trim() = "+") Then
+                                .Richtung = Common.EVO_RICHTUNG.Maximierung
+                            Else
+                                .Richtung = Common.EVO_RICHTUNG.Minimierung
+                            End If
+                            If (WerteArray(5).Trim() = "+") Then
+                                .OpFact = 1
+                            ElseIf (WerteArray(5).Trim() = "-") Then
+                                .OpFact = -1
+                            ElseIf Not (WerteArray(5).Trim() = "") Then
+                                .OpFact = Convert.ToDouble(WerteArray(5).Trim())
+                            End If
+                        End With
+
+                        'Ecology initialisieren
+                        Objective_Ecology.initialize(Me)
+
+                        'Neue ObjectiveFunction abspeichern
+                        ReDim Preserve Me.List_ObjectiveFunctions(i)
+                        Me.List_ObjectiveFunctions(i) = Objective_Ecology
+                        i += 1
 
                     Case ObjectiveFunction.ObjectiveType.Aggregate
 

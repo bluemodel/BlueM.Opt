@@ -250,27 +250,27 @@ Public Class ObjectiveFunction_SKos
                     count = 0
                     ReDim Preserve TRS_Array(TRS_Array.GetLength(0))
                     TRS_Array(j).Name = Array1(1).Trim()
-                    TRS_Array(j).Laenge = Array1(3).Trim()
-                    TRS_Array(j).A0_Hoehe_Sohle = Array2(1)
-                    TRS_Array(j).A1_Breite_Sohle_L = Array2(2)
-                    TRS_Array(j).A2_Breite_Sohle_R = Array2(4)
+                    TRS_Array(j).Laenge = Convert.ToDouble(Array1(3).Trim(), Common.Provider.FortranProvider)
+                    TRS_Array(j).A0_Hoehe_Sohle = Convert.ToDouble(Array2(1).Trim(), Common.Provider.FortranProvider)
+                    TRS_Array(j).A1_Breite_Sohle_L = Convert.ToDouble(Array2(2).Trim(), Common.Provider.FortranProvider)
+                    TRS_Array(j).A2_Breite_Sohle_R = Convert.ToDouble(Array2(4).Trim(), Common.Provider.FortranProvider)
 
                 ElseIf Array1(1).Trim() = "" Then
                     count += 1
                 End If
 
                 If count = 1 Then
-                    TRS_Array(j).B0_Hoehe_Gerinne = Array2(1)
-                    TRS_Array(j).B1_Breite_Ufer_L = Array2(2)
-                    TRS_Array(j).B2_Breite_Ufer_R = Array2(4)
+                    TRS_Array(j).B0_Hoehe_Gerinne = Convert.ToDouble(Array2(1).Trim(), Common.Provider.FortranProvider)
+                    TRS_Array(j).B1_Breite_Ufer_L = Convert.ToDouble(Array2(2).Trim(), Common.Provider.FortranProvider)
+                    TRS_Array(j).B2_Breite_Ufer_R = Convert.ToDouble(Array2(4).Trim(), Common.Provider.FortranProvider)
                 ElseIf count = 2 Then
-                    TRS_Array(j).C0_Hoehe_FPlain = Array2(1)
-                    TRS_Array(j).C1_Breite_Vorl_L = Array2(2)
-                    TRS_Array(j).C2_Breite_Vorl_R = Array2(4)
+                    TRS_Array(j).C0_Hoehe_FPlain = Convert.ToDouble(Array2(1).Trim(), Common.Provider.FortranProvider)
+                    TRS_Array(j).C1_Breite_Vorl_L = Convert.ToDouble(Array2(2).Trim(), Common.Provider.FortranProvider)
+                    TRS_Array(j).C2_Breite_Vorl_R = Convert.ToDouble(Array2(4).Trim(), Common.Provider.FortranProvider)
                 ElseIf count = 3 Then
-                    TRS_Array(j).D0_Hoehe_Rand = Array2(1)
-                    TRS_Array(j).D1_Breite_Rand_L = Array2(2)
-                    TRS_Array(j).D2_Breite_Rand_R = Array2(4)
+                    TRS_Array(j).D0_Hoehe_Rand = Convert.ToDouble(Array2(1).Trim(), Common.Provider.FortranProvider)
+                    TRS_Array(j).D1_Breite_Rand_L = Convert.ToDouble(Array2(2).Trim(), Common.Provider.FortranProvider)
+                    TRS_Array(j).D2_Breite_Rand_R = Convert.ToDouble(Array2(4).Trim(), Common.Provider.FortranProvider)
                     count = 0
                 End If
             End If
@@ -386,7 +386,7 @@ Public Class ObjectiveFunction_SKos
                 array = Zeile.Split("|")
                 'Werte zuweisen
                 TAl_Array(j, 0) = array(1).Trim()
-                TAl_Array(j, 1) = array(3).Trim()
+                TAl_Array(j, 1) = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
                 j += 1
                 gelesen = True
             End If
@@ -402,7 +402,7 @@ Public Class ObjectiveFunction_SKos
         'Array bereinigen
         'UPGRADE: Bereinigung könnte stark verkürzt werden, da das Array keine "leeren" Plätze enthält
         Dim x, y As Integer
-        Dim TmpArray(TAl_Array.GetUpperBound(0), 1) As String
+        Dim TmpArray(TAl_Array.GetUpperBound(0), 1)
         System.Array.Copy(TAl_Array, TmpArray, TAl_Array.Length)
         x = 0
 
