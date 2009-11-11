@@ -438,7 +438,7 @@ Public Class ObjectiveFunction_SKos
                     If Bauwerksliste(i, 0) = TAL_Array(j, 0) Then
                         Volumen = TAL_Array(j, 1)
                         '=1925*POTENZ(H28;0,564)
-                        Bauwerksliste(i, 1) = 1925 * System.Math.Pow(Volumen, 0.564)
+                        Bauwerksliste(i, 1) = 1925 * System.Math.Pow(Volumen * 1000, 0.564)
                         gefunden = True
                     End If
                 Next
