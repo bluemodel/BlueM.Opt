@@ -1107,7 +1107,7 @@ Public Class Problem
                     .Schaltung(2, 0) = array(7).Trim()
                     .Schaltung(2, 1) = array(8).Trim()
                     .KostenTyp = array(9).Trim()
-                    .Kosten = array(10).Trim()
+                    .Volumen = array(10).Trim()
                     .Bauwerke(0) = array(11).Trim()
                     .Bauwerke(1) = array(12).Trim()
                     .Bauwerke(2) = array(13).Trim()

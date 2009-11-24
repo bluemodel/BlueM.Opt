@@ -96,17 +96,17 @@ Public Class ObjectiveFunction_Ecology
     '***************************************
     Private Function Calculate_Costs() As Double
 
-        Dim CostsFromCES As Boolean = False
+        Dim CostsFromCES As Boolean = True
         '* defniert ob die Kosten aus der CES Datei berechnet werden
 
-        Dim costs As Double = 0
+        Dim volumen As Double = 0
         Dim i, j As Integer
 
 
         If CostsFromCES Then
 
             For i = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
-                costs += Me.mProblem.List_Locations(i).List_Massnahmen(Akt_Path(i)).Kosten
+                volumen += Me.mProblem.List_Locations(i).List_Massnahmen(Akt_Path(i)).Volumen
             Next
 
         Else
@@ -131,13 +131,13 @@ Public Class ObjectiveFunction_Ecology
             For i = 0 To Akt_Elemente.GetUpperBound(0)
                 For j = 0 To Elementliste.GetUpperBound(0)
                     If Elementliste(j, 0) = Akt_Elemente(i) Then
-                        costs = costs + Elementliste(j, 1)
+                        volumen = volumen + Elementliste(j, 1)
                     End If
                 Next
             Next
         End If
 
-        Return costs
+        Return volumen
     End Function
 
     'Funktion zum erstellen der Elementliste

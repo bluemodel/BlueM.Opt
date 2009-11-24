@@ -106,7 +106,7 @@ Public Class ObjectiveFunction_SKos
         If CostsFromCES Then
 
             For i = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
-                costs += Me.mProblem.List_Locations(i).List_Massnahmen(Akt_Path(i)).Kosten
+                costs += 1269 * System.Math.Pow(Me.mProblem.List_Locations(i).List_Massnahmen(Akt_Path(i)).Volumen * 1000, 0.605)
             Next
 
         Else
@@ -437,8 +437,8 @@ Public Class ObjectiveFunction_SKos
                 For j = 0 To TAL_Array.GetUpperBound(0)
                     If Bauwerksliste(i, 0) = TAL_Array(j, 0) Then
                         Volumen = TAL_Array(j, 1)
-                        '=1925*POTENZ(H28;0,564)
-                        Bauwerksliste(i, 1) = 1925 * System.Math.Pow(Volumen * 1000, 0.564)
+                        '=1269*POTENZ(H28;0,605)
+                        Bauwerksliste(i, 1) = 1269 * System.Math.Pow(Volumen * 1000, 0.605)
                         gefunden = True
                     End If
                 Next
