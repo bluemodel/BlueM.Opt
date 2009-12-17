@@ -81,6 +81,7 @@ Public Module Constants
     'Mutationsoperator
     Public Enum CES_MUTATION as Integer
         RND_Switch = 1
+        Gene_Insertion = 2
         'Dyn_Switch = 2
     End Enum
 

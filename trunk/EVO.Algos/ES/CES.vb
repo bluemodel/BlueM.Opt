@@ -13,9 +13,16 @@ Public Class CES
     '****                                                                       ****
     '**** Februar 2007                                                          ****
     '****                                                                       ****
-    '**** Letzte Änderung: März 2007                                            ****
+    '**** Letzte Änderung: Dezember 2009                                            ****
     '*******************************************************************************
     '*******************************************************************************
+
+    '******* Konvention *******
+    'Cities:      1 2 3 4 5 6 7
+    'Pathindex:   0 1 2 3 4 5 6
+    'CutPoint:  -1 0 1 2 3 4 5 6
+    'LB + UB(n-2)  x         x
+    '**************************
 
 #Region "Eigenschaften"
     '##################
@@ -447,7 +454,7 @@ Public Class CES
         Dim i As Integer
 
         For i = 0 To ChildPath_A.GetUpperBound(0)
-            If Bernoulli() = True Then
+            If BernoulliVer() = True Then
                 ChildPath_A(i) = ParPath_B(i)
             Else
                 ChildPath_A(i) = ParPath_A(i)
@@ -455,7 +462,7 @@ Public Class CES
         Next
 
         For i = 0 To ChildPath_B.GetUpperBound(0)
-            If Bernoulli() = True Then
+            If BernoulliVer() = True Then
                 ChildPath_B(i) = ParPath_A(i)
             Else
                 ChildPath_B(i) = ParPath_B(i)
@@ -660,9 +667,9 @@ Public Class CES
                     Case CES_MUTATION.RND_Switch
                         'Verändert zufällig ein gen des Paths
                         Call MutOp_RND_Switch(Children(i).Path)
-                        'Case CES_MUTATION.Dyn_Switch
-                        '    'Verändert zufällig ein gen des Paths mit dynamisch erhöhter Mutationsrate
-                        '    Call MutOp_Dyn_Switch(Children(i).Path, count)
+                    Case CES_MUTATION.Gene_Insertion
+                        'Selektiert einen Subpath und generiert diesen neu
+                        Call MutOp_Gene_Insertion(Children(i).Path)
                 End Select
                 count += 1
             Loop While is_nullvariante(Children(i).Path) = True And Not count >= 1000
@@ -692,6 +699,43 @@ Public Class CES
                 Tmp_b = CInt(Int((upperb_b - lowerb_b + 1) * Rnd() + lowerb_b))
                 Path(i) = Tmp_b
             End If
+        Next
+
+    End Sub
+
+    'Mutationsoperator "Gene_Insertion"
+    'Selektiert einen Subpath und setzt diesen neu
+    '********************************************
+    Private Sub MutOp_Gene_Insertion(ByVal Path() As Integer)
+
+        Dim l, i As Integer
+        Dim BegEnde(0) As Integer
+        Dim lowerb As Integer = 0
+        Dim upperb As Integer
+        Randomize()
+
+        Call Create_n_SubPath(BegEnde)
+        ReDim Preserve BegEnde(1)
+
+        l = CInt(Int(ModSett.n_Locations * mSettings.CES.Pr_MutRate / 100))
+
+        If BernoulliVer() Then
+            BegEnde(1) = BegEnde(0) + l
+            If BegEnde(1) > ModSett.n_Locations - 1 Then
+                BegEnde(1) = ModSett.n_Locations - 1
+            End If
+        Else
+            BegEnde(1) = BegEnde(0) - l
+            If BegEnde(1) < 0 Then
+                BegEnde(1) = 0
+            End If
+        End If
+
+        Array.Sort(BegEnde)
+
+        For i = BegEnde(0) To BegEnde(1)
+            upperb = ModSett.n_PathDimension(i) - 1
+            Path(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
         Next
 
     End Sub
@@ -1068,10 +1112,10 @@ Public Class CES
 
     'Hilfsfunktion generiert Bernoulli verteilte Zufallszahl
     '*******************************************************
-    Public Function Bernoulli() As Boolean
+    Public Function BernoulliVer() As Boolean
         Dim lowerb As Integer = 0
         Dim upperbo As Integer = 1
-        Bernoulli = CInt(Int(2 * Rnd()))
+        BernoulliVer = CInt(Int(2 * Rnd()))
     End Function
 
     'Hilfsfunktion: Gerade oder Ungerade Zahl
@@ -1101,16 +1145,25 @@ Public Class CES
 
         Array.Sort(CutPoint)
 
-        'ToDO: Doppler müssen aussortiert und neu generiert werden
+    End Sub
 
-        'For i = 0 To CutPoint.GetUpperBound(0) -1 
-        '    If CutPoint(i) = CutPoint(i + 1) Then
-        '        Array.Clear(CutPoint,i,1)
-        '    End If
-        'Next
-        'Array.Sort(CutPoint)
+    'Hilfsfunktion generiert eine Subpath mit Beginn und ende
+    'Mit Bernoulli Verteilung mal von rechts mal von links
+    '*****************************************************
+    Public Sub Create_n_SubPath(ByRef BegEnde() As Integer)
+
+        Dim i As Integer
+        Dim lowerb As Integer = 0
+        Dim upperb As Integer = ModSett.n_Locations - 1
+
+        For i = 0 To BegEnde.GetUpperBound(0)
+            BegEnde(i) = CInt(Int((upperb - lowerb + 1) * Rnd() + lowerb))
+        Next
+
+        Array.Sort(BegEnde)
 
     End Sub
+
 
     'NonDominated Sorting
     'XXXXXXXXXXXXXXXXXXXX
