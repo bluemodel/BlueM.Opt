@@ -2172,15 +2172,18 @@ Partial Public Class Form1
                     'MsgBox(ReprodItems & " and " & MutItems)
 
                     Call Me.INI_App(ANW_BLUEM)
-                    Call Me.INI_Datensatz("D:\xData\Erft_1984_06_Qmax_Skos\Erft.ALL")
+                    Call Me.INI_Datensatz("D:\xData\Erft_Final\CES_1O_1984\Erft.ALL")
                     Call Me.INI_Method(METH_CES)
+                    Call Me.loadSettings("D:\xData\Erft_Final\CES_1O_1984\Settings\Settings_batch.xml")
 
                     'BatchMode einschalten
                     Me.mSettings.General.BatchMode = True
 
                     'Settings ändern
-                    Me.mSettings.CES.OptReprodOp = ReprodItem
+                    'Me.mSettings.CES.OptReprodOp = ReprodItem
+                    Me.mSettings.CES.OptReprodOp = CES_REPRODOP.k_Point_Crossover
                     Me.mSettings.CES.OptMutOperator = MutItem
+                    Me.mSettings.CES.K_Value = 5
 
                     'Neue Settings ins Form schreiben (optional)
                     Call Me.EVO_Einstellungen1.refreshForm()
@@ -2194,7 +2197,7 @@ Partial Public Class Form1
                     Call Me.STARTEN()
 
                     'Qualität wird im Controller geprüft dann Stop Button
-                    Call Monitor1.savelog("D:\xData\Erft_1984_06_Qmax_Skos\Batch\" & Me.mSettings.CES.OptReprodOp.ToString & " ")
+                    Call Monitor1.savelog("D:\xData\Erft_Final\CES_1O_1984\Batch\" & Me.mSettings.CES.OptReprodOp.ToString & " ")
 
                     Call Button_New_Click(sender, e)
 
