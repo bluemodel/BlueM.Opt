@@ -237,7 +237,7 @@ Public Class ESController
                 'erfolgreich evaluierte Individuen wurden bereits über Event verarbeitet
 
                 'Abbruchkriterium für die Qualitätsprüfung (1372.82)
-                If mySettings.General.BatchMode And CES1.Children(i_Child).PrimObjectives(0) < 1372.82 Then
+                If mySettings.General.BatchMode And CES1.Children(i_Child).PrimObjectives(0) < 1370 Then
                     Me.myMonitor.LogAppend("Generation: " & Me.CES_i_gen & "   Child: " & i_Child)
                     Exit Sub
                 End If
