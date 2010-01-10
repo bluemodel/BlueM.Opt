@@ -2161,61 +2161,67 @@ Partial Public Class Form1
 
     Private Sub Start_CES_BatchMode(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
 
-        'Fuer die fortlaufende Log Datei mus:
+        'Fuer die fortlaufende Log Datei muss:
         'Me.Monitor1.Reset()
         'hier im Form abgeschaltet werden
+        '"Die Evaluierung der Generation" abschalten
         'im OptResult die Datenbank deaktivieren:
         'Call Me.db_insert(CType(Ind, Common.Individuum_CES))
+        'Grenze einsetzen im ESController: "Abbruchkriterium"
 
-        Dim n_cycles As Integer = 7
+        Dim n_cycles As Integer = 15
         'Dim ReprodItem As EVO.Common.Constants.CES_REPRODOP
-        Dim MutItem As EVO.Common.Constants.CES_MUTATION
+        'Dim MutItem As EVO.Common.Constants.CES_MUTATION
 
         Dim i As Integer
         'For Each ReprodItem In System.Enum.GetValues(GetType(EVO.Common.Constants.CES_REPRODOP))
-            For Each MutItem In System.Enum.GetValues(GetType(EVO.Common.Constants.CES_MUTATION))
-                For i = 1 To n_cycles
-                
-                Call Me.INI_App(ANW_BLUEM)
-                Call Me.INI_Datensatz("D:\xData\Erft_Final\CES_1O_1984\Erft.ALL")
-                Call Me.INI_Method(METH_CES)
-                Call Me.loadSettings("D:\xData\Erft_Final\CES_1O_1984\Settings\Settings_batch.xml")
+        'For Each MutItem In System.Enum.GetValues(GetType(EVO.Common.Constants.CES_MUTATION))
+        For i = 1 To n_cycles
 
-                'BatchMode einschalten
-                Me.mSettings.General.BatchMode = True
+            Call Me.INI_App(ANW_BLUEM)
+            Call Me.INI_Datensatz("D:\xData\Erft_Final\MI_1O_1984\Erft.ALL")
+            Call Me.INI_Method(METH_HYBRID)
+            Call Me.loadSettings("D:\xData\Erft_Final\MI_1O_1984\Settings\Settings_batch.xml")
 
-                'Settings ändern
-                'Me.mSettings.CES.OptReprodOp = ReprodItem
-                Me.mSettings.CES.OptMutOperator = MutItem
+            'BatchMode einschalten
+            Me.mSettings.General.BatchMode = True
 
-                '*** Hier wird immer nur einer gesetzt! *****
-                Me.mSettings.CES.OptReprodOp = CES_REPRODOP.Uniform_Crossover
-                Me.mSettings.CES.K_Value = 3
+            'Settings ändern *************************************************
+            'Me.mSettings.CES.OptReprodOp = ReprodItem
+            'Me.mSettings.CES.OptMutOperator = MutItem
 
-                If Me.mSettings.CES.OptMutOperator = CES_MUTATION.RND_Switch Then
-                    Me.mSettings.CES.Pr_MutRate = 7
-                Else
-                    Me.mSettings.CES.Pr_MutRate = 20
-                End If
+            '*** Hier wird immer nur einer gesetzt! *****
+            'Me.mSettings.CES.OptReprodOp = CES_REPRODOP.Uniform_Crossover
+            'Me.mSettings.CES.K_Value = 3
 
-                'Neue Settings ins Form schreiben (optional)
-                Call Me.EVO_Einstellungen1.refreshForm()
+            'If Me.mSettings.CES.OptMutOperator = CES_MUTATION.RND_Switch Then
+            '    Me.mSettings.CES.Pr_MutRate = 7
+            'Else
+            '    Me.mSettings.CES.Pr_MutRate = 20
+            'End If
 
-                Call Monitor1.SelectTabLog()
-                Call Monitor1.Show()
+            Me.mSettings.CES.Mem_Strategy = MEMORY_STRATEGY.E_Two_Loc_Down
 
-                Monitor1.LogAppend("ReprodOperator: " & Me.mSettings.CES.OptReprodOp.ToString)
-                Monitor1.LogAppend("MutOperator: " & Me.mSettings.CES.OptMutOperator.ToString)
+            '*****************************************************************
 
-                Call Me.STARTEN()
+            'Neue Settings ins Form schreiben (optional)
+            Call Me.EVO_Einstellungen1.refreshForm()
 
-                'Qualität wird im Controller geprüft dann Stop Button
-                Call Monitor1.savelog("D:\xData\Erft_Final\CES_1O_1984\Batch\Batch ")
+            Call Monitor1.SelectTabLog()
+            Call Monitor1.Show()
 
-                Call Button_New_Click(sender, e)
+            Monitor1.LogAppend(Me.mSettings.CES.Mem_Strategy.ToString)
+            'Monitor1.LogAppend("MutOperator: " & Me.mSettings.CES.OptMutOperator.ToString)
 
-                Next
-            Next
+            Call Me.STARTEN()
+
+            'Qualität wird im Controller geprüft dann Stop Button
+            Call Monitor1.savelog("D:\xData\Erft_Final\MI_1O_1984\Batch\Batch ")
+
+            Call Button_New_Click(sender, e)
+
+        Next
+        'Next
         'Next
 
     End Sub
