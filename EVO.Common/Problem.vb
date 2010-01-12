@@ -391,14 +391,14 @@ Public Class Problem
                 End If
 
                 'liegt ein Objekt vor?
-                If (i > 0 And array.GetUpperBound(0) > 7) Then
+                If (array.GetUpperBound(0) > 7) Then
                     If Not array(7).Trim() = "" Then
                         Me.List_OptParameter(i).Objekt = array(7).Trim()
                     End If
                 End If
 
                 'liegt ein Zeitpunkt vor?
-                If (i > 0 And array.GetUpperBound(0) > 8) Then
+                If (array.GetUpperBound(0) > 8) Then
                     If Not array(8).Trim() = "" Then
                         Me.List_OptParameter(i).Zeitpunkt = Convert.ToInt32(array(8).Trim())
                     End If
