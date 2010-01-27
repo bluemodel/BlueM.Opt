@@ -26,6 +26,7 @@ Public Class Settings
         Private mDrawOnlyCurrentGeneration As Boolean
         Private mBatchMode As Boolean
         Private mMPCMode As Boolean
+        Private mObjBoundary  As Double
         Public Property BatchMode() As Boolean
             Get
                 Return mBatchMode
@@ -41,6 +42,15 @@ Public Class Settings
             End Get
             Set(ByVal value As Boolean)
                 mMPCMode = value
+            End Set
+        End Property
+        
+        Public Property ObjBoundary() As Double
+            Get
+                Return mObjBoundary
+            End Get
+            Set(ByVal value As double)
+                mObjBoundary = value
             End Set
         End Property
         ''' <summary>
