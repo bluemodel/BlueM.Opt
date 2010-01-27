@@ -1003,6 +1003,10 @@ Partial Public Class Form1
         Me.mSettings.General.BatchMode = _batchmode
     End Sub
 
+    Public Sub setMPCMode(ByVal _mpcmode As Boolean)
+        Me.mSettings.General.MPCMode = _mpcmode
+    End Sub
+
 #End Region 'Initialisierung der Anwendungen
 
 #Region "Ablaufkontrolle"
@@ -1025,6 +1029,8 @@ Partial Public Class Form1
 
         'Stoppuhr
         Dim AllOptTime As New Stopwatch
+        Dim blnSimWeiter As Boolean
+
         AllOptTime.Start()
 
         'Optimierung starten
@@ -1079,10 +1085,19 @@ Partial Public Class Form1
                 Call Me.Sim1.prepareSimulation()
 
                 'Startwerte evaluieren
+                blnSimWeiter = True
                 If (Me.mProblem.Method <> METH_SENSIPLOT) Then
-                    Call Me.evaluateStartwerte()
+                    If Me.mSettings.General.MPCMode = True Then
+                        Call Me.evaluateStartwerte_MPC(blnSimWeiter)
+                        If blnSimWeiter = False Then
+                            Exit Select
+                        End If
+                    Else
+                        Call Me.evaluateStartwerte()
+                    End If
                 End If
 
+                
                 'Controller für Sim initialisieren und starten
                 Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
                 Call controller.InitApp(Me.Sim1)
@@ -2137,6 +2152,27 @@ Partial Public Class Form1
         If (isOK) Then
             Call Me.Hauptdiagramm1.ZeichneStartWert(startind)
             My.Application.DoEvents()
+        End If
+
+
+    End Sub
+
+    Private Sub evaluateStartwerte_MPC(ByRef blnWeiter As Boolean)
+
+        Dim isOK As Boolean
+        Dim startind As EVO.Common.Individuum
+
+        blnWeiter = True
+        startind = Me.mProblem.getIndividuumStart()
+
+        isOK = Sim1.Evaluate(startind) 'hier ohne multithreading
+        If (isOK) Then
+            Call Me.Hauptdiagramm1.ZeichneStartWert(startind)
+            My.Application.DoEvents()
+        End If
+
+        If startind.PrimObjectives(0) < 0.0001 Then
+            blnWeiter = False
         End If
 
     End Sub

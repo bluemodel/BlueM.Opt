@@ -25,6 +25,7 @@ Public Class Settings
         Private mMultithreadingAllowed As Boolean
         Private mDrawOnlyCurrentGeneration As Boolean
         Private mBatchMode As Boolean
+        Private mMPCMode As Boolean
         Public Property BatchMode() As Boolean
             Get
                 Return mBatchMode
@@ -34,6 +35,14 @@ Public Class Settings
             End Set
         End Property
 
+        Public Property MPCMode() As Boolean
+            Get
+                Return mMPCMode
+            End Get
+            Set(ByVal value As Boolean)
+                mMPCMode = value
+            End Set
+        End Property
         ''' <summary>
         ''' Multithreading erlauben/verbieten und gleichzeitig ein-/ausschalten
         ''' </summary>
