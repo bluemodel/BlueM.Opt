@@ -1006,6 +1006,10 @@ Partial Public Class Form1
     Public Sub setMPCMode(ByVal _mpcmode As Boolean)
         Me.mSettings.General.MPCMode = _mpcmode
     End Sub
+    
+    Public Sub setObjBoundary (ByVal _objboundary As Double)
+        Me.mSettings.General.ObjBoundary = _objboundary 
+    End Sub
 
 #End Region 'Initialisierung der Anwendungen
 
@@ -2171,7 +2175,7 @@ Partial Public Class Form1
             My.Application.DoEvents()
         End If
 
-        If startind.PrimObjectives(0) < 0.0001 Then
+        If startind.PrimObjectives(0) < me.mSettings.General.ObjBoundary Then
             blnWeiter = False
         End If
 
