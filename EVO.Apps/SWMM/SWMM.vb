@@ -409,6 +409,18 @@ Public Class SWMM
                               blnValueAdded = True
                               Exit Do
                            End If
+                           'Falls keine Nodes überstaut sind bei Node Flooding Summary muss geährleistet werden,
+                           'dass der Wert 0 übergeben wird. 
+                           Select Case objValue.Block
+                              Case "NodeFlooding"
+                                 If Zeile.TrimStart.StartsWith("No nodes were flooded.") Then
+                                    tmpValue = 0.0
+                                    Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                                    blnValueAdded = True
+                                    Exit Do
+                                 End If
+                              Case Else
+                           End Select
                         Loop Until StrRead.Peek() = -1
                      End If
                      If blnValueAdded Then Exit Do
