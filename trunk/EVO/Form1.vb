@@ -20,6 +20,9 @@ Imports System.Xml
 Imports System.Xml.Serialization
 Imports IHWB.EVO.Common.Constants
 
+
+
+
 ''' <summary>
 ''' Main Window
 ''' </summary>
@@ -111,6 +114,12 @@ Partial Public Class Form1
     Private WithEvents Monitor1 As EVO.Diagramm.Monitor
 
 #End Region 'Eigenschaften
+
+
+#Region "für MPC Schleifen"
+    Public bStartenWiederholen As Boolean
+#End Region
+
 
 #Region "Methoden"
 
@@ -1006,9 +1015,9 @@ Partial Public Class Form1
     Public Sub setMPCMode(ByVal _mpcmode As Boolean)
         Me.mSettings.General.MPCMode = _mpcmode
     End Sub
-    
-    Public Sub setObjBoundary (ByVal _objboundary As Double)
-        Me.mSettings.General.ObjBoundary = _objboundary 
+
+    Public Sub setObjBoundary(ByVal _objboundary As Double)
+        Me.mSettings.General.ObjBoundary = _objboundary
     End Sub
 
 #End Region 'Initialisierung der Anwendungen
@@ -1035,120 +1044,132 @@ Partial Public Class Form1
         Dim AllOptTime As New Stopwatch
         Dim blnSimWeiter As Boolean
 
-        AllOptTime.Start()
+        bStartenWiederholen = True
+        Do While (bStartenWiederholen)
+            bStartenWiederholen = False
 
-        'Optimierung starten
-        '-------------------
-        Me.isRun = True
+            AllOptTime.Start()
 
-        'Monitor anzeigen
-        If (Me.ToolStripButton_Monitor.Checked) Then
-            Call Me.Monitor1.Show()
-        End If
+            'Optimierung starten
+            '-------------------
+            Me.isRun = True
 
-        'Ergebnis-Buttons
-        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
-        If (Not IsNothing(Sim1)) Then
-            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = True
-            Me.ToolStripButton_Scatterplot.Enabled = True
-            Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
-        End If
+            'Monitor anzeigen
+            If (Me.ToolStripButton_Monitor.Checked) Then
+                Call Me.Monitor1.Show()
+            End If
 
-        'Einstellungen-Buttons
-        Me.ToolStripMenuItem_SettingsLoad.Enabled = False
+            'Ergebnis-Buttons
+            Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
+            If (Not IsNothing(Sim1)) Then
+                Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = True
+                Me.ToolStripButton_Scatterplot.Enabled = True
+                Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
+            End If
 
-        'Anwendungs-Groupbox deaktivieren
-        Me.GroupBox_Anwendung.Enabled = False
+            'Einstellungen-Buttons
+            Me.ToolStripMenuItem_SettingsLoad.Enabled = False
 
-        'Settings in temp-Verzeichnis speichern
-        Dim dir As String
-        dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
-        Me.saveSettings(dir & "Settings.xml")
+            'Anwendungs-Groupbox deaktivieren
+            Me.GroupBox_Anwendung.Enabled = False
 
-        'Event auslösen (BatchMode)
-        If (Me.mSettings.General.BatchMode) Then
-            Me.BatchCounter += 1
-            RaiseEvent OptimizationStarted()
-        End If
+            'Settings in temp-Verzeichnis speichern
+            Dim dir As String
+            dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
+            Me.saveSettings(dir & "Settings.xml")
 
-        'Settings deaktivieren
-        Call Me.EVO_Einstellungen1.freeze()
+            'Event auslösen (BatchMode)
+            If (Me.mSettings.General.BatchMode) Then
+                Me.BatchCounter += 1
+                'Sprung in Funktion MPC.Controller.EvoController
+                'dort abspeichern der Settings und dann gehts hier weiter
+                RaiseEvent OptimizationStarted()
+            End If
 
-        'Settings an Hauptdiagramm übergeben
-        Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
+            'Settings deaktivieren
+            Call Me.EVO_Einstellungen1.freeze()
 
-        'Diagramm vorbereiten und initialisieren
-        Call Me.PrepareDiagramm()
+            'Settings an Hauptdiagramm übergeben
+            Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
 
-        Select Case Anwendung
+            'Diagramm vorbereiten und initialisieren
+            Call Me.PrepareDiagramm()
 
-            'Sim-Anwendungen
-            Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
+            Select Case Anwendung
 
-                'Simulationen vorbereiten
-                Call Me.Sim1.prepareSimulation()
+                'Sim-Anwendungen
+                Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
 
-                'Startwerte evaluieren
-                blnSimWeiter = True
-                If (Me.mProblem.Method <> METH_SENSIPLOT) Then
-                    If Me.mSettings.General.MPCMode = True Then
-                        Call Me.evaluateStartwerte_MPC(blnSimWeiter)
-                        If blnSimWeiter = False Then
-                            Exit Select
+                    'Simulationen vorbereiten
+                    Call Me.Sim1.prepareSimulation()
+
+                    'Startwerte evaluieren
+                    blnSimWeiter = True
+                    If (Me.mProblem.Method <> METH_SENSIPLOT) Then
+                        If Me.mSettings.General.MPCMode = True Then
+                            'Falls die Zielfunktionsauswertung kleiner ist als der ein vorgegebener Schwellwert (MPC.Form1)
+                            'dann blnSimWEiter = false, weil dann gar nicht weiter simuliert werden muss
+                            Call Me.evaluateStartwerte_MPC(blnSimWeiter)
+                            If blnSimWeiter = False Then
+                                Exit Select
+                            End If
+                        Else
+                            Call Me.evaluateStartwerte()
                         End If
-                    Else
-                        Call Me.evaluateStartwerte()
                     End If
-                End If
 
-                
-                'Controller für Sim initialisieren und starten
-                Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                Call controller.InitApp(Me.Sim1)
-                Call controller.Start()
 
-                'Testprobleme
-            Case ANW_TESTPROBLEME
+                    'Controller für Sim initialisieren und starten
+                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                    Call controller.InitApp(Me.Sim1)
+                    Call controller.Start()
 
-                'Controller für Testproblem initialisieren und starten
-                Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                Call controller.InitApp(Me.Testprobleme1)
-                Call controller.Start()
+                    'Testprobleme
+                Case ANW_TESTPROBLEME
 
-                'Traveling Salesman
-            Case ANW_TSP
+                    'Controller für Testproblem initialisieren und starten
+                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                    Call controller.InitApp(Me.Testprobleme1)
+                    Call controller.Start()
 
-                'Controller für TSP initialisieren und starten
-                Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                'Call controller.InitApp() bei TSP nicht benötigt
-                Call controller.Start()
+                    'Traveling Salesman
+                Case ANW_TSP
 
-        End Select
+                    'Controller für TSP initialisieren und starten
+                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                    'Call controller.InitApp() bei TSP nicht benötigt
+                    Call controller.Start()
 
-        ''Globale Fehlerbehandlung für Optimierungslauf:
-        'Catch ex As Exception
-        '    MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
-        'End Try
+            End Select
 
-        'Optimierung beendet
-        '-------------------
-        Me.isRun = False
+            ''Globale Fehlerbehandlung für Optimierungslauf:
+            'Catch ex As Exception
+            '    MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
+            'End Try
 
-        'nochmaligen Start verhindern
-        Me.Button_Start.Enabled = False
+            'Optimierung beendet
+            '-------------------
+            Me.isRun = False
 
-        'Ausgabe der Optimierungszeit
-        AllOptTime.Stop()
+            'nochmaligen Start verhindern
+            Me.Button_Start.Enabled = False
 
-        If (Me.mSettings.General.BatchMode) Then
-            'Event auslösen 
-            RaiseEvent OptimizationReady()
-        Else
-            MsgBox("Optimierung beendet!", MsgBoxStyle.Information, "BlueM.Opt")
-            Me.Monitor1.LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Milliseconds & "ms")
-        End If
+            'Ausgabe der Optimierungszeit
+            AllOptTime.Stop()
+
+            If (Me.mSettings.General.BatchMode) Then
+                'Event auslösen 
+                RaiseEvent OptimizationReady()
+            End If
+
+        Loop
+
+        MsgBox("Optimierung beendet!", MsgBoxStyle.Information, "BlueM.Opt")
+        Me.Monitor1.LogAppend("Die Optimierung dauerte:   " & AllOptTime.Elapsed.Hours & "h  " & AllOptTime.Elapsed.Minutes & "m  " & AllOptTime.Elapsed.Seconds & "s     " & AllOptTime.Elapsed.Milliseconds & "ms")
 
     End Sub
+
+
 
     ''' <summary>
     ''' Optimierung pausieren/weiterlaufen lassen
@@ -2161,7 +2182,12 @@ Partial Public Class Form1
 
     End Sub
 
-    Private Sub evaluateStartwerte_MPC(ByRef blnWeiter As Boolean)
+    ''' <summary>
+    ''' Die Startwerte der Optparameter bei MPC-Anwendungen evaluieren
+    ''' </summary>
+    ''' <remarks>nur für Sim-Anwendungen!</remarks>
+    ''' <remarks>Mit Vergleich der Zielfunktionsgrenze, damit bei MPC nicht optimiert werden muss wenn Obj = Null</remarks>
+        Private Sub evaluateStartwerte_MPC(ByRef blnWeiter As Boolean)
 
         Dim isOK As Boolean
         Dim startind As EVO.Common.Individuum
@@ -2175,7 +2201,7 @@ Partial Public Class Form1
             My.Application.DoEvents()
         End If
 
-        If startind.PrimObjectives(0) < me.mSettings.General.ObjBoundary Then
+        If startind.PrimObjectives(0) < Me.mSettings.General.ObjBoundary Then
             blnWeiter = False
         End If
 
