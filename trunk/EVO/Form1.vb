@@ -2185,7 +2185,6 @@ Partial Public Class Form1
     ''' <summary>
     ''' Die Startwerte der Optparameter bei MPC-Anwendungen evaluieren
     ''' </summary>
-    ''' <remarks>nur für Sim-Anwendungen!</remarks>
     ''' <remarks>Mit Vergleich der Zielfunktionsgrenze, damit bei MPC nicht optimiert werden muss wenn Obj = Null</remarks>
         Private Sub evaluateStartwerte_MPC(ByRef blnWeiter As Boolean)
 
