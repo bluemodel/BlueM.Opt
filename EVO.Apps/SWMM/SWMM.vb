@@ -401,6 +401,8 @@ Public Class SWMM
                      KeyWord_SimGr = "  " & objValue.SimGr
                      Zeile = StrRead.ReadLine.ToString
                      If (Zeile.StartsWith(KeyWord_Block)) Then
+                        Zeile = StrRead.ReadLine.ToString    'Es folgt immer eine Zeile mit Sternen
+                        Zeile = StrRead.ReadLine.ToString    'und dann noch eine Leerzeile
                         Do
                            Zeile = StrRead.ReadLine.ToString
                            If (Zeile.StartsWith(KeyWord_SimGr)) Then
@@ -408,19 +410,24 @@ Public Class SWMM
                               Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
                               blnValueAdded = True
                               Exit Do
-                           End If
                            'Falls keine Nodes überstaut sind bei Node Flooding Summary muss geährleistet werden,
                            'dass der Wert 0 übergeben wird. 
-                           Select Case objValue.Block
-                              Case "NodeFlooding"
-                                 If Zeile.TrimStart.StartsWith("No nodes were flooded.") Then
-                                    tmpValue = 0.0
-                                    Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
-                                    blnValueAdded = True
-                                    Exit Do
-                                 End If
-                              Case Else
-                           End Select
+                           'Select Case objValue.Block
+                           '   Case "NodeFlooding"
+                           '      If Zeile.TrimStart.StartsWith("No nodes were flooded.") Then
+                           '         tmpValue = 0.0
+                           '         Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                           '         blnValueAdded = True
+                           '         Exit Do
+                              'Case Else
+                           'End Select
+                           'Wenn die SimGr nicht im Block auftaucht muss tmpvalue = 0 gesetzt werden
+                           ElseIf Zeile.TrimStart.StartsWith("**********************") Then    'nächster Block beginnt
+                              tmpValue = 0.0
+                              Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                              blnValueAdded = True
+                              Exit Do
+                           End If
                         Loop Until StrRead.Peek() = -1
                      End If
                      If blnValueAdded Then Exit Do
