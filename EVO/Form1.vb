@@ -3,13 +3,11 @@
 '**** BlueM.Opt                                                             ****
 '****                                                                       ****
 '**** Christoph Huebner, Felix Froehlich, Dirk Muschalla, Dominik Kerber    ****
+'**** Frank Reußner                                                         ****
 '****                                                                       ****
 '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
 '**** TU Darmstadt                                                          ****
 '****                                                                       ****
-'**** Erstellt: Dezember 2003                                               ****
-'****                                                                       ****
-'**** Letzte Änderung: Dezember 2008                                        ****
 '*******************************************************************************
 '*******************************************************************************
 
@@ -1042,125 +1040,12 @@ Partial Public Class Form1
 
         'Stoppuhr
         Dim AllOptTime As New Stopwatch
-        Dim blnSimWeiter As Boolean
 
         bStartenWiederholen = True
         Do While (bStartenWiederholen)
             bStartenWiederholen = False
 
-            AllOptTime.Start()
-
-            'Optimierung starten
-            '-------------------
-            Me.isRun = True
-
-            'Monitor anzeigen
-            If (Me.ToolStripButton_Monitor.Checked) Then
-                Call Me.Monitor1.Show()
-            End If
-
-            'Ergebnis-Buttons
-            Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
-            If (Not IsNothing(Sim1)) Then
-                Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = True
-                Me.ToolStripButton_Scatterplot.Enabled = True
-                Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
-            End If
-
-            'Einstellungen-Buttons
-            Me.ToolStripMenuItem_SettingsLoad.Enabled = False
-
-            'Anwendungs-Groupbox deaktivieren
-            Me.GroupBox_Anwendung.Enabled = False
-
-            'Settings in temp-Verzeichnis speichern
-            Dim dir As String
-            dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
-            Me.saveSettings(dir & "Settings.xml")
-
-            'Event auslösen (BatchMode)
-            If (Me.mSettings.General.BatchMode) Then
-                Me.BatchCounter += 1
-                'Sprung in Funktion MPC.Controller.EvoController
-                'dort abspeichern der Settings und dann gehts hier weiter
-                RaiseEvent OptimizationStarted()
-            End If
-
-            'Settings deaktivieren
-            Call Me.EVO_Einstellungen1.freeze()
-
-            'Settings an Hauptdiagramm übergeben
-            Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
-
-            'Diagramm vorbereiten und initialisieren
-            Call Me.PrepareDiagramm()
-
-            Select Case Anwendung
-
-                'Sim-Anwendungen
-                Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
-
-                    'Simulationen vorbereiten
-                    Call Me.Sim1.prepareSimulation()
-
-                    'Startwerte evaluieren
-                    blnSimWeiter = True
-                    If (Me.mProblem.Method <> METH_SENSIPLOT) Then
-                        If Me.mSettings.General.MPCMode = True Then
-                            'Falls die Zielfunktionsauswertung kleiner ist als der ein vorgegebener Schwellwert (MPC.Form1)
-                            'dann blnSimWEiter = false, weil dann gar nicht weiter simuliert werden muss
-                            Call Me.evaluateStartwerte_MPC(blnSimWeiter)
-                            If blnSimWeiter = False Then
-                                Exit Select
-                            End If
-                        Else
-                            Call Me.evaluateStartwerte()
-                        End If
-                    End If
-
-
-                    'Controller für Sim initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                    Call controller.InitApp(Me.Sim1)
-                    Call controller.Start()
-
-                    'Testprobleme
-                Case ANW_TESTPROBLEME
-
-                    'Controller für Testproblem initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                    Call controller.InitApp(Me.Testprobleme1)
-                    Call controller.Start()
-
-                    'Traveling Salesman
-                Case ANW_TSP
-
-                    'Controller für TSP initialisieren und starten
-                    Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                    'Call controller.InitApp() bei TSP nicht benötigt
-                    Call controller.Start()
-
-            End Select
-
-            ''Globale Fehlerbehandlung für Optimierungslauf:
-            'Catch ex As Exception
-            '    MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
-            'End Try
-
-            'Optimierung beendet
-            '-------------------
-            Me.isRun = False
-
-            'nochmaligen Start verhindern
-            Me.Button_Start.Enabled = False
-
-            'Ausgabe der Optimierungszeit
-            AllOptTime.Stop()
-
-            If (Me.mSettings.General.BatchMode) Then
-                'Event auslösen 
-                RaiseEvent OptimizationReady()
-            End If
+            Call StarteDurchlauf(AllOptTime)
 
         Loop
 
@@ -1169,7 +1054,124 @@ Partial Public Class Form1
 
     End Sub
 
+    Private Sub StarteDurchlauf(ByRef AllOptTime As Stopwatch)
+        'Stoppuhr
+        Dim blnSimWeiter As Boolean
+        AllOptTime.Start()
 
+        'Optimierung starten
+        '-------------------
+        Me.isRun = True
+
+        'Monitor anzeigen
+        If (Me.ToolStripButton_Monitor.Checked) Then
+            Call Me.Monitor1.Show()
+        End If
+
+        'Ergebnis-Buttons
+        Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
+        If (Not IsNothing(Sim1)) Then
+            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = True
+            Me.ToolStripButton_Scatterplot.Enabled = True
+            Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
+        End If
+
+        'Einstellungen-Buttons
+        Me.ToolStripMenuItem_SettingsLoad.Enabled = False
+
+        'Anwendungs-Groupbox deaktivieren
+        Me.GroupBox_Anwendung.Enabled = False
+
+        'Settings in temp-Verzeichnis speichern
+        Dim dir As String
+        dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
+        Me.saveSettings(dir & "Settings.xml")
+
+        'Event auslösen (BatchMode)
+        If (Me.mSettings.General.BatchMode) Then
+            Me.BatchCounter += 1
+            'Sprung in Funktion MPC.Controller.EvoController
+            'dort abspeichern der Settings und dann gehts hier weiter
+            RaiseEvent OptimizationStarted()
+        End If
+
+        'Settings deaktivieren
+        Call Me.EVO_Einstellungen1.freeze()
+
+        'Settings an Hauptdiagramm übergeben
+        Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
+
+        'Diagramm vorbereiten und initialisieren
+        Call Me.PrepareDiagramm()
+
+        Select Case Anwendung
+
+            'Sim-Anwendungen
+            Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM
+
+                'Simulationen vorbereiten
+                Call Me.Sim1.prepareSimulation()
+
+                'Startwerte evaluieren
+                blnSimWeiter = True
+                If (Me.mProblem.Method <> METH_SENSIPLOT) Then
+                    If Me.mSettings.General.MPCMode = True Then
+                        'Falls die Zielfunktionsauswertung kleiner ist als der ein vorgegebener Schwellwert (MPC.Form1)
+                        'dann blnSimWEiter = false, weil dann gar nicht weiter simuliert werden muss
+                        Call Me.evaluateStartwerte_MPC(blnSimWeiter)
+                        If blnSimWeiter = False Then
+                            Exit Select
+                        End If
+                    Else
+                        Call Me.evaluateStartwerte()
+                    End If
+                End If
+
+
+                'Controller für Sim initialisieren und starten
+                Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                Call controller.InitApp(Me.Sim1)
+                Call controller.Start()
+
+                'Testprobleme
+            Case ANW_TESTPROBLEME
+
+                'Controller für Testproblem initialisieren und starten
+                Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                Call controller.InitApp(Me.Testprobleme1)
+                Call controller.Start()
+
+                'Traveling Salesman
+            Case ANW_TSP
+
+                'Controller für TSP initialisieren und starten
+                Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
+                'Call controller.InitApp() bei TSP nicht benötigt
+                Call controller.Start()
+
+        End Select
+
+        ''Globale Fehlerbehandlung für Optimierungslauf:
+        'Catch ex As Exception
+        '    MsgBox(ex.Message, MsgBoxStyle.Critical, "Fehler")
+        'End Try
+
+        'Optimierung beendet
+        '-------------------
+        Me.isRun = False
+
+        'nochmaligen Start verhindern
+        Me.Button_Start.Enabled = False
+
+        'Ausgabe der Optimierungszeit
+        AllOptTime.Stop()
+
+        If (Me.mSettings.General.BatchMode) Then
+            'Event auslösen 
+            RaiseEvent OptimizationReady()
+        End If
+
+    End Sub
 
     ''' <summary>
     ''' Optimierung pausieren/weiterlaufen lassen
