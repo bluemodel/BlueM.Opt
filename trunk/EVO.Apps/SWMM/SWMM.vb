@@ -94,12 +94,15 @@ Public Class SWMM
 
         'SWMM DLL instanzieren je nach Anzahl der Threads
         '------------------------------------------------
-        ReDim swmm_dll(Me.n_Threads - 1)
-        Dim i As Integer
+        If swmm_dll Is Nothing Then
+            ReDim swmm_dll(Me.n_Threads - 1)
+            Dim i As Integer
 
-        For i = 0 To Me.n_Threads - 1
-            swmm_dll(i) = New SWMM_EngineDotNetAccess(dll_path)
-        Next
+            For i = 0 To Me.n_Threads - 1
+                'toDo: prüfen, ob schon instanziert
+                swmm_dll(i) = New SWMM_EngineDotNetAccess(dll_path)
+            Next
+        End If
 
         'Thread-Objekte instanzieren
         ReDim MySWMMThreads(Me.n_Threads - 1)
