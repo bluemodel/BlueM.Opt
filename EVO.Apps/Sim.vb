@@ -969,10 +969,10 @@ Handler:
             If n_CPU = 1 Then
                 n_Threads = 4
             Else
-                n_Threads = (2 * n_CPU) + 1
+                n_Threads = n_CPU + 1
             End If
 
-            'n_Threads = 6
+            'n_Threads = 3
 
             Return n_Threads
 
