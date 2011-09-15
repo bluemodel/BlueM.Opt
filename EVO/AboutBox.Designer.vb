@@ -18,7 +18,7 @@ Partial Class AboutBox
     Friend WithEvents LabelProductName As System.Windows.Forms.Label
     Friend WithEvents LabelVersion As System.Windows.Forms.Label
     Friend WithEvents LabelCompanyName As System.Windows.Forms.Label
-    Friend WithEvents TextBoxDescription As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox_Description As System.Windows.Forms.TextBox
     Friend WithEvents OKButton As System.Windows.Forms.Button
     Friend WithEvents LabelCopyright As System.Windows.Forms.Label
 
@@ -36,10 +36,20 @@ Partial Class AboutBox
         Me.LabelVersion = New System.Windows.Forms.Label
         Me.LabelCopyright = New System.Windows.Forms.Label
         Me.LabelCompanyName = New System.Windows.Forms.Label
-        Me.TextBoxDescription = New System.Windows.Forms.TextBox
+        Me.TextBox_Description = New System.Windows.Forms.TextBox
         Me.OKButton = New System.Windows.Forms.Button
         Me.LinkLabel1 = New System.Windows.Forms.LinkLabel
+        Me.TabControl1 = New System.Windows.Forms.TabControl
+        Me.TabPage_Description = New System.Windows.Forms.TabPage
+        Me.TabPage_License = New System.Windows.Forms.TabPage
+        Me.TextBox_License = New System.Windows.Forms.TextBox
+        Me.TabPage_Credits = New System.Windows.Forms.TabPage
+        Me.TextBox_Credits = New System.Windows.Forms.TextBox
         CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabControl1.SuspendLayout()
+        Me.TabPage_Description.SuspendLayout()
+        Me.TabPage_License.SuspendLayout()
+        Me.TabPage_Credits.SuspendLayout()
         Me.SuspendLayout()
         '
         'LogoPictureBox
@@ -100,18 +110,19 @@ Partial Class AboutBox
         Me.LabelCompanyName.Text = "Company Name"
         Me.LabelCompanyName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'TextBoxDescription
+        'TextBox_Description
         '
-        Me.TextBoxDescription.Location = New System.Drawing.Point(12, 122)
-        Me.TextBoxDescription.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
-        Me.TextBoxDescription.Multiline = True
-        Me.TextBoxDescription.Name = "TextBoxDescription"
-        Me.TextBoxDescription.ReadOnly = True
-        Me.TextBoxDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.TextBoxDescription.Size = New System.Drawing.Size(334, 123)
-        Me.TextBoxDescription.TabIndex = 0
-        Me.TextBoxDescription.TabStop = False
-        Me.TextBoxDescription.Text = resources.GetString("TextBoxDescription.Text")
+        Me.TextBox_Description.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TextBox_Description.Location = New System.Drawing.Point(0, 0)
+        Me.TextBox_Description.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
+        Me.TextBox_Description.Multiline = True
+        Me.TextBox_Description.Name = "TextBox_Description"
+        Me.TextBox_Description.ReadOnly = True
+        Me.TextBox_Description.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.TextBox_Description.Size = New System.Drawing.Size(326, 100)
+        Me.TextBox_Description.TabIndex = 0
+        Me.TextBox_Description.TabStop = False
+        Me.TextBox_Description.Text = resources.GetString("TextBox_Description.Text")
         '
         'OKButton
         '
@@ -128,10 +139,75 @@ Partial Class AboutBox
         Me.LinkLabel1.AutoSize = True
         Me.LinkLabel1.Location = New System.Drawing.Point(13, 259)
         Me.LinkLabel1.Name = "LinkLabel1"
-        Me.LinkLabel1.Size = New System.Drawing.Size(201, 13)
+        Me.LinkLabel1.Size = New System.Drawing.Size(131, 13)
         Me.LinkLabel1.TabIndex = 1
         Me.LinkLabel1.TabStop = True
-        Me.LinkLabel1.Text = "http://www.ihwb.tu-darmstadt.de/bluem/"
+        Me.LinkLabel1.Text = "http://www.bluemodel.org"
+        '
+        'TabControl1
+        '
+        Me.TabControl1.Controls.Add(Me.TabPage_Description)
+        Me.TabControl1.Controls.Add(Me.TabPage_License)
+        Me.TabControl1.Controls.Add(Me.TabPage_Credits)
+        Me.TabControl1.Location = New System.Drawing.Point(12, 122)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(334, 126)
+        Me.TabControl1.TabIndex = 2
+        '
+        'TabPage_Description
+        '
+        Me.TabPage_Description.Controls.Add(Me.TextBox_Description)
+        Me.TabPage_Description.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_Description.Name = "TabPage_Description"
+        Me.TabPage_Description.Size = New System.Drawing.Size(326, 100)
+        Me.TabPage_Description.TabIndex = 0
+        Me.TabPage_Description.Text = "Description"
+        Me.TabPage_Description.UseVisualStyleBackColor = True
+        '
+        'TabPage_License
+        '
+        Me.TabPage_License.Controls.Add(Me.TextBox_License)
+        Me.TabPage_License.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_License.Name = "TabPage_License"
+        Me.TabPage_License.Size = New System.Drawing.Size(326, 100)
+        Me.TabPage_License.TabIndex = 1
+        Me.TabPage_License.Text = "License"
+        Me.TabPage_License.UseVisualStyleBackColor = True
+        '
+        'TextBox_License
+        '
+        Me.TextBox_License.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TextBox_License.Location = New System.Drawing.Point(0, 0)
+        Me.TextBox_License.Multiline = True
+        Me.TextBox_License.Name = "TextBox_License"
+        Me.TextBox_License.ReadOnly = True
+        Me.TextBox_License.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.TextBox_License.Size = New System.Drawing.Size(326, 100)
+        Me.TextBox_License.TabIndex = 1
+        Me.TextBox_License.Text = resources.GetString("TextBox_License.Text")
+        '
+        'TabPage_Credits
+        '
+        Me.TabPage_Credits.Controls.Add(Me.TextBox_Credits)
+        Me.TabPage_Credits.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_Credits.Name = "TabPage_Credits"
+        Me.TabPage_Credits.Size = New System.Drawing.Size(326, 100)
+        Me.TabPage_Credits.TabIndex = 2
+        Me.TabPage_Credits.Text = "Credits"
+        Me.TabPage_Credits.UseVisualStyleBackColor = True
+        '
+        'TextBox_Credits
+        '
+        Me.TextBox_Credits.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TextBox_Credits.Location = New System.Drawing.Point(0, 0)
+        Me.TextBox_Credits.Multiline = True
+        Me.TextBox_Credits.Name = "TextBox_Credits"
+        Me.TextBox_Credits.ReadOnly = True
+        Me.TextBox_Credits.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.TextBox_Credits.Size = New System.Drawing.Size(326, 100)
+        Me.TextBox_Credits.TabIndex = 0
+        Me.TextBox_Credits.Text = resources.GetString("TextBox_Credits.Text")
         '
         'AboutBox
         '
@@ -139,9 +215,9 @@ Partial Class AboutBox
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.OKButton
         Me.ClientSize = New System.Drawing.Size(358, 289)
+        Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.LinkLabel1)
         Me.Controls.Add(Me.OKButton)
-        Me.Controls.Add(Me.TextBoxDescription)
         Me.Controls.Add(Me.LabelCompanyName)
         Me.Controls.Add(Me.LabelCopyright)
         Me.Controls.Add(Me.LabelVersion)
@@ -154,12 +230,25 @@ Partial Class AboutBox
         Me.Padding = New System.Windows.Forms.Padding(9)
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "About Wave"
+        Me.Text = "About BlueM.Opt"
         CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabControl1.ResumeLayout(False)
+        Me.TabPage_Description.ResumeLayout(False)
+        Me.TabPage_Description.PerformLayout()
+        Me.TabPage_License.ResumeLayout(False)
+        Me.TabPage_License.PerformLayout()
+        Me.TabPage_Credits.ResumeLayout(False)
+        Me.TabPage_Credits.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
     Friend WithEvents LinkLabel1 As System.Windows.Forms.LinkLabel
+    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Friend WithEvents TabPage_Description As System.Windows.Forms.TabPage
+    Friend WithEvents TabPage_License As System.Windows.Forms.TabPage
+    Friend WithEvents TextBox_License As System.Windows.Forms.TextBox
+    Friend WithEvents TabPage_Credits As System.Windows.Forms.TabPage
+    Friend WithEvents TextBox_Credits As System.Windows.Forms.TextBox
 
 End Class
