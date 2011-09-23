@@ -1,3 +1,28 @@
+' Copyright (c) 2011, ihwb, TU Darmstadt
+' All rights reserved.
+' 
+' Released under the BSD-2-Clause License:
+' 
+' Redistribution and use in source and binary forms, with or without modification, 
+' are permitted provided that the following conditions are met:
+' 
+' * Redistributions of source code must retain the above copyright notice, this list 
+'   of conditions and the following disclaimer.
+' * Redistributions in binary form must reproduce the above copyright notice, this list 
+'   of conditions and the following disclaimer in the documentation and/or other materials 
+'   provided with the distribution.
+' 
+' THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+' EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+' OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+' SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+' SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
+' OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+' HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR 
+' TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+' EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'--------------------------------------------------------------------------------------------
+'
 Public Class Hypervolumen
     Private _Dimension As Integer 'Dimension des Zielfunktionsraumes
     Private _Referenzpunkt() As Double
@@ -7,19 +32,19 @@ Public Class Hypervolumen
     Public Sub New()
         'Standardwerte setzen
         _Dimension = 0
-        _Normalisiert = false
+        _Normalisiert = False
     End Sub
     'Eigenschaft Dimension des Problems
     Public Property Dimension() As Integer
 
         Get
-            Return me._Dimension
+            Return Me._Dimension
         End Get
 
         Set(ByVal Value As Integer)
-            If value > 0 Then
+            If Value > 0 Then
                 Me._Dimension = Value
-                Redim me._Referenzpunkt(me._Dimension)
+                ReDim Me._Referenzpunkt(Me._Dimension)
             Else
                 Throw New Exception("Dimension des Zielfunktionsraumes muss immer größer 0 sein")
             End If
@@ -65,28 +90,28 @@ Public Class Hypervolumen
             Throw New Exception("Es muss mindestens eine Lösung übergeben werden!")
         End If
         If Loesungsvektor.GetUpperBound(1) <> Me._Dimension Then
-            throw new Exception("Der Lösungsvektor hat die falsche Dimension!")
+            Throw New Exception("Der Lösungsvektor hat die falsche Dimension!")
         End If
         If Loesungsvektor.GetUpperBound(0) <> AnzLoesungen Then
-            throw new Exception("Der Lösungsvektor hat nicht die angebenen Anzahl an Lösungen!")
+            Throw New Exception("Der Lösungsvektor hat nicht die angebenen Anzahl an Lösungen!")
         End If
 
         ReDim Qvektor(AnzLoesungen, Me._Dimension - 1)
 
         If Me._Normalisiert Then
-            for i = 0 to Anzloesungen -1
-            For j = 0 To Me._Dimension - 1
+            For i = 0 To AnzLoesungen - 1
+                For j = 0 To Me._Dimension - 1
                     Qvektor(i, j) = Loesungsvektor(i, j) / Me._Referenzpunkt(j)
                 Next
             Next
         Else
-             Loesungsvektor.CopyTo(Qvektor,0)
+            Loesungsvektor.CopyTo(Qvektor, 0)
         End If
 
         HV = 0.0
-        term = 1.0
+        Term = 1.0
         For j = 0 To Me._Dimension - 1
-            term *= Me._Referenzpunkt(j) - Qvektor(0, j)
+            Term *= Me._Referenzpunkt(j) - Qvektor(0, j)
         Next
         HV += Term
         For i = 1 To AnzLoesungen - 1
