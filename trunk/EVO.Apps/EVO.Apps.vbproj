@@ -141,9 +141,6 @@
     <Content Include="BlueM\libifcoremd.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="SMUSI\smusi.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="SWMM\IHWB.SWMM.DllAdapter.dll" />
     <Content Include="SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
