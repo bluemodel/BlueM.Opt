@@ -13,7 +13,7 @@ Imports IHWB.EVO.Common.Constants
                                & "BlueM.Opt ist ein Optimierungsframework zur Optimierung, Autokalibrierung und der Sensitivitätsanalyse von Modellparametern sowie zu deren Visualisierung." & eol & eol _
                                & "Enthaltene Simulationsmodelle:" & eol _
                                & "* BlueM.Sim v0.9.6b (r717) (http://www.bluemodel.org)" & eol _
-                               & "* SWMM v5.0.014 (http://www.epa.gov/ednnrmrl/models/swmm/)" & eol _
+                               & "* SWMM v5.0.018 (http://www.epa.gov/ednnrmrl/models/swmm/)" & eol _
                                & "* IHA Software v7.03 (http://www.nature.org/initiatives/freshwater/conservationtools/)")> 
 <Assembly: AssemblyCompany("TU Darmstadt - ihwb")> 
 <Assembly: AssemblyProduct("BlueM.Opt")> 
