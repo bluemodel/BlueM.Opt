@@ -483,7 +483,7 @@ Partial Public Class Form1
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'Objekt der Klasse Smusi initialisieren
-                    Sim1 = New EVO.Apps.Smusi()
+                    'Sim1 = New EVO.Apps.Smusi()
 
 
                 Case ANW_SCAN 'Anwendung S:CAN
