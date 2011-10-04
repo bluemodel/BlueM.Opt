@@ -59,7 +59,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="IHWB.BlueM.DllAdapter, Version=0.0.1.1, Culture=neutral, processorArchitecture=MSIL" />
-    <Reference Include="IHWB.SMUSI.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="IHWB.SWMM.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -98,7 +97,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Sim.vb" />
-    <Compile Include="SMUSI\Smusi.vb" />
+    <None Include="SMUSI\Smusi.vb">
+      <SubType>Code</SubType>
+    </None>
     <Compile Include="SWMM\SWMM.vb" />
     <Compile Include="SWMM\SWMMThread.vb" />
     <Compile Include="S_CAN\Scan.vb" />
@@ -130,9 +131,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BlueM\IHWB.BlueM.DllAdapter.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SMUSI\IHWB.SMUSI.DllAdapter.dll" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="BlueM\libguide40.dll">
