@@ -137,10 +137,10 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</value>
   </data>
   <data name="TextBox_Credits.Text" xml:space="preserve">
-    <value>Developers:
-Dirk Muschalla, Christoph Hübner, Felix Froehlich, Steffen Heusch, Dominik Kerber
+    <value>Developers (in alphabetical order):
+Michael Bach, Felix Froehlich, Steffen Heusch, Christoph Hübner, Dirk Muschalla, Manfred Ostrowski, Frank Reußner
 
-Diese Software benutzt Silk Icons: http://www.famfamfam.com/lab/icons/silk/
-Diese Software benutzt TeeChart: http://www.steema.com/products/teechart/</value>
+This software uses Silk Icons: http://www.famfamfam.com/lab/icons/silk/
+This software uses TeeChart: http://www.steema.com/products/teechart/</value>
   </data>
 </root>
