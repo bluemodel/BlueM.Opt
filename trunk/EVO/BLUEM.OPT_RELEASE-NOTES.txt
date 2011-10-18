@@ -1,13 +1,14 @@
 ﻿===============================================================
 BlueM.Opt Release Notes
 ===============================================================
-Autoren: Christoph Hübner, Felix Froehlich, Dirk Muschalla
-(c) IHWB TU-Darmstadt
-Website: http://130.83.196.220/bluem/wiki/index.php/BlueM.Opt
-===============================================================
-
-Version 1.5 (rxxxx - xxxx-xx)
+Version 1.5 (r1721 - 2011-10)
 -----------------------------
+Initial Release under the BSD-2 License, see LICENSE.txt for more information.
+
+CHANGED:
+* SMUSI no longer included due to licensing terms
+* BlueM.Sim updated to v0.9.7
+* Various bugfixes and enhancements
 
 
 Version 1.4 (r1656 - 2009-09)
