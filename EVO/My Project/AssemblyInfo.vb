@@ -32,6 +32,6 @@ Imports IHWB.EVO.Common.Constants
 ' mit '*' verwenden. Siehe unten
 
 
-<Assembly: AssemblyVersion("1.6.0.*")> 
+<Assembly: AssemblyVersion("1.5.0.*")> 
 
 
