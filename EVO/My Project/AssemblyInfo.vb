@@ -17,7 +17,7 @@ Imports IHWB.EVO.Common.Constants
                                & "* IHA Software v7.03 (http://www.nature.org/initiatives/freshwater/conservationtools/)")> 
 <Assembly: AssemblyCompany("TU Darmstadt - ihwb")> 
 <Assembly: AssemblyProduct("BlueM.Opt")> 
-<Assembly: AssemblyCopyright("Copyright © ihwb 2011")> 
+<Assembly: AssemblyCopyright("BSD-2 - Copyright © ihwb 2011")> 
 <Assembly: AssemblyTrademark("")>
 <Assembly: AssemblyCulture("")>
 

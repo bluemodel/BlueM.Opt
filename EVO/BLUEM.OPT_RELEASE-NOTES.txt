@@ -1,7 +1,7 @@
 ﻿===============================================================
 BlueM.Opt Release Notes
 ===============================================================
-Version 1.5 (r1721 - 2011-10)
+Version 1.5 (r1724 - 2011-10)
 -----------------------------
 Initial Release under the BSD-2 License, see LICENSE.txt for more information.
 
