@@ -133,9 +133,6 @@
     <None Include="BlueM\IHWB.BlueM.DllAdapter.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BlueM\libguide40.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="BlueM\libifcoremd.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
