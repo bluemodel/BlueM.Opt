@@ -1,0 +1,67 @@
+﻿===============================================================
+BlueM.Opt Release Notes
+===============================================================
+Version 1.5 (r1726 - 2011-10)
+-----------------------------
+Initial Release under the BSD-2 License, see LICENSE.txt for more information.
+
+CHANGED:
+* SMUSI no longer included due to licensing terms
+* BlueM.Sim updated to v0.9.7
+* Various bugfixes and enhancements
+
+
+Version 1.4 (r1656 - 2009-09)
+-----------------------------
+NEW:
+* New format of the ZIE-file (Objective Functions) (bug 414)
+  - Possibility of using simulation result values for objective functions
+* The problem description is displayed in the log after loading
+* For PES-problems that have 'Schrittweitenvektor' switched on, the Monitor now displays the step size of each parameter separately (bug 374)
+CHANGED:
+* Simulations are now always carried out in a temporary "Thread_N" folder
+  (Exception: simulation of selected solutions for displaying results in Wave)
+
+Version 1.3 (r1523 - 2009-05)
+-----------------------------
+NEW: 
+* Vor der Optimierung werden die Startwerte der Optparameter evaluiert (Bug 147)
+* Zielfunktionen unterstützen jetzt Zielgruppen (Bug 256)
+* Neue Methode MetaEvo
+
+Version 1.2.4
+-------------
+* UPDATE: Multithreading wird zentral verwaltet und kann von allen Applikationen genutzt werden. Multithreading kann im Optionsdialog ausgeschaltet werden. (Bug 345)
+* CHANGED: UI Redesign
+
+Version 1.2.3
+-------------
+* NEW: Neue Methode DDS (Dynamically Dimensioned Search)
+* UPDATE: SWMM-Anbindung verbessert - Multithreading möglich
+
+Version 1.2.2
+-------------
+* NEW: Ein Optimierungsergebnis kann jetzt auch im Entscheidungsraum (als Scatterplot-Matrix) dargestellt werden (Bug 375)
+* FIXED: Fehler im PES Kern bedingt durch die freie Evaluierungsreihenfolge des Multithreadings behoben
+
+Version 1.2.1
+-------------
+* Neue Problemklasse EVO.Common.Problem wird überall herumgereicht und definiert das zu lösende Optimierungsproblem (Bug 348)
+* Ein eigenes Monitorfenster (Ansicht -> Monitor anzeigen) zeigt den Verlauf des Hypervolumens und der Schrittweite an (Bug 349)
+
+Version 1.2
+-----------
+* Umstrukturierung mit neuen Projekten EVO.Apps, EVO.Diagramm und EVO.OptResult
+* Anzeige des Verlaufs der Schrittweite Dn im Indikatordiagramm
+
+Version 1.1.1
+-------------
+* Klasse EVO.Common.Individuum ist jetzt Basisklasse wovon neue, spezielle Individuumsklassen erben können (Bug 343)
+
+Version 1.1
+-----------
+* Evaluierungsläufe (Simulationen) mit BlueM können laufen jetzt in mehreren Threads gleichzeitig ab (Bug 345)
+
+Version 1.0
+-----------
+* Anfang der Versionierung
