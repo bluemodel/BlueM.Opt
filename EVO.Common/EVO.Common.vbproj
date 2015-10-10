@@ -82,7 +82,6 @@
     <Compile Include="Modellparameter.vb" />
     <Compile Include="ObjectiveFunctions\ObjectiveFunction_Aggregate.vb" />
     <Compile Include="ObjectiveFunctions\ObjectiveFunction_Ecology.vb" />
-    <Compile Include="ObjectiveFunctions\ObjectiveFunction_IHA.vb" />
     <Compile Include="ObjectiveFunctions\ObjectiveFunction_Series.vb" />
     <Compile Include="ObjectiveFunctions\ObjectiveFunction_SKos.vb" />
     <Compile Include="ObjectiveFunctions\ObjectiveFunction_ValueFromSeries.vb" />
@@ -136,10 +135,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\IHA.Win\IHA.Win.vbproj">
-      <Project>{7A7828C7-812B-45C0-AC5A-AE2DB74B7CD8}</Project>
-      <Name>IHA.Win</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Wave\Wave.vbproj">
       <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
       <Name>Wave</Name>

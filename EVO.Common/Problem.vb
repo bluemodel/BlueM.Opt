@@ -522,7 +522,6 @@ Public Class Problem
         Const AnzSpalten_ObjFSeries As Integer = 13                 'Anzahl Spalten Reihenvergleich in der ZIE-Datei
         Const AnzSpalten_ObjFValue As Integer = 12                  'Anzahl Spalten Wertevergleich in der ZIE-Datei
         Const AnzSpalten_ObjFValueFromSeries As Integer = 13        'Anzahl Spalten Reihenwertevergleich in der ZIE-Datei
-        Const AnzSpalten_ObjFIHA As Integer = 11                    'Anzahl Spalten IHA-Analyse in der ZIE-Datei
         Const AnzSpalten_ObjFAggregate As Integer = 4               'Anzahl Spalten Aggregierte Ziele in der ZIE-Datei
         Const AnzSpalten_ObjFSKos As Integer = 5                    'Anzahl Spalten SKos in der ZIE-Datei
         Const AnzSpalten_ObjFEcology As Integer = 5                 'Anzahl Spalten SKos in der ZIE-Datei
@@ -554,8 +553,6 @@ Public Class Problem
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.Value
                 ElseIf Zeile.StartsWith("*ValueFromSeries") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.ValueFromSeries
-                ElseIf Zeile.StartsWith("*IHA-Analysis") Then
-                    currentObjectiveType = ObjectiveFunction.ObjectiveType.IHA
                 ElseIf Zeile.StartsWith("*SKos") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.SKos
                 ElseIf Zeile.StartsWith("*Ecology") Then
@@ -701,46 +698,6 @@ Public Class Problem
                         'Neue ObjectiveFunction abspeichern
                         ReDim Preserve Me.List_ObjectiveFunctions(i)
                         Me.List_ObjectiveFunctions(i) = Objective_ValueFromSeries
-                        i += 1
-
-                    Case ObjectiveFunction.ObjectiveType.IHA
-
-                        'IHA-Analyse
-                        '===========
-
-                        'Kontrolle
-                        If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFIHA + 1) Then
-                            Throw New Exception("Block Reihenvergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
-                        End If
-
-                        'ObjectiveFunction instanzieren
-                        Dim objective_IHA As New EVO.Common.ObjectiveFunction_IHA()
-
-                        'Gemeinsame Spalten einlesen
-                        Call Me.Read_ZIE_CommonColumns(objective_IHA, Zeile)
-
-                        'Restliche Spalten einlesen
-                        With objective_IHA
-                            .RefGr = WerteArray(9).Trim()
-                            .RefReiheDatei = WerteArray(10).Trim()
-                            If (WerteArray(11).Trim() <> "") Then
-                                .hasIstWert = True
-                                .IstWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
-                            Else
-                                .hasIstWert = False
-                            End If
-
-                            'Referenzreihe einlesen
-                            .RefReihe = Me.Read_ZIE_RefReihe(Me.mWorkDir & .RefReiheDatei, .RefGr, SimStart, SimEnde)
-
-                        End With
-
-                        'IHA-Analyse initialisieren
-                        objective_IHA.initialize(Me.WorkDir, Me.Datensatz, SimStart, SimEnde)
-
-                        'Neue ObjectiveFunction abspeichern
-                        ReDim Preserve Me.List_ObjectiveFunctions(i)
-                        Me.List_ObjectiveFunctions(i) = objective_IHA
                         i += 1
 
                     Case ObjectiveFunction.ObjectiveType.SKos
