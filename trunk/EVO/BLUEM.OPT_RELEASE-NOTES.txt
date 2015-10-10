@@ -1,6 +1,13 @@
 ﻿===============================================================
 BlueM.Opt Release Notes
 ===============================================================
+Version 1.6 (beta)
+-----------------------------
+REMOVED:
+* Dropped support for the objective function "IHA-Analysis", IHA-Software no longer included. 
+  (Corresponds to dropped support for RVA-files in Wave r332)
+
+
 Version 1.5 (r1726 - 2011-10)
 -----------------------------
 Initial Release under the BSD-2 License, see LICENSE.txt for more information.

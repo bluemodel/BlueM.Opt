@@ -1672,8 +1672,6 @@ Partial Public Class Form1
     Public Sub showWave(ByVal checkedSolutions As Collection)
 
         Dim isOK As Boolean
-        Dim isIHA As Boolean
-        Dim objective_IHA As EVO.Common.ObjectiveFunction_IHA
         Dim isSWMM As Boolean
         Dim WorkDir_Prev As String
 
@@ -1698,24 +1696,6 @@ Partial Public Class Form1
         'Wave instanzieren
         Dim Wave1 As New Wave.Wave()
 
-        'Sonderfall bei ObjectiveFunction_IHA: 
-        'ein 2. Wave für RVA-Diagramme instanzieren
-        Dim Wave2 As Wave.Wave = Nothing
-        For Each objective As EVO.Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-            If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.IHA) Then
-                isIHA = True
-                objective_IHA = objective '1. IHA-objective verwenden
-                Wave2 = New Wave.Wave()
-                Call Wave2.PrepareChart_RVA()
-                'IHA-Vergleichsmodus?
-                If (objective_IHA.isComparison) Then
-                    'Referenz-RVAErgebnis in Wave2 laden
-                    Call Wave2.Display_RVA(objective_IHA.RVABase)
-                End If
-                Exit For
-            End If
-        Next
-
         'Alle ausgewählten Lösungen durchlaufen
         '======================================
         For Each ind As Common.Individuum In Sim1.OptResult.getSelectedSolutions()
@@ -1737,16 +1717,6 @@ Partial Public Class Form1
                 Exit Sub
             End If
 
-            'Sonderfall IHA-Berechnung
-            If (isIHA) Then
-                'RVA-Ergebnis in Wave2 laden
-                Dim RVAResult As Wave.RVA.Struct_RVAValues
-                RVAResult = objective_IHA.IHASys.RVAResult
-                'Lösungsnummer an Titel anhängen
-                RVAResult.Title = "Lösung " & ind.ID.ToString()
-                Call Wave2.Display_RVA(RVAResult)
-            End If
-
             'Zu zeichnenden Simulationsreihen zurücksetzen
             SimSeries.Clear()
 
@@ -1755,13 +1725,11 @@ Partial Public Class Form1
             For Each objective As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
 
                 If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Series _
-                    Or objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.ValueFromSeries _
-                    Or objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.IHA) Then
+                    Or objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.ValueFromSeries) Then
 
                     With objective
 
                         'Referenzreihe in Wave laden
-                        'TODO: IHA-Referenzreihe auch laden?
                         '---------------------------
                         If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Series) Then
                             With CType(objective, Common.ObjectiveFunction_Series)
@@ -1795,7 +1763,6 @@ Partial Public Class Form1
         'Wave anzeigen
         '-------------
         Call Wave1.Show()
-        If (Not IsNothing(Wave2)) Then Call Wave2.Show()
 
         'Simulationsverzeichnis zurücksetzen
         Sim1.WorkDir_Current = WorkDir_Prev

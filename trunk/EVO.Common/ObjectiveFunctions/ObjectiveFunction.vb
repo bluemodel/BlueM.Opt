@@ -53,7 +53,6 @@ Public MustInherit Class ObjectiveFunction
         Series = 1
         Value = 2
         ValueFromSeries = 3
-        IHA = 4
         Aggregate = 5
         SKos = 6
         Ecology = 7
@@ -98,7 +97,7 @@ Public MustInherit Class ObjectiveFunction
     ''' <summary>
     ''' Name der Funktion, mit der der Objectivewert berechnet werden soll
     ''' </summary>
-    ''' <remarks>Erlaubte Werte: "AbQuad", "Diff", "n‹ber", "s‹ber", "nUnter", "sUnter", "Volf", "IHA". Siehe auch Wiki</remarks>
+    ''' <remarks>Erlaubte Werte: "AbQuad", "Diff", "n‹ber", "s‹ber", "nUnter", "sUnter", "Volf". Siehe auch Wiki</remarks>
     Public Funktion As String
 
     ''' <summary>
