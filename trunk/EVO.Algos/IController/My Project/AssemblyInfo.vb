@@ -10,9 +10,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("EVO.IController")> 
 <Assembly: AssemblyDescription("Interface für Controller")> 
-<Assembly: AssemblyCompany("ihwb")> 
+<Assembly: AssemblyCompany("BlueM Dev Group")> 
 <Assembly: AssemblyProduct("EVO.IController")> 
-<Assembly: AssemblyCopyright("Copyright © ihwb 2009")> 
+<Assembly: AssemblyCopyright("Copyright © BlueM Dev Group")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>

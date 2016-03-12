@@ -10,9 +10,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("EVO.ES")> 
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("IHWB - TU Darmstadt")> 
+<Assembly: AssemblyCompany("BlueM Dev Group")> 
 <Assembly: AssemblyProduct("EVO.ES")> 
-<Assembly: AssemblyCopyright("Copyright © IHWB 2008")> 
+<Assembly: AssemblyCopyright("Copyright © BlueM Dev Group")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)> 

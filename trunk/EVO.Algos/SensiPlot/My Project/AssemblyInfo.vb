@@ -10,9 +10,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("EVO.SensiPlot")> 
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("IHWB - TU Darmstadt")> 
+<Assembly: AssemblyCompany("BlueM Dev Group")> 
 <Assembly: AssemblyProduct("EVO.SensiPlot")> 
-<Assembly: AssemblyCopyright("Copyright © ihwb 2009")> 
+<Assembly: AssemblyCopyright("Copyright © BlueM Dev Group")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
