@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("MO_Indicator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("BlueM Dev Group")]
 [assembly: AssemblyProduct("MO_Indicator")]
-[assembly: AssemblyCopyright("Copyright ©  2008")]
+[assembly: AssemblyCopyright("Copyright © BlueM Dev Group")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -10,9 +10,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("Traveling Salesman Problem")> 
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("IHWB - TU Darmstadt")> 
+<Assembly: AssemblyCompany("BlueM Dev Group")> 
 <Assembly: AssemblyProduct("TSP")> 
-<Assembly: AssemblyCopyright("Copyright © IHWB 2009")> 
+<Assembly: AssemblyCopyright("Copyright © BlueM Dev Group")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
