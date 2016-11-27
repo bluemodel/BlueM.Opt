@@ -26,6 +26,7 @@
 '--------------------------------------------------------------------------------------------
 '
 Imports System.IO
+Imports BlueM
 
 Public Class Scan
     Inherits Sim

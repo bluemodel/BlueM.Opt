@@ -30,6 +30,7 @@ Imports System.Windows.Forms
 Imports System.Globalization
 Imports System.Threading
 Imports IHWB.EVO.Common.Constants
+Imports BlueM
 
 '*******************************************************************************
 '*******************************************************************************

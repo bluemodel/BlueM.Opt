@@ -25,6 +25,8 @@
 ' EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '--------------------------------------------------------------------------------------------
 '
+Imports BlueM
+
 ''' <summary>
 ''' Klasse für die Definition von Objective Funktionen
 ''' </summary>

@@ -37,6 +37,7 @@
 '*******************************************************************************
 
 Imports System.IO
+Imports BlueM
 
 ''' <summary>
 ''' Definiert das zu lösende Optimierungsproblem

@@ -25,6 +25,8 @@
 ' EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '--------------------------------------------------------------------------------------------
 '
+Imports BlueM
+
 Public Class ObjectiveFunction_ValueFromSeries
     Inherits ObjectiveFunction
 
