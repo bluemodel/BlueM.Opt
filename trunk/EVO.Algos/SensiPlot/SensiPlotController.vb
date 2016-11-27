@@ -26,6 +26,7 @@
 '--------------------------------------------------------------------------------------------
 '
 Imports IHWB.EVO.Common.Constants
+Imports BlueM
 
 Public Class SensiPlotController
     Implements EVO.IController
