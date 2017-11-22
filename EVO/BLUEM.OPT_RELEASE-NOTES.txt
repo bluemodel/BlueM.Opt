@@ -3,6 +3,10 @@ BlueM.Opt Release Notes
 ===============================================================
 Version 1.6 (beta)
 -----------------------------
+NEW:
+* Added support for the simulation engine TALSIM. talsimw.exe has to be provided by the user.
+CHANGED:
+* Updated Wave to v1.6
 REMOVED:
 * Dropped support for the objective function "IHA-Analysis", IHA-Software no longer included. 
   (Corresponds to dropped support for RVA-files in Wave r332)
