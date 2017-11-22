@@ -894,16 +894,16 @@ Public Class Problem
     ''' <param name="EvalStart">Startpunkt der Evaluierung</param>
     ''' <param name="EvalEnde">Endpunkt der Evaluierung</param>
     ''' <returns>Zeitreihe</returns>
-    Private Function Read_ZIE_RefReihe(ByVal dateipfad As String, ByVal refgroesse As String, ByVal EvalStart As DateTime, ByVal EvalEnde As DateTime) As Wave.Zeitreihe
+    Private Function Read_ZIE_RefReihe(ByVal dateipfad As String, ByVal refgroesse As String, ByVal EvalStart As DateTime, ByVal EvalEnde As DateTime) As Wave.TimeSeries
 
-        Dim RefReihe As Wave.Zeitreihe
+        Dim RefReihe As Wave.TimeSeries
 
         'Referenzreihe aus Datei einlesen
-        Dim dateiobjekt As Wave.Dateiformat = Wave.Dateifactory.getDateiInstanz(dateipfad)
-        RefReihe = dateiobjekt.getReihe(refgroesse)
+        Dim dateiobjekt As Wave.FileFormatBase = Wave.FileFactory.getDateiInstanz(dateipfad)
+        RefReihe = dateiobjekt.getTimeSeries(refgroesse)
 
         'Zeitraum der Referenzreihe überprüfen
-        If (RefReihe.Anfangsdatum > EvalStart Or RefReihe.Enddatum < EvalEnde) Then
+        If (RefReihe.StartDate > EvalStart Or RefReihe.EndDate < EvalEnde) Then
             'Referenzreihe deckt Evaluierungszeitraum nicht ab
             Throw New Exception("Die Referenzreihe '" & dateipfad & "' deckt den Evaluierungszeitraum nicht ab!")
         Else
@@ -1002,18 +1002,18 @@ Public Class Problem
                         Select Case (ext.ToUpper)
                             Case ".WEL"
                                 Dim WEL As New Wave.WEL(Me.mWorkDir & .GrenzReiheDatei)
-                                .GrenzReihe = WEL.getReihe(.GrenzGr)
+                                .GrenzReihe = WEL.getTimeSeries(.GrenzGr)
                             Case ".ZRE"
                                 Dim ZRE As New Wave.ZRE(Me.mWorkDir & .GrenzReiheDatei)
-                                .GrenzReihe = ZRE.getReihe(0)
+                                .GrenzReihe = ZRE.getTimeSeries(0)
                             Case Else
                                 Throw New Exception("Das Format der Grenzwertreihe '" & .GrenzReiheDatei & "' wurde nicht erkannt!")
                         End Select
 
                         'Zeitraum der Grenzwertreihe überprüfen
                         '--------------------------------------
-                        GrenzStart = .GrenzReihe.XWerte(0)
-                        GrenzEnde = .GrenzReihe.XWerte(.GrenzReihe.Length - 1)
+                        GrenzStart = .GrenzReihe.StartDate
+                        GrenzEnde = .GrenzReihe.EndDate
 
                         If (GrenzStart > SimStart Or GrenzEnde < SimEnde) Then
                             'Grenzwertreihe deckt Simulationszeitraum nicht ab

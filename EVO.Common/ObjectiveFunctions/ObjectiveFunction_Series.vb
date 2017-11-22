@@ -53,7 +53,7 @@ Public Class ObjectiveFunction_Series
     ''' <summary>
     ''' Die Referenzreihe
     ''' </summary>
-    Public RefReihe As Wave.Zeitreihe
+    Public RefReihe As Wave.TimeSeries
 
     ''' <summary>
     ''' Start des Evaluierungszeitraums
@@ -73,7 +73,7 @@ Public Class ObjectiveFunction_Series
     Public Overrides Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
 
         Dim QWert As Double
-        Dim SimReihe As Wave.Zeitreihe
+        Dim SimReihe As Wave.TimeSeries
 
         'SimReihe aus SimErgebnis rausholen
         SimReihe = SimErgebnis.Reihen(Me.SimGr).Clone()

@@ -1677,7 +1677,7 @@ Partial Public Class Form1
         Dim isSWMM As Boolean
         Dim WorkDir_Prev As String
 
-        Dim zre As Wave.Zeitreihe
+        Dim zre As Wave.TimeSeries
         Dim SimSeries As New Collection                 'zu zeichnende Simulationsreihen
         Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
 

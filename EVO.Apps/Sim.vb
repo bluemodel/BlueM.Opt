@@ -922,7 +922,7 @@ Handler:
         Dim i As Integer
 
         'Simulationsergebnis auslesen
-        Dim SimReihe As Wave.Zeitreihe
+        Dim SimReihe As Wave.TimeSeries
         SimReihe = Me.SimErgebnis.Reihen(constr.SimGr)
 
         'Fallunterscheidung GrenzTyp (Wert/Reihe)
@@ -950,10 +950,10 @@ Handler:
                 For i = 0 To SimReihe.Length - 1
 
                     If (constr.GrenzPos = "Obergrenze") Then
-                        summe += Math.Min(constr.GrenzReihe.YWerte(i) - SimReihe.YWerte(i), 0)
+                        summe += Math.Min(constr.GrenzReihe.Values(i) - SimReihe.Values(i), 0)
 
                     ElseIf (constr.GrenzPos = "Untergrenze") Then
-                        summe += Math.Min(SimReihe.YWerte(i) - constr.GrenzReihe.YWerte(i), 0)
+                        summe += Math.Min(SimReihe.Values(i) - constr.GrenzReihe.Values(i), 0)
 
                     End If
 

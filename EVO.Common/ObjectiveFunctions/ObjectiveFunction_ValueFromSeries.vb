@@ -69,7 +69,7 @@ Public Class ObjectiveFunction_ValueFromSeries
     Public Overrides Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
 
         Dim SimWert As Double
-        Dim SimReihe As Wave.Zeitreihe
+        Dim SimReihe As Wave.TimeSeries
         Dim QWert As Double
 
         'SimReihe aus SimErgebnis rausholen

@@ -83,7 +83,7 @@ Public Class SensiPlotController
         Dim serie As Steema.TeeChart.Styles.Points
         Dim serie3D As New Steema.TeeChart.Styles.Points3D
         Dim surface As New Steema.TeeChart.Styles.Surface
-        Dim SimReihe As Wave.Zeitreihe
+        Dim SimReihe As Wave.TimeSeries
         Dim SimReihen As Collection
         Dim Wave1 As Wave.Wave
 
@@ -244,7 +244,7 @@ Public Class SensiPlotController
         '-----------------------
         If (Me.mySettings.SensiPlot.Show_Wave) Then
             Wave1 = New Wave.Wave()
-            For Each zre As Wave.Zeitreihe In SimReihen
+            For Each zre As Wave.TimeSeries In SimReihen
                 Wave1.Import_Series(zre)
             Next
             Call Wave1.Show()

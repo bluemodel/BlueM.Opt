@@ -88,7 +88,7 @@ Public Class Constraintfunction
     ''' Die Grenzwertreihe
     ''' </summary>
     ''' <remarks>Nur bei Typ = "Reihe"</remarks>
-    Public GrenzReihe As Wave.Zeitreihe
+    Public GrenzReihe As Wave.TimeSeries
 
     ''' <summary>
     ''' Gibt die Bezeichnung zurück
