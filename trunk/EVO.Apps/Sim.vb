@@ -792,7 +792,7 @@ Public MustInherit Class Sim
         Dim AnzZeichen As Short
         Dim AnzZeil As Integer
         Dim i, j As Integer
-        Dim Zeilenarray() As String
+        Dim Zeilen As Collections.Generic.Dictionary(Of Integer, String)
         Dim Zeile As String
         Dim StrLeft As String
         Dim StrRight As String
@@ -817,25 +817,15 @@ Public MustInherit Class Sim
             StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
             StrReadSync = TextReader.Synchronized(StrRead)
 
-            'Anzahl der Zeilen feststellen
+            Zeilen = New Collections.Generic.Dictionary(Of Integer, String)
+
+            'Datei komplett einlesen
             AnzZeil = 0
-            On Error GoTo Handler
             Do
                 Zeile = StrRead.ReadLine.ToString
                 AnzZeil += 1
+                Zeilen.Add(AnzZeil, Zeile)
             Loop Until StrRead.Peek() = -1
-Handler:
-            If AnzZeil = 0 Then
-                Throw New Exception("Fehler beim lesen der Datei '" & DateiPfad & "'. Sie könnte leer sein.")
-            End If
-
-            ReDim Zeilenarray(AnzZeil - 1)
-
-            'Datei komplett einlesen
-            FiStr.Seek(0, SeekOrigin.Begin)
-            For j = 0 To AnzZeil - 1
-                Zeilenarray(j) = StrRead.ReadLine.ToString
-            Next
 
             StrReadSync.Close()
             StrRead.Close()
@@ -845,7 +835,10 @@ Handler:
             AnzZeichen = Me.mProblem.List_ModellParameter(i).SpBis - Me.mProblem.List_ModellParameter(i).SpVon + 1
 
             'Zeile einlesen und splitten
-            Zeile = Zeilenarray(Me.mProblem.List_ModellParameter(i).ZeileNr - 1)
+            Zeile = Zeilen(Me.mProblem.List_ModellParameter(i).ZeileNr)
+            If (Zeile.Length < Me.mProblem.List_ModellParameter(i).SpVon) Then
+                Throw New Exception("Der Modellparameter '" & Me.mProblem.List_ModellParameter(i).Bezeichnung & "' kann nicht geschrieben werden, da in der angegebenen Zeile und Spalte kein Platz ist!")
+            End If
             StrLeft = Zeile.Substring(0, Me.mProblem.List_ModellParameter(i).SpVon - 1)
             If (Zeile.Length > Me.mProblem.List_ModellParameter(i).SpBis) Then
                 StrRight = Zeile.Substring(Me.mProblem.List_ModellParameter(i).SpBis)
@@ -879,14 +872,14 @@ Handler:
             'Zeile wieder zusammensetzen
             Zeile = StrLeft & WertStr & StrRight
 
-            Zeilenarray(Me.mProblem.List_ModellParameter(i).ZeileNr - 1) = Zeile
+            Zeilen(Me.mProblem.List_ModellParameter(i).ZeileNr) = Zeile
 
             'Alle Zeilen wieder in Datei schreiben
             StrWrite = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
             StrWriteSync = TextWriter.Synchronized(StrWrite)
 
-            For j = 0 To AnzZeil - 1
-                StrWrite.WriteLine(Zeilenarray(j))
+            For Each Zeile In Zeilen.Values
+                StrWrite.WriteLine(Zeile)
             Next
 
             StrWriteSync.Close()
