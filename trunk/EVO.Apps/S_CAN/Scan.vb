@@ -35,7 +35,7 @@ Public Class Scan
 
     Private Parameter As Collection
     Private stoffe As String()
-    Private zeitreihen() As Wave.Zeitreihe
+    Private zeitreihen() As Wave.TimeSeries
 
     ''' <summary>
     ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
@@ -133,22 +133,22 @@ Public Class Scan
         'Schleife über Stoffe
         For k = 1 To Me.stoffe.GetUpperBound(0)
 
-            Me.zeitreihen(k - 1) = New Wave.Zeitreihe(stoffe(k))
+            Me.zeitreihen(k - 1) = New Wave.TimeSeries(stoffe(k))
 
             Dim tmpWert As Double
 
             'Schleife über Zeitschritte
-            For i = 0 To input.Zeitreihen(0).Length - 1
+            For i = 0 To input.TimeSeries(0).Length - 1
                 tmpWert = 0
 
                 'Schleife über Wellenlängen
-                For j = 2 To input.Zeitreihen.GetUpperBound(0)
-                    tmpWert += input.Zeitreihen(j).YWerte(i) * Parameter(input.Zeitreihen(j).Title)(stoffe(k))
+                For j = 2 To input.TimeSeries.GetUpperBound(0)
+                    tmpWert += input.TimeSeries(j).Values(i) * Parameter(input.TimeSeries(j).Title)(stoffe(k))
                 Next
 
                 tmpWert += Parameter("Konst")(stoffe(k))
 
-                Me.zeitreihen(k - 1).AddNode(input.Zeitreihen(0).XWerte(i), tmpWert)
+                Me.zeitreihen(k - 1).AddNode(input.TimeSeries(0).Dates(i), tmpWert)
 
             Next
 
@@ -189,8 +189,8 @@ Public Class Scan
         inputdatei = Me.WorkDir_Current & Me.Datensatz & "_input.WEL"
         Me.input = New Wave.WEL(inputdatei, True)
 
-        Me.SimStart = Me.input.Zeitreihen(0).Anfangsdatum
-        Me.SimEnde = Me.input.Zeitreihen(0).Enddatum
+        Me.SimStart = Me.input.TimeSeries(0).StartDate
+        Me.SimEnde = Me.input.TimeSeries(0).Enddate
         'Me.SimDT
 
     End Sub

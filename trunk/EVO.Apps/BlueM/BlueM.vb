@@ -402,7 +402,7 @@ Public Class BlueM
         Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir_Current & Me.Datensatz & ".WEL", True)
 
         'Reihen zu Simulationsergebnis hinzufügen
-        For Each zre As Wave.Zeitreihe In WELtmp.Zeitreihen
+        For Each zre As Wave.TimeSeries In WELtmp.TimeSeries
             Me.SimErgebnis.Reihen.Add(zre.Title, zre)
         Next
 
@@ -415,7 +415,7 @@ Public Class BlueM
             Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
 
             'Reihen zu Simulationsergebnis hinzufügen
-            For Each zre As Wave.Zeitreihe In KWLtmp.Zeitreihen
+            For Each zre As Wave.TimeSeries In KWLtmp.TimeSeries
                 Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
 

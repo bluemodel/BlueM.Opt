@@ -43,13 +43,13 @@ Public MustInherit Class ObjectiveFunction
         ''' <summary>
         ''' Ergebnisreihen (Key ist ObjectiveFunction Name)
         ''' </summary>
-        Public Reihen As Dictionary(Of String, Wave.Zeitreihe)
+        Public Reihen As Dictionary(Of String, Wave.TimeSeries)
         ''' <summary>
         ''' Löscht alle vorhandenen Ergebnisse
         ''' </summary>
         Public Sub Clear()
             Me.Werte = New Dictionary(Of String, Double)
-            Me.Reihen = New Dictionary(Of String, Wave.Zeitreihe)
+            Me.Reihen = New Dictionary(Of String, Wave.TimeSeries)
         End Sub
     End Structure
 
@@ -188,7 +188,7 @@ Public MustInherit Class ObjectiveFunction
     ''' <param name="Funktion">comparison function</param>
     ''' <returns>function value</returns>
     ''' <remarks>BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!</remarks>
-    Protected Shared Function compareSeries(ByVal SimReihe As Wave.Zeitreihe, ByVal RefReihe As Wave.Zeitreihe, ByVal Funktion As String) As Double
+    Protected Shared Function compareSeries(ByVal SimReihe As Wave.TimeSeries, ByVal RefReihe As Wave.TimeSeries, ByVal Funktion As String) As Double
 
         Dim QWert As Double
         Dim i As Integer
@@ -206,7 +206,7 @@ Public MustInherit Class ObjectiveFunction
                 '------------------------
                 QWert = 0
                 For i = 0 To SimReihe.Length - 1
-                    QWert += (RefReihe.YWerte(i) - SimReihe.YWerte(i)) ^ 2
+                    QWert += (RefReihe.Values(i) - SimReihe.Values(i)) ^ 2
                 Next
 
             Case "Diff"
@@ -214,7 +214,7 @@ Public MustInherit Class ObjectiveFunction
                 '----------------
                 QWert = 0
                 For i = 0 To SimReihe.Length - 1
-                    QWert += Math.Abs(RefReihe.YWerte(i) - SimReihe.YWerte(i))
+                    QWert += Math.Abs(RefReihe.Values(i) - SimReihe.Values(i))
                 Next
 
             Case "Volf"
@@ -223,8 +223,8 @@ Public MustInherit Class ObjectiveFunction
                 Dim VolSim As Double = 0
                 Dim VolZiel As Double = 0
                 For i = 0 To SimReihe.Length - 1
-                    VolSim += SimReihe.YWerte(i)
-                    VolZiel += RefReihe.YWerte(i)
+                    VolSim += SimReihe.Values(i)
+                    VolZiel += RefReihe.Values(i)
                 Next
                 'Differenz bilden und auf ZielVolumen beziehen
                 QWert = Math.Abs(VolZiel - VolSim) / VolZiel * 100
@@ -234,7 +234,7 @@ Public MustInherit Class ObjectiveFunction
                 '-------------------------------------------------------------------
                 Dim nUnter As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < RefReihe.YWerte(i)) Then
+                    If (SimReihe.Values(i) < RefReihe.Values(i)) Then
                         nUnter += 1
                     End If
                 Next
@@ -245,8 +245,8 @@ Public MustInherit Class ObjectiveFunction
                 '---------------------------
                 Dim sUnter As Double = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) < RefReihe.YWerte(i)) Then
-                        sUnter += RefReihe.YWerte(i) - SimReihe.YWerte(i)
+                    If (SimReihe.Values(i) < RefReihe.Values(i)) Then
+                        sUnter += RefReihe.Values(i) - SimReihe.Values(i)
                     End If
                 Next
                 QWert = sUnter
@@ -256,7 +256,7 @@ Public MustInherit Class ObjectiveFunction
                 '------------------------------------------------------------------
                 Dim nUeber As Integer = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > RefReihe.YWerte(i)) Then
+                    If (SimReihe.Values(i) > RefReihe.Values(i)) Then
                         nUeber += 1
                     End If
                 Next
@@ -267,8 +267,8 @@ Public MustInherit Class ObjectiveFunction
                 '--------------------------
                 Dim sUeber As Double = 0
                 For i = 0 To SimReihe.Length - 1
-                    If (SimReihe.YWerte(i) > RefReihe.YWerte(i)) Then
-                        sUeber += SimReihe.YWerte(i) - RefReihe.YWerte(i)
+                    If (SimReihe.Values(i) > RefReihe.Values(i)) Then
+                        sUeber += SimReihe.Values(i) - RefReihe.Values(i)
                     End If
                 Next
                 QWert = sUeber
@@ -279,12 +279,12 @@ Public MustInherit Class ObjectiveFunction
                 'Mittelwert bilden
                 Dim Qobs_quer, zaehler, nenner As Double
                 For i = 0 To SimReihe.Length - 1
-                    Qobs_quer += RefReihe.YWerte(i)
+                    Qobs_quer += RefReihe.Values(i)
                 Next
                 Qobs_quer = Qobs_quer / (SimReihe.Length)
                 For i = 0 To SimReihe.Length - 1
-                    zaehler += (RefReihe.YWerte(i) - SimReihe.YWerte(i)) * (RefReihe.YWerte(i) - SimReihe.YWerte(i))
-                    nenner += (RefReihe.YWerte(i) - Qobs_quer) * (RefReihe.YWerte(i) - Qobs_quer)
+                    zaehler += (RefReihe.Values(i) - SimReihe.Values(i)) * (RefReihe.Values(i) - SimReihe.Values(i))
+                    nenner += (RefReihe.Values(i) - Qobs_quer) * (RefReihe.Values(i) - Qobs_quer)
                 Next
                 'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
                 QWert = zaehler / nenner
@@ -304,9 +304,9 @@ Public MustInherit Class ObjectiveFunction
                 var_x = 0
                 var_y = 0
                 For i = 0 To SimReihe.Length - 1
-                    kovar += (SimReihe.YWerte(i) - avg_x) * (RefReihe.YWerte(i) - avg_y)
-                    var_x += (SimReihe.YWerte(i) - avg_x) ^ 2
-                    var_y += (RefReihe.YWerte(i) - avg_y) ^ 2
+                    kovar += (SimReihe.Values(i) - avg_x) * (RefReihe.Values(i) - avg_y)
+                    var_x += (SimReihe.Values(i) - avg_x) ^ 2
+                    var_y += (RefReihe.Values(i) - avg_y) ^ 2
                 Next
                 var_x = 1 / (SimReihe.Length - 1) * var_x
                 var_y = 1 / (SimReihe.Length - 1) * var_y

@@ -309,7 +309,7 @@ Public Class Smusi
                   datei = element & "_WEL.ASC"
                   ASCtmp = New Wave.ASC(Me.WorkDir_Current & datei, True)
                   'Simulationsergebnis abspeichern
-                  For Each zre As Wave.Zeitreihe In ASCtmp.Zeitreihen
+                  For Each zre As Wave.TimeSeries In ASCtmp.Zeitreihen
                     Me.SimErgebnis.Reihen.Add(element & "_" & zre.Title, zre)
                   Next
                   ASCtmp = Nothing
