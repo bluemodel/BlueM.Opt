@@ -103,6 +103,8 @@
     <Compile Include="SWMM\SWMM.vb" />
     <Compile Include="SWMM\SWMMThread.vb" />
     <Compile Include="S_CAN\Scan.vb" />
+    <Compile Include="TALSIM\TALSIM.vb" />
+    <Compile Include="TALSIM\TALSIMThread.vb" />
     <Compile Include="Testprobleme\Testprobleme.vb" />
   </ItemGroup>
   <ItemGroup>
