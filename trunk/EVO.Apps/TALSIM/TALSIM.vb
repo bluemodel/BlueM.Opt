@@ -264,12 +264,13 @@ Public Class Talsim
 
         Try
 
-            'write the path to the dataset into the talsim.run file
+            'write the path to the dataset and the dataset name into the talsim.run file
             Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
             If (Not File.Exists(runfile)) Then
                 Throw New Exception(runfile & " nicht gefunden!")
             End If
             Dim line As String
+            'read the file
             Dim filestr As New FileStream(runfile, FileMode.Open)
             Dim strread As New StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim lines As New Collections.Generic.List(Of String)
@@ -280,16 +281,18 @@ Public Class Talsim
             strread.Close()
             filestr.Close()
 
+            'overwrite the file
             Dim strwrite As New StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-
             For Each line In lines
-                If line.StartsWith("Path=")
+                If line.StartsWith("Path=") Then
                     'update the sim path
                     line = "Path=" & MyBase.WorkDir_Current
+                ElseIf line.StartsWith("System=") Then
+                    'update the dataset name
+                    line = "System=" & MyBase.Datensatz
                 End If
                 strwrite.WriteLine(line)
             Next
-
             strwrite.Close()
 
             'TALSIM starten
@@ -297,7 +300,7 @@ Public Class Talsim
             Dim startInfo As New ProcessStartInfo()
             startInfo.FileName = Me.exe_path
             startInfo.UseShellExecute = True
-            'startInfo.WindowStyle = ProcessWindowStyle.Minimized
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden
             startInfo.WorkingDirectory = IO.Path.GetDirectoryName(Me.exe_path)
             'start
             proc = Process.Start(startInfo)
