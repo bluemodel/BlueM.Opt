@@ -66,7 +66,7 @@ Public Class TalsimThread
             End If
             Dim line As String
             'read the file
-            Dim filestr As New IO.FileStream(runfile, IO.FileMode.Open)
+            Dim filestr As New IO.FileStream(runfile, IO.FileMode.Open, IO.FileAccess.Read)
             Dim strread As New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim lines As New Collections.Generic.List(Of String)
             Do
