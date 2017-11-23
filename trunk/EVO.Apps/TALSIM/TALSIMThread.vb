@@ -24,9 +24,10 @@
 ' TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
 ' EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '--------------------------------------------------------------------------------------------
-'
-'Klasse beinhaltet alle Infomationen für einen Simulationslauf im Thread
-'***********************************************************************
+''' <summary>
+''' Klasse beinhaltet alle Infomationen für einen Simulationslauf im Thread
+''' </summary>
+''' <remarks></remarks>
 Public Class TalsimThread
 
     Private Thread_ID As Integer
@@ -35,6 +36,7 @@ Public Class TalsimThread
     Private DS_Name As String
     Private SimIsOK As Boolean
     Private launchReady As Boolean
+    Public Shared exe_path As String
 
     Public Sub New(ByVal _Thread_ID As Integer, ByVal _Child_ID As Integer, ByVal _WorkFolder As String, ByVal _DS_Name As String)
         Me.Thread_ID = _Thread_ID
@@ -43,17 +45,94 @@ Public Class TalsimThread
         Me.DS_Name = _DS_Name
     End Sub
 
-    'Die Funktion startet die Simulation mit dem entsprechendem WorkingDir
-    '*********************************************************************
+    ''' <summary>
+    ''' Die Funktion startet die Simulation mit dem entsprechendem WorkingDir
+    ''' </summary>
+    ''' <remarks></remarks>
     Public Sub launchSim()
 
         Me.SimIsOK = False
+        Dim isFinished As Boolean
         Me.launchReady = False
 
         'Priority
         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
-        'TODO: copy procedure from TALSIM.launchSim() but find a way around using the talsim.run file
+        Try
+            'write the path to the dataset and the dataset name into a new run file
+            Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
+            If (Not IO.File.Exists(runfile)) Then
+                Throw New Exception(runfile & " nicht gefunden!")
+            End If
+            Dim line As String
+            'read the file
+            Dim filestr As New IO.FileStream(runfile, IO.FileMode.Open)
+            Dim strread As New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim lines As New Collections.Generic.List(Of String)
+            Do
+                line = strread.ReadLine()
+                lines.Add(line)
+            Loop Until strread.Peek = -1
+            strread.Close()
+            filestr.Close()
+
+            'write a new run file
+            Dim runfilename As String = Me.DS_Name & "_" & Me.Thread_ID & ".run"
+            runfile = IO.Path.Combine(IO.Path.GetDirectoryName(TalsimThread.exe_path), runfilename)
+            Dim strwrite As New IO.StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            For Each line In lines
+                If line.StartsWith("Path=") Then
+                    'update the sim path
+                    line = "Path=" & Me.WorkFolder
+                ElseIf line.StartsWith("System=") Then
+                    'update the dataset name
+                    line = "System=" & Me.DS_Name
+                End If
+                strwrite.WriteLine(line)
+            Next
+            strwrite.Close()
+
+            'TALSIM starten
+            Dim proc As Process
+            Dim startInfo As New ProcessStartInfo()
+            startInfo.FileName = TalsimThread.exe_path
+            startInfo.Arguments = runfilename
+            startInfo.UseShellExecute = True
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden
+            startInfo.WorkingDirectory = IO.Path.GetDirectoryName(TalsimThread.exe_path)
+            'start
+            proc = Process.Start(startInfo)
+            'wait until finished
+            Do
+                isFinished = proc.WaitForExit(100)
+                System.Windows.Forms.Application.DoEvents()
+            Loop Until isFinished
+            'close the process
+            proc.Close()
+
+            'TODO: check contents of .SIMEND?
+            'if .ERR file exists, simulation finished with errors
+            If IO.File.Exists(IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".err")) Then
+                Throw New Exception("Simulation finished with errors!")
+            End If
+
+            'Simulation erfolgreich
+            Me.SimIsOK = True
+
+        Catch ex As Exception
+
+            'Simulationsfehler aufgetreten
+            EVO.Diagramm.Monitor.getInstance().LogAppend(ex.Message)
+
+            'Simulation nicht erfolgreich
+            Me.SimIsOK = False
+
+        Finally
+
+            'ready for next sim
+            Me.launchReady = True
+
+        End Try
 
     End Sub
 

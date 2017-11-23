@@ -77,7 +77,7 @@ Public Class Talsim
     ''' <returns>True</returns>
     Public Overrides ReadOnly Property MultithreadingSupported() As Boolean
         Get
-            Return False
+            Return True
         End Get
     End Property
 
@@ -116,6 +116,7 @@ Public Class Talsim
         Call MyBase.prepareSimulation()
 
         'Thread-Objekte instanzieren
+        TalsimThread.exe_path = Me.exe_path
         ReDim MyTalsimThreads(n_Threads - 1)
         For i = 0 To n_Threads - 1
             MyTalsimThreads(i) = New TalsimThread(i, -1, "Folder", Datensatz)
