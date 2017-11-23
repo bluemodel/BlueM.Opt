@@ -102,6 +102,8 @@ Public Class TalsimThread
             startInfo.WorkingDirectory = IO.Path.GetDirectoryName(TalsimThread.exe_path)
             'start
             proc = Process.Start(startInfo)
+            'DEBUG: write to log
+            'EVO.Diagramm.Monitor.getInstance().LogAppend("Thread " & Me.Thread_ID & ": " & startInfo.FileName & " " & startInfo.Arguments)
             'wait until finished
             Do
                 isFinished = proc.WaitForExit(100)
@@ -110,10 +112,14 @@ Public Class TalsimThread
             'close the process
             proc.Close()
 
-            'TODO: check contents of .SIMEND?
             'if .ERR file exists, simulation finished with errors
             If IO.File.Exists(IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".err")) Then
                 Throw New Exception("Simulation finished with errors!")
+            End If
+
+            'if .SIMEND does not exist, simulation aborted prematurely
+            If Not IO.File.Exists(IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".SIMEND")) Then
+                Throw New Exception("Thread " & Me.Thread_ID & ": " & "Simulation aborted prematurely!")
             End If
 
             'Simulation erfolgreich
