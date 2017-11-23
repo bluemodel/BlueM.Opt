@@ -64,7 +64,7 @@ Public Class Talsim
             exts.AddRange(New String() {"ALL", "SYS", "FKT", "KTR", "EXT", "JGG", "WGG", _
                                         "TGG", "TAL", "HYA", "TRS", "EZG", "EIN", "URB", _
                                         "VER", "RUE", "BEK", "BOA", "BOD", "LNZ", "EFL", _
-                                        "DIF", "ZRE", "BIN", "FKA", "SCE", "QAB", "DAT"})
+                                        "DIF", "FKA", "SCE", "QAB", "UPD"})
 
             Return exts
 
@@ -100,7 +100,7 @@ Public Class Talsim
 
         'Pfad zu talsimw.exe bestimmen
         '-----------------------------
-        exe_path = System.Windows.Forms.Application.StartupPath() & "\TALSIM\talsimw.exe"
+        exe_path = System.Windows.Forms.Application.StartupPath() & "\TALSIM\talsimw32.exe"
 
         If (Not File.Exists(exe_path)) Then
             Throw New Exception(exe_path & " nicht gefunden!")
@@ -185,7 +185,7 @@ Public Class Talsim
 
         'WEL output
         If Not settings("WEL") = "J"
-            Throw New Exception("Die Ganglinienausgabe ist in der .ALL Dazei nicht eingeschaltet! Es muss 'WEL=J' eingestellt sein!")
+            Throw New Exception("Die Ganglinienausgabe ist in der .ALL Datei nicht eingeschaltet! Es muss 'WEL=J' eingestellt sein!")
         End If
 
         'store SimStart and SimEnd
@@ -264,7 +264,7 @@ Public Class Talsim
 
         Try
 
-            'write the path to the dataset and the dataset name into the talsim.run file
+            'write the path to the dataset and the dataset name into a new run file
             Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
             If (Not File.Exists(runfile)) Then
                 Throw New Exception(runfile & " nicht gefunden!")
@@ -281,7 +281,9 @@ Public Class Talsim
             strread.Close()
             filestr.Close()
 
-            'overwrite the file
+            'write a new run file
+            Dim runfilename As String = MyBase.Datensatz & ".run"
+            runfile = IO.Path.Combine(IO.Path.GetDirectoryName(Me.exe_path), runfilename)
             Dim strwrite As New StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
             For Each line In lines
                 If line.StartsWith("Path=") Then
@@ -299,6 +301,7 @@ Public Class Talsim
             Dim proc As Process
             Dim startInfo As New ProcessStartInfo()
             startInfo.FileName = Me.exe_path
+            startInfo.Arguments = runfilename
             startInfo.UseShellExecute = True
             startInfo.WindowStyle = ProcessWindowStyle.Hidden
             startInfo.WorkingDirectory = IO.Path.GetDirectoryName(Me.exe_path)
