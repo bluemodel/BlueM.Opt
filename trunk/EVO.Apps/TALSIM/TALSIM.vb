@@ -100,7 +100,7 @@ Public Class Talsim
 
         'Pfad zu talsimw.exe bestimmen
         '-----------------------------
-        exe_path = System.Windows.Forms.Application.StartupPath() & "\TALSIM\talsimw32.exe"
+        exe_path = System.Windows.Forms.Application.StartupPath() & "\TALSIM\talsimw64.exe"
 
         If (Not File.Exists(exe_path)) Then
             Throw New Exception(exe_path & " nicht gefunden!")
@@ -130,12 +130,10 @@ Public Class Talsim
 
         Call MyBase.setProblem(prob)
 
-        'BlueM-spezifische Weiterverarbeitung von ZielReihen:
-        '====================================================
+        'TALSIM-spezifische Weiterverarbeitung von ZielReihen:
         Dim objective As Common.ObjectiveFunction
 
-        'KWL: Feststellen, ob irgendeine Zielfunktion die KTR.WEL-Datei benutzt
-        '------------------------------------------------------------------
+        'KTR.WEL: Feststellen, ob irgendeine Zielfunktion die KTR.WEL-Datei benutzt
         For Each objective In Me.mProblem.List_ObjectiveFunctions
             If (objective.Datei = "KTR.WEL") Then
                 Me.useKWL = True
@@ -178,11 +176,6 @@ Public Class Talsim
         Loop Until StrRead.Peek() = -1
 
         'check settings
-
-        'version
-        If Not settings("VERSION") = "1.1" Then
-            Throw New Exception("Die .ALL Datei benutzt nicht das erwartete Format mit VERSION=1.1!")
-        End If
 
         'WEL output
         If Not settings("WEL") = "J"
@@ -266,6 +259,7 @@ Public Class Talsim
         Try
 
             'write the path to the dataset and the dataset name into a new run file
+            'TODO: this is actually only necessary once per optimization run!
             Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
             If (Not File.Exists(runfile)) Then
                 Throw New Exception(runfile & " nicht gefunden!")
