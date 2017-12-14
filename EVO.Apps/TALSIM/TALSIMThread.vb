@@ -60,6 +60,7 @@ Public Class TalsimThread
 
         Try
             'write the path to the dataset and the dataset name into a new run file
+            'TODO: this is actually only necessary once per optimization run!
             Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
             If (Not IO.File.Exists(runfile)) Then
                 Throw New Exception(runfile & " nicht gefunden!")
