@@ -108,7 +108,8 @@ Public Class TalsimThread
             startInfo.WorkingDirectory = IO.Path.GetDirectoryName(TalsimThread.exe_path)
 
             'Carry out up to 5 simulation attempts, because TALSIM sometimes blocks access to the time series files in multithreading mode
-            For i_attempt As Integer = 1 To 5
+            Dim n_attempts As Integer = 5
+            For i_attempt As Integer = 1 To n_attempts
 
                 'start
                 proc = Process.Start(startInfo)
@@ -128,7 +129,12 @@ Public Class TalsimThread
                     Exit For
                 End If
 
-                EVO.Diagramm.Monitor.getInstance().LogAppend("TALSIM Simulationsversuch " & i_attempt & " fehlgeschlagen, versuche es erneut...")
+                If i_attempt < n_attempts Then
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("TALSIM Simulationsversuch " & i_attempt & " fehlgeschlagen, versuche es erneut...")
+                    System.Threading.Thread.Sleep(100)
+                Else
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("TALSIM Simulationsversuch " & i_attempt & " fehlgeschlagen, Parametersatz wird verworfen!")
+                End If
 
             Next
 
