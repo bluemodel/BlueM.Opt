@@ -120,7 +120,7 @@ Public Class TalsimThread
             Dim errfile As String = IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".err")
             If IO.File.Exists(errfile) Then
                 'read err-file
-                Dim errmsg As String = "Simulation finished with errors:"
+                Dim errmsg As String = "TALSIM Simulation finished with errors:"
                 filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
                 strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
                 Do
@@ -135,7 +135,7 @@ Public Class TalsimThread
 
             'if .SIMEND does not exist, simulation aborted prematurely
             If Not IO.File.Exists(IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".SIMEND")) Then
-                Throw New Exception("Thread " & Me.Thread_ID & ": " & "Simulation aborted prematurely!")
+                Throw New Exception("Thread " & Me.Thread_ID & ": " & "TALSIM Simulation aborted prematurely!")
             End If
 
             'Simulation erfolgreich
