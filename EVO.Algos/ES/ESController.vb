@@ -750,9 +750,11 @@ Public Class ESController
                     End If 'Ende alle Nachfahren (multithread)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("Generation " & PES1.PES_iAkt.iAktGen & " abgeschlossen.")
+
                     'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
                     'Die neuen Eltern werden generiert
-                    EVO.Diagramm.Monitor.getInstance().LogAppend("Generiere neue Eltern...")
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("Bestimme neue Eltern...")
                     Call PES1.EsEltern()
 
                     'Sekundäre Population
