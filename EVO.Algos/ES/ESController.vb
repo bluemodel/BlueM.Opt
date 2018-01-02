@@ -590,11 +590,15 @@ Public Class ESController
         'xxxxxxxxxxxxxxxx
         For PES1.PES_iAkt.iAktRunde = 0 To Me.mySettings.PES.Pop.N_Runden - 1
 
+            EVO.Diagramm.Monitor.getInstance().LogAppend("Starte Runde " & PES1.PES_iAkt.iAktRunde & "...")
+
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
             'Über alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 0 To Me.mySettings.PES.Pop.N_Popul - 1
+
+                EVO.Diagramm.Monitor.getInstance().LogAppend("Starte Population " & PES1.PES_iAkt.iAktPop & "...")
 
                 'POPULATIONS REPRODUKTIONSPROZESS
                 '################################
@@ -609,6 +613,8 @@ Public Class ESController
                 'Über alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxx
                 For PES1.PES_iAkt.iAktGen = 0 To Me.mySettings.PES.N_Gen - 1
+
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("Starte Generation " & PES1.PES_iAkt.iAktGen & "...")
 
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
@@ -656,6 +662,8 @@ Public Class ESController
                             '----------------------------
                             If (Not isOK(i_Nachf)) Then
 
+                                EVO.Diagramm.Monitor.getInstance().LogAppend("Evaluierung des Nachfahren " & i_Nachf & " fehlgeschlagen, es wird ein neuer Parametersatz generiert und evaluiert...")
+
                                 Dim n_Tries As Integer = 0
 
                                 Do
@@ -695,6 +703,17 @@ Public Class ESController
                         'Stop?
                         If (Me.stopped) Then Exit Sub
 
+                        'Anzahl Evaluierungsfehler bestimmen und in Log schreiben
+                        Dim errorcount As Integer = 0
+                        For Each success As Boolean In isOK
+                            If Not success Then errorcount += 1
+                        Next
+                        If errorcount > 0 Then
+                            Dim msg As String
+                            msg = "Evaluierung von " & errorcount & " Nachfahren der Generation fehlgeschlagen, es werden neue Parametersätze generiert und evaluiert..."
+                            EVO.Diagramm.Monitor.getInstance().LogAppend(msg)
+                        End If
+
                         'Alle evaluierten Individuen durchlaufen
                         For i_Nachf = 0 To inds.GetUpperBound(0)
 
@@ -733,11 +752,14 @@ Public Class ESController
 
                     'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
                     'Die neuen Eltern werden generiert
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("Generiere neue Eltern...")
                     Call PES1.EsEltern()
 
                     'Sekundäre Population
                     '====================
                     If (Me.mySettings.PES.OptModus = Common.Constants.EVO_MODUS.Multi_Objective) Then
+
+                        EVO.Diagramm.Monitor.getInstance().LogAppend("Aktualisiere Sekundäre Population...")
 
                         'SekPop abspeichern
                         '------------------
