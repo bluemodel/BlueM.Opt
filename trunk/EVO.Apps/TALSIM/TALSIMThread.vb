@@ -97,6 +97,8 @@ Public Class TalsimThread
             strwrite.Close()
 
             'TALSIM starten
+            Dim errfile As String = IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".err")
+            Dim simendfile As String = IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".SIMEND")
             Dim proc As Process
             Dim startInfo As New ProcessStartInfo()
             startInfo.FileName = TalsimThread.exe_path
@@ -104,42 +106,56 @@ Public Class TalsimThread
             startInfo.UseShellExecute = True
             startInfo.WindowStyle = ProcessWindowStyle.Hidden
             startInfo.WorkingDirectory = IO.Path.GetDirectoryName(TalsimThread.exe_path)
-            'start
-            proc = Process.Start(startInfo)
-            'DEBUG: write to log
-            'EVO.Diagramm.Monitor.getInstance().LogAppend("Thread " & Me.Thread_ID & ": " & startInfo.FileName & " " & startInfo.Arguments)
-            'wait until finished
-            Do
-                isFinished = proc.WaitForExit(100)
-                System.Windows.Forms.Application.DoEvents()
-            Loop Until isFinished
-            'close the process
-            proc.Close()
 
-            'if .ERR file exists, simulation finished with errors
-            Dim errfile As String = IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".err")
-            If IO.File.Exists(errfile) Then
-                'read err-file
-                Dim errmsg As String = "TALSIM Simulation finished with errors:"
-                filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
-                strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            'Carry out up to 5 simulation attempts, because TALSIM sometimes blocks access to the time series files in multithreading mode
+            For i_attempt As Integer = 1 To 5
+
+                'start
+                proc = Process.Start(startInfo)
+                'DEBUG: write to log
+                'EVO.Diagramm.Monitor.getInstance().LogAppend("Thread " & Me.Thread_ID & ": " & startInfo.FileName & " " & startInfo.Arguments)
+                'wait until finished
                 Do
-                    line = strread.ReadLine()
-                    errmsg &= EVO.Common.eol & line
-                Loop Until strread.Peek = -1
-                strread.Close()
-                filestr.Close()
+                    isFinished = proc.WaitForExit(100)
+                    System.Windows.Forms.Application.DoEvents()
+                Loop Until isFinished
+                'close the process
+                proc.Close()
 
-                Throw New Exception(errmsg)
+                'Simulation erfolgreich?
+                If Not IO.File.Exists(errfile) And IO.File.Exists(simendfile) Then
+                    Me.SimIsOK = True
+                    Exit For
+                End If
+
+                EVO.Diagramm.Monitor.getInstance().LogAppend("TALSIM Simulationsversuch " & i_attempt & " fehlgeschlagen, versuche es erneut...")
+
+            Next
+
+            If Not Me.SimIsOK Then
+
+                'if .ERR file exists, simulation finished with errors
+                If IO.File.Exists(errfile) Then
+                    'read err-file
+                    Dim errmsg As String = "TALSIM Simulation mit Fehlern beendet:"
+                    filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
+                    strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+                    Do
+                        line = strread.ReadLine()
+                        errmsg &= EVO.Common.eol & line
+                    Loop Until strread.Peek = -1
+                    strread.Close()
+                    filestr.Close()
+
+                    Throw New Exception(errmsg)
+                End If
+
+                'if .SIMEND does not exist, simulation aborted prematurely
+                If Not IO.File.Exists(simendfile) Then
+                    Throw New Exception("Thread " & Me.Thread_ID & ": " & "TALSIM Simulation vorzeitig abgebrochen!")
+                End If
+
             End If
-
-            'if .SIMEND does not exist, simulation aborted prematurely
-            If Not IO.File.Exists(IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".SIMEND")) Then
-                Throw New Exception("Thread " & Me.Thread_ID & ": " & "TALSIM Simulation aborted prematurely!")
-            End If
-
-            'Simulation erfolgreich
-            Me.SimIsOK = True
 
         Catch ex As Exception
 
