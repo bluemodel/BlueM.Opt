@@ -51,6 +51,9 @@ Public Class TalsimThread
     ''' <remarks></remarks>
     Public Sub launchSim()
 
+        Dim filestr As IO.FileStream
+        Dim strread As IO.StreamReader
+
         Me.SimIsOK = False
         Dim isFinished As Boolean
         Me.launchReady = False
@@ -67,8 +70,8 @@ Public Class TalsimThread
             End If
             Dim line As String
             'read the file
-            Dim filestr As New IO.FileStream(runfile, IO.FileMode.Open, IO.FileAccess.Read)
-            Dim strread As New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            filestr = New IO.FileStream(runfile, IO.FileMode.Open, IO.FileAccess.Read)
+            strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim lines As New Collections.Generic.List(Of String)
             Do
                 line = strread.ReadLine()
@@ -114,8 +117,20 @@ Public Class TalsimThread
             proc.Close()
 
             'if .ERR file exists, simulation finished with errors
-            If IO.File.Exists(IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".err")) Then
-                Throw New Exception("Simulation finished with errors!")
+            Dim errfile As String = IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".err")
+            If IO.File.Exists(errfile) Then
+                'read err-file
+                Dim errmsg As String = "Simulation finished with errors:"
+                filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
+                strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+                Do
+                    line = strread.ReadLine()
+                    errmsg &= EVO.Common.eol & line
+                Loop Until strread.Peek = -1
+                strread.Close()
+                filestr.Close()
+
+                Throw New Exception(errmsg)
             End If
 
             'if .SIMEND does not exist, simulation aborted prematurely
