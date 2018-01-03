@@ -63,13 +63,13 @@ Public Class TalsimThread
 
         Try
             'write the path to the dataset and the dataset name into a new run file
-            'TODO: this is actually only necessary once per optimization run!
+            'this is done for every simulation because otherwise we would have to keep track of runfiles and thread IDs separately
             Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
             If (Not IO.File.Exists(runfile)) Then
                 Throw New Exception(runfile & " nicht gefunden!")
             End If
             Dim line As String
-            'read the file
+            'read the template run file
             filestr = New IO.FileStream(runfile, IO.FileMode.Open, IO.FileAccess.Read)
             strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim lines As New Collections.Generic.List(Of String)
