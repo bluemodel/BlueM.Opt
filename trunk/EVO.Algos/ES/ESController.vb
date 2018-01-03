@@ -793,6 +793,7 @@ Public Class ESController
                     End If
 
                     'Verlauf aktualisieren
+                    Me.myProgress.iNachf = 0
                     Me.myProgress.iGen = PES1.PES_iAkt.iAktGen + 1
 
                     System.Windows.Forms.Application.DoEvents()
@@ -869,8 +870,8 @@ Public Class ESController
         PES1.PES_iAkt.iAktNachf = iNachfahre
         Call PES1.EsBest(ind)
 
-        'Verlauf aktualisieren
-        Me.myProgress.iNachf = iNachfahre + 1
+        'Verlauf aktualisieren (don't use iNachf as they are not always processed in order)
+        Me.myProgress.NextNachf()
 
         System.Windows.Forms.Application.DoEvents()
 
