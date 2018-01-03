@@ -4,7 +4,7 @@ BlueM.Opt Release Notes
 Version 1.6 (beta)
 -----------------------------
 NEW:
-* Added support for the simulation engine TALSIM. talsimw.exe has to be provided by the user.
+* Added support for the simulation engine TALSIM. talsimw64.exe has to be provided by the user.
 CHANGED:
 * Updated Wave to v1.6
 FIXED:
