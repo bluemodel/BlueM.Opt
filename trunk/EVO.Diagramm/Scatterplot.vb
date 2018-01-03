@@ -671,7 +671,7 @@ Partial Public Class Scatterplot
                         Case Common.SPACE.SolutionSpace
                             serie.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID.ToString())
                         Case Common.SPACE.DecisionSpace
-                            serie.Add(ind.OptParameter_RWerte(i), ind.OptParameter_RWerte(j), ind.ID.ToString())
+                            serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
                     End Select
 
                     'Mark anzeigen
