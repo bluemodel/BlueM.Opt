@@ -107,7 +107,7 @@ namespace IHWB.EVO.MetaEvo
         /// <param name="inputTestproblem">Testproblem-Objekt</param>
         public void InitApp(ref IHWB.EVO.Apps.Testprobleme testprobleme_input)
         {
-            this.apptype = IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme;
+            this.apptype = IHWB.EVO.Common.Constants.ApplicationTypes.Testproblems;
             this.testprobleme = testprobleme_input;
         }
 
@@ -423,7 +423,7 @@ namespace IHWB.EVO.MetaEvo
                     progress1.iNachf = 0;
                     //Simulieren
 
-                    if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
+                    if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testproblems)
                     {
                         for (int i = 0; i < generation.Length; i++)
                         {
@@ -923,7 +923,7 @@ namespace IHWB.EVO.MetaEvo
             storeInDB = (this.role == "Single PC") ? true : false;
 
             //Testproblem
-            if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme)
+            if (this.apptype == IHWB.EVO.Common.Constants.ApplicationTypes.Testproblems)
             {
                 //Evaluieren und zeichnen
                 this.testprobleme.Evaluate(ref ind, 0, ref this.hauptdiagramm1);

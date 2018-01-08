@@ -89,7 +89,7 @@ Public Class HJController
     ''' Initialisiert den Controller für Testprobleme
     ''' </summary>
     Public Sub InitApp(ByRef inputTestprobleme As EVO.Apps.Testprobleme) Implements IController.InitApp
-        Me.myAppType = ApplicationTypes.Testprobleme
+        Me.myAppType = ApplicationTypes.Testproblems
         Me.Testprobleme1 = inputTestprobleme
     End Sub
 

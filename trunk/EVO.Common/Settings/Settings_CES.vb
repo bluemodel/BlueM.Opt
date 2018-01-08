@@ -31,7 +31,7 @@ Public Class Settings_CES
 
 #Region "Eigenschaften"
 
-    Private _Startparameter As EVO_STARTPARAMETER
+    Private _Startparameter As EVO_STARTPARAMETERS
 
     Private _OptModus As String
 
@@ -39,7 +39,7 @@ Public Class Settings_CES
     Private _n_Generations As Integer
     Private _n_Parents As Integer
     Private _n_Children As Integer
-    Private _OptStrategie As EVO_STRATEGIE
+    Private _OptStrategie As EVO_STRATEGY
     Private _OptReprodOp As CES_REPRODOP
     Private _k_Value As Integer
     Private _OptMutOperator As CES_MUTATION
@@ -69,11 +69,11 @@ Public Class Settings_CES
     ''' <summary>
     ''' Startparameter (NICHT GENUTZT!)
     ''' </summary>
-    Public Property Startparameter() As EVO_STARTPARAMETER
+    Public Property Startparameter() As EVO_STARTPARAMETERS
         Get
             Return _Startparameter
         End Get
-        Set(ByVal value As EVO_STARTPARAMETER)
+        Set(ByVal value As EVO_STARTPARAMETERS)
             _Startparameter = value
         End Set
     End Property
@@ -129,11 +129,11 @@ Public Class Settings_CES
     ''' <summary>
     ''' "plus" oder "minus" Strategie
     ''' </summary>
-    Public Property OptStrategie() As EVO_STRATEGIE
+    Public Property OptStrategie() As EVO_STRATEGY
         Get
             Return _OptStrategie
         End Get
-        Set(ByVal value As EVO_STRATEGIE)
+        Set(ByVal value As EVO_STRATEGY)
             _OptStrategie = value
         End Set
     End Property
@@ -376,7 +376,7 @@ Public Class Settings_CES
     Public Sub setStandard(ByVal Method As String)
 
         'wird nicht genutzt!
-        Me.Startparameter = EVO_STARTPARAMETER.Original
+        Me.Startparameter = EVO_STARTPARAMETERS.Original
 
         Me.OptModus = Method
 
@@ -388,7 +388,7 @@ Public Class Settings_CES
                 Me.N_Generations = 10
                 Me.N_Parents = 5
                 Me.N_Children = 20
-                Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
+                Me.OptStrategie = EVO_STRATEGY.Plus_Strategy
                 Me.OptReprodOp = CES_REPRODOP.Uniform_Crossover
                 Me.OptMutOperator = CES_MUTATION.RND_Switch
                 Me.Pr_MutRate = 10
@@ -414,7 +414,7 @@ Public Class Settings_CES
                 Me.N_Generations = 100
                 Me.N_Parents = 3
                 Me.N_Children = 7
-                Me.OptStrategie = EVO_STRATEGIE.Plus_Strategie
+                Me.OptStrategie = EVO_STRATEGY.Plus_Strategy
                 Me.OptReprodOp = CES_REPRODOP.Uniform_Crossover
                 Me.OptMutOperator = CES_MUTATION.RND_Switch
                 Me.Pr_MutRate = 10

@@ -113,7 +113,7 @@ Partial Public Class Scatterplot
 
             If (Me.ShowRefResult And Me.ShownSpace = Common.SPACE.DecisionSpace)
                 If (Not Me.OptResultRef.holdsOptparameters)
-                    MsgBox("Das Vergleichsergebnis wurde ohne OptParameter geladen und kann daher nicht im Entscheidungsraum angezeigt werden!", MsgBoxStyle.Information, "Scatterplot-Matrix")
+                    MsgBox("The comparison result was loaded without optimization parameters and can therefore not be displayed in the decision space!", MsgBoxStyle.Information, "Scatterplot matrix")
                     Me.ShowRefResult = False
                 End If
             End If
@@ -141,11 +141,11 @@ Partial Public Class Scatterplot
         Select Case Me.ShownSpace
 
             Case Common.SPACE.SolutionSpace
-                Me.Text &= " - Solution Space"
+                Me.Text &= " - Solution space"
                 Call Me.draw_solutionspace()
 
             Case Common.SPACE.DecisionSpace
-                Me.Text &= " - Decision Space"
+                Me.Text &= " - Decision space"
                 Call Me.draw_decisionspace()
 
         End Select
@@ -306,7 +306,7 @@ Partial Public Class Scatterplot
 
                             shape1 = New Steema.TeeChart.Styles.Shape(.Chart)
                             shape1.Style = Steema.TeeChart.Styles.ShapeStyles.Rectangle
-                            shape1.Title = "Verbesserungsbereich"
+                            shape1.Title = "Area of improvement"
 
                             'Shape formatieren
                             shape1.Color = Color.Black
@@ -360,7 +360,7 @@ Partial Public Class Scatterplot
                         'Alle Lösungen
                         '-------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
@@ -376,7 +376,7 @@ Partial Public Class Scatterplot
                     'Startwert
                     '=========
                     If (Me.ShowStartValue) Then
-                        serie = .getSeriesPoint("Startwert", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         ind = Me.OptResult.getSolution(1)
                         serie.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID.ToString())
                     End If
@@ -385,9 +385,9 @@ Partial Public Class Scatterplot
                     'Vergleichsergebnis anzeigen
                     '===========================
                     If (Me.ShowRefResult) Then
-                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (Vergleichsergebnis)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (comparison result)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind In Me.OptResultRef.getSekPop()
-                            serie.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID & " (Vergleichsergebnis)")
+                            serie.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID & " (comparison result)")
                         Next
                     End If
 
@@ -529,7 +529,7 @@ Partial Public Class Scatterplot
                         'Alle Lösungen
                         '-------------
                         serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
@@ -545,17 +545,17 @@ Partial Public Class Scatterplot
                     'Vergleichsergebnis anzeigen
                     '===========================
                     If (Me.ShowRefResult) Then
-                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (Vergleichsergebnis)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (comparison result)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
-                            serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID & " (Vergleichsergebnis)")
+                            serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID & " (comparison result)")
                         Next
                     End If
 
                     'Startwerte der Parameter eintragen
                     '==================================
                     If (Me.ShowStartValue) Then
-                        serie = .getSeriesPoint("Startwert", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        serie.Add(Me.mProblem.List_OptParameter(Me.Auswahl(i)).StartWert, Me.mProblem.List_OptParameter(Me.Auswahl(j)).StartWert, "Startwert")
+                        serie = .getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie.Add(Me.mProblem.List_OptParameter(Me.Auswahl(i)).StartWert, Me.mProblem.List_OptParameter(Me.Auswahl(j)).StartWert, "Start value")
                     End If
 
                     'Diagramme auf der Diagonalen ausblenden
@@ -642,7 +642,7 @@ Partial Public Class Scatterplot
             End If
 
         Catch ex As Exception
-            MsgBox("Lösung nicht auswählbar!", MsgBoxStyle.Information)
+            MsgBox("Solution is not selectable!", MsgBoxStyle.Information)
         End Try
 
     End Sub
@@ -665,7 +665,7 @@ Partial Public Class Scatterplot
                 With Me.Diags(i, j)
 
                     'Roten Punkt zeichnen
-                    serie = .getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+                    serie = .getSeriesPoint("Selected solutions", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
 
                     Select Case Me.ShownSpace
                         Case Common.SPACE.SolutionSpace
@@ -700,7 +700,7 @@ Partial Public Class Scatterplot
                 With Me.Diags(i, j)
 
                     'Serie löschen
-                    serie = .getSeriesPoint("ausgewählte Lösungen")
+                    serie = .getSeriesPoint("Selected solutions")
                     serie.Dispose()
 
                 End With

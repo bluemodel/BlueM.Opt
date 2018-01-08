@@ -37,7 +37,7 @@ Public Class Settings_TSP
     Private _Problem As EnProblem
     Private _ReprodOperator As EnReprodOperator
     Private _MutOperator As EnMutOperator
-    Private _Strategy As EVO_STRATEGIE
+    Private _Strategy As EVO_STRATEGY
 
     Public Property N_Cities() As Integer
         Get
@@ -102,11 +102,11 @@ Public Class Settings_TSP
         End Set
     End Property
 
-    Public Property Strategy() As EVO_STRATEGIE
+    Public Property Strategy() As EVO_STRATEGY
         Get
             Return _Strategy
         End Get
-        Set(ByVal value As EVO_STRATEGIE)
+        Set(ByVal value As EVO_STRATEGY)
             _Strategy = value
         End Set
     End Property
@@ -121,7 +121,7 @@ Public Class Settings_TSP
         Problem = EnProblem.circle
         ReprodOperator = EnReprodOperator.Order_Crossover_OX
         MutOperator = EnMutOperator.Translocation_3_Opt
-        Strategy = EVO_STRATEGIE.Plus_Strategie
+        Strategy = EVO_STRATEGY.Plus_Strategy
     End Sub
 
 End Class

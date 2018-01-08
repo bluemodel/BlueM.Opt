@@ -447,9 +447,9 @@ Partial Class EVO_Einstellungen
         Label_OptModus.AutoSize = True
         Label_OptModus.Location = New System.Drawing.Point(2, 9)
         Label_OptModus.Name = "Label_OptModus"
-        Label_OptModus.Size = New System.Drawing.Size(42, 13)
+        Label_OptModus.Size = New System.Drawing.Size(37, 13)
         Label_OptModus.TabIndex = 0
-        Label_OptModus.Text = "Modus:"
+        Label_OptModus.Text = "Mode:"
         '
         'LabelStrategie
         '
@@ -458,16 +458,16 @@ Partial Class EVO_Einstellungen
         LabelStrategie.Name = "LabelStrategie"
         LabelStrategie.Size = New System.Drawing.Size(54, 13)
         LabelStrategie.TabIndex = 2
-        LabelStrategie.Text = "Selektion:"
+        LabelStrategie.Text = "Selection:"
         '
         'LabelStartwerte
         '
         LabelStartwerte.AutoSize = True
         LabelStartwerte.Location = New System.Drawing.Point(2, 64)
         LabelStartwerte.Name = "LabelStartwerte"
-        LabelStartwerte.Size = New System.Drawing.Size(58, 13)
+        LabelStartwerte.Size = New System.Drawing.Size(66, 13)
         LabelStartwerte.TabIndex = 4
-        LabelStartwerte.Text = "Startwerte:"
+        LabelStartwerte.Text = "Start values:"
         '
         'LabelMutation
         '
@@ -485,69 +485,69 @@ Partial Class EVO_Einstellungen
         LabelStartSchrittweite.Name = "LabelStartSchrittweite"
         LabelStartSchrittweite.Size = New System.Drawing.Size(90, 13)
         LabelStartSchrittweite.TabIndex = 8
-        LabelStartSchrittweite.Text = "Start-Schrittweite:"
+        LabelStartSchrittweite.Text = "Starting step size:"
         '
         'LabelAnzNachf
         '
         LabelAnzNachf.AutoSize = True
         LabelAnzNachf.Location = New System.Drawing.Point(8, 64)
         LabelAnzNachf.Name = "LabelAnzNachf"
-        LabelAnzNachf.Size = New System.Drawing.Size(115, 13)
+        LabelAnzNachf.Size = New System.Drawing.Size(76, 13)
         LabelAnzNachf.TabIndex = 4
-        LabelAnzNachf.Text = "Anzahl der Nachfolger:"
+        LabelAnzNachf.Text = "No of children:"
         '
         'LabelAnzGen
         '
         LabelAnzGen.AutoSize = True
         LabelAnzGen.Location = New System.Drawing.Point(7, 20)
         LabelAnzGen.Name = "LabelAnzGen"
-        LabelAnzGen.Size = New System.Drawing.Size(127, 13)
+        LabelAnzGen.Size = New System.Drawing.Size(94, 13)
         LabelAnzGen.TabIndex = 0
-        LabelAnzGen.Text = "Anzahl der Generationen:"
+        LabelAnzGen.Text = "No of generations:"
         '
         'Label2
         '
-        Label2.Location = New System.Drawing.Point(9, 18)
+        Label2.Location = New System.Drawing.Point(8, 20)
         Label2.Name = "Label2"
-        Label2.Size = New System.Drawing.Size(58, 34)
+        Label2.Size = New System.Drawing.Size(72, 26)
         Label2.TabIndex = 0
-        Label2.Text = "Ermitteln der Eltern:"
+        Label2.Text = "Determination of parents:"
         '
         'LabelInteract
         '
         LabelInteract.AutoSize = True
         LabelInteract.Location = New System.Drawing.Point(8, 24)
         LabelInteract.Name = "LabelInteract"
-        LabelInteract.Size = New System.Drawing.Size(117, 13)
+        LabelInteract.Size = New System.Drawing.Size(121, 13)
         LabelInteract.TabIndex = 0
-        LabelInteract.Text = "Austausch mit SekPop:"
+        LabelInteract.Text = "Exchange with sec pop:"
         '
         'LabelAnzRunden
         '
         LabelAnzRunden.AutoSize = True
         LabelAnzRunden.Location = New System.Drawing.Point(8, 16)
         LabelAnzRunden.Name = "LabelAnzRunden"
-        LabelAnzRunden.Size = New System.Drawing.Size(101, 13)
+        LabelAnzRunden.Size = New System.Drawing.Size(71, 13)
         LabelAnzRunden.TabIndex = 0
-        LabelAnzRunden.Text = "Anzahl der Runden:"
+        LabelAnzRunden.Text = "No of rounds:"
         '
         'LabelAnzPop
         '
         LabelAnzPop.AutoSize = True
         LabelAnzPop.Location = New System.Drawing.Point(7, 36)
         LabelAnzPop.Name = "LabelAnzPop"
-        LabelAnzPop.Size = New System.Drawing.Size(107, 13)
+        LabelAnzPop.Size = New System.Drawing.Size(93, 13)
         LabelAnzPop.TabIndex = 2
-        LabelAnzPop.Text = "Anzahl Populationen:"
+        LabelAnzPop.Text = "No of populations:"
         '
         'LabelAnzPopEltern
         '
         LabelAnzPopEltern.AutoSize = True
         LabelAnzPopEltern.Location = New System.Drawing.Point(7, 58)
         LabelAnzPopEltern.Name = "LabelAnzPopEltern"
-        LabelAnzPopEltern.Size = New System.Drawing.Size(112, 13)
+        LabelAnzPopEltern.Size = New System.Drawing.Size(117, 13)
         LabelAnzPopEltern.TabIndex = 4
-        LabelAnzPopEltern.Text = "Anzahl Eltern [max=5]:"
+        LabelAnzPopEltern.Text = "No. of parents [max=5]:"
         '
         'LabelOptPopEltern
         '
@@ -555,7 +555,7 @@ Partial Class EVO_Einstellungen
         LabelOptPopEltern.Name = "LabelOptPopEltern"
         LabelOptPopEltern.Size = New System.Drawing.Size(76, 28)
         LabelOptPopEltern.TabIndex = 6
-        LabelOptPopEltern.Text = "Ermittlung der Pop-Eltern:"
+        LabelOptPopEltern.Text = "Determination pop parents:"
         '
         'LabelPopStrategie
         '
@@ -563,7 +563,7 @@ Partial Class EVO_Einstellungen
         LabelPopStrategie.Name = "LabelPopStrategie"
         LabelPopStrategie.Size = New System.Drawing.Size(76, 17)
         LabelPopStrategie.TabIndex = 8
-        LabelPopStrategie.Text = "Selektion:"
+        LabelPopStrategie.Text = "Selection:"
         '
         'LabelPopPenalty
         '
@@ -571,7 +571,7 @@ Partial Class EVO_Einstellungen
         LabelPopPenalty.Name = "LabelPopPenalty"
         LabelPopPenalty.Size = New System.Drawing.Size(76, 29)
         LabelPopPenalty.TabIndex = 10
-        LabelPopPenalty.Text = "Ermittlung der Pop-Güte:"
+        LabelPopPenalty.Text = "Determination pop quality:"
         '
         'Label_Line
         '
@@ -727,7 +727,7 @@ Partial Class EVO_Einstellungen
         GroupBox_Diagramm.Size = New System.Drawing.Size(209, 62)
         GroupBox_Diagramm.TabIndex = 4
         GroupBox_Diagramm.TabStop = False
-        GroupBox_Diagramm.Text = "Diagramm"
+        GroupBox_Diagramm.Text = "Diagram"
         '
         'CheckBox_drawOnlyCurrentGen
         '
@@ -738,7 +738,7 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_drawOnlyCurrentGen.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.CheckBox_drawOnlyCurrentGen.Size = New System.Drawing.Size(197, 37)
         Me.CheckBox_drawOnlyCurrentGen.TabIndex = 1
-        Me.CheckBox_drawOnlyCurrentGen.Text = "Nur die aktuelle Generation anzeigen:"
+        Me.CheckBox_drawOnlyCurrentGen.Text = "Only display the current generation:"
         Me.CheckBox_drawOnlyCurrentGen.UseVisualStyleBackColor = True
         '
         'BindingSource_General
@@ -794,7 +794,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Sim.Size = New System.Drawing.Size(209, 53)
         Me.GroupBox_Sim.TabIndex = 3
         Me.GroupBox_Sim.TabStop = False
-        Me.GroupBox_Sim.Text = "Simulationen"
+        Me.GroupBox_Sim.Text = "Simulations"
         '
         'CheckBox_useMultithreading
         '
@@ -806,7 +806,7 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_useMultithreading.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.CheckBox_useMultithreading.Size = New System.Drawing.Size(197, 24)
         Me.CheckBox_useMultithreading.TabIndex = 0
-        Me.CheckBox_useMultithreading.Text = "Multithreading benutzen:"
+        Me.CheckBox_useMultithreading.Text = "Use multithreading:"
         Me.CheckBox_useMultithreading.UseVisualStyleBackColor = True
         '
         'TabPage_PES
@@ -845,9 +845,9 @@ Partial Class EVO_Einstellungen
         Me.PES_Label_OptModus.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.PES_Label_OptModus.Location = New System.Drawing.Point(77, 9)
         Me.PES_Label_OptModus.Name = "PES_Label_OptModus"
-        Me.PES_Label_OptModus.Size = New System.Drawing.Size(44, 13)
+        Me.PES_Label_OptModus.Size = New System.Drawing.Size(38, 13)
         Me.PES_Label_OptModus.TabIndex = 1
-        Me.PES_Label_OptModus.Text = "Modus"
+        Me.PES_Label_OptModus.Text = "Mode"
         '
         'BindingSource_PES
         '
@@ -907,7 +907,7 @@ Partial Class EVO_Einstellungen
         Me.PES_Checkbox_isDnVektor.Name = "PES_Checkbox_isDnVektor"
         Me.PES_Checkbox_isDnVektor.Size = New System.Drawing.Size(144, 18)
         Me.PES_Checkbox_isDnVektor.TabIndex = 10
-        Me.PES_Checkbox_isDnVektor.Text = "mit Schrittweitenvektor"
+        Me.PES_Checkbox_isDnVektor.Text = "Use step size vector"
         '
         'GroupBox_Generationen
         '
@@ -922,7 +922,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Generationen.Size = New System.Drawing.Size(200, 90)
         Me.GroupBox_Generationen.TabIndex = 11
         Me.GroupBox_Generationen.TabStop = False
-        Me.GroupBox_Generationen.Text = "Generationen"
+        Me.GroupBox_Generationen.Text = "Generations"
         '
         'PES_Numeric_AnzNachf
         '
@@ -965,9 +965,9 @@ Partial Class EVO_Einstellungen
         Me.LabelAnzEltern.AutoSize = True
         Me.LabelAnzEltern.Location = New System.Drawing.Point(7, 42)
         Me.LabelAnzEltern.Name = "LabelAnzEltern"
-        Me.LabelAnzEltern.Size = New System.Drawing.Size(90, 13)
+        Me.LabelAnzEltern.Size = New System.Drawing.Size(74, 13)
         Me.LabelAnzEltern.TabIndex = 2
-        Me.LabelAnzEltern.Text = "Anzahl der Eltern:"
+        Me.LabelAnzEltern.Text = "No of parents:"
         '
         'GroupBox_Eltern
         '
@@ -982,15 +982,15 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Eltern.Size = New System.Drawing.Size(200, 104)
         Me.GroupBox_Eltern.TabIndex = 12
         Me.GroupBox_Eltern.TabStop = False
-        Me.GroupBox_Eltern.Text = "Eltern"
+        Me.GroupBox_Eltern.Text = "Parents"
         '
         'PES_Combo_OptEltern
         '
         Me.PES_Combo_OptEltern.DataBindings.Add(New System.Windows.Forms.Binding("SelectedItem", Me.BindingSource_PES, "Reproduktionsop", True))
         Me.PES_Combo_OptEltern.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.PES_Combo_OptEltern.Location = New System.Drawing.Point(64, 23)
+        Me.PES_Combo_OptEltern.Location = New System.Drawing.Point(85, 23)
         Me.PES_Combo_OptEltern.Name = "PES_Combo_OptEltern"
-        Me.PES_Combo_OptEltern.Size = New System.Drawing.Size(130, 21)
+        Me.PES_Combo_OptEltern.Size = New System.Drawing.Size(109, 21)
         Me.PES_Combo_OptEltern.TabIndex = 1
         '
         'PES_Checkbox_isTournamentSelection
@@ -1000,9 +1000,9 @@ Partial Class EVO_Einstellungen
         Me.PES_Checkbox_isTournamentSelection.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_PES, "RecombXYEnabled", True, System.Windows.Forms.DataSourceUpdateMode.Never))
         Me.PES_Checkbox_isTournamentSelection.Location = New System.Drawing.Point(11, 81)
         Me.PES_Checkbox_isTournamentSelection.Name = "PES_Checkbox_isTournamentSelection"
-        Me.PES_Checkbox_isTournamentSelection.Size = New System.Drawing.Size(130, 17)
+        Me.PES_Checkbox_isTournamentSelection.Size = New System.Drawing.Size(128, 17)
         Me.PES_Checkbox_isTournamentSelection.TabIndex = 5
-        Me.PES_Checkbox_isTournamentSelection.Text = "Tournament Selection"
+        Me.PES_Checkbox_isTournamentSelection.Text = "Tournament selection"
         Me.PES_Checkbox_isTournamentSelection.UseVisualStyleBackColor = True
         '
         'PES_Numeric_Rekombxy
@@ -1033,9 +1033,9 @@ Partial Class EVO_Einstellungen
         Me.LabelRekombxy3.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_PES, "RecombXYEnabled", True, System.Windows.Forms.DataSourceUpdateMode.Never))
         Me.LabelRekombxy3.Location = New System.Drawing.Point(75, 57)
         Me.LabelRekombxy3.Name = "LabelRekombxy3"
-        Me.LabelRekombxy3.Size = New System.Drawing.Size(81, 13)
+        Me.LabelRekombxy3.Size = New System.Drawing.Size(79, 13)
         Me.LabelRekombxy3.TabIndex = 4
-        Me.LabelRekombxy3.Text = "-Rekombination"
+        Me.LabelRekombxy3.Text = "- recombination"
         '
         'GroupBox_SekPop
         '
@@ -1050,7 +1050,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_SekPop.Size = New System.Drawing.Size(200, 93)
         Me.GroupBox_SekPop.TabIndex = 13
         Me.GroupBox_SekPop.TabStop = False
-        Me.GroupBox_SekPop.Text = "Sekundäre Population"
+        Me.GroupBox_SekPop.Text = "Secondary population"
         '
         'PES_CheckBox_SekPop_isBegrenzung
         '
@@ -1058,9 +1058,9 @@ Partial Class EVO_Einstellungen
         Me.PES_CheckBox_SekPop_isBegrenzung.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_PES_SekPop, "Is_Begrenzung", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.PES_CheckBox_SekPop_isBegrenzung.Location = New System.Drawing.Point(10, 45)
         Me.PES_CheckBox_SekPop_isBegrenzung.Name = "PES_CheckBox_SekPop_isBegrenzung"
-        Me.PES_CheckBox_SekPop_isBegrenzung.Size = New System.Drawing.Size(149, 17)
+        Me.PES_CheckBox_SekPop_isBegrenzung.Size = New System.Drawing.Size(121, 17)
         Me.PES_CheckBox_SekPop_isBegrenzung.TabIndex = 2
-        Me.PES_CheckBox_SekPop_isBegrenzung.Text = "SekPop-Größe begrenzen"
+        Me.PES_CheckBox_SekPop_isBegrenzung.Text = "Limit size of sec pop"
         Me.PES_CheckBox_SekPop_isBegrenzung.UseVisualStyleBackColor = True
         '
         'BindingSource_PES_SekPop
@@ -1076,7 +1076,7 @@ Partial Class EVO_Einstellungen
         Me.PES_Numeric_nInteract.Size = New System.Drawing.Size(53, 20)
         Me.PES_Numeric_nInteract.TabIndex = 1
         Me.PES_Numeric_nInteract.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.ToolTip1.SetToolTip(Me.PES_Numeric_nInteract, "Alle n Generationen")
+        Me.ToolTip1.SetToolTip(Me.PES_Numeric_nInteract, "Every n generations")
         Me.PES_Numeric_nInteract.Value = New Decimal(New Integer() {10, 0, 0, 0})
         '
         'PES_Numeric_MaxMemberSekPop
@@ -1095,12 +1095,11 @@ Partial Class EVO_Einstellungen
         '
         Me.LabelMaxMemberSekPop.AutoSize = True
         Me.LabelMaxMemberSekPop.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_PES_SekPop, "Is_Begrenzung", True, System.Windows.Forms.DataSourceUpdateMode.Never))
-        Me.LabelMaxMemberSekPop.Location = New System.Drawing.Point(53, 67)
+        Me.LabelMaxMemberSekPop.Location = New System.Drawing.Point(26, 67)
         Me.LabelMaxMemberSekPop.Name = "LabelMaxMemberSekPop"
-        Me.LabelMaxMemberSekPop.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.LabelMaxMemberSekPop.Size = New System.Drawing.Size(81, 13)
+        Me.LabelMaxMemberSekPop.Size = New System.Drawing.Size(108, 13)
         Me.LabelMaxMemberSekPop.TabIndex = 3
-        Me.LabelMaxMemberSekPop.Text = "Max. Mitglieder:"
+        Me.LabelMaxMemberSekPop.Text = "Max. no. of members:"
         '
         'PES_Checkbox_isPopul
         '
@@ -1110,7 +1109,7 @@ Partial Class EVO_Einstellungen
         Me.PES_Checkbox_isPopul.Name = "PES_Checkbox_isPopul"
         Me.PES_Checkbox_isPopul.Size = New System.Drawing.Size(112, 18)
         Me.PES_Checkbox_isPopul.TabIndex = 14
-        Me.PES_Checkbox_isPopul.Text = "mit Populationen"
+        Me.PES_Checkbox_isPopul.Text = "Use populations"
         '
         'BindingSource_PES_Pop
         '
@@ -1136,7 +1135,7 @@ Partial Class EVO_Einstellungen
         Me.PES_GroupBox_Populationen.Size = New System.Drawing.Size(200, 158)
         Me.PES_GroupBox_Populationen.TabIndex = 0
         Me.PES_GroupBox_Populationen.TabStop = False
-        Me.PES_GroupBox_Populationen.Text = "Populationen"
+        Me.PES_GroupBox_Populationen.Text = "Populations"
         '
         'PES_Numeric_AnzRunden
         '
@@ -2171,7 +2170,7 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.Size = New System.Drawing.Size(234, 713)
         Me.GroupBox_Einstellungen.TabIndex = 0
         Me.GroupBox_Einstellungen.TabStop = False
-        Me.GroupBox_Einstellungen.Text = "Einstellungen:"
+        Me.GroupBox_Einstellungen.Text = "Settings:"
         '
         'EVO_Einstellungen
         '

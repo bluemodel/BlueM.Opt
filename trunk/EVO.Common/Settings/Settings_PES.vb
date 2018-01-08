@@ -31,9 +31,9 @@ Public Class Settings_PES
 
 #Region "Eigenschaften"
 
-    Private _OptModus As EVO_MODUS
-    Private _Strategie As EVO_STRATEGIE
-    Private _Startparameter As EVO_STARTPARAMETER
+    Private _OptModus As EVO_MODE
+    Private _Strategie As EVO_STRATEGY
+    Private _Startparameter As EVO_STARTPARAMETERS
     Private _N_Gen As Integer
     Private _N_Eltern As Integer
     Private _N_Nachf As Integer
@@ -49,17 +49,17 @@ Public Class Settings_PES
     ''' <summary>
     ''' Single- oder Multi-Objective
     ''' </summary>
-    Public Property OptModus() As EVO_MODUS
+    Public Property OptModus() As EVO_MODE
         Get
             Return _OptModus
         End Get
-        Set(ByVal value As EVO_MODUS)
+        Set(ByVal value As EVO_MODE)
             _OptModus = value
             'Neuen Standardwert für PopPenalty setzen
             Select Case _OptModus
-                Case EVO_MODUS.Single_Objective
-                    Me.Pop.PopPenalty = EVO_POP_PENALTY.Mittelwert
-                Case EVO_MODUS.Multi_Objective
+                Case EVO_MODE.Single_Objective
+                    Me.Pop.PopPenalty = EVO_POP_PENALTY.Average
+                Case EVO_MODE.Multi_Objective
                     Me.Pop.PopPenalty = EVO_POP_PENALTY.Crowding
             End Select
         End Set
@@ -68,11 +68,11 @@ Public Class Settings_PES
     ''' <summary>
     ''' Startparameter
     ''' </summary>
-    Public Property Startparameter() As EVO_STARTPARAMETER
+    Public Property Startparameter() As EVO_STARTPARAMETERS
         Get
             Return _Startparameter
         End Get
-        Set(ByVal value As EVO_STARTPARAMETER)
+        Set(ByVal value As EVO_STARTPARAMETERS)
             _Startparameter = value
         End Set
     End Property
@@ -80,11 +80,11 @@ Public Class Settings_PES
     ''' <summary>
     ''' Typ der Evolutionsstrategie (+ oder ,)
     ''' </summary>
-    Public Property Strategie() As EVO_STRATEGIE
+    Public Property Strategie() As EVO_STRATEGY
         Get
             Return _Strategie
         End Get
-        Set(ByVal value As EVO_STRATEGIE)
+        Set(ByVal value As EVO_STRATEGY)
             _Strategie = value
         End Set
     End Property
@@ -136,7 +136,7 @@ Public Class Settings_PES
             _Reproduktionsoperator = value
             'Diversity Tournament aktualisieren
             Select Case Me.Reproduktionsop
-                Case PES_REPRODOP.XY_Diskret, PES_REPRODOP.XY_Mitteln, PES_REPRODOP.Neighbourhood, PES_REPRODOP.XY_Mitteln_Diskret
+                Case PES_REPRODOP.XY_Discrete, PES_REPRODOP.XY_Average, PES_REPRODOP.Neighborhood, PES_REPRODOP.XY_Average_Discrete
                     Me.Is_DiversityTournament = True
                 Case Else
                     Me.Is_DiversityTournament = False
@@ -301,7 +301,7 @@ Public Class Settings_PES
         Private _N_Popul As Integer
         Private _N_PopEltern As Integer
         Private _PopEltern As EVO_POP_ELTERN
-        Private _PopStrategie As EVO_STRATEGIE
+        Private _PopStrategie As EVO_STRATEGY
         Private _PopPenalty As EVO_POP_PENALTY
 
         ''' <summary>
@@ -378,11 +378,11 @@ Public Class Settings_PES
         ''' <summary>
         ''' Typ der Evolutionsstrategie (+ oder ,) auf Populationsebene
         ''' </summary>
-        Public Property PopStrategie() As EVO_STRATEGIE
+        Public Property PopStrategie() As EVO_STRATEGY
             Get
                 Return _PopStrategie
             End Get
-            Set(ByVal value As EVO_STRATEGIE)
+            Set(ByVal value As EVO_STRATEGY)
                 _PopStrategie = value
             End Set
         End Property
@@ -405,17 +405,17 @@ Public Class Settings_PES
 
     'Standardwerte setzen
     '********************
-    Public Sub setStandard(ByVal modus As EVO_MODUS)
+    Public Sub setStandard(ByVal modus As EVO_MODE)
 
         Me.OptModus = modus
 
         Select Case Me.OptModus
 
-            Case EVO_MODUS.Single_Objective
+            Case EVO_MODE.Single_Objective
 
-                Me.OptModus = EVO_MODUS.Single_Objective
-                Me.Strategie = EVO_STRATEGIE.Plus_Strategie
-                Me.Startparameter = EVO_STARTPARAMETER.Original
+                Me.OptModus = EVO_MODE.Single_Objective
+                Me.Strategie = EVO_STRATEGY.Plus_Strategy
+                Me.Startparameter = EVO_STARTPARAMETERS.Original
 
                 Me.Mutationsop = PES_MUTATIONSOP.Rechenberg
                 Me.SetMutation.DnStart = 0.1
@@ -431,21 +431,21 @@ Public Class Settings_PES
                 Me.SekPop.Is_Begrenzung = False
                 Me.SekPop.N_MaxMembers = 0
 
-                Me.Reproduktionsop = PES_REPRODOP.XX_Mitteln_Diskret
+                Me.Reproduktionsop = PES_REPRODOP.XX_Average_Discrete
                 Me.N_RekombXY = 3
                 Me.Is_DiversityTournament = False
 
                 Me.Pop.Is_POPUL = False
-                Me.Pop.PopEltern = EVO_POP_ELTERN.Rekombination
-                Me.Pop.PopStrategie = EVO_STRATEGIE.Plus_Strategie
-                Me.Pop.PopPenalty = EVO_POP_PENALTY.Mittelwert
+                Me.Pop.PopEltern = EVO_POP_ELTERN.Recombination
+                Me.Pop.PopStrategie = EVO_STRATEGY.Plus_Strategy
+                Me.Pop.PopPenalty = EVO_POP_PENALTY.Average
 
 
-            Case EVO_MODUS.Multi_Objective
+            Case EVO_MODE.Multi_Objective
 
-                Me.OptModus = EVO_MODUS.Multi_Objective
-                Me.Strategie = EVO_STRATEGIE.Plus_Strategie
-                Me.Startparameter = EVO_STARTPARAMETER.Original
+                Me.OptModus = EVO_MODE.Multi_Objective
+                Me.Strategie = EVO_STRATEGY.Plus_Strategy
+                Me.Startparameter = EVO_STARTPARAMETERS.Original
 
                 Me.Mutationsop = PES_MUTATIONSOP.Rechenberg
                 Me.SetMutation.DnStart = 0.1
@@ -460,14 +460,14 @@ Public Class Settings_PES
                 Me.SekPop.Is_Begrenzung = True
                 Me.SekPop.N_MaxMembers = 50
 
-                Me.Reproduktionsop = PES_REPRODOP.XX_Mitteln_Diskret
+                Me.Reproduktionsop = PES_REPRODOP.XX_Average_Discrete
                 Me.N_RekombXY = 3
                 Me.Is_DiversityTournament = True
 
                 Me.Pop.Is_POPUL = False
-                Me.Pop.PopEltern = EVO_POP_ELTERN.Rekombination
-                Me.Pop.PopStrategie = EVO_STRATEGIE.Plus_Strategie
-                Me.Pop.PopPenalty = EVO_POP_PENALTY.Mittelwert
+                Me.Pop.PopEltern = EVO_POP_ELTERN.Recombination
+                Me.Pop.PopStrategie = EVO_STRATEGY.Plus_Strategy
+                Me.Pop.PopPenalty = EVO_POP_PENALTY.Average
 
         End Select
     End Sub
@@ -484,19 +484,19 @@ Public Class Settings_PES
 
     Public ReadOnly Property StrategieEnabled() As Boolean
         Get
-            Return (Me.OptModus = EVO_MODUS.Single_Objective)
+            Return (Me.OptModus = EVO_MODE.Single_Objective)
         End Get
     End Property
 
     Public ReadOnly Property SekPopEnabled() As Boolean
         Get
-            Return (Me.OptModus = EVO_MODUS.Multi_Objective)
+            Return (Me.OptModus = EVO_MODE.Multi_Objective)
         End Get
     End Property
 
     Public ReadOnly Property PopulEnabled() As Boolean
         Get
-            If (Me.OptModus = EVO_MODUS.Single_Objective) Then
+            If (Me.OptModus = EVO_MODE.Single_Objective) Then
                 Return True
             Else
                 Return False
@@ -509,11 +509,11 @@ Public Class Settings_PES
             Dim Items() As EVO_POP_PENALTY
             Items = New EVO_POP_PENALTY() {}
             Select Case Me._OptModus
-                Case EVO_MODUS.Single_Objective
-                    Items = New EVO_POP_PENALTY() {EVO_POP_PENALTY.Mittelwert, EVO_POP_PENALTY.Schlechtester}
-                Case EVO_MODUS.Multi_Objective
+                Case EVO_MODE.Single_Objective
+                    Items = New EVO_POP_PENALTY() {EVO_POP_PENALTY.Average, EVO_POP_PENALTY.Worst}
+                Case EVO_MODE.Multi_Objective
                     'BUG 264: Popgüte bei MultiObjective überflüssig?
-                    Items = New EVO_POP_PENALTY() {EVO_POP_PENALTY.Crowding, EVO_POP_PENALTY.Spannweite}
+                    Items = New EVO_POP_PENALTY() {EVO_POP_PENALTY.Crowding, EVO_POP_PENALTY.Span}
             End Select
             Return Items
         End Get
@@ -528,7 +528,7 @@ Public Class Settings_PES
     Public ReadOnly Property RecombXYEnabled() As Boolean
         Get
             Select Case Me.Reproduktionsop
-                Case PES_REPRODOP.XY_Diskret, PES_REPRODOP.XY_Mitteln, PES_REPRODOP.Neighbourhood, PES_REPRODOP.XY_Mitteln_Diskret
+                Case PES_REPRODOP.XY_Discrete, PES_REPRODOP.XY_Average, PES_REPRODOP.Neighborhood, PES_REPRODOP.XY_Average_Discrete
                     Return True
                 Case Else
                     Return False

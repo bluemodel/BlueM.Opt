@@ -66,7 +66,7 @@ Public Class TalsimThread
             'this is done for every simulation because otherwise we would have to keep track of runfiles and thread IDs separately
             Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
             If (Not IO.File.Exists(runfile)) Then
-                Throw New Exception(runfile & " nicht gefunden!")
+                Throw New Exception(runfile & " not found!")
             End If
             Dim line As String
             'read the template run file
@@ -130,10 +130,10 @@ Public Class TalsimThread
                 End If
 
                 If i_attempt < n_attempts Then
-                    EVO.Diagramm.Monitor.getInstance().LogAppend("TALSIM Simulationsversuch " & i_attempt & " fehlgeschlagen, versuche es erneut...")
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("TALSIM simulation attempt " & i_attempt & " was unsuccessful, trying again...")
                     System.Threading.Thread.Sleep(100)
                 Else
-                    EVO.Diagramm.Monitor.getInstance().LogAppend("TALSIM Simulationsversuch " & i_attempt & " fehlgeschlagen, Parametersatz wird verworfen!")
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("TALSIM simulation attempt " & i_attempt & " was unsuccessful, parameter set will be discarded!")
                 End If
 
             Next
@@ -143,7 +143,7 @@ Public Class TalsimThread
                 'if .ERR file exists, simulation finished with errors
                 If IO.File.Exists(errfile) Then
                     'read err-file
-                    Dim errmsg As String = "TALSIM Simulation mit Fehlern beendet:"
+                    Dim errmsg As String = "TALSIM simulation ended with errors:"
                     filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
                     strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
                     Do
@@ -158,7 +158,7 @@ Public Class TalsimThread
 
                 'if .SIMEND does not exist, simulation aborted prematurely
                 If Not IO.File.Exists(simendfile) Then
-                    Throw New Exception("Thread " & Me.Thread_ID & ": " & "TALSIM Simulation vorzeitig abgebrochen!")
+                    Throw New Exception("Thread " & Me.Thread_ID & ": " & "TALSIM simulation aborted prematurely!")
                 End If
 
             End If

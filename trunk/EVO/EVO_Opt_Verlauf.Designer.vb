@@ -81,7 +81,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.Anzeige_Verlauf.Size = New System.Drawing.Size(464, 76)
         Me.Anzeige_Verlauf.TabIndex = 0
         Me.Anzeige_Verlauf.TabStop = False
-        Me.Anzeige_Verlauf.Text = "Verlauf der Optimierung"
+        Me.Anzeige_Verlauf.Text = "Optimization progress"
         '
         'ProgressBarRunde
         '
@@ -119,9 +119,9 @@ Partial Public Class EVO_Opt_Verlauf
         Me.lblNachfolger.AutoSize = True
         Me.lblNachfolger.Location = New System.Drawing.Point(221, 42)
         Me.lblNachfolger.Name = "lblNachfolger"
-        Me.lblNachfolger.Size = New System.Drawing.Size(59, 13)
+        Me.lblNachfolger.Size = New System.Drawing.Size(30, 13)
         Me.lblNachfolger.TabIndex = 20
-        Me.lblNachfolger.Text = "Nachfolger"
+        Me.lblNachfolger.Text = "Child"
         '
         'lblGeneration
         '
@@ -150,7 +150,7 @@ Partial Public Class EVO_Opt_Verlauf
         Me.lblRunde.Name = "lblRunde"
         Me.lblRunde.Size = New System.Drawing.Size(39, 13)
         Me.lblRunde.TabIndex = 17
-        Me.lblRunde.Text = "Runde"
+        Me.lblRunde.Text = "Round"
         '
         'lblvon_4
         '
@@ -158,9 +158,9 @@ Partial Public Class EVO_Opt_Verlauf
         Me.lblvon_4.AutoSize = True
         Me.lblvon_4.Location = New System.Drawing.Point(316, 42)
         Me.lblvon_4.Name = "lblvon_4"
-        Me.lblvon_4.Size = New System.Drawing.Size(25, 13)
+        Me.lblvon_4.Size = New System.Drawing.Size(16, 13)
         Me.lblvon_4.TabIndex = 16
-        Me.lblvon_4.Text = "von"
+        Me.lblvon_4.Text = "of"
         '
         'lblvon_3
         '
@@ -168,27 +168,27 @@ Partial Public Class EVO_Opt_Verlauf
         Me.lblvon_3.AutoSize = True
         Me.lblvon_3.Location = New System.Drawing.Point(316, 24)
         Me.lblvon_3.Name = "lblvon_3"
-        Me.lblvon_3.Size = New System.Drawing.Size(25, 13)
+        Me.lblvon_3.Size = New System.Drawing.Size(16, 13)
         Me.lblvon_3.TabIndex = 15
-        Me.lblvon_3.Text = "von"
+        Me.lblvon_3.Text = "of"
         '
         'lblvon_2
         '
         Me.lblvon_2.AutoSize = True
         Me.lblvon_2.Location = New System.Drawing.Point(86, 42)
         Me.lblvon_2.Name = "lblvon_2"
-        Me.lblvon_2.Size = New System.Drawing.Size(25, 13)
+        Me.lblvon_2.Size = New System.Drawing.Size(16, 13)
         Me.lblvon_2.TabIndex = 14
-        Me.lblvon_2.Text = "von"
+        Me.lblvon_2.Text = "of"
         '
         'lblvon_1
         '
         Me.lblvon_1.AutoSize = True
         Me.lblvon_1.Location = New System.Drawing.Point(86, 24)
         Me.lblvon_1.Name = "lblvon_1"
-        Me.lblvon_1.Size = New System.Drawing.Size(25, 13)
+        Me.lblvon_1.Size = New System.Drawing.Size(16, 13)
         Me.lblvon_1.TabIndex = 13
-        Me.lblvon_1.Text = "von"
+        Me.lblvon_1.Text = "of"
         '
         'LabelaktNachf
         '

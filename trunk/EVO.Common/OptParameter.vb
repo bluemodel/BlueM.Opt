@@ -72,7 +72,7 @@ Public Class OptParameter
     Public C As Double
 
     'Beziehung
-    Public Beziehung As Common.Constants.Beziehung
+    Public Beziehung As Common.Constants.Relationship
 
 #End Region 'Eigenschaften
 
@@ -93,7 +93,7 @@ Public Class OptParameter
         Me.Xn = 0.5
         Me.StartWert = 0.5
         Me.Dn = 0.1
-        Me.Beziehung = Constants.Beziehung.keine
+        Me.Beziehung = Constants.Relationship.none
         Me.Objekt = ""
         Me.Zeitpunkt = 0
 

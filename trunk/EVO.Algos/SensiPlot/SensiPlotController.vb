@@ -171,7 +171,7 @@ Public Class SensiPlotController
                 isOK = True
                 If (Anz_SensiPara > 1) Then
                     'Es muss nur der zweite Parameter auf eine Beziehung geprüft werden
-                    If (Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Beziehung <> Beziehung.keine) Then
+                    If (Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Beziehung <> Relationship.none) Then
                         'Beziehung bezieht sich immer auf den in der Liste vorherigen Parameter
                         If (Me.mySettings.SensiPlot.Selected_OptParameters(0) = Me.mySettings.SensiPlot.Selected_OptParameters(1) - 1) Then
 
@@ -181,13 +181,13 @@ Public Class SensiPlotController
                             Dim wert As Double = Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).RWert
 
                             Select Case Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Beziehung
-                                Case Beziehung.kleiner
+                                Case Relationship.smaller_than
                                     If (wert < ref) Then isOK = True
-                                Case Beziehung.kleinergleich
+                                Case Relationship.smaller_equal
                                     If (wert <= ref) Then isOK = True
-                                Case Beziehung.groesser
+                                Case Relationship.larger_than
                                     If (wert > ref) Then isOK = True
-                                Case Beziehung.groessergleich
+                                Case Relationship.larger_equal
                                     If (wert >= ref) Then isOK = True
                             End Select
 

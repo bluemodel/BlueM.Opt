@@ -61,16 +61,16 @@ Partial Class MDBImportDialog
         GroupBox_Zielfunktionen.Size = New System.Drawing.Size(418, 224)
         GroupBox_Zielfunktionen.TabIndex = 10
         GroupBox_Zielfunktionen.TabStop = False
-        GroupBox_Zielfunktionen.Text = "Zielfunktionen (für Hauptdiagramm)"
+        GroupBox_Zielfunktionen.Text = "Objectives (for main chart)"
         '
         'Label_XAchse
         '
         Label_XAchse.AutoSize = True
         Label_XAchse.Location = New System.Drawing.Point(6, 21)
         Label_XAchse.Name = "Label_XAchse"
-        Label_XAchse.Size = New System.Drawing.Size(50, 13)
+        Label_XAchse.Size = New System.Drawing.Size(38, 13)
         Label_XAchse.TabIndex = 6
-        Label_XAchse.Text = "X-Achse:"
+        Label_XAchse.Text = "X-axis:"
         '
         'Label_YAchse
         '
@@ -79,9 +79,9 @@ Partial Class MDBImportDialog
         Label_YAchse.AutoSize = True
         Label_YAchse.Location = New System.Drawing.Point(141, 21)
         Label_YAchse.Name = "Label_YAchse"
-        Label_YAchse.Size = New System.Drawing.Size(50, 13)
+        Label_YAchse.Size = New System.Drawing.Size(39, 13)
         Label_YAchse.TabIndex = 11
-        Label_YAchse.Text = "Y-Achse:"
+        Label_YAchse.Text = "Y-Axis:"
         '
         'Label_ZAchse
         '
@@ -90,9 +90,9 @@ Partial Class MDBImportDialog
         Label_ZAchse.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Label_ZAchse.Location = New System.Drawing.Point(277, 21)
         Label_ZAchse.Name = "Label_ZAchse"
-        Label_ZAchse.Size = New System.Drawing.Size(96, 13)
+        Label_ZAchse.Size = New System.Drawing.Size(85, 13)
         Label_ZAchse.TabIndex = 14
-        Label_ZAchse.Text = "Z-Achse (optional):"
+        Label_ZAchse.Text = "Z-Axis (optional):"
         '
         'ListBox_ZieleX
         '
@@ -130,9 +130,9 @@ Partial Class MDBImportDialog
         Label_SekPop.AutoSize = True
         Label_SekPop.Location = New System.Drawing.Point(9, 22)
         Label_SekPop.Name = "Label_SekPop"
-        Label_SekPop.Size = New System.Drawing.Size(54, 13)
+        Label_SekPop.Size = New System.Drawing.Size(44, 13)
         Label_SekPop.TabIndex = 14
-        Label_SekPop.Text = "Anzeigen:"
+        Label_SekPop.Text = "Display:"
         '
         'OK_Button
         '
@@ -152,13 +152,13 @@ Partial Class MDBImportDialog
         Me.Cancel_Button.Name = "Cancel_Button"
         Me.Cancel_Button.Size = New System.Drawing.Size(67, 23)
         Me.Cancel_Button.TabIndex = 1
-        Me.Cancel_Button.Text = "Abbrechen"
+        Me.Cancel_Button.Text = "Cancel"
         '
         'ComboBox_SekPop
         '
         Me.ComboBox_SekPop.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox_SekPop.FormattingEnabled = True
-        Me.ComboBox_SekPop.Items.AddRange(New Object() {"letzte", "keine", "ausschließlich"})
+        Me.ComboBox_SekPop.Items.AddRange(New Object() {"last", "none", "exclusively"})
         Me.ComboBox_SekPop.Location = New System.Drawing.Point(69, 19)
         Me.ComboBox_SekPop.Name = "ComboBox_SekPop"
         Me.ComboBox_SekPop.Size = New System.Drawing.Size(94, 21)
@@ -175,7 +175,7 @@ Partial Class MDBImportDialog
         Me.GroupBox_SekPop.Size = New System.Drawing.Size(175, 73)
         Me.GroupBox_SekPop.TabIndex = 15
         Me.GroupBox_SekPop.TabStop = False
-        Me.GroupBox_SekPop.Text = "Sekundäre Population"
+        Me.GroupBox_SekPop.Text = "Secondary population"
         '
         'CheckBox_Hypervol
         '
@@ -183,9 +183,9 @@ Partial Class MDBImportDialog
         Me.CheckBox_Hypervol.Location = New System.Drawing.Point(9, 46)
         Me.CheckBox_Hypervol.Name = "CheckBox_Hypervol"
         Me.CheckBox_Hypervol.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.CheckBox_Hypervol.Size = New System.Drawing.Size(154, 17)
+        Me.CheckBox_Hypervol.Size = New System.Drawing.Size(133, 17)
         Me.CheckBox_Hypervol.TabIndex = 15
-        Me.CheckBox_Hypervol.Text = "Hypervolumen berechnen?"
+        Me.CheckBox_Hypervol.Text = "Calculate hypervolume"
         Me.CheckBox_Hypervol.UseVisualStyleBackColor = True
         '
         'MDBImportDialog
@@ -201,7 +201,7 @@ Partial Class MDBImportDialog
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "MDBImportDialog"
-        Me.Text = "Optimierungsergebnis laden"
+        Me.Text = "Load optimization result"
         GroupBox_Zielfunktionen.ResumeLayout(False)
         GroupBox_Zielfunktionen.PerformLayout()
         Me.GroupBox_SekPop.ResumeLayout(False)

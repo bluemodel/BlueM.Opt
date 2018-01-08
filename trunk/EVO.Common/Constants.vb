@@ -42,7 +42,7 @@ Public Module Constants
     '*******************************************************************************
 
     'URL zur Hilfe
-    Public Const HelpURL As String = "http://130.83.196.220/bluem/wiki/index.php/BlueM.Opt"
+    Public Const HelpURL As String = "http://wiki.bluemodel.org/index.php/BlueM.Opt"
 
     'Verschiedenes
     Public Const eol As String = Chr(13) & Chr(10)             'Zeilenumbruch
@@ -50,7 +50,7 @@ Public Module Constants
     'ApplicationTypes
     Public Enum ApplicationTypes As Integer
         Sim = 1
-        Testprobleme = 2
+        Testproblems = 2
     End Enum
 
     'Anwendungen
@@ -59,7 +59,7 @@ Public Module Constants
     Public Const ANW_SCAN As String = "S:CAN"
     Public Const ANW_SWMM As String = "SWMM"
     Public Const ANW_TALSIM As String = "TALSIM"
-    Public Const ANW_TESTPROBLEME As String = "Testprobleme"
+    Public Const ANW_TESTPROBLEMS As String = "Testproblems"
     Public Const ANW_TSP As String = "Traveling Salesman"
 
     'Optimierungsmethoden
@@ -79,21 +79,21 @@ Public Module Constants
     End Enum
 
     'Option für Startvorgabe für Optimierung
-    Public Enum EVO_STARTPARAMETER As Integer
-        Zufall = 1
+    Public Enum EVO_STARTPARAMETERS As Integer
+        Random = 1
         Original = 2
     End Enum
 
     'Modus der Optimierung
-    Public Enum EVO_MODUS As Integer
+    Public Enum EVO_MODE As Integer
         Single_Objective = 0
         Multi_Objective = 1
     End Enum
 
     'Evo-Strategie-Typ
-    Public Enum EVO_STRATEGIE As Integer
-        Plus_Strategie = 1                                'Eltern + Nachfolger
-        Komma_Strategie = 2                               'nur Nachfolger
+    Public Enum EVO_STRATEGY As Integer
+        Plus_Strategy = 1                                'Eltern + Nachfolger
+        Comma_Strategy = 2                               'nur Nachfolger
     End Enum
 
     'Reproduktionsoperator
@@ -115,14 +115,14 @@ Public Module Constants
 
     'Option zur Erzeugung der Eltern
     Public Enum PES_REPRODOP As Integer
-        Selektion = 1                           'zufällige Selektion as Bestwertspeicher
-        XX_Diskret = 2                          'Rekombination nach x/x-Schema, diskretes vertauschen der Gene
-        XX_Mitteln = 3                          'Rekombination nach x/x-Schema, mittelwertbildung der Gene über y-Eltern
-        XY_Diskret = 4                          'Rekombination nach x/y-Schema, diskretes vertauschen der Gene
-        XY_Mitteln = 5                          'Rekombination nach x/y-Schema, mittelwertbildung der Gene über y-Eltern
-        Neighbourhood = 6                       'Neighboorghood-Rekombination
-        XX_Mitteln_Diskret = 7                  'Rekombination nach x/x-Schema, diskretes vertauschen der Gene, miteln der Strategieparameter 
-        XY_Mitteln_Diskret = 8                  'Rekombination nach x/y-Schema, diskretes vertauschen der Gene, miteln der Strategieparameter
+        Selection = 1                           'zufällige Selektion as Bestwertspeicher
+        XX_Discrete = 2                         'Rekombination nach x/x-Schema, diskretes vertauschen der Gene
+        XX_Average = 3                          'Rekombination nach x/x-Schema, mittelwertbildung der Gene über y-Eltern
+        XY_Discrete = 4                         'Rekombination nach x/y-Schema, diskretes vertauschen der Gene
+        XY_Average = 5                          'Rekombination nach x/y-Schema, mittelwertbildung der Gene über y-Eltern
+        Neighborhood = 6                        'Neighborhood-Rekombination
+        XX_Average_Discrete = 7                 'Rekombination nach x/x-Schema, diskretes vertauschen der Gene, miteln der Strategieparameter 
+        XY_Average_Discrete = 8                 'Rekombination nach x/y-Schema, diskretes vertauschen der Gene, miteln der Strategieparameter
     End Enum
 
     'Option für die Mutation
@@ -135,17 +135,17 @@ Public Module Constants
 
     'Option zur Erzeugung der Pop-Eltern
     Public Enum EVO_POP_ELTERN As Integer
-        Rekombination = 1                       'Rekombination aus den PopEltern
-        Mittelwert = 2                          'Mittelwertbildung aus den PopEltern
-        Selektion = 3                           'zufällige Selektion aus Bestwertspeicher
+        Recombination = 1                       'Rekombination aus den PopEltern
+        Average = 2                             'Mittelwertbildung aus den PopEltern
+        Selection = 3                           'zufällige Selektion aus Bestwertspeicher
     End Enum
 
     'Option zur Ermittlung der Populationsqualität
     Public Enum EVO_POP_PENALTY As Integer
-        Mittelwert = 1                          'SingleObjective
-        Schlechtester = 2                       'SingleObjective
+        Average = 1                             'SingleObjective
+        Worst = 2                               'SingleObjective
         Crowding = 3                            'MultiObjective
-        Spannweite = 4                          'MultiObjective
+        Span = 4                                'MultiObjective
     End Enum
 
     'Option zur Wahl des Hybrid Verfahrens
@@ -171,35 +171,35 @@ Public Module Constants
     End Enum
 
     'Beziehung
-    Public Enum Beziehung As Integer
-        keine = 0
-        kleiner = 1
-        kleinergleich = 2
-        groesser = 3
-        groessergleich = 4
+    Public Enum Relationship As Integer
+        none = 0
+        smaller_than = 1
+        smaller_equal = 2
+        larger_than = 3
+        larger_equal = 4
     End Enum
 
     'String in der Form < >, <=, >= in Beziehung umwandeln
     '*****************************************************
-    Public Function getBeziehung(ByVal bez_str As String) As Beziehung
-        Select Case bez_str
+    Public Function getRelationship(ByVal rel_str As String) As Relationship
+        Select Case rel_str
             Case "<"
-                Return Beziehung.kleiner
+                Return Relationship.smaller_than
             Case "<="
-                Return Beziehung.kleinergleich
+                Return Relationship.smaller_equal
             Case ">"
-                Return Beziehung.groesser
+                Return Relationship.larger_than
             Case ">="
-                Return Beziehung.groessergleich
+                Return Relationship.larger_equal
             Case Else
-                Throw New Exception("Beziehung '" & bez_str & "' nicht erkannt!")
+                Throw New Exception("Relationship '" & rel_str & "' not recognized!")
         End Select
     End Function
 
     'Richtung einer Zielfunktion
-    Public Enum EVO_RICHTUNG As Integer
-        Minimierung = 1
-        Maximierung = -1
+    Public Enum EVO_DIRECTION As Integer
+        Minimization = 1
+        Maximization = -1
     End Enum
 
     'TSP Enums

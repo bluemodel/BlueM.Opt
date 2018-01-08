@@ -96,11 +96,11 @@ Partial Public Class SolutionDialog
             If (feature.isPrimObjective) Then
                 cellstyle.BackColor = Color.LightGreen
                 column.HeaderText = feature.Bezeichnung & " (*)"
-                column.HeaderCell.ToolTipText = "OptZiel"
+                column.HeaderCell.ToolTipText = "Primary objective function"
             Else
                 cellstyle.BackColor = Color.LightBlue
                 column.HeaderText = feature.Bezeichnung
-                column.HeaderCell.ToolTipText = "SekZiel"
+                column.HeaderCell.ToolTipText = "Secondary objective function"
             End If
             column.ReadOnly = True
             column.Name = feature.Bezeichnung
@@ -144,7 +144,7 @@ Partial Public Class SolutionDialog
             column = New DataGridViewTextBoxColumn()
             column.ReadOnly = True
             column.HeaderText = OptPara.Bezeichnung
-            column.HeaderCell.ToolTipText = "OptParameter"
+            column.HeaderCell.ToolTipText = "Optimization parameter"
             column.Name = OptPara.Bezeichnung
             column.DefaultCellStyle = cellstyle.Clone()
             Me.DataGridView1.Columns.Add(column)

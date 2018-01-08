@@ -68,18 +68,18 @@ Public Class EVO_Einstellungen
         'Comboboxen initialisieren
         '-------------------------
         'PES:
-        Me.PES_Combo_Strategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
-        Me.PES_Combo_Startparameter.DataSource = System.Enum.GetValues(GetType(EVO_STARTPARAMETER))
+        Me.PES_Combo_Strategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGY))
+        Me.PES_Combo_Startparameter.DataSource = System.Enum.GetValues(GetType(EVO_STARTPARAMETERS))
         Me.PES_Combo_DnMutation.DataSource = System.Enum.GetValues(GetType(PES_MUTATIONSOP))
         Me.PES_Combo_OptEltern.DataSource = System.Enum.GetValues(GetType(PES_REPRODOP))
         Me.PES_Combo_PopEltern.DataSource = System.Enum.GetValues(GetType(EVO_POP_ELTERN))
-        Me.PES_Combo_PopStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
+        Me.PES_Combo_PopStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGY))
 
         'CES
         Me.CES_Combo_Reproduction.DataSource = System.Enum.GetValues(GetType(CES_REPRODOP))
         Me.CES_Combo_Mutation.DataSource = System.Enum.GetValues(GetType(CES_MUTATION))
-        Me.CES_Combo_Selection.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGIE))
-        Me.CES_Combo_IniValues.DataSource = System.Enum.GetValues(GetType(EVO_STARTPARAMETER))
+        Me.CES_Combo_Selection.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGY))
+        Me.CES_Combo_IniValues.DataSource = System.Enum.GetValues(GetType(EVO_STARTPARAMETERS))
         Me.CES_Combo_HybridType.DataSource = System.Enum.GetValues(GetType(HYBRID_TYPE))
         Me.CES_Combo_MemStrategy.DataSource = System.Enum.GetValues(GetType(MEMORY_STRATEGY))
 
