@@ -6,6 +6,7 @@ Version 1.6 (beta)
 NEW:
 * Added support for the simulation engine TALSIM. talsimw64.exe has to be provided by the user.
 CHANGED:
+* Translated the main GUI and all messages related to PES and TALSIM to English
 * Updated Wave to v1.6
 FIXED:
 * When displaying the decision space as a scatterplot matrix and not selecting all optimization parameters for display, 

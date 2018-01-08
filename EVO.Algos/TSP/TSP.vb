@@ -233,14 +233,14 @@ Public Class TSP
     Public Sub Selection_Process()
         Dim i, j As Integer
 
-        If mySettings.Strategy = Common.EVO_STRATEGIE.Komma_Strategie Then
+        If mySettings.Strategy = Common.EVO_STRATEGY.Comma_Strategy Then
             For i = 0 To mySettings.N_Parents - 1
                 ParentList(i).Penalty = ChildrenList(i).Penalty
                 Array.Copy(ChildrenList(i).Image, ParentList(i).Image, ChildrenList(i).Image.Length)
                 Array.Copy(ChildrenList(i).Path, ParentList(i).Path, ChildrenList(i).Path.Length)
             Next i
 
-        ElseIf mySettings.Strategy = Common.EVO_STRATEGIE.Plus_Strategie Then
+        ElseIf mySettings.Strategy = Common.EVO_STRATEGY.Plus_Strategy Then
             j = 0
             For i = 0 To mySettings.N_Parents - 1
                 If ParentList(i).Penalty < ChildrenList(j).Penalty Then

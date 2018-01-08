@@ -80,7 +80,7 @@ Public MustInherit Class ObjectiveFunction
     ''' <summary>
     ''' Richtung der ObjectiveFunction (d.h. zu maximieren oder zu minimieren)
     ''' </summary>
-    Public Richtung As Constants.EVO_RICHTUNG
+    Public Richtung As Constants.EVO_DIRECTION
 
     ''' <summary>
     ''' Operator bzw Faktor

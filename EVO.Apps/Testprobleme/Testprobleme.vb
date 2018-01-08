@@ -33,9 +33,9 @@ Public Class Testprobleme
     '#############
 
     'Testprobleme:
-    Private Const TP_SinusFunktion As String = "Sinus-Funktion"
-    Private Const TP_BealeProblem As String = "Beale-Problem"
-    Private Const TP_Schwefel24Problem As String = "Schwefel 2.4-Problem"
+    Private Const TP_SinusFunktion As String = "Sine function"
+    Private Const TP_BealeProblem As String = "Beale problem"
+    Private Const TP_Schwefel24Problem As String = "Schwefel 2.4 problem"
     Private Const TP_Deb1 As String = "Deb 1"
     Private Const TP_ZitzlerDebT1 As String = "Zitzler/Deb T1"
     Private Const TP_ZitzlerDebT2 As String = "Zitzler/Deb T2"
@@ -43,7 +43,7 @@ Public Class Testprobleme
     Private Const TP_ZitzlerDebT4 As String = "Zitzler/Deb T4"
     Private Const TP_CONSTR As String = "CONSTR"
     Private Const TP_Box As String = "Box"
-    Private Const TP_AbhängigeParameter As String = "Abhängige Parameter"
+    Private Const TP_DependentParameters As String = "Dependent parameters"
     Private Const TP_FloodMitigation As String = "Flood Mitigation"
 
     Private mSelectedTestproblem As String
@@ -76,8 +76,8 @@ Public Class Testprobleme
             array(7) = TP_ZitzlerDebT4
             array(8) = TP_CONSTR
             array(9) = TP_Box
-            array(10) = TP_AbhängigeParameter
-			array(11) = TP_FloodMitigation
+            array(10) = TP_DependentParameters
+            array(11) = TP_FloodMitigation
 
             Return array
 
@@ -120,7 +120,7 @@ Public Class Testprobleme
         Select Case Me.mSelectedTestproblem
 
             Case TP_SinusFunktion
-                Me.mTestProblemDescription = "Parameter an Sinusfunktion anpassen"
+                Me.mTestProblemDescription = "Fit parameters to sine function"
                 Me.mAnzParameter = 50
                 Me.mAnzZiele = 1
                 Me.mAnzConstraints = 0
@@ -131,7 +131,7 @@ Public Class Testprobleme
                 Next
 
             Case TP_BealeProblem
-                Me.mTestProblemDescription = "Es wird das Minimum des Beale-Problems gesucht (x=(3, 0.5), F(x)=0)"
+                Me.mTestProblemDescription = "Find the minimum of the Beale problem (x=(3, 0.5), F(x)=0)"
                 Me.mAnzParameter = 2
                 Me.mAnzZiele = 1
                 Me.mAnzConstraints = 0
@@ -142,7 +142,7 @@ Public Class Testprobleme
                 Next
 
             Case TP_Schwefel24Problem
-                Me.mTestProblemDescription = "Minimum der Problemstellung wird gesucht (xi=1, F(x)=0)"
+                Me.mTestProblemDescription = "Find the minimum (xi=1, F(x)=0)"
                 Me.mAnzParameter = 5
                 Me.mAnzZiele = 1
                 Me.mAnzConstraints = 0
@@ -153,7 +153,7 @@ Public Class Testprobleme
                 Next
 
             Case TP_Deb1
-                Me.mTestProblemDescription = "Multikriterielles Testproblem (konvex)"
+                Me.mTestProblemDescription = "Multicriteria test problem (convex)"
                 Me.mAnzParameter = 2
                 Me.mAnzZiele = 2
                 Me.mAnzConstraints = 0
@@ -165,7 +165,7 @@ Public Class Testprobleme
                 Next
 
             Case TP_ZitzlerDebT1
-                Me.mTestProblemDescription = "Multikriterielles Testproblem (konvex)"
+                Me.mTestProblemDescription = "Multicriteria test problem (convex)"
                 Me.mAnzParameter = 30
                 Me.mAnzZiele = 2
                 Me.mAnzConstraints = 0
@@ -177,7 +177,7 @@ Public Class Testprobleme
                 Next
 
             Case TP_ZitzlerDebT2
-                Me.mTestProblemDescription = "Multikriterielles Testproblem (konkav)"
+                Me.mTestProblemDescription = "Multicriteria test problem (concave)"
                 Me.mAnzParameter = 30
                 Me.mAnzZiele = 2
                 Me.mAnzConstraints = 0
@@ -189,7 +189,7 @@ Public Class Testprobleme
                 Next
 
             Case TP_ZitzlerDebT3
-                Me.mTestProblemDescription = "Multikriterielles Testproblem (konvex, nicht stetig)"
+                Me.mTestProblemDescription = "Multicriteria test problem (convex, non-continuous)"
                 Me.mAnzParameter = 15
                 Me.mAnzZiele = 2
                 Me.mAnzConstraints = 0
@@ -201,7 +201,7 @@ Public Class Testprobleme
                 Next
 
             Case TP_ZitzlerDebT4
-                Me.mTestProblemDescription = "Multikriterielles Testproblem (konvex)"
+                Me.mTestProblemDescription = "Multicriteria test problem (convex)"
                 Me.mAnzParameter = 10
                 Me.mAnzZiele = 2
                 Me.mAnzConstraints = 0
@@ -213,7 +213,7 @@ Public Class Testprobleme
                 Next
 
             Case TP_CONSTR
-                Me.mTestProblemDescription = "Multikriterielles Testproblem (konvex) mit zwei Randbedingungen"
+                Me.mTestProblemDescription = "Multicriteria test problem (convex) with two constraints"
                 Me.mAnzParameter = 2
                 Me.mAnzZiele = 2
                 Me.mAnzConstraints = 2
@@ -225,7 +225,7 @@ Public Class Testprobleme
                 Next
 
             Case TP_Box
-                Me.mTestProblemDescription = "Multikriterielles Testproblem (Kreis) mit zwei Randbedingungen"
+                Me.mTestProblemDescription = "Multicriteria test problem (circle) with two contraints"
                 Me.mAnzParameter = 3
                 Me.mAnzZiele = 3
                 Me.mAnzConstraints = 2
@@ -236,8 +236,8 @@ Public Class Testprobleme
                     Me.mOptPara(i).Xn = Rnd()
                 Next
 
-            Case TP_AbhängigeParameter
-                Me.mTestProblemDescription = "Bedingung: Y > X"
+            Case TP_DependentParameters
+                Me.mTestProblemDescription = "Relationship: Y > X"
                 Me.mAnzParameter = 2
                 Me.mAnzZiele = 1
                 Me.mAnzConstraints = 0
@@ -247,8 +247,8 @@ Public Class Testprobleme
                     Me.mOptPara(i).Xn = 1
                 Next
                 'Beziehungen
-                Me.mOptPara(0).Beziehung = Common.Constants.Beziehung.keine
-                Me.mOptPara(1).Beziehung = Common.Constants.Beziehung.groesser
+                Me.mOptPara(0).Beziehung = Common.Constants.Relationship.none
+                Me.mOptPara(1).Beziehung = Common.Constants.Relationship.larger_than
 
             Case TP_FloodMitigation 'Ajay
                 Me.mTestProblemDescription = "Multicriteria Problem Flood Mitigation and Hydropower Generation"
@@ -313,7 +313,7 @@ Public Class Testprobleme
             Case TP_Box
                 Call Me.DiagInitialise_3D_Box(Diag)
 
-            Case TP_AbhängigeParameter
+            Case TP_DependentParameters
                 Call Me.DiagInitialise_AbhParameter(Diag)
 
             Case Else
@@ -340,7 +340,7 @@ Public Class Testprobleme
         achsen = New Collection()
 
         'X-Achse
-        achse.Title = "X-Wert"
+        achse.Title = "X value"
         achse.Automatic = False
         achse.Minimum = 0
         achse.Maximum = 2 * Math.PI
@@ -348,7 +348,7 @@ Public Class Testprobleme
         achsen.Add(achse)
 
         'Y-Achse
-        achse.Title = "Y-Wert"
+        achse.Title = "Y value"
         achse.Automatic = False
         achse.Minimum = -1
         achse.Maximum = 1
@@ -357,7 +357,7 @@ Public Class Testprobleme
 
         'Diagramm initialisieren
         '-----------------------
-        Call Diag.DiagInitialise("Sinus Funktion", achsen, Me.mProblem)
+        Call Diag.DiagInitialise("Sine function", achsen, Me.mProblem)
 
         'Sinuslinie zeichnen
         '-------------------
@@ -371,7 +371,7 @@ Public Class Testprobleme
             array_y(i) = Math.Sin(i * Unterteilung_X)
         Next i
 
-        serie = Diag.getSeriesLine("Sinusfunktion", "Green")
+        serie = Diag.getSeriesLine("Sine function", "Green")
         Call serie.Add(array_x, array_y)
 
     End Sub
@@ -393,19 +393,19 @@ Public Class Testprobleme
         achsen = New Collection()
 
         'X-Achse
-        achse.Title = "Berechnungsschritt"
+        achse.Title = "Calculation step"
         achse.Automatic = True
         achse.Minimum = 0
         Call achsen.Add(achse)
 
         'Y-Achse
-        achse.Title = "Funktionswert"
+        achse.Title = "Function value"
         achse.Automatic = False
         achse.Minimum = 0
         achse.Maximum = Ausgangswert * 1.3
         Call achsen.Add(achse)
 
-        Call Diag.DiagInitialise("Beale Problem", achsen, Me.mProblem)
+        Call Diag.DiagInitialise("Beale problem", achsen, Me.mProblem)
 
         'Linie für den Ausgangswert anzeigen
         colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
@@ -442,19 +442,19 @@ Public Class Testprobleme
         achsen = New Collection()
 
         'X-Achse
-        achse.Title = "Berechnungsschritt"
+        achse.Title = "Calculation step"
         achse.Automatic = True
         achse.Minimum = 0
         Call achsen.Add(achse)
 
         'Y-Achse
-        achse.Title = "Funktionswert"
+        achse.Title = "Function value"
         achse.Automatic = False
         achse.Minimum = 0
         achse.Maximum = Ausgangswert * 1.3
         Call achsen.Add(achse)
 
-        Call Diag.DiagInitialise("Schwefel 2.4 Problem", achsen, Me.mProblem)
+        Call Diag.DiagInitialise("Schwefel 2.4 problem", achsen, Me.mProblem)
 
         'Linie für den Ausgangswert anzeigen
         colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
@@ -475,7 +475,7 @@ Public Class Testprobleme
         Dim achsen As Collection
         Dim xachse, yachse As EVO.Diagramm.Diagramm.Achse
 
-        title = "Testproblem"
+        title = "Test problem"
 
         'Achsen
         '------
@@ -567,7 +567,7 @@ Public Class Testprobleme
                     Array1X(j) = 0.1 + j * 0.009
                     Array1Y(j) = 1 / Array1X(j)
                 Next j
-                serie = Diag.getSeriesLine("Paretofront", "Green")
+                serie = Diag.getSeriesLine("Pareto front", "Green")
                 serie.Add(Array1X, Array1Y)
 
                 'Linie 2 berechnen und zeichnen
@@ -575,7 +575,7 @@ Public Class Testprobleme
                     Array2X(j) = 0.1 + j * 0.009
                     Array2Y(j) = (1 + 5) / Array2X(j)
                 Next j
-                serie = Diag.getSeriesLine("Linie 2", "Red")
+                serie = Diag.getSeriesLine("Line 2", "Red")
                 serie.Add(Array2X, Array2Y)
 
 
@@ -589,7 +589,7 @@ Public Class Testprobleme
                     ArrayX(j) = j / 1000
                     ArrayY(j) = 1 - Math.Sqrt(ArrayX(j))
                 Next j
-                serie = Diag.getSeriesLine("Paretofront", "Green")
+                serie = Diag.getSeriesLine("Pareto front", "Green")
                 serie.Add(ArrayX, ArrayY)
 
 
@@ -603,7 +603,7 @@ Public Class Testprobleme
                     ArrayX(j) = j / 100
                     ArrayY(j) = 1 - (ArrayX(j) * ArrayX(j))
                 Next j
-                serie = Diag.getSeriesLine("Paretofront", "Green")
+                serie = Diag.getSeriesLine("Pareto front", "Green")
                 serie.Add(ArrayX, ArrayY)
 
 
@@ -618,7 +618,7 @@ Public Class Testprobleme
                     ArrayX(j) = j / 100
                     ArrayY(j) = 1 - Math.Sqrt(ArrayX(j)) - ArrayX(j) * Math.Sin(10 * Math.PI * ArrayX(j))
                 Next j
-                serie = Diag.getSeriesLine("Paretofront", "Green")
+                serie = Diag.getSeriesLine("Pareto front", "Green")
                 serie.Add(ArrayX, ArrayY)
 
 
@@ -633,7 +633,7 @@ Public Class Testprobleme
                         ArrayX(j) = j / 1000
                         ArrayY(j) = (1 + (i - 1) / 4) * (1 - Math.Sqrt(ArrayX(j) / (1 + (i - 1) / 4)))
                     Next
-                    serie = Diag.getSeriesLine("Lokales Optimum " & i)
+                    serie = Diag.getSeriesLine("Local optimum " & i)
                     serie.Add(ArrayX, ArrayY)
                 Next
 
@@ -654,7 +654,7 @@ Public Class Testprobleme
                     Array1X(j) = 0.1 + j * 0.009
                     Array1Y(j) = 1 / Array1X(j)
                 Next j
-                serie = Diag.getSeriesLine("Grenze 1", "Red")
+                serie = Diag.getSeriesLine("Constraint 1", "Red")
                 serie.Add(Array1X, Array1Y)
 
                 'Grenze 2 berechnen und zeichnen
@@ -662,7 +662,7 @@ Public Class Testprobleme
                     Array2X(j) = 0.1 + j * 0.009
                     Array2Y(j) = (1 + 5) / Array2X(j)
                 Next j
-                serie = Diag.getSeriesLine("Grenze 2", "Red")
+                serie = Diag.getSeriesLine("Constraint 2", "Red")
                 serie.Add(Array2X, Array2Y)
 
                 'Grenze 3 berechnen und zeichnen
@@ -672,7 +672,7 @@ Public Class Testprobleme
                     Array3X(j) = 0.1 + (j + 2) * 0.009
                     Array3Y(j) = (7 - 9 * Array3X(j)) / Array3X(j)
                 Next j
-                serie = Diag.getSeriesLine("Grenze 3", "Blue")
+                serie = Diag.getSeriesLine("Constraint 3", "Blue")
                 serie.Add(Array3X, Array3Y)
 
                 'Grenze 4 berechnen und zeichnen
@@ -682,7 +682,7 @@ Public Class Testprobleme
                     Array4X(j) = 0.1 + (j + 2) * 0.009
                     Array4Y(j) = (9 * Array4X(j)) / Array4X(j)
                 Next j
-                serie = Diag.getSeriesLine("Grenze 4", "Red")
+                serie = Diag.getSeriesLine("Constraint 4", "Red")
                 serie.Add(Array4X, Array4Y)
 
             Case TP_FloodMitigation
@@ -807,7 +807,7 @@ Public Class Testprobleme
 
         'Schnittgerade zwischen den Constraints
         series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-        series3D.Title = "Schnittgerade"
+        series3D.Title = "Intersection"
         series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
         series3D.LinePen.Visible = True
         series3D.LinePen.Width = 1
@@ -852,7 +852,7 @@ Public Class Testprobleme
         Call achsen.Add(achse)
 
         'Z-Achse
-        achse.Title = "Zielfunktion"
+        achse.Title = "Objective function"
         achse.Automatic = False
         achse.Minimum = 0
         achse.Maximum = 2
@@ -860,7 +860,7 @@ Public Class Testprobleme
         Call achsen.Add(achse)
 
         'Diagramm initialisieren
-        Call Diag.DiagInitialise(TP_AbhängigeParameter, achsen, Me.mProblem)
+        Call Diag.DiagInitialise(TP_DependentParameters, achsen, Me.mProblem)
 
         'Serien
         '------
@@ -1109,7 +1109,7 @@ Public Class Testprobleme
                 '--------
                 If (Not ind.Is_Feasible) Then
                     'Ungültige Lösung
-                    serie = Diag.getSeriesPoint("Population (ungültig)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                    serie = Diag.getSeriesPoint("Population (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 Else
                     'Gültige Lösung
                     serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
@@ -1135,14 +1135,14 @@ Public Class Testprobleme
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
                 If (Not ind.Is_Feasible) Then
                     'Ungültige Lösung
-                    serie3D = Diag.getSeries3DPoint("Population (ungültig)", "Gray")
+                    serie3D = Diag.getSeries3DPoint("Population (invalid)", "Gray")
                 Else
                     'Gültige Lösung
                     serie3D = Diag.getSeries3DPoint("Population", "Orange")
                 End If
                 serie3D.Add(ind.Objectives(0), ind.Objectives(1), ind.Objectives(2))
 
-            Case TP_AbhängigeParameter
+            Case TP_DependentParameters
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Qualitätswerte berechnen
@@ -1210,7 +1210,7 @@ Public Class Testprobleme
                 If ind.Is_Feasible Then
                     serie = Diag.getSeriesPoint("Population", "Orange")
                 Else
-                    serie = Diag.getSeriesPoint("Population (ungültig)", "Gray")
+                    serie = Diag.getSeriesPoint("Population (invalid)", "Gray")
                 End If
                 serie.Add(ind.Objectives(0), ind.Objectives(1))
 

@@ -170,7 +170,7 @@ Public Class CES
         If (Settings.CES.N_Generations < 1) Then
             Throw New Exception("Die Anzahl der Generationen ist kleiner 1!")
         End If
-        If (Settings.CES.OptStrategie <> EVO_STRATEGIE.Komma_Strategie And Settings.CES.OptStrategie <> EVO_STRATEGIE.Plus_Strategie) Then
+        If (Settings.CES.OptStrategie <> EVO_STRATEGY.Comma_Strategy And Settings.CES.OptStrategie <> EVO_STRATEGY.Plus_Strategy) Then
             Throw New Exception("Typ der Evolutionsstrategie ist nicht '+' oder ','")
         End If
         'If (Settings.CES.OptReprodOp <> CES_REPRODOP.Uniform_Crossover And CES_REPRODOP.Order_Crossover And CES_REPRODOP.Part_Mapped_Cross) Then
@@ -358,7 +358,7 @@ Public Class CES
                     '***************************************************************************************************
                     For m = 0 To Children(i).Loc(j).PES_OptPara.GetUpperBound(0)
                         Children(i).Loc(j).PES_OptPara(m).Dn = mSettings.PES.SetMutation.DnStart
-                        If mSettings.PES.Startparameter = EVO_STARTPARAMETER.Zufall Then
+                        If mSettings.PES.Startparameter = EVO_STARTPARAMETERS.Random Then
                             Randomize()
                             Children(i).Loc(j).PES_OptPara(m).Xn = Rnd()
                         End If
@@ -377,14 +377,14 @@ Public Class CES
 
         'Strategie MINUS
         'xxxxxxxxxxxxxxx
-        If mSettings.CES.OptStrategie = EVO_STRATEGIE.Komma_Strategie Then
+        If mSettings.CES.OptStrategie = EVO_STRATEGY.Comma_Strategy Then
             For i = 0 To mSettings.CES.N_Parents - 1
                 Parents(i) = Children(i).Clone()
             Next i
 
             'Strategie PLUS
             'xxxxxxxxxxxxxx
-        ElseIf mSettings.CES.OptStrategie = EVO_STRATEGIE.Plus_Strategie Then
+        ElseIf mSettings.CES.OptStrategie = EVO_STRATEGY.Plus_Strategy Then
 
             For i = 0 To mSettings.CES.N_Children - 1
                 'Des schlechteste Elter wird bestimmt

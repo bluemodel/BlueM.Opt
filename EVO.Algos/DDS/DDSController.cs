@@ -92,7 +92,7 @@ namespace modelEAU.DDS
         public void InitApp(ref IHWB.EVO.Apps.Testprobleme inputTestproblem)
         {
             this.Testproblem = inputTestproblem;
-            this.myAppType = IHWB.EVO.Common.Constants.ApplicationTypes.Testprobleme;
+            this.myAppType = IHWB.EVO.Common.Constants.ApplicationTypes.Testproblems;
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace modelEAU.DDS
             Current_Parameter = new double[this.mProblem.NumOptParams];
             DDS = new modelEAU.DDS.DDS();
 
-            if (this.mProblem.List_ObjectiveFunctions[0].Richtung == IHWB.EVO.Common.Constants.EVO_RICHTUNG.Maximierung)
+            if (this.mProblem.List_ObjectiveFunctions[0].Richtung == IHWB.EVO.Common.Constants.EVO_DIRECTION.Maximization)
             {
                 DDS.to_max = -1.0;
             }

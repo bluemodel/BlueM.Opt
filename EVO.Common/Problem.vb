@@ -171,13 +171,13 @@ Public Class Problem
     ''' Optimierungsmodus
     ''' </summary>
     ''' <returns>Single-Objective oder Multi-Objective</returns>
-    Public ReadOnly Property Modus() As EVO.Common.Constants.EVO_MODUS
+    Public ReadOnly Property Modus() As EVO.Common.Constants.EVO_MODE
         Get
             Select Case Me.NumPrimObjective
                 Case 1
-                    Return EVO_MODUS.Single_Objective
+                    Return EVO_MODE.Single_Objective
                 Case Is > 1
-                    Return EVO_MODUS.Multi_Objective
+                    Return EVO_MODE.Multi_Objective
                 Case Else
                     Throw New Exception("Es sind keine PrimaryObjective-Functions definiert!")
             End Select
@@ -414,7 +414,7 @@ Public Class Problem
                 'liegt eine Beziehung vor?
                 If (i > 0 And array.GetUpperBound(0) > 6) Then
                     If Not array(6).Trim() = "" Then
-                        Me.List_OptParameter(i).Beziehung = Common.Constants.getBeziehung(array(6).Trim())
+                        Me.List_OptParameter(i).Beziehung = Common.Constants.getRelationship(array(6).Trim())
                     End If
                 End If
 
@@ -725,9 +725,9 @@ Public Class Problem
                             .Bezeichnung = WerteArray(2).Trim()
                             .Gruppe = WerteArray(3).Trim()
                             If (WerteArray(4).Trim() = "+") Then
-                                .Richtung = Common.EVO_RICHTUNG.Maximierung
+                                .Richtung = Common.EVO_DIRECTION.Maximization
                             Else
-                                .Richtung = Common.EVO_RICHTUNG.Minimierung
+                                .Richtung = Common.EVO_DIRECTION.Minimization
                             End If
                             If (WerteArray(5).Trim() = "+") Then
                                 .OpFact = 1
@@ -768,9 +768,9 @@ Public Class Problem
                             .Bezeichnung = WerteArray(2).Trim()
                             .Gruppe = WerteArray(3).Trim()
                             If (WerteArray(4).Trim() = "+") Then
-                                .Richtung = Common.EVO_RICHTUNG.Maximierung
+                                .Richtung = Common.EVO_DIRECTION.Maximization
                             Else
-                                .Richtung = Common.EVO_RICHTUNG.Minimierung
+                                .Richtung = Common.EVO_DIRECTION.Minimization
                             End If
                             If (WerteArray(5).Trim() = "+") Then
                                 .OpFact = 1
@@ -812,9 +812,9 @@ Public Class Problem
                             .Bezeichnung = WerteArray(2).Trim()
                             .Gruppe = WerteArray(3).Trim()
                             If (WerteArray(4).Trim() = "+") Then
-                                .Richtung = Common.EVO_RICHTUNG.Maximierung
+                                .Richtung = Common.EVO_DIRECTION.Maximization
                             Else
-                                .Richtung = Common.EVO_RICHTUNG.Minimierung
+                                .Richtung = Common.EVO_DIRECTION.Minimization
                             End If
                         End With
 
@@ -867,9 +867,9 @@ Public Class Problem
             .Bezeichnung = WerteArray(2).Trim()
             .Gruppe = WerteArray(3).Trim()
             If (WerteArray(4).Trim() = "+") Then
-                .Richtung = Common.EVO_RICHTUNG.Maximierung
+                .Richtung = Common.EVO_DIRECTION.Maximization
             Else
-                .Richtung = Common.EVO_RICHTUNG.Minimierung
+                .Richtung = Common.EVO_DIRECTION.Minimization
             End If
 
             If (WerteArray(5).Trim() = "+") Then

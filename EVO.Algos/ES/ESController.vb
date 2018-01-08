@@ -108,7 +108,7 @@ Public Class ESController
     ''' Initialisiert den Controller für Testprobleme
     ''' </summary>
     Public Sub InitApp(ByRef inputTestprobleme As EVO.Apps.Testprobleme) Implements IController.InitApp
-        Me.myAppType = ApplicationTypes.Testprobleme
+        Me.myAppType = ApplicationTypes.Testproblems
         Me.Testprobleme1 = inputTestprobleme
     End Sub
 
@@ -244,7 +244,7 @@ Public Class ESController
             '****************************************
 
             OptTimeParaPerGen.Stop()
-            EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation " & Me.CES_i_gen & " dauerte:   " & OptTimeParaPerGen.Elapsed.Hours & "h  " & OptTimeParaPerGen.Elapsed.Minutes & "m  " & OptTimeParaPerGen.Elapsed.Seconds & "s     " & OptTimeParaPerGen.Elapsed.Seconds & "ms")
+            EVO.Diagramm.Monitor.getInstance().LogAppend("The evaluation of generation " & Me.CES_i_gen & " took " & OptTimeParaPerGen.Elapsed.Hours & "h " & OptTimeParaPerGen.Elapsed.Minutes & "m " & OptTimeParaPerGen.Elapsed.Seconds & "s " & OptTimeParaPerGen.Elapsed.Seconds & "ms")
             TimePerGeneration(Me.CES_i_gen + 1) = OptTimeParaPerGen.Elapsed
             TimePerGeneration(0) += OptTimeParaPerGen.Elapsed
 
@@ -256,7 +256,7 @@ Public Class ESController
 
                 If (Not isOK(i_Child)) Then
                     'Simulationsfehler aufgetreten!
-                    Dim msg As String = "Der Nachfahre mit der ID " & CES1.Children(i_Child).ID & " wurde nicht richtig evaluiert! Die Simulation wurde mit Fehlern abgebrochen."
+                    Dim msg As String = "The child with the ID " & CES1.Children(i_Child).ID & " was not evaluated successfully! The simulation aborted with errors."
                     MsgBox(msg, MsgBoxStyle.Critical, "ESController")
                     'Abbruch!
                     Exit Sub
@@ -353,7 +353,7 @@ Public Class ESController
         Next
         'Ende der Generationsschleife CES
 
-        EVO.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung aller Generationen dauerte:   " & TimePerGeneration(0).Hours.ToString & "h  " & TimePerGeneration(0).Minutes.ToString & "m  " & TimePerGeneration(0).Seconds.ToString & "s     " & TimePerGeneration(0).Milliseconds.ToString & "ms")
+        EVO.Diagramm.Monitor.getInstance().LogAppend("The evaluation of all generations took: " & TimePerGeneration(0).Hours.ToString & "h " & TimePerGeneration(0).Minutes.ToString & "m " & TimePerGeneration(0).Seconds.ToString & "s " & TimePerGeneration(0).Milliseconds.ToString & "ms")
 
         'Falls jetzt noch PES ausgeführt werden soll
         'Starten der PES mit der Front von CES
@@ -434,7 +434,7 @@ Public Class ESController
                             For m = 0 To CES1.Children(i_Child).Loc(i_loc).PES_OptPara.GetUpperBound(0)
                                 CES1.Children(i_Child).Loc(i_loc).PES_OptPara(m).Dn = CES1.mSettings.PES.SetMutation.DnStart
                                 'Falls zufällige Startwerte
-                                If CES1.mSettings.PES.Startparameter = Common.Constants.EVO_STARTPARAMETER.Zufall Then
+                                If CES1.mSettings.PES.Startparameter = Common.Constants.EVO_STARTPARAMETERS.Random Then
                                     Randomize()
                                     CES1.Children(i_Child).Loc(i_loc).PES_OptPara(m).Xn = Rnd()
                                 End If
@@ -590,7 +590,7 @@ Public Class ESController
         'xxxxxxxxxxxxxxxx
         For PES1.PES_iAkt.iAktRunde = 0 To Me.mySettings.PES.Pop.N_Runden - 1
 
-            EVO.Diagramm.Monitor.getInstance().LogAppend("Starte Runde " & PES1.PES_iAkt.iAktRunde & "...")
+            EVO.Diagramm.Monitor.getInstance().LogAppend("Starting round " & PES1.PES_iAkt.iAktRunde & "...")
 
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
@@ -598,7 +598,7 @@ Public Class ESController
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 0 To Me.mySettings.PES.Pop.N_Popul - 1
 
-                EVO.Diagramm.Monitor.getInstance().LogAppend("Starte Population " & PES1.PES_iAkt.iAktPop & "...")
+                EVO.Diagramm.Monitor.getInstance().LogAppend("Starting population " & PES1.PES_iAkt.iAktPop & "...")
 
                 'POPULATIONS REPRODUKTIONSPROZESS
                 '################################
@@ -614,7 +614,7 @@ Public Class ESController
                 'xxxxxxxxxxxxxxxxxxxxxx
                 For PES1.PES_iAkt.iAktGen = 0 To Me.mySettings.PES.N_Gen - 1
 
-                    EVO.Diagramm.Monitor.getInstance().LogAppend("Starte Generation " & PES1.PES_iAkt.iAktGen & "...")
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("Starting generation " & PES1.PES_iAkt.iAktGen & "...")
 
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
@@ -636,7 +636,7 @@ Public Class ESController
                         'Neue Parameter holen
                         Call PES_getNewParameters(inds(i_Nachf))
 
-                        If (myAppType = ApplicationTypes.Testprobleme) Then
+                        If (myAppType = ApplicationTypes.Testproblems) Then
 
                             'Testprobleme immer direkt auswerten
                             '===================================
@@ -662,7 +662,7 @@ Public Class ESController
                             '----------------------------
                             If (Not isOK(i_Nachf)) Then
 
-                                EVO.Diagramm.Monitor.getInstance().LogAppend("Evaluierung des Nachfahren " & i_Nachf & " fehlgeschlagen, es wird ein neuer Parametersatz generiert und evaluiert...")
+                                EVO.Diagramm.Monitor.getInstance().LogAppend("Evaluation of child " & i_Nachf & " was unsuccessful, a new parameter set will be generated and evaluated...")
 
                                 Dim n_Tries As Integer = 0
 
@@ -670,7 +670,7 @@ Public Class ESController
                                     'Abbruchkriterium
                                     n_Tries += 1
                                     If (n_Tries > 10) Then
-                                        Throw New Exception("Es konnte auch nach 10 Versuchen kein gültiger Datensatz erzeugt werden!")
+                                        Throw New Exception("Unable to generate a valid dataset after 10 tries!")
                                     End If
 
                                     'Parametersatz erneuern
@@ -710,7 +710,7 @@ Public Class ESController
                         Next
                         If errorcount > 0 Then
                             Dim msg As String
-                            msg = "Evaluierung von " & errorcount & " Nachfahren der Generation fehlgeschlagen, es werden neue Parametersätze generiert und evaluiert..."
+                            msg = "Evaluation of " & errorcount & " children of the current generation failed, will generate and evaluate new parameter sets..."
                             EVO.Diagramm.Monitor.getInstance().LogAppend(msg)
                         End If
 
@@ -727,7 +727,7 @@ Public Class ESController
                                     'Abbruchkriterium
                                     n_Tries += 1
                                     If (n_Tries > 10) Then
-                                        Throw New Exception("Es konnte auch nach 10 Versuchen kein gültiger Datensatz erzeugt werden!")
+                                        Throw New Exception("Unable to generate a valid dataset after 10 tries!")
                                     End If
 
                                     'Parametersatz erneuern
@@ -750,18 +750,18 @@ Public Class ESController
                     End If 'Ende alle Nachfahren (multithread)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    EVO.Diagramm.Monitor.getInstance().LogAppend("Generation " & PES1.PES_iAkt.iAktGen & " abgeschlossen.")
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("Generation " & PES1.PES_iAkt.iAktGen & " completed.")
 
                     'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
                     'Die neuen Eltern werden generiert
-                    EVO.Diagramm.Monitor.getInstance().LogAppend("Bestimme neue Eltern...")
+                    EVO.Diagramm.Monitor.getInstance().LogAppend("Determining new parents...")
                     Call PES1.EsEltern()
 
                     'Sekundäre Population
                     '====================
-                    If (Me.mySettings.PES.OptModus = Common.Constants.EVO_MODUS.Multi_Objective) Then
+                    If (Me.mySettings.PES.OptModus = Common.Constants.EVO_MODE.Multi_Objective) Then
 
-                        EVO.Diagramm.Monitor.getInstance().LogAppend("Aktualisiere Sekundäre Population...")
+                        EVO.Diagramm.Monitor.getInstance().LogAppend("Updating secondary population...")
 
                         'SekPop abspeichern
                         '------------------
@@ -893,10 +893,10 @@ Public Class ESController
             With Me.myMonitor.Diag
 
                 'Durchlaufachse (unten)
-                .Axes.Bottom.Title.Caption = "Durchlauf"
+                .Axes.Bottom.Title.Caption = "Iteration"
 
                 'Schrittweitenachse (links)
-                .Axes.Left.Title.Caption = "Schrittweite"
+                .Axes.Left.Title.Caption = "Step size"
 
             End With
 
@@ -905,12 +905,12 @@ Public Class ESController
                 'Bei PES-Schrittweitenvektor eine Linie für jeden Parameter
                 ReDim Me.Line_Dn(Me.myProblem.List_OptParameter_Save.Length - 1)
                 For i As Integer = 0 To Me.myProblem.List_OptParameter_Save.Length - 1
-                    Me.Line_Dn(i) = Me.myMonitor.Diag.getSeriesLine("Schrittweite " & Me.myProblem.List_OptParameter_Save(i).Bezeichnung)
+                    Me.Line_Dn(i) = Me.myMonitor.Diag.getSeriesLine("Step size " & Me.myProblem.List_OptParameter_Save(i).Bezeichnung)
                 Next
             Else
                 'Ansonsten nur eine Linie
                 ReDim Me.Line_Dn(0)
-                Me.Line_Dn(0) = Me.myMonitor.Diag.getSeriesLine("Schrittweite", "Blue")
+                Me.Line_Dn(0) = Me.myMonitor.Diag.getSeriesLine("Step size", "Blue")
             End If
 
             'Linien formatieren
@@ -938,7 +938,7 @@ Public Class ESController
 
                 'Hypervolumenachse (rechts)
                 .Axes.Right.Visible = True
-                .Axes.Right.Title.Caption = "Hypervolumen"
+                .Axes.Right.Title.Caption = "Hypervolume"
                 .Axes.Right.Title.Angle = 90
                 .Axes.Right.Automatic = True
                 .Axes.Right.Grid.Visible = False
@@ -946,7 +946,7 @@ Public Class ESController
             End With
 
             'Linie
-            Me.Line_Hypervolume = Me.myMonitor.Diag.getSeriesLine("Hypervolumen", "Red")
+            Me.Line_Hypervolume = Me.myMonitor.Diag.getSeriesLine("Hypervolume", "Red")
             Me.Line_Hypervolume.CustomHorizAxis = Me.myMonitor.Diag.Axes.Top
             Me.Line_Hypervolume.CustomVertAxis = Me.myMonitor.Diag.Axes.Right
             Me.Line_Hypervolume.Color = System.Drawing.Color.Red
@@ -1031,16 +1031,16 @@ Public Class ESController
             '2D
             '--
             Dim serie2 As Steema.TeeChart.Styles.Points
-            serie2 = Me.myHauptDiagramm.getSeriesPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
+            serie2 = Me.myHauptDiagramm.getSeriesPoint("Nadir point", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
             serie2.Clear()
-            serie2.Add(nadir(0), nadir(1), "Nadirpunkt")
+            serie2.Add(nadir(0), nadir(1), "Nadir point")
         Else
             '3D
             '--
             Dim serie3 As Steema.TeeChart.Styles.Points3D
-            serie3 = Me.myHauptDiagramm.getSeries3DPoint("Nadirpunkt", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
+            serie3 = Me.myHauptDiagramm.getSeries3DPoint("Nadir point", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
             serie3.Clear()
-            serie3.Add(nadir(0), nadir(1), nadir(2), "Nadirpunkt")
+            serie3.Add(nadir(0), nadir(1), nadir(2), "Nadir point")
         End If
 
     End Sub

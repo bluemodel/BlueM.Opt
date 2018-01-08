@@ -25,9 +25,9 @@ Partial Class Monitor
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Monitor))
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage_Diagramm = New System.Windows.Forms.TabPage
+        Me.Diag = New IHWB.EVO.Diagramm.Diagramm
         Me.TabPage_Log = New System.Windows.Forms.TabPage
         Me.TextBox_Log = New System.Windows.Forms.TextBox
-        Me.Diag = New IHWB.EVO.Diagramm.Diagramm
         Me.TabControl1.SuspendLayout()
         Me.TabPage_Diagramm.SuspendLayout()
         Me.TabPage_Log.SuspendLayout()
@@ -54,8 +54,250 @@ Partial Class Monitor
         Me.TabPage_Diagramm.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPage_Diagramm.Size = New System.Drawing.Size(488, 439)
         Me.TabPage_Diagramm.TabIndex = 0
-        Me.TabPage_Diagramm.Text = "Diagramm"
+        Me.TabPage_Diagramm.Text = "Chart"
         Me.TabPage_Diagramm.UseVisualStyleBackColor = True
+        '
+        'Diag
+        '
+        Me.Diag.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        '
+        '
+        '
+        Me.Diag.Aspect.View3D = False
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.Bottom.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.Bottom.Labels.Bevel.StringColorTwo = "FF808080"
+        Me.Diag.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
+        Me.Diag.Axes.Bottom.MaximumOffset = 3
+        Me.Diag.Axes.Bottom.MinimumOffset = 3
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.Bottom.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.Bottom.Title.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.Depth.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.Depth.Labels.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.Depth.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.Depth.Title.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.DepthTop.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.DepthTop.Labels.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.DepthTop.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.DepthTop.Title.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.Left.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.Left.Labels.Bevel.StringColorTwo = "FF808080"
+        Me.Diag.Axes.Left.MaximumOffset = 3
+        Me.Diag.Axes.Left.MinimumOffset = 3
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.Left.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.Left.Title.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.Right.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.Right.Labels.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.Right.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.Right.Title.Bevel.StringColorTwo = "FF808080"
+        Me.Diag.Axes.Right.Visible = False
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.Top.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.Top.Labels.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Axes.Top.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Axes.Top.Title.Bevel.StringColorTwo = "FF808080"
+        Me.Diag.Axes.Top.Visible = False
+        Me.Diag.BackColor = System.Drawing.Color.Transparent
+        Me.Diag.Cursor = System.Windows.Forms.Cursors.Default
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Footer.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Footer.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Header.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Header.Bevel.StringColorTwo = "FF808080"
+        Me.Diag.Header.Visible = False
+        '
+        '
+        '
+        Me.Diag.Legend.Alignment = Steema.TeeChart.LegendAlignments.Bottom
+        '
+        '
+        '
+        Me.Diag.Legend.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Legend.Bevel.StringColorTwo = "FF808080"
+        Me.Diag.Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Legend.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Legend.Title.Bevel.StringColorTwo = "FF808080"
+        Me.Diag.Location = New System.Drawing.Point(0, 0)
+        Me.Diag.Name = "Diag"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Panel.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Panel.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        Me.Diag.Panel.Brush.Color = System.Drawing.Color.Transparent
+        '
+        '
+        '
+        Me.Diag.Panning.Allow = Steema.TeeChart.ScrollModes.None
+        Me.Diag.Size = New System.Drawing.Size(488, 439)
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.SubFooter.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.SubFooter.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.SubHeader.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.SubHeader.Bevel.StringColorTwo = "FF808080"
+        Me.Diag.TabIndex = 8
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Walls.Back.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Walls.Back.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Walls.Bottom.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Walls.Bottom.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Walls.Left.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Walls.Left.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Diag.Walls.Right.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Diag.Walls.Right.Bevel.StringColorTwo = "FF808080"
         '
         'TabPage_Log
         '
@@ -81,68 +323,6 @@ Partial Class Monitor
         Me.TextBox_Log.ScrollBars = System.Windows.Forms.ScrollBars.Both
         Me.TextBox_Log.Size = New System.Drawing.Size(476, 427)
         Me.TextBox_Log.TabIndex = 0
-        '
-        'Diag
-        '
-        Me.Diag.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        '
-        '
-        '
-        Me.Diag.Aspect.View3D = False
-        Me.Diag.Aspect.ZOffset = 0
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.Diag.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
-        Me.Diag.Axes.Bottom.MaximumOffset = 3
-        Me.Diag.Axes.Bottom.MinimumOffset = 3
-        '
-        '
-        '
-        Me.Diag.Axes.Left.MaximumOffset = 3
-        Me.Diag.Axes.Left.MinimumOffset = 3
-        '
-        '
-        '
-        Me.Diag.Axes.Right.Visible = False
-        '
-        '
-        '
-        Me.Diag.Axes.Top.Visible = False
-        Me.Diag.BackColor = System.Drawing.Color.Transparent
-        Me.Diag.Cursor = System.Windows.Forms.Cursors.Default
-        '
-        '
-        '
-        Me.Diag.Header.Visible = False
-        '
-        '
-        '
-        Me.Diag.Legend.Alignment = Steema.TeeChart.LegendAlignments.Bottom
-        Me.Diag.Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
-        Me.Diag.Location = New System.Drawing.Point(0, 0)
-        Me.Diag.Name = "Monitor"
-        '
-        '
-        '
-        '
-        '
-        '
-        Me.Diag.Panel.Brush.Color = System.Drawing.Color.Transparent
-        '
-        '
-        '
-        Me.Diag.Panning.Allow = Steema.TeeChart.ScrollModes.None
-        Me.Diag.Size = New System.Drawing.Size(488, 439)
-        Me.Diag.TabIndex = 8
         '
         'Monitor
         '

@@ -103,7 +103,7 @@ Public Class Talsim
         exe_path = System.Windows.Forms.Application.StartupPath() & "\TALSIM\talsimw64.exe"
 
         If (Not File.Exists(exe_path)) Then
-            Throw New Exception(exe_path & " nicht gefunden!")
+            Throw New Exception(exe_path & " not found!")
         End If
 
     End Sub
@@ -264,7 +264,7 @@ Public Class Talsim
             'this is done for every simulation because the workdir may change
             Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
             If (Not File.Exists(runfile)) Then
-                Throw New Exception(runfile & " nicht gefunden!")
+                Throw New Exception(runfile & " not found!")
             End If
             Dim line As String
             'read the template run file
@@ -319,7 +319,7 @@ Public Class Talsim
             'if .ERR file exists, simulation finished with errors
             If IO.File.Exists(errfile) Then
                 'read err-file
-                Dim errmsg As String = "TALSIM Simulation mit Fehlern beendet:"
+                Dim errmsg As String = "TALSIM simulation ended with errors:"
                 filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
                 strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
                 Do
@@ -334,7 +334,7 @@ Public Class Talsim
 
             'if .SIMEND does not exist, simulation aborted prematurely
             If Not IO.File.Exists(simendfile) Then
-                Throw New Exception("TALSIM Simulation vorzeitig abgebrochen!")
+                Throw New Exception("TALSIM simulation aborted prematurely!")
             End If
 
             'Simulation erfolgreich

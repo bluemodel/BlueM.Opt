@@ -100,20 +100,20 @@ Partial Class Form1
         '
         MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen, Me.BachModeToolStripMenuItem})
         MenuItem_Tools.Name = "MenuItem_Tools"
-        MenuItem_Tools.Size = New System.Drawing.Size(44, 20)
+        MenuItem_Tools.Size = New System.Drawing.Size(48, 20)
         MenuItem_Tools.Text = "Tools"
         '
         'MenuItem_DatensatzZurücksetzen
         '
         Me.MenuItem_DatensatzZurücksetzen.Enabled = False
         Me.MenuItem_DatensatzZurücksetzen.Name = "MenuItem_DatensatzZurücksetzen"
-        Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(200, 22)
-        Me.MenuItem_DatensatzZurücksetzen.Text = "Datensatz zurücksetzen"
+        Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(161, 22)
+        Me.MenuItem_DatensatzZurücksetzen.Text = "Reset dataset"
         '
         'BachModeToolStripMenuItem
         '
         Me.BachModeToolStripMenuItem.Name = "BachModeToolStripMenuItem"
-        Me.BachModeToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+        Me.BachModeToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
         Me.BachModeToolStripMenuItem.Text = "CES Batch Mode"
         '
         'MenuItem_Info
@@ -126,13 +126,13 @@ Partial Class Form1
         'ToolStripMenuItem_Help
         '
         Me.ToolStripMenuItem_Help.Name = "ToolStripMenuItem_Help"
-        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(114, 22)
-        Me.ToolStripMenuItem_Help.Text = "Hilfe"
+        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(107, 22)
+        Me.ToolStripMenuItem_Help.Text = "Help"
         '
         'ToolStripMenuItem_About
         '
         Me.ToolStripMenuItem_About.Name = "ToolStripMenuItem_About"
-        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(114, 22)
+        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(107, 22)
         Me.ToolStripMenuItem_About.Text = "About"
         '
         'ToolStripSeparator4
@@ -174,7 +174,7 @@ Partial Class Form1
         Me.Button_Start.Size = New System.Drawing.Size(165, 38)
         Me.Button_Start.TabIndex = 3
         Me.Button_Start.Text = "Start"
-        Me.ToolTip1.SetToolTip(Me.Button_Start, "Optimierung starten")
+        Me.ToolTip1.SetToolTip(Me.Button_Start, "Start optimization")
         Me.Button_Start.UseVisualStyleBackColor = True
         '
         'Button_Stop
@@ -186,7 +186,7 @@ Partial Class Form1
         Me.Button_Stop.Size = New System.Drawing.Size(59, 38)
         Me.Button_Stop.TabIndex = 21
         Me.Button_Stop.Text = "Stop"
-        Me.ToolTip1.SetToolTip(Me.Button_Stop, "Optimierung abbrechen")
+        Me.ToolTip1.SetToolTip(Me.Button_Stop, "Abort optimization")
         Me.Button_Stop.UseVisualStyleBackColor = True
         '
         'GroupBox_Anwendung
@@ -207,7 +207,7 @@ Partial Class Form1
         Me.GroupBox_Anwendung.Size = New System.Drawing.Size(714, 50)
         Me.GroupBox_Anwendung.TabIndex = 0
         Me.GroupBox_Anwendung.TabStop = False
-        Me.GroupBox_Anwendung.Text = "Anwendung"
+        Me.GroupBox_Anwendung.Text = "Application"
         '
         'Button_BrowseDatensatz
         '
@@ -225,9 +225,9 @@ Partial Class Form1
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ComboBox_Datensatz.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox_Datensatz.FormattingEnabled = True
-        Me.ComboBox_Datensatz.Location = New System.Drawing.Point(206, 18)
+        Me.ComboBox_Datensatz.Location = New System.Drawing.Point(200, 18)
         Me.ComboBox_Datensatz.Name = "ComboBox_Datensatz"
-        Me.ComboBox_Datensatz.Size = New System.Drawing.Size(308, 21)
+        Me.ComboBox_Datensatz.Size = New System.Drawing.Size(314, 21)
         Me.ComboBox_Datensatz.TabIndex = 13
         '
         'Label_Anwendung
@@ -256,9 +256,9 @@ Partial Class Form1
         Me.Label_Methode.AutoSize = True
         Me.Label_Methode.Location = New System.Drawing.Point(555, 22)
         Me.Label_Methode.Name = "Label_Methode"
-        Me.Label_Methode.Size = New System.Drawing.Size(52, 13)
+        Me.Label_Methode.Size = New System.Drawing.Size(46, 13)
         Me.Label_Methode.TabIndex = 11
-        Me.Label_Methode.Text = "Methode:"
+        Me.Label_Methode.Text = "Method:"
         '
         'ComboBox_Methode
         '
@@ -275,9 +275,9 @@ Partial Class Form1
         Me.Label_Datensatz.AutoSize = True
         Me.Label_Datensatz.Location = New System.Drawing.Point(147, 22)
         Me.Label_Datensatz.Name = "Label_Datensatz"
-        Me.Label_Datensatz.Size = New System.Drawing.Size(58, 13)
+        Me.Label_Datensatz.Size = New System.Drawing.Size(47, 13)
         Me.Label_Datensatz.TabIndex = 12
-        Me.Label_Datensatz.Text = "Datensatz:"
+        Me.Label_Datensatz.Text = "Dataset:"
         '
         'ToolStrip1
         '
@@ -295,8 +295,8 @@ Partial Class Form1
         Me.ToolStripButton_New.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton_New.Name = "ToolStripButton_New"
         Me.ToolStripButton_New.Size = New System.Drawing.Size(23, 22)
-        Me.ToolStripButton_New.Text = "Neu"
-        Me.ToolStripButton_New.ToolTipText = "Eine neue Optimierung starten"
+        Me.ToolStripButton_New.Text = "New"
+        Me.ToolStripButton_New.ToolTipText = "Start a new optimization"
         '
         'ToolStripSplitButton_Settings
         '
@@ -304,23 +304,22 @@ Partial Class Form1
         Me.ToolStripSplitButton_Settings.Image = Global.IHWB.EVO.My.Resources.Resources.wrench
         Me.ToolStripSplitButton_Settings.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripSplitButton_Settings.Name = "ToolStripSplitButton_Settings"
-        Me.ToolStripSplitButton_Settings.Size = New System.Drawing.Size(102, 22)
-        Me.ToolStripSplitButton_Settings.Text = "Einstellungen"
-        Me.ToolStripSplitButton_Settings.ToolTipText = "Allgemeine Einstellungen"
+        Me.ToolStripSplitButton_Settings.Size = New System.Drawing.Size(81, 22)
+        Me.ToolStripSplitButton_Settings.Text = "Settings"
         '
         'ToolStripMenuItem_SettingsSave
         '
         Me.ToolStripMenuItem_SettingsSave.Image = Global.IHWB.EVO.My.Resources.Resources.page_white_put
         Me.ToolStripMenuItem_SettingsSave.Name = "ToolStripMenuItem_SettingsSave"
-        Me.ToolStripMenuItem_SettingsSave.Size = New System.Drawing.Size(209, 22)
-        Me.ToolStripMenuItem_SettingsSave.Text = "Einstellungen speichern..."
+        Me.ToolStripMenuItem_SettingsSave.Size = New System.Drawing.Size(153, 22)
+        Me.ToolStripMenuItem_SettingsSave.Text = "Save settings..."
         '
         'ToolStripMenuItem_SettingsLoad
         '
         Me.ToolStripMenuItem_SettingsLoad.Image = Global.IHWB.EVO.My.Resources.Resources.page_white_get
         Me.ToolStripMenuItem_SettingsLoad.Name = "ToolStripMenuItem_SettingsLoad"
-        Me.ToolStripMenuItem_SettingsLoad.Size = New System.Drawing.Size(209, 22)
-        Me.ToolStripMenuItem_SettingsLoad.Text = "Einstellungen laden..."
+        Me.ToolStripMenuItem_SettingsLoad.Size = New System.Drawing.Size(153, 22)
+        Me.ToolStripMenuItem_SettingsLoad.Text = "Load settings..."
         '
         'ToolStripSplitButton_ErgebnisDB
         '
@@ -328,32 +327,32 @@ Partial Class Form1
         Me.ToolStripSplitButton_ErgebnisDB.Image = Global.IHWB.EVO.My.Resources.Resources.database
         Me.ToolStripSplitButton_ErgebnisDB.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripSplitButton_ErgebnisDB.Name = "ToolStripSplitButton_ErgebnisDB"
-        Me.ToolStripSplitButton_ErgebnisDB.Size = New System.Drawing.Size(80, 22)
-        Me.ToolStripSplitButton_ErgebnisDB.Text = "Ergebnis"
-        Me.ToolStripSplitButton_ErgebnisDB.ToolTipText = "Optimierungsergebnis"
+        Me.ToolStripSplitButton_ErgebnisDB.Size = New System.Drawing.Size(71, 22)
+        Me.ToolStripSplitButton_ErgebnisDB.Text = "Result"
+        Me.ToolStripSplitButton_ErgebnisDB.ToolTipText = "Optimization result"
         '
         'ToolStripMenuItem_ErgebnisDBSave
         '
         Me.ToolStripMenuItem_ErgebnisDBSave.Image = Global.IHWB.EVO.My.Resources.Resources.database_save
         Me.ToolStripMenuItem_ErgebnisDBSave.Name = "ToolStripMenuItem_ErgebnisDBSave"
-        Me.ToolStripMenuItem_ErgebnisDBSave.Size = New System.Drawing.Size(200, 22)
-        Me.ToolStripMenuItem_ErgebnisDBSave.Text = "ErgebnisDB speichern..."
+        Me.ToolStripMenuItem_ErgebnisDBSave.Size = New System.Drawing.Size(169, 22)
+        Me.ToolStripMenuItem_ErgebnisDBSave.Text = "Save result DB..."
         Me.ToolStripMenuItem_ErgebnisDBSave.ToolTipText = "Ergebnisdatenbank speichern..."
         '
         'ToolStripMenuItem_ErgebnisDBLoad
         '
         Me.ToolStripMenuItem_ErgebnisDBLoad.Image = Global.IHWB.EVO.My.Resources.Resources.database_connect
         Me.ToolStripMenuItem_ErgebnisDBLoad.Name = "ToolStripMenuItem_ErgebnisDBLoad"
-        Me.ToolStripMenuItem_ErgebnisDBLoad.Size = New System.Drawing.Size(200, 22)
-        Me.ToolStripMenuItem_ErgebnisDBLoad.Text = "ErgebnisDB laden..."
+        Me.ToolStripMenuItem_ErgebnisDBLoad.Size = New System.Drawing.Size(169, 22)
+        Me.ToolStripMenuItem_ErgebnisDBLoad.Text = "Load result DB..."
         Me.ToolStripMenuItem_ErgebnisDBLoad.ToolTipText = "Optimierungsergebnis aus bestehender DB laden"
         '
         'ToolStripMenuItem_ErgebnisDBCompare
         '
         Me.ToolStripMenuItem_ErgebnisDBCompare.Image = Global.IHWB.EVO.My.Resources.Resources.database_go
         Me.ToolStripMenuItem_ErgebnisDBCompare.Name = "ToolStripMenuItem_ErgebnisDBCompare"
-        Me.ToolStripMenuItem_ErgebnisDBCompare.Size = New System.Drawing.Size(200, 22)
-        Me.ToolStripMenuItem_ErgebnisDBCompare.Text = "Ergebnis vergleichen..."
+        Me.ToolStripMenuItem_ErgebnisDBCompare.Size = New System.Drawing.Size(169, 22)
+        Me.ToolStripMenuItem_ErgebnisDBCompare.Text = "Compare results..."
         Me.ToolStripMenuItem_ErgebnisDBCompare.ToolTipText = "mit einem anderen Optimierungsergebnis vergleichen"
         '
         'ToolStripSplitButton_Diagramm
@@ -362,40 +361,39 @@ Partial Class Form1
         Me.ToolStripSplitButton_Diagramm.Image = Global.IHWB.EVO.My.Resources.Resources.wave
         Me.ToolStripSplitButton_Diagramm.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripSplitButton_Diagramm.Name = "ToolStripSplitButton_Diagramm"
-        Me.ToolStripSplitButton_Diagramm.Size = New System.Drawing.Size(86, 22)
-        Me.ToolStripSplitButton_Diagramm.Text = "Diagramm"
-        Me.ToolStripSplitButton_Diagramm.ToolTipText = "Diagramm"
+        Me.ToolStripSplitButton_Diagramm.Size = New System.Drawing.Size(68, 22)
+        Me.ToolStripSplitButton_Diagramm.Text = "Chart"
         '
         'ToolStripMenuItem_TChartEdit
         '
         Me.ToolStripMenuItem_TChartEdit.Image = Global.IHWB.EVO.My.Resources.Resources.chart_curve_edit
         Me.ToolStripMenuItem_TChartEdit.Name = "ToolStripMenuItem_TChartEdit"
-        Me.ToolStripMenuItem_TChartEdit.Size = New System.Drawing.Size(199, 22)
-        Me.ToolStripMenuItem_TChartEdit.Text = "Diagramm bearbeiten..."
+        Me.ToolStripMenuItem_TChartEdit.Size = New System.Drawing.Size(134, 22)
+        Me.ToolStripMenuItem_TChartEdit.Text = "Edit chart..."
         Me.ToolStripMenuItem_TChartEdit.ToolTipText = "Diagramm bearbeiten"
         '
         'ToolStripMenuItem_TChartSave
         '
         Me.ToolStripMenuItem_TChartSave.Image = Global.IHWB.EVO.My.Resources.Resources.icon_teechart
         Me.ToolStripMenuItem_TChartSave.Name = "ToolStripMenuItem_TChartSave"
-        Me.ToolStripMenuItem_TChartSave.Size = New System.Drawing.Size(199, 22)
-        Me.ToolStripMenuItem_TChartSave.Text = "TEN speichern..."
+        Me.ToolStripMenuItem_TChartSave.Size = New System.Drawing.Size(134, 22)
+        Me.ToolStripMenuItem_TChartSave.Text = "Save TEN..."
         Me.ToolStripMenuItem_TChartSave.ToolTipText = "Diagramm im TEN-Format speichern"
         '
         'ToolStripMenuItem_TChart2PNG
         '
         Me.ToolStripMenuItem_TChart2PNG.Image = Global.IHWB.EVO.My.Resources.Resources.icon_png
         Me.ToolStripMenuItem_TChart2PNG.Name = "ToolStripMenuItem_TChart2PNG"
-        Me.ToolStripMenuItem_TChart2PNG.Size = New System.Drawing.Size(199, 22)
-        Me.ToolStripMenuItem_TChart2PNG.Text = "PNG speichern..."
+        Me.ToolStripMenuItem_TChart2PNG.Size = New System.Drawing.Size(134, 22)
+        Me.ToolStripMenuItem_TChart2PNG.Text = "Save PNG..."
         Me.ToolStripMenuItem_TChart2PNG.ToolTipText = "Diagramm als PNG-Datei speichern"
         '
         'ToolStripMenuItem_Tchart2CSV
         '
         Me.ToolStripMenuItem_Tchart2CSV.Image = Global.IHWB.EVO.My.Resources.Resources.icon_excel
         Me.ToolStripMenuItem_Tchart2CSV.Name = "ToolStripMenuItem_Tchart2CSV"
-        Me.ToolStripMenuItem_Tchart2CSV.Size = New System.Drawing.Size(199, 22)
-        Me.ToolStripMenuItem_Tchart2CSV.Text = "CSV speichern..."
+        Me.ToolStripMenuItem_Tchart2CSV.Size = New System.Drawing.Size(134, 22)
+        Me.ToolStripMenuItem_Tchart2CSV.Text = "Save CSV..."
         Me.ToolStripMenuItem_Tchart2CSV.ToolTipText = "Diagrammdaten als CSV-Datei speichern"
         '
         'ToolStripButton_Monitor
@@ -406,8 +404,7 @@ Partial Class Form1
         Me.ToolStripButton_Monitor.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton_Monitor.Name = "ToolStripButton_Monitor"
         Me.ToolStripButton_Monitor.Size = New System.Drawing.Size(23, 22)
-        Me.ToolStripButton_Monitor.Text = "Monitor anzeigen/ausblenden"
-        Me.ToolStripButton_Monitor.ToolTipText = "Monitor anzeigen/ausblenden"
+        Me.ToolStripButton_Monitor.Text = "Show/hide Monitor"
         '
         'ToolStripButton_Scatterplot
         '
@@ -417,7 +414,7 @@ Partial Class Form1
         Me.ToolStripButton_Scatterplot.Name = "ToolStripButton_Scatterplot"
         Me.ToolStripButton_Scatterplot.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_Scatterplot.Text = "Scatterplot"
-        Me.ToolStripButton_Scatterplot.ToolTipText = "Scatterplotmatrix anzeigen"
+        Me.ToolStripButton_Scatterplot.ToolTipText = "Display scatterplot matrix"
         '
         'StatusStrip1
         '
@@ -436,19 +433,266 @@ Partial Class Form1
         '
         '
         Me.Hauptdiagramm1.Aspect.View3D = False
-        Me.Hauptdiagramm1.Aspect.ZOffset = 0
         '
         '
         '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.Bottom.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Bottom.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Bottom.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.Bottom.Title.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.Depth.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Depth.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Depth.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.Depth.Labels.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.Depth.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Depth.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Depth.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.Depth.Title.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.Left.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Left.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Left.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.Left.Labels.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.Left.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Left.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Left.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.Left.Title.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.Right.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Right.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Right.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.Right.Labels.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.Right.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Right.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Right.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.Right.Title.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.Top.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Top.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Top.Labels.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.Top.Labels.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Axes.Top.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Top.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Top.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Axes.Top.Title.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Footer.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Footer.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Footer.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Footer.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Header.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Header.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Header.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Header.Bevel.StringColorTwo = "FF808080"
         Me.Hauptdiagramm1.Header.Lines = New String() {"BlueM.Opt"}
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Legend.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Legend.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Legend.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Legend.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Legend.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Legend.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Legend.Title.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Legend.Title.Bevel.StringColorTwo = "FF808080"
         Me.Hauptdiagramm1.Location = New System.Drawing.Point(241, 106)
         Me.Hauptdiagramm1.MinimumSize = New System.Drawing.Size(477, 0)
         Me.Hauptdiagramm1.Name = "Hauptdiagramm1"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Panel.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Panel.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Panel.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Panel.Bevel.StringColorTwo = "FF808080"
         Me.Hauptdiagramm1.Size = New System.Drawing.Size(477, 627)
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.SubFooter.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.SubFooter.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.SubFooter.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.SubFooter.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.SubHeader.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.SubHeader.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.SubHeader.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.SubHeader.Bevel.StringColorTwo = "FF808080"
         Me.Hauptdiagramm1.TabIndex = 17
         '
         '
         '
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Walls.Back.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Back.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Back.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Walls.Back.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Walls.Bottom.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Bottom.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Bottom.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Walls.Bottom.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Walls.Left.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Left.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Left.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Walls.Left.Bevel.StringColorTwo = "FF808080"
+        '
+        '
+        '
+        '
+        '
+        '
+        Me.Hauptdiagramm1.Walls.Right.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Right.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Right.Bevel.StringColorOne = "FFFFFFFF"
+        Me.Hauptdiagramm1.Walls.Right.Bevel.StringColorTwo = "FF808080"
         Me.Hauptdiagramm1.Walls.View3D = False
         '
         'EVO_Opt_Verlauf1

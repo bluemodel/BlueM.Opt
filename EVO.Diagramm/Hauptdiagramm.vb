@@ -171,7 +171,7 @@ Public Class Hauptdiagramm
             'SingleObjective
             'xxxxxxxxxxxxxxx
             If (Not ind.Is_Feasible) Then
-                serie = Me.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray", , , ColEach)
+                serie = Me.getSeriesPoint("Population " & (pop + 1).ToString() & " (invalid)", "Gray", , , ColEach)
             Else
                 serie = Me.getSeriesPoint("Population " & (pop + 1).ToString(), , , , ColEach)
             End If
@@ -183,7 +183,7 @@ Public Class Hauptdiagramm
                 Case EVO.Common.METH_METAEVO
                     Call serie.Add(runde * Me.mSettings.MetaEvo.NumberGenerations * Me.mSettings.MetaEvo.PopulationSize + gen * Me.mSettings.MetaEvo.PopulationSize + nachf, ind.PrimObjectives(0), ind.ID.ToString(), Farbe)
                 Case Else
-                    Throw New Exception("Für diese Methode Single Objective zeichnen nicht definiert")
+                    Throw New Exception("Drawing function not defined for this single objective method!")
             End Select
         Else
             'MultiObjective
@@ -192,7 +192,7 @@ Public Class Hauptdiagramm
                 '2D-Diagramm
                 '------------------------------------------------------------------------
                 If (Not ind.Is_Feasible) Then
-                    serie = Me.getSeriesPoint("Population" & " (ungültig)", "Gray", , , ColEach)
+                    serie = Me.getSeriesPoint("Population" & " (invalid)", "Gray", , , ColEach)
                 Else
                     serie = Me.getSeriesPoint("Population", "Orange", , , ColEach)
                 End If
@@ -203,7 +203,7 @@ Public Class Hauptdiagramm
                 '------------------------------------------------------------------------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
                 If (Not ind.Is_Feasible) Then
-                    serie3D = Me.getSeries3DPoint("Population" & " (ungültig)", "Gray", , , ColEach)
+                    serie3D = Me.getSeries3DPoint("Population" & " (invalid)", "Gray", , , ColEach)
                 Else
                     serie3D = Me.getSeries3DPoint("Population", "Orange", , , ColEach)
                 End If
@@ -232,7 +232,7 @@ Public Class Hauptdiagramm
         If (Me.mProblem.NumPrimObjective = 1) Then
             'SingleObjective
             'xxxxxxxxxxxxxxx
-            serie = Me.getSeriesPoint("Startwert", farbe)
+            serie = Me.getSeriesPoint("Start value", farbe)
             Call serie.Add(1, ind.PrimObjectives(0), ind.ID.ToString())
         Else
             'MultiObjective
@@ -240,14 +240,14 @@ Public Class Hauptdiagramm
             If (Me.mProblem.NumPrimObjective = 2) Then
                 '2D-Diagramm
                 '------------------------------------------------------------------------
-                serie = Me.getSeriesPoint("Startwert", farbe)
+                serie = Me.getSeriesPoint("Start value", farbe)
                 Call serie.Add(ind.PrimObjectives(0), ind.PrimObjectives(1), ind.ID.ToString())
 
             Else
                 '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                 '------------------------------------------------------------------------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
-                serie3D = Me.getSeries3DPoint("Startwert", farbe)
+                serie3D = Me.getSeries3DPoint("Start value", farbe)
                 Call serie3D.Add(ind.PrimObjectives(0), ind.PrimObjectives(1), ind.PrimObjectives(2), ind.ID.ToString())
             End If
         End If
@@ -268,7 +268,7 @@ Public Class Hauptdiagramm
         If (Me.mProblem.NumPrimObjective = 2) Then
             '2 Zielfunktionen
             '----------------------------------------------------------------
-            serie = Me.getSeriesPoint("Sekundäre Population", "Green")
+            serie = Me.getSeriesPoint("Secondary population", "Green")
             serie.Clear()
             For i = 0 To values.GetUpperBound(0)
                 serie.Add(values(i, 0), values(i, 1), pop(i).ID.ToString())
@@ -277,7 +277,7 @@ Public Class Hauptdiagramm
         ElseIf (Me.mProblem.NumPrimObjective >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
-            serie3D = Me.getSeries3DPoint("Sekundäre Population", "Green")
+            serie3D = Me.getSeries3DPoint("Secondary population", "Green")
             serie3D.Clear()
             For i = 0 To values.GetUpperBound(0)
                 serie3D.Add(values(i, 0), values(i, 1), values(i, 2), pop(i).ID.ToString())
@@ -295,7 +295,7 @@ Public Class Hauptdiagramm
         If (Me.mProblem.NumPrimObjective = 1) Then
             'SingleObjective
             'xxxxxxxxxxxxxxx
-            serie = Me.getSeriesPoint("Population " & (pop + 1).ToString() & " (ungültig)", "Gray")
+            serie = Me.getSeriesPoint("Population " & (pop + 1).ToString() & " (invalid)", "Gray")
             serie.Clear()
             serie = Me.getSeriesPoint("Population " & (pop + 1).ToString())
             serie.Clear()
@@ -305,7 +305,7 @@ Public Class Hauptdiagramm
             If (Me.mProblem.NumPrimObjective = 2) Then
                 '2D-Diagramm
                 '------------------------------------------------------------------------
-                serie = Me.getSeriesPoint("Population (ungültig)", "Gray")
+                serie = Me.getSeriesPoint("Population (invalid)", "Gray")
                 serie.Clear()
                 serie = Me.getSeriesPoint("Population", "Orange")
                 serie.Clear()
@@ -313,7 +313,7 @@ Public Class Hauptdiagramm
                 '3D-Diagramm
                 '-----------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
-                serie3D = Me.getSeries3DPoint("Population (ungültig)", "Gray")
+                serie3D = Me.getSeries3DPoint("Population (invalid)", "Gray")
                 serie3D.Clear()
                 serie3D = Me.getSeries3DPoint("Population", "Orange")
                 serie3D.Clear()
@@ -361,7 +361,7 @@ Public Class Hauptdiagramm
         If (Me.ZielIndexZ <> -1) Then
             If (Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).hasIstWert) Then
                 'BUG 317: ColorLine auf Depth-Axis geht nicht!
-                MsgBox("Der IstWert auf der Z-Achse (" & Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Bezeichnung & ") kann leider nicht angezeigt werden (Bug 317)", MsgBoxStyle.Information)
+                MsgBox("The current value on the Z-axis (" & Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Bezeichnung & ") can not be displayed (Bug 317)", MsgBoxStyle.Information)
                 'colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
                 'colorline1.Pen.Color = System.Drawing.Color.Red
                 'colorline1.AllowDrag = False
@@ -393,7 +393,7 @@ Public Class Hauptdiagramm
             '2D-Diagramm
             '-----------
             Dim serie As Steema.TeeChart.Styles.Series
-            serie = Me.getSeriesPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+            serie = Me.getSeriesPoint("Selected solutions", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
             serie.Marks.Visible = True
             serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie.Marks.Transparency = 50
@@ -410,7 +410,7 @@ Public Class Hauptdiagramm
             '3D-Diagramm
             '-----------
             Dim serie3D As Steema.TeeChart.Styles.Points3D
-            serie3D = Me.getSeries3DPoint("ausgewählte Lösungen", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
+            serie3D = Me.getSeries3DPoint("Selected solutions", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
             serie3D.Add(ind.Objectives(Me.ZielIndexX), ind.Objectives(Me.ZielIndexY), ind.Objectives(Me.ZielIndexZ), ind.ID.ToString())
             serie3D.Marks.Visible = True
             serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
@@ -429,14 +429,14 @@ Public Class Hauptdiagramm
             '2D-Diagramm
             '-----------
             Dim serie As Steema.TeeChart.Styles.Series
-            serie = Me.getSeriesPoint("ausgewählte Lösungen")
+            serie = Me.getSeriesPoint("Selected solutions")
             serie.Dispose()
 
         Else
             '3D-Diagramm
             '-----------
             Dim serie3D As Steema.TeeChart.Styles.Points3D
-            serie3D = Me.getSeries3DPoint("ausgewählte Lösungen")
+            serie3D = Me.getSeries3DPoint("Selected solutions")
             serie3D.Dispose()
         End If
 

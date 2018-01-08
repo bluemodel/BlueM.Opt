@@ -31,12 +31,12 @@ Partial Class ScatterplotDialog
         Me.CheckedListBox_Auswahl = New System.Windows.Forms.CheckedListBox
         Me.CheckBox_SekPopOnly = New System.Windows.Forms.CheckBox
         Me.GroupBox_Options = New System.Windows.Forms.GroupBox
+        Me.CheckBox_showIstWerte = New System.Windows.Forms.CheckBox
+        Me.CheckBox_showStartValue = New System.Windows.Forms.CheckBox
         Me.CheckBox_showRef = New System.Windows.Forms.CheckBox
         Me.RadioButton_SolutionSpace = New System.Windows.Forms.RadioButton
         Me.RadioButton_DecisionSpace = New System.Windows.Forms.RadioButton
         Me.GroupBox_Raum = New System.Windows.Forms.GroupBox
-        Me.CheckBox_showStartValue = New System.Windows.Forms.CheckBox
-        Me.CheckBox_showIstWerte = New System.Windows.Forms.CheckBox
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Auswahl.SuspendLayout()
         Me.GroupBox_Options.SuspendLayout()
@@ -61,7 +61,7 @@ Partial Class ScatterplotDialog
         Me.Button_Cancel.Name = "Button_Cancel"
         Me.Button_Cancel.Size = New System.Drawing.Size(67, 23)
         Me.Button_Cancel.TabIndex = 4
-        Me.Button_Cancel.Text = "Abbrechen"
+        Me.Button_Cancel.Text = "Cancel"
         '
         'GroupBox_Auswahl
         '
@@ -72,17 +72,17 @@ Partial Class ScatterplotDialog
         Me.GroupBox_Auswahl.Size = New System.Drawing.Size(164, 201)
         Me.GroupBox_Auswahl.TabIndex = 2
         Me.GroupBox_Auswahl.TabStop = False
-        Me.GroupBox_Auswahl.Text = "Auswahl"
+        Me.GroupBox_Auswahl.Text = "Selection"
         '
         'LinkLabel_CheckAll
         '
         Me.LinkLabel_CheckAll.AutoSize = True
         Me.LinkLabel_CheckAll.Location = New System.Drawing.Point(6, 179)
         Me.LinkLabel_CheckAll.Name = "LinkLabel_CheckAll"
-        Me.LinkLabel_CheckAll.Size = New System.Drawing.Size(78, 13)
+        Me.LinkLabel_CheckAll.Size = New System.Drawing.Size(50, 13)
         Me.LinkLabel_CheckAll.TabIndex = 1
         Me.LinkLabel_CheckAll.TabStop = True
-        Me.LinkLabel_CheckAll.Text = "Alle auswählen"
+        Me.LinkLabel_CheckAll.Text = "Select all"
         '
         'CheckedListBox_Auswahl
         '
@@ -100,10 +100,10 @@ Partial Class ScatterplotDialog
         Me.CheckBox_SekPopOnly.CheckState = System.Windows.Forms.CheckState.Checked
         Me.CheckBox_SekPopOnly.Location = New System.Drawing.Point(9, 19)
         Me.CheckBox_SekPopOnly.Name = "CheckBox_SekPopOnly"
-        Me.CheckBox_SekPopOnly.Size = New System.Drawing.Size(128, 17)
+        Me.CheckBox_SekPopOnly.Size = New System.Drawing.Size(123, 17)
         Me.CheckBox_SekPopOnly.TabIndex = 0
-        Me.CheckBox_SekPopOnly.Text = "nur SekPop anzeigen"
-        Me.ToolTip1.SetToolTip(Me.CheckBox_SekPopOnly, "nur die Sekundäre Population anzeigen")
+        Me.CheckBox_SekPopOnly.Text = "Display sec pop only"
+        Me.ToolTip1.SetToolTip(Me.CheckBox_SekPopOnly, "Display only the secondary population")
         Me.CheckBox_SekPopOnly.UseVisualStyleBackColor = True
         '
         'GroupBox_Options
@@ -117,7 +117,29 @@ Partial Class ScatterplotDialog
         Me.GroupBox_Options.Size = New System.Drawing.Size(146, 201)
         Me.GroupBox_Options.TabIndex = 1
         Me.GroupBox_Options.TabStop = False
-        Me.GroupBox_Options.Text = "Optionen"
+        Me.GroupBox_Options.Text = "Options"
+        '
+        'CheckBox_showIstWerte
+        '
+        Me.CheckBox_showIstWerte.AutoSize = True
+        Me.CheckBox_showIstWerte.Location = New System.Drawing.Point(9, 66)
+        Me.CheckBox_showIstWerte.Name = "CheckBox_showIstWerte"
+        Me.CheckBox_showIstWerte.Size = New System.Drawing.Size(130, 17)
+        Me.CheckBox_showIstWerte.TabIndex = 2
+        Me.CheckBox_showIstWerte.Text = "Display current values"
+        Me.ToolTip1.SetToolTip(Me.CheckBox_showIstWerte, "Displays the current values of the objective functions as areas")
+        Me.CheckBox_showIstWerte.UseVisualStyleBackColor = True
+        '
+        'CheckBox_showStartValue
+        '
+        Me.CheckBox_showStartValue.AutoSize = True
+        Me.CheckBox_showStartValue.Location = New System.Drawing.Point(9, 42)
+        Me.CheckBox_showStartValue.Name = "CheckBox_showStartValue"
+        Me.CheckBox_showStartValue.Size = New System.Drawing.Size(117, 17)
+        Me.CheckBox_showStartValue.TabIndex = 1
+        Me.CheckBox_showStartValue.Text = "Display start values"
+        Me.ToolTip1.SetToolTip(Me.CheckBox_showStartValue, "Displays the solution that was evaluated using the start values")
+        Me.CheckBox_showStartValue.UseVisualStyleBackColor = True
         '
         'CheckBox_showRef
         '
@@ -125,8 +147,8 @@ Partial Class ScatterplotDialog
         Me.CheckBox_showRef.Name = "CheckBox_showRef"
         Me.CheckBox_showRef.Size = New System.Drawing.Size(128, 31)
         Me.CheckBox_showRef.TabIndex = 3
-        Me.CheckBox_showRef.Text = "Vergleichsergebnis anzeigen"
-        Me.ToolTip1.SetToolTip(Me.CheckBox_showRef, "Zeigt die sekundäre Population des geladenen Vergleichsergebnissen an")
+        Me.CheckBox_showRef.Text = "Display comparison result"
+        Me.ToolTip1.SetToolTip(Me.CheckBox_showRef, "Displays the secondary population of the loaded comparison result")
         Me.CheckBox_showRef.UseVisualStyleBackColor = True
         '
         'RadioButton_SolutionSpace
@@ -134,9 +156,9 @@ Partial Class ScatterplotDialog
         Me.RadioButton_SolutionSpace.AutoSize = True
         Me.RadioButton_SolutionSpace.Location = New System.Drawing.Point(9, 19)
         Me.RadioButton_SolutionSpace.Name = "RadioButton_SolutionSpace"
-        Me.RadioButton_SolutionSpace.Size = New System.Drawing.Size(88, 17)
+        Me.RadioButton_SolutionSpace.Size = New System.Drawing.Size(95, 17)
         Me.RadioButton_SolutionSpace.TabIndex = 0
-        Me.RadioButton_SolutionSpace.Text = "Lösungsraum"
+        Me.RadioButton_SolutionSpace.Text = "Solution space"
         Me.RadioButton_SolutionSpace.UseVisualStyleBackColor = True
         '
         'RadioButton_DecisionSpace
@@ -144,9 +166,9 @@ Partial Class ScatterplotDialog
         Me.RadioButton_DecisionSpace.AutoSize = True
         Me.RadioButton_DecisionSpace.Location = New System.Drawing.Point(179, 19)
         Me.RadioButton_DecisionSpace.Name = "RadioButton_DecisionSpace"
-        Me.RadioButton_DecisionSpace.Size = New System.Drawing.Size(118, 17)
+        Me.RadioButton_DecisionSpace.Size = New System.Drawing.Size(98, 17)
         Me.RadioButton_DecisionSpace.TabIndex = 1
-        Me.RadioButton_DecisionSpace.Text = "Entscheidungsraum"
+        Me.RadioButton_DecisionSpace.Text = "Decision space"
         Me.RadioButton_DecisionSpace.UseVisualStyleBackColor = True
         '
         'GroupBox_Raum
@@ -158,29 +180,7 @@ Partial Class ScatterplotDialog
         Me.GroupBox_Raum.Size = New System.Drawing.Size(316, 46)
         Me.GroupBox_Raum.TabIndex = 0
         Me.GroupBox_Raum.TabStop = False
-        Me.GroupBox_Raum.Text = "Raum"
-        '
-        'CheckBox_showStartValue
-        '
-        Me.CheckBox_showStartValue.AutoSize = True
-        Me.CheckBox_showStartValue.Location = New System.Drawing.Point(9, 42)
-        Me.CheckBox_showStartValue.Name = "CheckBox_showStartValue"
-        Me.CheckBox_showStartValue.Size = New System.Drawing.Size(114, 17)
-        Me.CheckBox_showStartValue.TabIndex = 1
-        Me.CheckBox_showStartValue.Text = "Startwert anzeigen"
-        Me.ToolTip1.SetToolTip(Me.CheckBox_showStartValue, "Zeigt das Start-Individuum an")
-        Me.CheckBox_showStartValue.UseVisualStyleBackColor = True
-        '
-        'CheckBox_showIstWerte
-        '
-        Me.CheckBox_showIstWerte.AutoSize = True
-        Me.CheckBox_showIstWerte.Location = New System.Drawing.Point(9, 66)
-        Me.CheckBox_showIstWerte.Name = "CheckBox_showIstWerte"
-        Me.CheckBox_showIstWerte.Size = New System.Drawing.Size(115, 17)
-        Me.CheckBox_showIstWerte.TabIndex = 2
-        Me.CheckBox_showIstWerte.Text = "Ist-Werte anzeigen"
-        Me.ToolTip1.SetToolTip(Me.CheckBox_showIstWerte, "Zeigt die IstWerte der Zielfunktionen als Flächen an")
-        Me.CheckBox_showIstWerte.UseVisualStyleBackColor = True
+        Me.GroupBox_Raum.Text = "Space"
         '
         'ScatterplotDialog
         '
@@ -201,7 +201,7 @@ Partial Class ScatterplotDialog
         Me.Name = "ScatterplotDialog"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Scatterplot-Matrix"
+        Me.Text = "Scatterplot matrix"
         Me.GroupBox_Auswahl.ResumeLayout(False)
         Me.GroupBox_Auswahl.PerformLayout()
         Me.GroupBox_Options.ResumeLayout(False)

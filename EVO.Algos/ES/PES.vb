@@ -168,60 +168,60 @@ Public Class PES
 
         'Überprüfung der Übergebenen Werte
         'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        If (Not System.Enum.IsDefined(GetType(EVO_STRATEGIE), settings.PES.Strategie)) Then
-            Throw New Exception("Ungültige Einstellung für 'Strategie'!")
+        If (Not System.Enum.IsDefined(GetType(EVO_STRATEGY), settings.PES.Strategie)) Then
+            Throw New Exception("Invalid setting for 'Strategy'!")
         End If
-        If (Not System.Enum.IsDefined(GetType(EVO_STARTPARAMETER), settings.PES.Startparameter)) Then
-            Throw New Exception("Ungültige Einstellung für 'Startparameter'!")
+        If (Not System.Enum.IsDefined(GetType(EVO_STARTPARAMETERS), settings.PES.Startparameter)) Then
+            Throw New Exception("Invalid setting for 'Start values'!")
         End If
         'Schrittweite
         If (Not System.Enum.IsDefined(GetType(PES_MUTATIONSOP), settings.PES.Mutationsop)) Then
-            Throw New Exception("Ungültige Einstellung für 'Mutation'!")
+            Throw New Exception("Invalid setting for 'Mutation'!")
         End If
         If (settings.PES.SetMutation.DnStart < 0) Then
-            Throw New Exception("Die Startschrittweite darf nicht kleiner 0 sein!")
+            Throw New Exception("The starting step size can not be less than 0!")
         End If
         'Generationen
         If (settings.PES.N_Gen < 1) Then
-            Throw New Exception("Die Anzahl der Generationen ist kleiner 1!")
+            Throw New Exception("The number of generations can not be less than 1!")
         End If
         If (settings.PES.N_Eltern < 1) Then
-            Throw New Exception("Die Anzahl der Eltern ist kleiner 1!")
+            Throw New Exception("The number of parents can not be less than 1!")
         End If
         If (settings.PES.N_Nachf <= settings.PES.N_Eltern And Me.mProblem.Method <> "HYBRID") Then
-            Throw New Exception("Die Anzahl der Eltern muss kleiner als die Anzahl der Nachfahren!" & Chr(13) & Chr(10) & "'Rechenberg 73' schlägt ein Verhältnis von 1:3 bis 1:5 vor.")
+            Throw New Exception("The number of parents must be less than the number of children!" & Chr(13) & Chr(10) & "Rechenberg (1973) recommends using ratios between 1:3 and 1:5.")
         End If
         If (settings.PES.N_Nachf < 1) Then
-            Throw New Exception("Die Anzahl der Nachfahren ist kleiner 1!")
+            Throw New Exception("The number of children can not be less than 1!")
         End If
         'Eltern
         If (Not System.Enum.IsDefined(GetType(PES_REPRODOP), settings.PES.Reproduktionsop)) Then
-            Throw New Exception("Ungültige Einstellung für die Ermittlung der Eltern!")
+            Throw New Exception("Invalid setting for the determination of parents!")
         End If
-        If (settings.PES.OptModus = EVO_MODUS.Single_Objective And settings.PES.Reproduktionsop = PES_REPRODOP.Neighbourhood) Then
-            Throw New Exception("Die Option 'Neighbourhood' für die Ermittlung der Eltern ist bei Single-Objective nicht zulässig!")
+        If (settings.PES.OptModus = EVO_MODE.Single_Objective And settings.PES.Reproduktionsop = PES_REPRODOP.Neighborhood) Then
+            Throw New Exception("The option 'Neighborhood' for the determination of parents can not be used for single objective problems!")
         End If
         If (settings.PES.N_RekombXY < 1) Then
-            Throw New Exception("Der Wert für die X/Y-Schema Rekombination ist kleiner 1!")
+            Throw New Exception("The value for the X/Y recombination can not be less than 1!")
         End If
         'Populationen
         If (settings.PES.Pop.N_Runden < 1) Then
-            Throw New Exception("Die Anzahl der Runden ist kleiner 1")
+            Throw New Exception("The number of rounds can not be less than 1!")
         End If
         If (settings.PES.Pop.N_Popul < 1) Then
-            Throw New Exception("Die Anzahl der Populationen ist kleiner 1")
+            Throw New Exception("The number of populations can not be less than 1!")
         End If
         If (settings.PES.Pop.N_PopEltern < 1) Then
-            Throw New Exception("Die Anzahl der Populationseltern ist kleiner 1")
+            Throw New Exception("The number of population parents can not be less than 1!")
         End If
         If (settings.PES.Pop.N_Popul < settings.PES.Pop.N_PopEltern) Then
-            Throw New Exception("Die Anzahl der Populationseltern darf nicht größer als die Anzahl der Populationen!")
+            Throw New Exception("The number of population parents can not be larger than the number of populations!")
         End If
         If (Not System.Enum.IsDefined(GetType(EVO_POP_ELTERN), settings.PES.Pop.PopEltern)) Then
-            Throw New Exception("Ungültige Einstellung für die Ermittlung der Populationseltern!")
+            Throw New Exception("Invalid setting for the determination of population parents!")
         End If
-        If (Not System.Enum.IsDefined(GetType(EVO_STRATEGIE), settings.PES.Pop.PopStrategie)) Then
-            Throw New Exception("Ungültige Einstellung für 'Selektion' auf Populationsebene!")
+        If (Not System.Enum.IsDefined(GetType(EVO_STRATEGY), settings.PES.Pop.PopStrategie)) Then
+            Throw New Exception("Invalid setting for 'Selection' at the population level!")
         End If
 
         'Übergabe der Optionen
@@ -244,7 +244,7 @@ Public Class PES
         'Penaltyfunktion ausgewertet werden)
 
         If (Me.mProblem.NumOptParams <= 0 Or Me.mProblem.NumPrimObjective <= 0) Then
-            Throw New Exception("Es muss mindestens ein Parameter variiert und eine Penaltyfunktion ausgewertet werden")
+            Throw New Exception("You must have at least one optimization parameter and one primary objective!")
         End If
 
         'Dynamisches Array Initialisieren
@@ -270,9 +270,9 @@ Public Class PES
         ReDim Best.Front(mSettings.PES.N_Eltern - 1, mSettings.PES.Pop.N_Popul - 1)
 
         'NDSorting wird nur benötigt, falls eine Paretofront approximiert wird
-        If (mSettings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
+        If (mSettings.PES.OptModus = EVO_MODE.Multi_Objective) Then
             NDSorting = Individuum.New_Indi_Array(Individuum.Individuumsklassen.Individuum_PES, mSettings.PES.N_Eltern + mSettings.PES.N_Nachf, "NDSorting")
-            If (mSettings.PES.Reproduktionsop = PES_REPRODOP.Neighbourhood) Then
+            If (mSettings.PES.Reproduktionsop = PES_REPRODOP.Neighborhood) Then
                 ReDim PenaltyDistance(mSettings.PES.N_Eltern - 1, mSettings.PES.N_Eltern - 1)
                 ReDim Distanceb(mSettings.PES.N_Eltern - 1)
             End If
@@ -294,7 +294,7 @@ Public Class PES
         Next
 
         'Falls NDSorting Crowding Distance wird initialisiert
-        If (mSettings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
+        If (mSettings.PES.OptModus = EVO_MODE.Multi_Objective) Then
             For n = 0 To mSettings.PES.Pop.N_Popul - 1
                 For m = 0 To Me.mProblem.NumPrimObjective - 1
                     Select Case mSettings.PES.Pop.PopPenalty
@@ -303,7 +303,7 @@ Public Class PES
                             'Qualität der Populationseltern wird auf sehr großen Wert gesetzt
                             Qbpop(n, m) = 1.0E+300
 
-                        Case EVO_POP_PENALTY.Spannweite
+                        Case EVO_POP_PENALTY.Span
                             'Qualität der Populationseltern wird auf 0 gesetzt
                             Qbpop(n, m) = 0
                     End Select
@@ -342,7 +342,7 @@ Public Class PES
         'Dynamisches Array wird mit Werten belegt
         For i = 0 To Me.mProblem.NumOptParams - 1
             If (Me.mProblem.List_OptParameter(i).Xn < 0 Or Me.mProblem.List_OptParameter(i).Xn > 1) Then
-                Throw New Exception("Der Startparameter '" & Me.mProblem.List_OptParameter(i).Bezeichnung & "' liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
+                Throw New Exception("The start value of the optimization parameter '" & Me.mProblem.List_OptParameter(i).Bezeichnung & "' is not between 0 und 1. It must be scaled to this range!")
             End If
             AktPara(i) = Me.mProblem.List_OptParameter(i).Clone()
             'Startschrittweite übernehmen
@@ -357,7 +357,7 @@ Public Class PES
         'Die Startparameter für die Eltern werden gesetzt
         Select Case Me.mSettings.PES.Startparameter
 
-            Case EVO_STARTPARAMETER.Zufall 'Zufällige Startwerte
+            Case EVO_STARTPARAMETERS.Random 'Zufällige Startwerte
                 For v = 0 To Me.mProblem.NumOptParams - 1
                     For n = 0 To mSettings.PES.N_Eltern - 1
                         For m = 0 To mSettings.PES.Pop.N_PopEltern - 1
@@ -370,7 +370,7 @@ Public Class PES
                     Next n
                 Next v
 
-            Case EVO_STARTPARAMETER.Original 'Originalparameter
+            Case EVO_STARTPARAMETERS.Original 'Originalparameter
                 For v = 0 To Me.mProblem.NumOptParams - 1
                     For n = 0 To mSettings.PES.N_Eltern - 1
                         For m = 0 To mSettings.PES.Pop.N_PopEltern - 1
@@ -393,7 +393,7 @@ Public Class PES
 
         'Check
         If (Parameter.Length <> Me.mProblem.List_OptParameter.Length) Then
-            Throw New Exception("Falsche Anzahl Parameter übergeben!")
+            Throw New Exception("Wrong number of parameters passed!")
         End If
 
         For v = 0 To Me.mProblem.NumOptParams - 1
@@ -486,7 +486,7 @@ Public Class PES
 
         Select Case mSettings.PES.Pop.PopEltern
 
-            Case EVO_POP_ELTERN.Rekombination 'MultiRekombination über alle Eltern (x/x,y) oder (x/x+y)
+            Case EVO_POP_ELTERN.Recombination 'MultiRekombination über alle Eltern (x/x,y) oder (x/x+y)
                 For n = 0 To mSettings.PES.N_Eltern - 1
                     R = Int(mSettings.PES.Pop.N_PopEltern * Rnd())
                     For v = 0 To Me.mProblem.NumOptParams - 1
@@ -497,7 +497,7 @@ Public Class PES
                     Next v
                 Next n
 
-            Case EVO_POP_ELTERN.Mittelwert 'Mittelwertbildung über alle Eltern
+            Case EVO_POP_ELTERN.Average 'Mittelwertbildung über alle Eltern
                 'Ermitteln der Elter und Schrittweite über Mittelung der Elternschrittweiten
                 For v = 0 To Me.mProblem.NumOptParams - 1
                     For n = 0 To mSettings.PES.N_Eltern - 1
@@ -512,7 +512,7 @@ Public Class PES
                     Next n
                 Next v
 
-            Case EVO_POP_ELTERN.Selektion 'Zufallswahl über alle Eltern
+            Case EVO_POP_ELTERN.Selection 'Zufallswahl über alle Eltern
                 R = Int(mSettings.PES.Pop.N_PopEltern * Rnd()) 'Zufallszahl entscheidet welcher
                 'Elternteil vererbt wird
                 For v = 0 To Me.mProblem.NumOptParams - 1
@@ -542,7 +542,7 @@ Public Class PES
 
         Select Case mSettings.PES.Reproduktionsop
 
-            Case PES_REPRODOP.Selektion 'Zufallswahl über alle Eltern
+            Case PES_REPRODOP.Selection 'Zufallswahl über alle Eltern
 
                 R = Int(mSettings.PES.N_Eltern * Rnd())    'Zufallszahl entscheidet
                 'welcher Enternteil vererbt wird
@@ -553,7 +553,7 @@ Public Class PES
                     AktPara(v).Xn = Xe(v, R, PES_iAkt.iAktPop)
                 Next v
 
-            Case PES_REPRODOP.XX_Diskret 'Multi-Rekombination, diskret
+            Case PES_REPRODOP.XX_Discrete 'Multi-Rekombination, diskret
 
                 For v = 0 To Me.mProblem.NumOptParams - 1
                     R = Int(mSettings.PES.N_Eltern * Rnd())
@@ -563,7 +563,7 @@ Public Class PES
                     AktPara(v).Xn = Xe(v, R, PES_iAkt.iAktPop)
                 Next v
 
-            Case PES_REPRODOP.XX_Mitteln 'Multi-Rekombination, gemittelt
+            Case PES_REPRODOP.XX_Average 'Multi-Rekombination, gemittelt
 
                 For v = 0 To Me.mProblem.NumOptParams - 1
                     AktPara(v).Dn = 0
@@ -577,7 +577,7 @@ Public Class PES
                     Next
                 Next v
 
-            Case PES_REPRODOP.XX_Mitteln_Diskret
+            Case PES_REPRODOP.XX_Average_Discrete
                 For v = 0 To Me.mProblem.NumOptParams - 1
                     AktPara(v).Dn = 0
                     R = Int(mSettings.PES.N_Eltern * Rnd())
@@ -590,7 +590,7 @@ Public Class PES
                 Next v
 
 
-            Case PES_REPRODOP.XY_Diskret 'Multi-Rekombination nach X/Y-Schema, diskrete Vertauschung
+            Case PES_REPRODOP.XY_Discrete 'Multi-Rekombination nach X/Y-Schema, diskrete Vertauschung
                 'Realisierungsspeicher und Elternspeicher initialisieren
                 'Anzahl der benötigten Eltern (Y)
                 ReDim Realisierungsspeicher(mSettings.PES.N_RekombXY - 1)
@@ -653,7 +653,7 @@ Public Class PES
                 Next v
 
 
-            Case PES_REPRODOP.XY_Mitteln 'Multi-Rekombination nach X/Y-Schema, Mittelung der Gene
+            Case PES_REPRODOP.XY_Average 'Multi-Rekombination nach X/Y-Schema, Mittelung der Gene
 
                 'Realisierungsspeicher und Elternspeicher initialisieren
                 'Anzahl der benötigten Eltern (Y)
@@ -720,7 +720,7 @@ Public Class PES
                     Next
                 Next v
 
-            Case PES_REPRODOP.XY_Mitteln_Diskret
+            Case PES_REPRODOP.XY_Average_Discrete
                 'Realisierungsspeicher und Elternspeicher initialisieren
                 'Anzahl der benötigten Eltern (Y)
                 ReDim Realisierungsspeicher(mSettings.PES.N_RekombXY - 1)
@@ -787,7 +787,7 @@ Public Class PES
                 Next v
 
 
-            Case PES_REPRODOP.Neighbourhood 'Neighbourhood Rekombination
+            Case PES_REPRODOP.Neighborhood 'Neighbourhood Rekombination
 
                 'Z1 = Int(Settings.PES.n_Eltern * Rnd())
                 'Do
@@ -1198,7 +1198,7 @@ Public Class PES
                 'Abbruchkriterium
                 '----------------
                 If (i >= 1000) Then
-                    Throw New Exception("Es konnte kein gültiger Parametersatz generiert werden")
+                    Throw New Exception("Unable to generate a valid parameter set!")
                 End If
 
                 'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
@@ -1259,7 +1259,7 @@ Public Class PES
         i = 0
         h1 = Qbpop(0, 0)
         For m = 1 To mSettings.PES.Pop.N_Popul - 1
-            If (mSettings.PES.OptModus = EVO_MODUS.Single_Objective) Then
+            If (mSettings.PES.OptModus = EVO_MODE.Single_Objective) Then
                 If Qbpop(m, 0) > h1 Then
                     h1 = Qbpop(m, 0)
                     i = m
@@ -1273,7 +1273,7 @@ Public Class PES
                             i = m
                         End If
 
-                    Case EVO_POP_PENALTY.Spannweite
+                    Case EVO_POP_PENALTY.Span
                         If Qbpop(m, 0) < h1 Then
                             h2 = Qbpop(m, 1)
                             i = m
@@ -1284,7 +1284,7 @@ Public Class PES
 
         'Der schlechtetste der besten Qualitätswerte wird bestimmt ; Position -> i
         '(höchster Wert der Kostenfunktion, niedrigster Wert der Spannweite)
-        If (mSettings.PES.OptModus = EVO_MODUS.Multi_Objective) Then
+        If (mSettings.PES.OptModus = EVO_MODE.Multi_Objective) Then
             j = 0
             h2 = Qbpop(0, 1)
             For m = 2 To mSettings.PES.Pop.N_Popul
@@ -1297,7 +1297,7 @@ Public Class PES
 
         'Qualität der aktuellen Population wird bestimmt
         h1 = 0
-        If (mSettings.PES.OptModus = EVO_MODUS.Single_Objective) Then
+        If (mSettings.PES.OptModus = EVO_MODE.Single_Objective) Then
             For m = 0 To mSettings.PES.N_Eltern - 1
                 h1 = h1 + Best.Qb(m, PES_iAkt.iAktPop, 0) / mSettings.PES.N_Eltern
             Next m
@@ -1308,7 +1308,7 @@ Public Class PES
 
         'Falls die Qualität des aktuellen Population besser ist (Penaltyfunktion geringer)
         'als die schlechteste im Bestwertspeicher, wird diese ersetzt
-        If (mSettings.PES.OptModus = EVO_MODUS.Single_Objective) Then
+        If (mSettings.PES.OptModus = EVO_MODE.Single_Objective) Then
             If h1 < Qbpop(i, 0) Then
                 Qbpop(i, 0) = h1
                 For m = 0 To Me.mProblem.NumOptParams - 1
@@ -1336,7 +1336,7 @@ Public Class PES
                         Next m
                     End If
 
-                Case EVO_POP_PENALTY.Spannweite
+                Case EVO_POP_PENALTY.Span
                     If h2 > Qbpop(j, 1) Then
                         Qbpop(j, 1) = h2
                         For m = 0 To Me.mProblem.NumOptParams - 1
@@ -1360,7 +1360,7 @@ Public Class PES
         Dim m, j, v As Integer
         Dim h As Double
 
-        If (mSettings.PES.OptModus = EVO_MODUS.Single_Objective) Then
+        If (mSettings.PES.OptModus = EVO_MODE.Single_Objective) Then
             'SO - Standard ES nach Rechenberg
             '--------------------------------
             'Der schlechteste der besten Qualitätswerte wird bestimmt ; Position -> j
@@ -1404,7 +1404,7 @@ Public Class PES
     Public Sub EsResetBWSpeicher()
         Dim n, i As Integer
 
-        If (mSettings.PES.Strategie = EVO_STRATEGIE.Komma_Strategie) Then
+        If (mSettings.PES.Strategie = EVO_STRATEGY.Comma_Strategy) Then
             For n = 0 To mSettings.PES.N_Eltern - 1
                 For i = 0 To Me.mProblem.NumPrimObjective - 1
                     Best.Qb(n, PES_iAkt.iAktPop, i) = 1.0E+300
@@ -1420,7 +1420,7 @@ Public Class PES
     Public Sub EsResetPopBWSpeicher()
         Dim n, i As Integer
 
-        If (mSettings.PES.Pop.PopStrategie = EVO_STRATEGIE.Komma_Strategie) Then
+        If (mSettings.PES.Pop.PopStrategie = EVO_STRATEGY.Comma_Strategy) Then
             For n = 0 To mSettings.PES.Pop.N_Popul - 1
                 For i = 0 To Me.mProblem.NumPrimObjective - 1
                     Qbpop(n, i) = 1.0E+300
@@ -1442,7 +1442,7 @@ Public Class PES
         Select Case mSettings.PES.Pop.PopPenalty
             Case EVO_POP_PENALTY.Crowding
                 Z = 0
-            Case EVO_POP_PENALTY.Spannweite
+            Case EVO_POP_PENALTY.Span
                 Z = 1
         End Select
 
@@ -1454,7 +1454,7 @@ Public Class PES
             Realisierungsspeicher(m, 1) = m
         Next m
 
-        If (mSettings.PES.OptModus = EVO_MODUS.Single_Objective) Then
+        If (mSettings.PES.OptModus = EVO_MODE.Single_Objective) Then
             'Standard ES nach Rechenberg
             '---------------------------
             For m = 0 To mSettings.PES.Pop.N_Popul - 1
@@ -1489,7 +1489,7 @@ Public Class PES
                         Next
                     Next
 
-                Case EVO_POP_PENALTY.Spannweite
+                Case EVO_POP_PENALTY.Span
                     For m = 0 To mSettings.PES.Pop.N_Popul - 1
                         For n = m To mSettings.PES.Pop.N_Popul - 1
                             If Realisierungsspeicher(m, 0) < Realisierungsspeicher(n, 0) Then
@@ -1523,7 +1523,7 @@ Public Class PES
         Dim i, v As Integer
 
 
-        If (mSettings.PES.OptModus = EVO_MODUS.Single_Objective) Then
+        If (mSettings.PES.OptModus = EVO_MODE.Single_Objective) Then
             'Standard ES nach Rechenberg
             'xxxxxxxxxxxxxxxxxxxxxxxxxxx
             'Die Eltern werden gleich der besten Kinder gesetzt (Schrittweite und Parameterwert)
@@ -1587,7 +1587,7 @@ Public Class PES
 
             '6: Sortierung der Lösungen ist nur für Neighbourhood-Rekombination notwendig
             '----------------------------------------------------------------------------
-            If (mSettings.PES.Reproduktionsop = PES_REPRODOP.Neighbourhood) Then
+            If (mSettings.PES.Reproduktionsop = PES_REPRODOP.Neighborhood) Then
                 Call Neighbourhood_AbstandsArray()
                 Call Neighbourhood_Crowding_Distance()
             End If
@@ -1857,7 +1857,7 @@ Public Class PES
         'XnTemp() die zu prüfenden (skalierten) Werte
 
         Dim isOK As Boolean = False
-        If (AktPara(ipara).Beziehung = Beziehung.keine) Then
+        If (AktPara(ipara).Beziehung = Relationship.none) Then
             'Keine Beziehung vorhanden
             isOK = True
         Else
@@ -1865,13 +1865,13 @@ Public Class PES
             Dim wert As Double = AktPara(ipara).Min + (AktPara(ipara).Max - AktPara(ipara).Min) * XnTemp(ipara)
             Dim ref As Double = AktPara(ipara - 1).Min + (AktPara(ipara - 1).Max - AktPara(ipara - 1).Min) * XnTemp(ipara - 1)
             Select Case AktPara(ipara).Beziehung
-                Case Beziehung.kleiner
+                Case Relationship.smaller_than
                     If (wert < ref) Then isOK = True
-                Case Beziehung.kleinergleich
+                Case Relationship.smaller_equal
                     If (wert <= ref) Then isOK = True
-                Case Beziehung.groesser
+                Case Relationship.larger_than
                     If (wert > ref) Then isOK = True
-                Case Beziehung.groessergleich
+                Case Relationship.larger_equal
                     If (wert >= ref) Then isOK = True
             End Select
         End If
@@ -1889,7 +1889,7 @@ Public Class PES
         'XeTemp die aktuellen Werte
 
         Dim isOK As Boolean = False
-        If (AktPara(ipara).Beziehung = Beziehung.keine) Then
+        If (AktPara(ipara).Beziehung = Relationship.none) Then
             'Keine Beziehung vorhanden
             isOK = True
         Else
@@ -1897,13 +1897,13 @@ Public Class PES
             Dim wert As Double = AktPara(ipara).Min + (AktPara(ipara).Max - AktPara(ipara).Min) * XeTemp(ipara, iElter, PES_iAkt.iAktPop)
             Dim ref As Double = AktPara(ipara - 1).Min + (AktPara(ipara - 1).Max - AktPara(ipara - 1).Min) * XeTemp(ipara - 1, iElter, PES_iAkt.iAktPop)
             Select Case AktPara(ipara).Beziehung
-                Case Beziehung.kleiner
+                Case Relationship.smaller_than
                     If (wert < ref) Then isOK = True
-                Case Beziehung.kleinergleich
+                Case Relationship.smaller_equal
                     If (wert <= ref) Then isOK = True
-                Case Beziehung.groesser
+                Case Relationship.larger_than
                     If (wert > ref) Then isOK = True
-                Case Beziehung.groessergleich
+                Case Relationship.larger_equal
                     If (wert >= ref) Then isOK = True
             End Select
         End If
