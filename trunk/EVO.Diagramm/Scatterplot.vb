@@ -545,6 +545,11 @@ Partial Public Class Scatterplot
                                 serie_inv.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
                             End If
                         Next
+                        'draw sec pop
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                            serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                        Next
                     End If
 
                     'Vergleichsergebnis anzeigen
