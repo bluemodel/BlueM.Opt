@@ -371,6 +371,11 @@ Partial Public Class Scatterplot
                                 serie_inv.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID.ToString())
                             End If
                         Next
+                        'draw sec pop
+                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        For Each ind In Me.OptResult.getSekPop()
+                            serie.Add(ind.Objectives(Me.Auswahl(i)), ind.Objectives(Me.Auswahl(j)), ind.ID.ToString())
+                        Next
                     End If
 
                     'Startwert
