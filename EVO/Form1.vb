@@ -622,10 +622,9 @@ Partial Public Class Form1
                     Try
                         Call Sim1.setDatensatz(pfad)
                     Catch
-                        'failed to set most recently used dataset, but doesn't matter
-					Finally
-                    	Cursor = Cursors.Default
+                        'failed
                     End Try
+                    Cursor = Cursors.Default
                 End If
 
         End Select
@@ -673,7 +672,7 @@ Partial Public Class Form1
 
                     End If
                 Catch ex As Exception
-                    'TODO: handle My.Settings.MRUSimDatensaetze error
+                    'TODO: log My.Settings.MRUSimDatensaetze error
                 End Try
 
 
@@ -748,54 +747,48 @@ Partial Public Class Form1
         'Datensatz-Reset
         Me.MenuItem_DatensatzZurücksetzen.Enabled = False
 
-        Try
+        'gewählten Datensatz an Anwendung übergeben
+        '------------------------------------------
+        Select Case Me.Anwendung
 
-            'gewählten Datensatz an Anwendung übergeben
-            '------------------------------------------
-            Select Case Me.Anwendung
+            Case ANW_TESTPROBLEMS
 
-                Case ANW_TESTPROBLEMS
+                'Testproblem setzen
+                Testprobleme1.setTestproblem(selectedDatensatz)
 
-                    'Testproblem setzen
-                    Testprobleme1.setTestproblem(selectedDatensatz)
+                'Tooltip anzeigen
+                Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
 
-                    'Tooltip anzeigen
-                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
+            Case Else '(Alle Sim-Anwendungen)
 
-                Case Else '(Alle Sim-Anwendungen)
+                'Benutzereinstellungen aktualisieren
+                Try
+                    'place selected dataset at the end of the list
+                    If (My.Settings.MRUSimDatensaetze.Contains(selectedDatensatz)) Then
+                        My.Settings.MRUSimDatensaetze.Remove(selectedDatensatz)
+                    End If
+                    My.Settings.MRUSimDatensaetze.Add(selectedDatensatz)
+                    'save user settings
+                    Call My.Settings.Save()
+                Catch ex As Exception
+                    'TODO: log My.Settings.MRUSimDatensaetze error
+                End Try
 
-                    'Benutzereinstellungen aktualisieren
-                    Try
-                        'place selected dataset at the end of the list
-                        If (My.Settings.MRUSimDatensaetze.Contains(selectedDatensatz)) Then
-                            My.Settings.MRUSimDatensaetze.Remove(selectedDatensatz)
-                        End If
-                        My.Settings.MRUSimDatensaetze.Add(selectedDatensatz)
-                        'save user settings
-                        Call My.Settings.Save()
-                    Catch ex As Exception
-                        'TODO: handle My.Settings.MRUSimDatensaetze error
-                    End Try
+                'Datensatz Combobox aktualisieren
+                Call Me.Datensatz_populateCombo()
 
-                    'Datensatz Combobox aktualisieren
-                    Call Me.Datensatz_populateCombo()
+                'Auswahl setzen (falls von ausserhalb)
+                Me.IsInitializing = True
+                Me.ComboBox_Datensatz.SelectedItem = selectedDatensatz
+                Me.IsInitializing = False
 
-                    'Auswahl setzen (falls von ausserhalb)
-                    Me.IsInitializing = True
-                    Me.ComboBox_Datensatz.SelectedItem = selectedDatensatz
-                    Me.IsInitializing = False
+                'Datensatz setzen
+                Call Sim1.setDatensatz(selectedDatensatz)
 
-                    'Datensatz setzen
-                    Call Sim1.setDatensatz(selectedDatensatz)
+                'Tooltip anzeigen
+                Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, selectedDatensatz)
 
-                    'Tooltip anzeigen
-                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, selectedDatensatz)
-
-            End Select
-        Catch ex As Exception
-            MsgBox("Unable to set the selected Dataset!" & eol & ex.Message, MsgBoxStyle.Critical)
-            Exit Sub
-        End Try
+        End Select
 
         'Methodenauswahl aktivieren und zurücksetzen
         '-------------------------------------------
