@@ -221,7 +221,11 @@ Public MustInherit Class Sim
         End If
 
         'Simulationsdaten einlesen
-        Call Me.Read_SimParameter()
+        Try
+            Call Me.Read_SimParameter()
+        Catch ex As Exception
+            Throw New Exception("Unable to read simulation parameters!" & eol & ex.Message)
+        End Try
 
     End Sub
 

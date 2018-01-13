@@ -619,8 +619,13 @@ Partial Public Class Form1
                     pfad = Me.ComboBox_Datensatz.Items(0)
                     'Datensatz setzen
                     Cursor = Cursors.WaitCursor
-                    Call Sim1.setDatensatz(pfad)
-                    Cursor = Cursors.Default
+                    Try
+                        Call Sim1.setDatensatz(pfad)
+                    Catch
+                        'failed to set most recently used dataset, but doesn't matter
+					Finally
+                    	Cursor = Cursors.Default
+                    End Try
                 End If
 
         End Select
@@ -652,20 +657,25 @@ Partial Public Class Form1
             Case Else '(Sim-Anwendungen)
 
                 'Mit Benutzer-MRUSimDatensätze füllen
-                If (My.Settings.MRUSimDatensaetze.Count > 0) Then
+                Try
+                    If (My.Settings.MRUSimDatensaetze.Count > 0) Then
 
-                    'Combobox rückwärts füllen
-                    For i = My.Settings.MRUSimDatensaetze.Count - 1 To 0 Step -1
+                        'Combobox rückwärts füllen
+                        For i = My.Settings.MRUSimDatensaetze.Count - 1 To 0 Step -1
 
-                        'nur existierende, zur Anwendung passende Datensätze anzeigen
-                        pfad = My.Settings.MRUSimDatensaetze(i)
-                        If (File.Exists(pfad) _
-                            And Path.GetExtension(pfad).ToUpper() = Me.Sim1.DatensatzExtension) Then
-                            Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze(i))
-                        End If
-                    Next
+                            'nur existierende, zur Anwendung passende Datensätze anzeigen
+                            pfad = My.Settings.MRUSimDatensaetze(i)
+                            If (File.Exists(pfad) _
+                                And Path.GetExtension(pfad).ToUpper() = Me.Sim1.DatensatzExtension) Then
+                                Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze(i))
+                            End If
+                        Next
 
-                End If
+                    End If
+                Catch ex As Exception
+                    'TODO: handle My.Settings.MRUSimDatensaetze error
+                End Try
+
 
         End Select
 
@@ -738,43 +748,54 @@ Partial Public Class Form1
         'Datensatz-Reset
         Me.MenuItem_DatensatzZurücksetzen.Enabled = False
 
-        'gewählten Datensatz an Anwendung übergeben
-        '------------------------------------------
-        Select Case Me.Anwendung
+        Try
 
-            Case ANW_TESTPROBLEMS
+            'gewählten Datensatz an Anwendung übergeben
+            '------------------------------------------
+            Select Case Me.Anwendung
 
-                'Testproblem setzen
-                Testprobleme1.setTestproblem(selectedDatensatz)
+                Case ANW_TESTPROBLEMS
 
-                'Tooltip anzeigen
-                Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
+                    'Testproblem setzen
+                    Testprobleme1.setTestproblem(selectedDatensatz)
 
-            Case Else '(Alle Sim-Anwendungen)
+                    'Tooltip anzeigen
+                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
 
-                'Benutzereinstellungen aktualisieren
-                If (My.Settings.MRUSimDatensaetze.Contains(selectedDatensatz)) Then
-                    My.Settings.MRUSimDatensaetze.Remove(selectedDatensatz)
-                End If
-                My.Settings.MRUSimDatensaetze.Add(selectedDatensatz)
-                'Benutzereinstellungen speichern
-                Call My.Settings.Save()
+                Case Else '(Alle Sim-Anwendungen)
 
-                'Datensatz Combobox aktualisieren
-                Call Me.Datensatz_populateCombo()
+                    'Benutzereinstellungen aktualisieren
+                    Try
+                        'place selected dataset at the end of the list
+                        If (My.Settings.MRUSimDatensaetze.Contains(selectedDatensatz)) Then
+                            My.Settings.MRUSimDatensaetze.Remove(selectedDatensatz)
+                        End If
+                        My.Settings.MRUSimDatensaetze.Add(selectedDatensatz)
+                        'save user settings
+                        Call My.Settings.Save()
+                    Catch ex As Exception
+                        'TODO: handle My.Settings.MRUSimDatensaetze error
+                    End Try
 
-                'Auswahl setzen (falls von ausserhalb)
-                Me.IsInitializing = True
-                Me.ComboBox_Datensatz.SelectedItem = selectedDatensatz
-                Me.IsInitializing = False
+                    'Datensatz Combobox aktualisieren
+                    Call Me.Datensatz_populateCombo()
 
-                'Datensatz setzen
-                Call Sim1.setDatensatz(selectedDatensatz)
+                    'Auswahl setzen (falls von ausserhalb)
+                    Me.IsInitializing = True
+                    Me.ComboBox_Datensatz.SelectedItem = selectedDatensatz
+                    Me.IsInitializing = False
 
-                'Tooltip anzeigen
-                Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, selectedDatensatz)
+                    'Datensatz setzen
+                    Call Sim1.setDatensatz(selectedDatensatz)
 
-        End Select
+                    'Tooltip anzeigen
+                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, selectedDatensatz)
+
+            End Select
+        Catch ex As Exception
+            MsgBox("Unable to set the selected Dataset!" & eol & ex.Message, MsgBoxStyle.Critical)
+            Exit Sub
+        End Try
 
         'Methodenauswahl aktivieren und zurücksetzen
         '-------------------------------------------
