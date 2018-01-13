@@ -168,7 +168,7 @@ Public Class Talsim
 
             If line.Length = 0 Then Continue Do
 
-            If Not (line.StartsWith("*") Or line.StartsWith("#") Or line.StartsWith("["))
+            If line.Contains("=") And Not (line.StartsWith("*") Or line.StartsWith("#") Or line.StartsWith("["))
                 kvp = line.Split("=")
                 settings.Add(kvp(0).ToUpper(), kvp(1).ToUpper())
             End If
@@ -176,16 +176,25 @@ Public Class Talsim
         Loop Until StrRead.Peek() = -1
 
         'check settings
-
         'WEL output
+        If Not settings.ContainsKey("WEL") Then
+            Throw New Exception("Key ""WEL"" not found in .ALL file!")
+        End If
         If Not settings("WEL") = "J"
             Throw New Exception("Die Ganglinienausgabe ist in der .ALL Datei nicht eingeschaltet! Es muss 'WEL=J' eingestellt sein!")
         End If
 
+        'Simstart and Simend
+        If Not settings.ContainsKey("SIMSTART") Or Not settings.ContainsKey("SIMEND") Then
+            Throw New Exception("Key ""SimStart"" and/or ""SimEnd"" not found in .ALL file!")
+        End If
         'store SimStart and SimEnd
         Me.SimStart = DateTime.ParseExact(settings("SIMSTART"), dateformat, New NumberformatInfo())
         Me.SimEnde = DateTime.ParseExact(settings("SIMEND"), dateformat, New NumberformatInfo())
 
+        If Not settings.ContainsKey("TIMESTEP_MIN") Then
+            Throw New Exception("Key ""TimeStep_min"" not found in .ALL file!")
+        End If
         'store timestep length
         'TODO: what if TIMESTEP_MONTH=J?
         Me.SimDT = New TimeSpan(0, settings("TIMESTEP_MIN"), 0)
