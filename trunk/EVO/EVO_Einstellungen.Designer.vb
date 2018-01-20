@@ -845,7 +845,7 @@ Partial Class EVO_Einstellungen
         Me.PES_Label_OptModus.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.PES_Label_OptModus.Location = New System.Drawing.Point(77, 9)
         Me.PES_Label_OptModus.Name = "PES_Label_OptModus"
-        Me.PES_Label_OptModus.Size = New System.Drawing.Size(38, 13)
+        Me.PES_Label_OptModus.Size = New System.Drawing.Size(47, 17)
         Me.PES_Label_OptModus.TabIndex = 1
         Me.PES_Label_OptModus.Text = "Mode"
         '
@@ -1000,7 +1000,7 @@ Partial Class EVO_Einstellungen
         Me.PES_Checkbox_isTournamentSelection.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_PES, "RecombXYEnabled", True, System.Windows.Forms.DataSourceUpdateMode.Never))
         Me.PES_Checkbox_isTournamentSelection.Location = New System.Drawing.Point(11, 81)
         Me.PES_Checkbox_isTournamentSelection.Name = "PES_Checkbox_isTournamentSelection"
-        Me.PES_Checkbox_isTournamentSelection.Size = New System.Drawing.Size(128, 17)
+        Me.PES_Checkbox_isTournamentSelection.Size = New System.Drawing.Size(131, 17)
         Me.PES_Checkbox_isTournamentSelection.TabIndex = 5
         Me.PES_Checkbox_isTournamentSelection.Text = "Tournament selection"
         Me.PES_Checkbox_isTournamentSelection.UseVisualStyleBackColor = True
@@ -1058,7 +1058,7 @@ Partial Class EVO_Einstellungen
         Me.PES_CheckBox_SekPop_isBegrenzung.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_PES_SekPop, "Is_Begrenzung", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.PES_CheckBox_SekPop_isBegrenzung.Location = New System.Drawing.Point(10, 45)
         Me.PES_CheckBox_SekPop_isBegrenzung.Name = "PES_CheckBox_SekPop_isBegrenzung"
-        Me.PES_CheckBox_SekPop_isBegrenzung.Size = New System.Drawing.Size(121, 17)
+        Me.PES_CheckBox_SekPop_isBegrenzung.Size = New System.Drawing.Size(124, 17)
         Me.PES_CheckBox_SekPop_isBegrenzung.TabIndex = 2
         Me.PES_CheckBox_SekPop_isBegrenzung.Text = "Limit size of sec pop"
         Me.PES_CheckBox_SekPop_isBegrenzung.UseVisualStyleBackColor = True
@@ -1235,7 +1235,7 @@ Partial Class EVO_Einstellungen
         Me.CES_Label_OptModusText.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.CES_Label_OptModusText.Location = New System.Drawing.Point(81, 10)
         Me.CES_Label_OptModusText.Name = "CES_Label_OptModusText"
-        Me.CES_Label_OptModusText.Size = New System.Drawing.Size(64, 13)
+        Me.CES_Label_OptModusText.Size = New System.Drawing.Size(81, 17)
         Me.CES_Label_OptModusText.TabIndex = 57
         Me.CES_Label_OptModusText.Text = "OptModus"
         '
@@ -1257,7 +1257,7 @@ Partial Class EVO_Einstellungen
         Me.CES_CheckBox_UseSecPop_CES.Location = New System.Drawing.Point(4, 312)
         Me.CES_CheckBox_UseSecPop_CES.Name = "CES_CheckBox_UseSecPop_CES"
         Me.CES_CheckBox_UseSecPop_CES.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CES_CheckBox_UseSecPop_CES.Size = New System.Drawing.Size(150, 17)
+        Me.CES_CheckBox_UseSecPop_CES.Size = New System.Drawing.Size(153, 17)
         Me.CES_CheckBox_UseSecPop_CES.TabIndex = 56
         Me.CES_CheckBox_UseSecPop_CES.Text = "Use secondary Population"
         Me.CES_CheckBox_UseSecPop_CES.UseVisualStyleBackColor = True
@@ -1283,7 +1283,7 @@ Partial Class EVO_Einstellungen
         Me.CES_CheckBox_isSecPopRestriction.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_CES, "Is_SecPopRestriction", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.CES_CheckBox_isSecPopRestriction.Location = New System.Drawing.Point(7, 35)
         Me.CES_CheckBox_isSecPopRestriction.Name = "CES_CheckBox_isSecPopRestriction"
-        Me.CES_CheckBox_isSecPopRestriction.Size = New System.Drawing.Size(124, 17)
+        Me.CES_CheckBox_isSecPopRestriction.Size = New System.Drawing.Size(127, 17)
         Me.CES_CheckBox_isSecPopRestriction.TabIndex = 57
         Me.CES_CheckBox_isSecPopRestriction.Text = "Restrict SecPop size"
         Me.CES_CheckBox_isSecPopRestriction.UseVisualStyleBackColor = True
@@ -1374,7 +1374,7 @@ Partial Class EVO_Einstellungen
         Me.CES_CheckBox_UseSecPop_PES.Location = New System.Drawing.Point(7, 138)
         Me.CES_CheckBox_UseSecPop_PES.Name = "CES_CheckBox_UseSecPop_PES"
         Me.CES_CheckBox_UseSecPop_PES.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CES_CheckBox_UseSecPop_PES.Size = New System.Drawing.Size(150, 17)
+        Me.CES_CheckBox_UseSecPop_PES.Size = New System.Drawing.Size(153, 17)
         Me.CES_CheckBox_UseSecPop_PES.TabIndex = 13
         Me.CES_CheckBox_UseSecPop_PES.Text = "Use secondary Population"
         Me.CES_CheckBox_UseSecPop_PES.UseVisualStyleBackColor = True
@@ -1386,7 +1386,7 @@ Partial Class EVO_Einstellungen
         Me.CES_CheckBox_StartPESPop.Location = New System.Drawing.Point(7, 103)
         Me.CES_CheckBox_StartPESPop.Name = "CES_CheckBox_StartPESPop"
         Me.CES_CheckBox_StartPESPop.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CES_CheckBox_StartPESPop.Size = New System.Drawing.Size(136, 17)
+        Me.CES_CheckBox_StartPESPop.Size = New System.Drawing.Size(139, 17)
         Me.CES_CheckBox_StartPESPop.TabIndex = 13
         Me.CES_CheckBox_StartPESPop.Text = "Start with Pop Mutation"
         Me.CES_CheckBox_StartPESPop.UseVisualStyleBackColor = True
@@ -1433,7 +1433,7 @@ Partial Class EVO_Einstellungen
         Me.CES_CheckBox_RealOptimisation.Location = New System.Drawing.Point(4, 422)
         Me.CES_CheckBox_RealOptimisation.Name = "CES_CheckBox_RealOptimisation"
         Me.CES_CheckBox_RealOptimisation.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CES_CheckBox_RealOptimisation.Size = New System.Drawing.Size(154, 17)
+        Me.CES_CheckBox_RealOptimisation.Size = New System.Drawing.Size(157, 17)
         Me.CES_CheckBox_RealOptimisation.TabIndex = 11
         Me.CES_CheckBox_RealOptimisation.Text = "Including Real Optimisation"
         Me.CES_CheckBox_RealOptimisation.UseVisualStyleBackColor = True
@@ -1617,7 +1617,7 @@ Partial Class EVO_Einstellungen
         Me.HJ_CheckBox_DNVektor.Enabled = False
         Me.HJ_CheckBox_DNVektor.Location = New System.Drawing.Point(15, 76)
         Me.HJ_CheckBox_DNVektor.Name = "HJ_CheckBox_DNVektor"
-        Me.HJ_CheckBox_DNVektor.Size = New System.Drawing.Size(133, 17)
+        Me.HJ_CheckBox_DNVektor.Size = New System.Drawing.Size(136, 17)
         Me.HJ_CheckBox_DNVektor.TabIndex = 2
         Me.HJ_CheckBox_DNVektor.Text = "mit Schrittweitenvektor"
         '
@@ -1832,7 +1832,7 @@ Partial Class EVO_Einstellungen
         Me.DDS_CheckBox_RandomStartparameters.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_DDS, "RandomStartparameters", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.DDS_CheckBox_RandomStartparameters.Location = New System.Drawing.Point(161, 66)
         Me.DDS_CheckBox_RandomStartparameters.Name = "DDS_CheckBox_RandomStartparameters"
-        Me.DDS_CheckBox_RandomStartparameters.Size = New System.Drawing.Size(15, 14)
+        Me.DDS_CheckBox_RandomStartparameters.Size = New System.Drawing.Size(18, 17)
         Me.DDS_CheckBox_RandomStartparameters.TabIndex = 5
         Me.DDS_CheckBox_RandomStartparameters.UseVisualStyleBackColor = True
         '
@@ -1889,11 +1889,11 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_CheckBox_wave.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "Show_Wave", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.SensiPlot_CheckBox_wave.Location = New System.Drawing.Point(9, 495)
         Me.SensiPlot_CheckBox_wave.Name = "SensiPlot_CheckBox_wave"
-        Me.SensiPlot_CheckBox_wave.Size = New System.Drawing.Size(101, 17)
+        Me.SensiPlot_CheckBox_wave.Size = New System.Drawing.Size(132, 17)
         Me.SensiPlot_CheckBox_wave.TabIndex = 15
-        Me.SensiPlot_CheckBox_wave.Text = "Wave anzeigen"
-        Me.ToolTip1.SetToolTip(Me.SensiPlot_CheckBox_wave, "Im Anschluss an die Sensitivitätsanalyse die Ganglinien aller Simulationen in Wav" & _
-                "e anzeigen")
+        Me.SensiPlot_CheckBox_wave.Text = "Show results in Wave"
+        Me.ToolTip1.SetToolTip(Me.SensiPlot_CheckBox_wave, "Show the hydrographs of all simulation results in BlueM.Wave after the sensitivit" & _
+                "y analysis has completed")
         Me.SensiPlot_CheckBox_wave.UseVisualStyleBackColor = True
         '
         'BindingSource_Sensiplot
@@ -1905,9 +1905,9 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_Label_NumSteps.AutoSize = True
         Me.SensiPlot_Label_NumSteps.Location = New System.Drawing.Point(6, 462)
         Me.SensiPlot_Label_NumSteps.Name = "SensiPlot_Label_NumSteps"
-        Me.SensiPlot_Label_NumSteps.Size = New System.Drawing.Size(81, 13)
+        Me.SensiPlot_Label_NumSteps.Size = New System.Drawing.Size(67, 13)
         Me.SensiPlot_Label_NumSteps.TabIndex = 14
-        Me.SensiPlot_Label_NumSteps.Text = "Anzahl Schritte:"
+        Me.SensiPlot_Label_NumSteps.Text = "No. of steps:"
         '
         'SensiPlot_NumericUpDown_NumSteps
         '
@@ -1927,7 +1927,7 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_GroupBox_Modus.Size = New System.Drawing.Size(209, 70)
         Me.SensiPlot_GroupBox_Modus.TabIndex = 12
         Me.SensiPlot_GroupBox_Modus.TabStop = False
-        Me.SensiPlot_GroupBox_Modus.Text = "Modus"
+        Me.SensiPlot_GroupBox_Modus.Text = "Mode"
         '
         'SensiPlot_RadioButton_Discrete
         '
@@ -1936,10 +1936,10 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_RadioButton_Discrete.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "SensiType_Discrete", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.SensiPlot_RadioButton_Discrete.Location = New System.Drawing.Point(9, 42)
         Me.SensiPlot_RadioButton_Discrete.Name = "SensiPlot_RadioButton_Discrete"
-        Me.SensiPlot_RadioButton_Discrete.Size = New System.Drawing.Size(58, 17)
+        Me.SensiPlot_RadioButton_Discrete.Size = New System.Drawing.Size(67, 17)
         Me.SensiPlot_RadioButton_Discrete.TabIndex = 10
         Me.SensiPlot_RadioButton_Discrete.TabStop = True
-        Me.SensiPlot_RadioButton_Discrete.Text = "Diskret"
+        Me.SensiPlot_RadioButton_Discrete.Text = "Discrete"
         Me.SensiPlot_RadioButton_Discrete.UseVisualStyleBackColor = True
         '
         'SensiPlot_RadioButton_NormalDistribution
@@ -1949,9 +1949,9 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_RadioButton_NormalDistribution.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_Sensiplot, "SensiTypeNormalDistributionEnabled", True, System.Windows.Forms.DataSourceUpdateMode.Never))
         Me.SensiPlot_RadioButton_NormalDistribution.Location = New System.Drawing.Point(9, 19)
         Me.SensiPlot_RadioButton_NormalDistribution.Name = "SensiPlot_RadioButton_NormalDistribution"
-        Me.SensiPlot_RadioButton_NormalDistribution.Size = New System.Drawing.Size(86, 17)
+        Me.SensiPlot_RadioButton_NormalDistribution.Size = New System.Drawing.Size(114, 17)
         Me.SensiPlot_RadioButton_NormalDistribution.TabIndex = 9
-        Me.SensiPlot_RadioButton_NormalDistribution.Text = "Gleichverteilt"
+        Me.SensiPlot_RadioButton_NormalDistribution.Text = "Normal distribution"
         Me.SensiPlot_RadioButton_NormalDistribution.UseVisualStyleBackColor = True
         '
         'SensiPlot_Label_Objectives
@@ -1959,9 +1959,9 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_Label_Objectives.AutoSize = True
         Me.SensiPlot_Label_Objectives.Location = New System.Drawing.Point(6, 198)
         Me.SensiPlot_Label_Objectives.Name = "SensiPlot_Label_Objectives"
-        Me.SensiPlot_Label_Objectives.Size = New System.Drawing.Size(116, 13)
+        Me.SensiPlot_Label_Objectives.Size = New System.Drawing.Size(147, 13)
         Me.SensiPlot_Label_Objectives.TabIndex = 6
-        Me.SensiPlot_Label_Objectives.Text = "Objective functions: (1)"
+        Me.SensiPlot_Label_Objectives.Text = "Objective functions (select 1):"
         '
         'SensiPlot_ListBox_Objectives
         '
@@ -1976,9 +1976,9 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_Label_OptParameter.AutoSize = True
         Me.SensiPlot_Label_OptParameter.Location = New System.Drawing.Point(6, 3)
         Me.SensiPlot_Label_OptParameter.Name = "SensiPlot_Label_OptParameter"
-        Me.SensiPlot_Label_OptParameter.Size = New System.Drawing.Size(115, 13)
+        Me.SensiPlot_Label_OptParameter.Size = New System.Drawing.Size(195, 13)
         Me.SensiPlot_Label_OptParameter.TabIndex = 4
-        Me.SensiPlot_Label_OptParameter.Text = "OptParameter: (1 bis 2)"
+        Me.SensiPlot_Label_OptParameter.Text = "Optimization parameters (select up to 2):"
         '
         'SensiPlot_ListBox_OptParameter
         '
