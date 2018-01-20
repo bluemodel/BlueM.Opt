@@ -66,7 +66,7 @@ Public Class SensiPlotController
     End Sub
 
     Public Sub InitApp(ByRef inputTestprobleme As Apps.Testprobleme) Implements IController.InitApp
-        Throw New Exception("SensiPlot kann keine Testprobleme berechnen!")
+        Throw New Exception("SensiPlot can not be used for test problems!")
     End Sub
 
     Public Sub Start() Implements IController.Start
@@ -226,7 +226,7 @@ Public Class SensiPlotController
                             'SimReihe auslesen
                             SimReihe = Sim1.SimErgebnis.Reihen(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
                             'Lösungs-ID an Titel anhängen
-                            SimReihe.Title += " (Lösung " & n.ToString() & ")"
+                            SimReihe.Title += " (Solution " & n.ToString() & ")"
                             'SimReihe zu Collection hinzufügen
                             SimReihen.Add(SimReihe)
                         End If
