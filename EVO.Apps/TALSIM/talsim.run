@@ -1,0 +1,5 @@
+[TALSIM]
+Path=..\directorypath\
+System=datasetname
+ExecMode=0
+VariationId=0

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -135,6 +135,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BlueM\IHWB.BlueM.DllAdapter.dll" />
+    <None Include="TALSIM\sydrodomain.ini">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TALSIM\talsim.run">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="BlueM\libifcoremd.dll">
@@ -142,6 +148,9 @@
     </Content>
     <Content Include="SWMM\IHWB.SWMM.DllAdapter.dll" />
     <Content Include="SWMM\SWMM5.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TALSIM\talsimw64.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

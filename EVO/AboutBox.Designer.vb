@@ -128,7 +128,7 @@ Partial Class AboutBox
         '
         Me.OKButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.OKButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.OKButton.Location = New System.Drawing.Point(271, 254)
+        Me.OKButton.Location = New System.Drawing.Point(287, 254)
         Me.OKButton.Name = "OKButton"
         Me.OKButton.Size = New System.Drawing.Size(75, 23)
         Me.OKButton.TabIndex = 0
@@ -146,13 +146,15 @@ Partial Class AboutBox
         '
         'TabControl1
         '
+        Me.TabControl1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage_Description)
         Me.TabControl1.Controls.Add(Me.TabPage_License)
         Me.TabControl1.Controls.Add(Me.TabPage_Credits)
         Me.TabControl1.Location = New System.Drawing.Point(12, 122)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(334, 126)
+        Me.TabControl1.Size = New System.Drawing.Size(350, 126)
         Me.TabControl1.TabIndex = 2
         '
         'TabPage_Description
@@ -192,7 +194,7 @@ Partial Class AboutBox
         Me.TabPage_Credits.Controls.Add(Me.TextBox_Credits)
         Me.TabPage_Credits.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_Credits.Name = "TabPage_Credits"
-        Me.TabPage_Credits.Size = New System.Drawing.Size(326, 100)
+        Me.TabPage_Credits.Size = New System.Drawing.Size(342, 100)
         Me.TabPage_Credits.TabIndex = 2
         Me.TabPage_Credits.Text = "Credits"
         Me.TabPage_Credits.UseVisualStyleBackColor = True
@@ -205,7 +207,7 @@ Partial Class AboutBox
         Me.TextBox_Credits.Name = "TextBox_Credits"
         Me.TextBox_Credits.ReadOnly = True
         Me.TextBox_Credits.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.TextBox_Credits.Size = New System.Drawing.Size(326, 100)
+        Me.TextBox_Credits.Size = New System.Drawing.Size(342, 100)
         Me.TextBox_Credits.TabIndex = 0
         Me.TextBox_Credits.Text = resources.GetString("TextBox_Credits.Text")
         '
@@ -214,7 +216,7 @@ Partial Class AboutBox
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.OKButton
-        Me.ClientSize = New System.Drawing.Size(358, 289)
+        Me.ClientSize = New System.Drawing.Size(374, 289)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.LinkLabel1)
         Me.Controls.Add(Me.OKButton)
