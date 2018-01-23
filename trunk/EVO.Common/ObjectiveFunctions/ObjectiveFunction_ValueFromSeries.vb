@@ -72,6 +72,11 @@ Public Class ObjectiveFunction_ValueFromSeries
         Dim SimReihe As Wave.TimeSeries
         Dim QWert As Double
 
+        'Check
+        If Not SimErgebnis.Reihen.ContainsKey(Me.SimGr) Then
+            Throw New Exception("Unable to find SimResult '" & Me.SimGr & "' in simulation result! Please check the dataset.")
+        End If
+
         'SimReihe aus SimErgebnis rausholen
         SimReihe = SimErgebnis.Reihen(Me.SimGr).Clone()
 
