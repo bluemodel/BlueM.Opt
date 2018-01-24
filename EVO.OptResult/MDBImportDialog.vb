@@ -78,7 +78,7 @@ Public Class MDBImportDialog
         If (Me.ListBox_ZieleY.Enabled) Then
             'Mindestens eine X- und Y-Achse ausgewählt?
             If (Me.ListBox_ZieleX.SelectedIndex = -1 Or Me.ListBox_ZieleY.SelectedIndex = -1) Then
-                MsgBox("Bitte mindestens eine X- und eine Y-Achse auswählen!", MsgBoxStyle.Exclamation, "Fehler")
+                MsgBox("Please select at least one X and Y axis!", MsgBoxStyle.Exclamation)
                 Me.DialogResult = Windows.Forms.DialogResult.None
                 Exit Sub
             End If
@@ -90,7 +90,7 @@ Public Class MDBImportDialog
                 (Not Me.ListBox_ZieleZ.SelectedIndex = -1 And _
                     (Me.ListBox_ZieleX.SelectedIndex = Me.ListBox_ZieleZ.SelectedIndex Or _
                     Me.ListBox_ZieleY.SelectedIndex = Me.ListBox_ZieleZ.SelectedIndex))) Then
-                MsgBox("Achsen müssen unterschiedlich sein!", MsgBoxStyle.Exclamation, "Fehler")
+                MsgBox("Please select different axes for each objective function!", MsgBoxStyle.Exclamation)
                 Me.DialogResult = Windows.Forms.DialogResult.None
                 Exit Sub
             End If
