@@ -1,7 +1,7 @@
 ﻿===============================================================
 BlueM.Opt Release Notes
 ===============================================================
-Version 1.6 (beta)
+Version 1.6.0
 -----------------------------
 NEW:
 * Added support for the simulation engine Talsim-NG (© SYDRO Consult GmbH, http://www.sydro.de). Talsim-NG engine v3.0.1.6 is included. 
