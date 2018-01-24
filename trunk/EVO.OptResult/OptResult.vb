@@ -169,7 +169,7 @@ Public Class OptResult
             End If
         Next
 
-        Throw New Exception("Konnte Lösung mit der ID " & ID & " nicht identifizieren!")
+        Throw New Exception("Unable to identify the solution with the ID " & ID & "!")
 
     End Function
 
@@ -668,7 +668,7 @@ Public Class OptResult
             Next
 
         Else
-            Throw New Exception("Sekundäre Population der Generation " & iGen & " nicht in DB vorhanden!")
+            Throw New Exception("Secondary population of generation " & iGen & " not found in database!")
         End If
 
         Return SekPop
@@ -741,7 +741,7 @@ Public Class OptResult
                     Call db_getIndividuen_CES()
 
                 Case Else
-                    Throw New Exception("OptResult.db_load() für Methode '" & Me.mProblem.Method & "' noch nicht implementiert!")
+                    Throw New Exception("OptResult.db_load() for Method '" & Me.mProblem.Method & "' not yet implemented!")
             End Select
 
             'Sekundärpopulationen laden
@@ -750,7 +750,7 @@ Public Class OptResult
             Return True
 
         Catch ex As Exception
-            MsgBox("Laden des Optimierungsergebnisses fehlgeschlagen!" & EVO.Common.eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Failed to load optimization result!" & EVO.Common.eol & ex.Message, MsgBoxStyle.Critical)
             Return False
         End Try
 

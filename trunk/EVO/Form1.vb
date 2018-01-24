@@ -2072,8 +2072,8 @@ Partial Public Class Form1
         Dim loadOptparameters, isOK As Boolean
 
         'Datei-öffnen Dialog anzeigen
-        Me.OpenFileDialog1.Filter = "Access-Datenbanken (*.mdb)|*.mdb"
-        Me.OpenFileDialog1.Title = "Vergleichsergebnis: Ergebnisdatenbank auswählen"
+        Me.OpenFileDialog1.Filter = "Access-Database (*.mdb)|*.mdb"
+        Me.OpenFileDialog1.Title = "Result comparison: select optimization result"
         Me.OpenFileDialog1.FileName = ""
         Me.OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
         diagresult = Me.OpenFileDialog1.ShowDialog()
@@ -2083,7 +2083,8 @@ Partial Public Class Form1
             sourceFile = Me.OpenFileDialog1.FileName
 
             'Abfrage
-            diagresult = MsgBox("Sollen auch die OptParameter-Werte des Vergleichsergebnisses geladen werden?" & eol & "(Dazu muss die OptParameter-Definition beider Ergebnisse identisch sein!)", MsgBoxStyle.YesNo, "Vergleichsergebnis laden")
+            diagresult = MsgBox("Should the optimization parameters of the comparison result be loaded as well?" & eol _
+                                & "(This requires that the optimization parameter definition of both results are identical!)", MsgBoxStyle.YesNo)
 
             If (diagresult = Windows.Forms.DialogResult.Yes) Then
                 loadOptparameters = True
@@ -2110,12 +2111,12 @@ Partial Public Class Form1
                     If (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                         '2D
                         '--
-                        serie = Me.Hauptdiagramm1.getSeriesPoint("Vergleichsergebnis", "Blue")
+                        serie = Me.Hauptdiagramm1.getSeriesPoint("Comparison result", "Blue")
                         serie.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY), "Vergleichsergebnis " & sekpopind.ID)
                     Else
                         '3D
                         '--
-                        serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Vergleichsergebnis", "Blue")
+                        serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Comparison result", "Blue")
                         serie3D.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID & " (Vergleichsergebnis)")
                     End If
                 Next
