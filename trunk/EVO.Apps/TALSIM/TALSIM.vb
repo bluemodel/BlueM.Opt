@@ -98,9 +98,20 @@ Public Class Talsim
         '-------------
         Me.useKWL = False
 
-        'Pfad zu talsimw.exe bestimmen
-        '-----------------------------
-        exe_path = System.Windows.Forms.Application.StartupPath() & "\TALSIM\talsimw64.exe"
+        'Pfad zu talsimw64.exe bestimmen
+        '-------------------------------
+        'attempt to get exe_path from UserSettings
+        exe_path = My.Settings.TALSIM_path
+
+        If (Not File.Exists(exe_path)) Then
+            'use default location instead
+            exe_path = System.Windows.Forms.Application.StartupPath() & "\TALSIM\talsimw64.exe"
+            If My.Settings.TALSIM_path.Trim() <> "" Then
+                MsgBox("UserSetting for TALSIM_path " & My.Settings.TALSIM_path & " was not found." & vbCrLf & "Using " & exe_path & " instead.", MsgBoxStyle.Information)
+            End If
+            My.Settings.TALSIM_path = exe_path
+            My.Settings.Save()
+        End If
 
         If (Not File.Exists(exe_path)) Then
             Throw New Exception(exe_path & " not found!")

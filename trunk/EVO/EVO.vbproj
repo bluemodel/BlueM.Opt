@@ -243,6 +243,7 @@
     <None Include="Resources\icon_excel.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Application\app.config" />
     <None Include="My Project\DataSources\IHWB.EVO.Common.Settings+Settings_General.datasource" />
     <None Include="My Project\DataSources\IHWB.EVO.Common.Settings_CES.datasource" />
