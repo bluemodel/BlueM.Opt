@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -134,6 +134,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="BlueM\IHWB.BlueM.DllAdapter.dll" />
     <None Include="TALSIM\sydrodomain.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
