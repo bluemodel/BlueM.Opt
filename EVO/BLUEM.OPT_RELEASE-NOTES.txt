@@ -5,7 +5,8 @@ Version 1.6.1
 -------------
 NEW:
 * Added a UserSetting "TALSIM_path" for specifying a custom path to talsimw64.exe
-
+CHANGED:
+* Switched target framework to .NET Framework 3.5
 
 Version 1.6.0
 -------------
