@@ -793,7 +793,7 @@ Public MustInherit Class Sim
     Public Sub Write_ModellParameter()
 
         Dim WertStr As String
-        Dim AnzZeichen As Short
+        Dim AnzZeichen, AnzNachkomma As Short
         Dim AnzZeil As Integer
         Dim i, j As Integer
         Dim Zeilen As Collections.Generic.Dictionary(Of Integer, String)
@@ -852,26 +852,28 @@ Public MustInherit Class Sim
 
             'Wert auf verfügbare Stellen kürzen
             '----------------------------------
-            'bestimmen des ganzzahligen Anteils, \-Operator ginge zwar theoretisch, ist aber für Zahlen < 1 nicht robust (warum auch immer)
-            WertStr = Convert.ToString(Me.Akt.ModPara(i) - Me.Akt.ModPara(i) Mod 1.0, Common.Provider.FortranProvider)
+            'Auf ganze Zahl runden und zu String konvertieren
+            WertStr = Convert.ToString(Convert.ToInt32(Me.Akt.ModPara(i), Common.Provider.FortranProvider))
 
             If (WertStr.Length > AnzZeichen) Then
                 'Wert zu lang
-                Throw New Exception("Der Wert des Modellparameters '" & Me.mProblem.List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
-
-            ElseIf (WertStr.Length < AnzZeichen - 1) Then
-                'Runden auf verfügbare Stellen: Anzahl der Stellen - Anzahl der Vorkommastellen - Komma
-                WertStr = Convert.ToString(Math.Round(Me.Akt.ModPara(i), AnzZeichen - WertStr.Length - 1), Common.Provider.FortranProvider)
+                Throw New Exception("Der ganzzahlige Teil des Modellparameters '" & Me.mProblem.List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
+            End If
+            'Anzahl verfügbarer Nachkommastellen = (Anzahl Zeichen) - (Anzahl Vorkommastellen) - (Punkt)
+            AnzNachkomma = AnzZeichen - WertStr.Length - 1
+            'Bei negativen Werten noch ein Zeichen für das Minuszeichen abziehen
+            If Me.Akt.ModPara(i) < 0 Then
+                AnzNachkomma -= 1
+            End If
+            If AnzNachkomma > 0 Then
+                'Runden auf verfügbare Stellen: 
+                WertStr = Convert.ToString(Math.Round(Me.Akt.ModPara(i), AnzNachkomma), Common.Provider.FortranProvider)
             Else
                 'Ganzzahligen Wert benutzen
             End If
 
             'Falls erforderlich, Wert mit Leerzeichen füllen
-            If (WertStr.Length < AnzZeichen) Then
-                For j = 1 To AnzZeichen - WertStr.Length
-                    WertStr = " " & WertStr
-                Next
-            End If
+            WertStr = WertStr.PadLeft(AnzZeichen)
 
             'Zeile wieder zusammensetzen
             Zeile = StrLeft & WertStr & StrRight
