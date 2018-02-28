@@ -7,6 +7,7 @@ NEW:
 * Added a UserSetting "TALSIM_path" for specifying a custom path to talsimw64.exe
 CHANGED:
 * Switched target framework to .NET Framework 3.5
+* Updated Talsim-NG engine to v3.0.1.7
 
 Version 1.6.0
 -------------
