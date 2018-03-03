@@ -82,14 +82,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MathNet.Iridium, Version=2008.8.16.470, Culture=neutral, PublicKeyToken=c061a3ec32cc0c6f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\MathNet\MathNet.Iridium.dll</HintPath>
-    </Reference>
-    <Reference Include="MathNet.Iridium.resources, Version=2008.8.16.470, Culture=de, PublicKeyToken=c061a3ec32cc0c6f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\MathNet\MathNet.Iridium.resources.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
