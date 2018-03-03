@@ -26,7 +26,6 @@
 '--------------------------------------------------------------------------------------------
 '
 Imports BlueM.Opt.Common
-Imports MathNet.Numerics
 
 Public Class PES
 
@@ -1084,58 +1083,6 @@ Public Class PES
                         'Restriktion für die mutierten Werte
                     Loop While (XnTemp(v) < 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
                 Next v
-
-                'Case PES_MUTATIONSOP.Asymmetrisch
-                '    '************************
-                '    'Asymmetrische Mutation *
-                '    '************************
-
-                '    '1. Schrittweite
-                '    '---------------
-                '    Dim Tau As Double
-                '    Dim TauStrich As Double
-
-                '    Tau = 1 / Math.Sqrt(2 * Math.Sqrt(Me.mProblem.NumOptParams))
-                '    TauStrich = 1 / Math.Sqrt(2 * Me.mProblem.NumOptParams)
-
-                '    Dim z As Double
-                '    Dim zi(Me.mProblem.NumOptParams - 1) As Double
-
-                '    Dim LNV As New MathNet.Numerics.Distributions.LognormalDistribution
-                '    LNV.SetDistributionParameters(0, TauStrich)
-                '    'wurden hier die richtigen Werte eingesetzt?
-                '    z = LNV.NextDouble
-                '    'gilt z pro Generation oder pro Nachfahre?
-
-                '    LNV.SetDistributionParameters(0, Tau)
-
-                '    For v = 0 To Me.mProblem.NumOptParams - 1
-                '        zi(v) = LNV.NextDouble
-                '        DnTemp(v) = AktPara(v).Dn * z * zi(v)
-                '    Next
-
-                '    '2. Schiefemaß
-                '    '--------------
-                '    Dim NV As New MathNet.Numerics.Distributions.NormalDistribution
-                '    NV.SetDistributionParameters(0, TauStrich)
-                '    'wurden hier die richtigen Werte eingesetzt?
-                '    z = NV.NextDouble
-                '    'gilt z pro Generation oder pro Nachfahre?
-
-                '    NV.SetDistributionParameters(0, Tau)
-
-                '    For v = 0 To Me.mProblem.NumOptParams - 1
-                '        zi(v) = NV.NextDouble
-                '        CTemp(v) = AktPara(v).C + z + zi(v)
-                '    Next
-
-                '    Dim Random As New MathNet.Numerics.RandomSources.AdditiveLaggedFibonacciRandomSource
-                '    z = Random.NextDouble
-
-                '    '3. Parameter Mutation
-                '    '---------------------
-                '    'Der asymetrische Zufallszahlengenerator aus
-                '    '"Asymmetrische Evolutionsstrategien" Hildebrand 2001 ist nicht verfügbar.
 
         End Select
 
