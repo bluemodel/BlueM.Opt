@@ -90,9 +90,9 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="TeeChart, Version=4.0.2009.35592, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
+    <Reference Include="TeeChart, Version=4.1.2011.4192, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\BlueM.Opt.Diagramm\Resources\TeeChart.dll</HintPath>
+      <HintPath>..\..\Diagramm\Resources\TeeChart.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
