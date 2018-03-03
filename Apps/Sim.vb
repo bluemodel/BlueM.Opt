@@ -795,7 +795,7 @@ Public MustInherit Class Sim
         Dim WertStr As String
         Dim AnzZeichen, AnzNachkomma As Short
         Dim AnzZeil As Integer
-        Dim i, j As Integer
+        Dim i As Integer
         Dim Zeilen As Collections.Generic.Dictionary(Of Integer, String)
         Dim Zeile As String
         Dim StrLeft As String
