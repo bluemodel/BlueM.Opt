@@ -52,10 +52,6 @@ Public Class OptParameter
     Public Min As Double                        'Minwert für die Umrechnung in reellen Parameterwert
     Public Max As Double                        'Maxwert für die Umrechnung in reellen Parameterwert
 
-    'Für MPC
-    Public Objekt As String                     'Objektbezeichnung (Zur Gruppierung der Optimierungsparameter)
-    Public Zeitpunkt As Integer                 'Zeitschritt zu dem der Optparameter gehört
-
     Public Property RWert() As Double           'Reeller Parameterwert
         Get
             Return Me.Min + (Me.Max - Me.Min) * Me.Xn
@@ -64,6 +60,7 @@ Public Class OptParameter
             Me.Xn = (value - Me.Min) / (Me.Max - Me.Min)
         End Set
     End Property
+
     Public StartWert As Double                  'Reeller Startwert
 
     'Schrittweite
@@ -94,8 +91,6 @@ Public Class OptParameter
         Me.StartWert = 0.5
         Me.Dn = 0.1
         Me.Beziehung = Constants.Relationship.none
-        Me.Objekt = ""
-        Me.Zeitpunkt = 0
 
     End Sub
 
@@ -119,8 +114,6 @@ Public Class OptParameter
         Clone.Max = Me.Max
         Clone.StartWert = Me.StartWert
         Clone.Beziehung = Me.Beziehung
-        Clone.Objekt = Me.Objekt
-        Clone.Zeitpunkt = Me.Zeitpunkt
 
         Return Clone
 

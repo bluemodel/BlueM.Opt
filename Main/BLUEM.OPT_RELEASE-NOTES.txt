@@ -11,6 +11,8 @@ CHANGED:
 * Streamlined namespaces and assembly names
 FIXED:
 * Account for the possibility of negative model parameters when writing to the input files
+REMOVED:
+* Removed compatibility with BlueM.MPC, the development of which has been discontinued
 
 Version 1.6.0
 -------------
