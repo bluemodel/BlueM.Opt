@@ -141,11 +141,6 @@ Partial Public Class Form1
 #End Region 'Eigenschaften
 
 
-#Region "für MPC Schleifen"
-    Public bStartenWiederholen As Boolean
-#End Region
-
-
 #Region "Methoden"
 
 #Region "UI"
@@ -1058,14 +1053,6 @@ Partial Public Class Form1
         Me.mSettings.General.BatchMode = _batchmode
     End Sub
 
-    Public Sub setMPCMode(ByVal _mpcmode As Boolean)
-        Me.mSettings.General.MPCMode = _mpcmode
-    End Sub
-
-    Public Sub setObjBoundary(ByVal _objboundary As Double)
-        Me.mSettings.General.ObjBoundary = _objboundary
-    End Sub
-
 #End Region 'Initialisierung der Anwendungen
 
 #Region "Ablaufkontrolle"
@@ -1089,13 +1076,7 @@ Partial Public Class Form1
         'Stoppuhr
         Dim AllOptTime As New Stopwatch
 
-        bStartenWiederholen = True
-        Do While (bStartenWiederholen)
-            bStartenWiederholen = False
-
-            Call StarteDurchlauf(AllOptTime)
-
-        Loop
+        Call StarteDurchlauf(AllOptTime)
 
         MsgBox("Optimization ended!", MsgBoxStyle.Information, "BlueM.Opt")
         Me.Monitor1.LogAppend("The optimization took " & AllOptTime.Elapsed.Hours & "h " & AllOptTime.Elapsed.Minutes & "m " & AllOptTime.Elapsed.Seconds & "s " & AllOptTime.Elapsed.Milliseconds & "ms")
@@ -1141,8 +1122,6 @@ Partial Public Class Form1
             'Event auslösen (BatchMode)
             If (Me.mSettings.General.BatchMode) Then
                 Me.BatchCounter += 1
-                'Sprung in Funktion MPC.Controller.EvoController
-                'dort abspeichern der Settings und dann gehts hier weiter
                 RaiseEvent OptimizationStarted()
             End If
 
@@ -1166,18 +1145,9 @@ Partial Public Class Form1
                     'Startwerte evaluieren
                     blnSimWeiter = True
                     If (Me.mProblem.Method <> METH_SENSIPLOT) Then
-                        If Me.mSettings.General.MPCMode = True Then
-                            'Falls die Zielfunktionsauswertung kleiner ist als der ein vorgegebener Schwellwert (MPC.Form1)
-                            'dann blnSimWEiter = false, weil dann gar nicht weiter simuliert werden muss
-                            Call Me.evaluateStartwerte_MPC(blnSimWeiter)
-                            If blnSimWeiter = False Then
-                                Exit Select
-                            End If
-                        Else
-                            isOK = Me.evaluateStartwerte()
-                            If Not isOK Then
-                                Throw New Exception("Simulation of start values was unsuccessful! Please check the dataset!")
-                            End If
+                        isOK = Me.evaluateStartwerte()
+                        If Not isOK Then
+                            Throw New Exception("Simulation of start values was unsuccessful! Please check the dataset!")
                         End If
                     End If
 
@@ -2209,30 +2179,6 @@ Partial Public Class Form1
         Return isOK
 
     End Function
-
-    ''' <summary>
-    ''' Die Startwerte der Optparameter bei MPC-Anwendungen evaluieren
-    ''' </summary>
-    ''' <remarks>Mit Vergleich der Zielfunktionsgrenze, damit bei MPC nicht optimiert werden muss wenn Obj = Null</remarks>
-        Private Sub evaluateStartwerte_MPC(ByRef blnWeiter As Boolean)
-
-        Dim isOK As Boolean
-        Dim startind As BlueM.Opt.Common.Individuum
-
-        blnWeiter = True
-        startind = Me.mProblem.getIndividuumStart()
-
-        isOK = Sim1.Evaluate(startind) 'hier ohne multithreading
-        If (isOK) Then
-            Call Me.Hauptdiagramm1.ZeichneStartWert(startind)
-            My.Application.DoEvents()
-        End If
-
-        If startind.PrimObjectives(0) < Me.mSettings.General.ObjBoundary Then
-            blnWeiter = False
-        End If
-
-    End Sub
 
     ''' <summary>
     ''' Das Form wird geschlossen
