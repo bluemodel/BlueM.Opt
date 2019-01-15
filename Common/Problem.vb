@@ -293,7 +293,7 @@ Public Class Problem
             Next
             msg &= "Constraints (" & Me.NumConstraints & "):" & eol
             For Each constraint As Constraintfunction In Me.List_Constraintfunctions
-                msg &= "* " & constraint.Bezeichnung
+                msg &= "* " & constraint.Bezeichnung & eol
             Next
             'TODO: Problem description for CES
             Return msg
