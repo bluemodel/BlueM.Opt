@@ -258,8 +258,8 @@ Public Class Hauptdiagramm
     Public Sub ZeichneSekPopulation(ByVal pop() As Common.Individuum)
 
         Dim i As Integer
-        Dim serie As Steema.TeeChart.Styles.Series
-        Dim serie3D As Steema.TeeChart.Styles.Points3D
+        Dim serie, serie_inv As Steema.TeeChart.Styles.Series
+        Dim serie3D, serie3D_inv As Steema.TeeChart.Styles.Points3D
         Dim values(,) As Double
 
         'Population in Array von Penalties transformieren
@@ -269,18 +269,31 @@ Public Class Hauptdiagramm
             '2 Zielfunktionen
             '----------------------------------------------------------------
             serie = Me.getSeriesPoint("Secondary population", "Green")
+            serie_inv = Me.getSeriesPoint("Secondary population (invalid)", "Gray")
             serie.Clear()
+            serie_inv.Clear()
             For i = 0 To values.GetUpperBound(0)
-                serie.Add(values(i, 0), values(i, 1), pop(i).ID.ToString())
+                If pop(i).Is_Feasible Then
+                    serie.Add(values(i, 0), values(i, 1), pop(i).ID.ToString())
+                Else
+                    serie_inv.Add(values(i, 0), values(i, 1), pop(i).ID.ToString())
+                End If
+
             Next i
 
         ElseIf (Me.mProblem.NumPrimObjective >= 3) Then
             '3 oder mehr Zielfunktionen (es werden die ersten drei angezeigt)
             '----------------------------------------------------------------
             serie3D = Me.getSeries3DPoint("Secondary population", "Green")
+            serie3D_inv = Me.getSeries3DPoint("Secondary population (invalid)", "Gray")
             serie3D.Clear()
+            serie3D_inv.Clear()
             For i = 0 To values.GetUpperBound(0)
-                serie3D.Add(values(i, 0), values(i, 1), values(i, 2), pop(i).ID.ToString())
+                If pop(i).Is_Feasible Then
+                    serie3D.Add(values(i, 0), values(i, 1), values(i, 2), pop(i).ID.ToString())
+                Else
+                    serie3D_inv.Add(values(i, 0), values(i, 1), values(i, 2), pop(i).ID.ToString())
+                End If
             Next i
         End If
 
