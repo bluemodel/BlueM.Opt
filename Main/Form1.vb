@@ -219,6 +219,7 @@ Partial Public Class Form1
         Me.ToolStripSplitButton_Diagramm.Enabled = False
         Me.ToolStripSplitButton_ErgebnisDB.Enabled = False
         Me.ToolStripButton_Scatterplot.Enabled = False
+        Me.ToolStripButton_SelectedSolutions.Enabled = False
         Me.ToolStripSplitButton_Settings.Enabled = False
         Me.ToolStripMenuItem_SettingsLoad.Enabled = True 'weil bei vorherigem Start deaktiviert
 
@@ -451,6 +452,7 @@ Partial Public Class Form1
             Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             Me.ToolStripButton_Scatterplot.Enabled = False
+            Me.ToolStripButton_SelectedSolutions.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
 
             'Multithreading standardmäßig verbieten
@@ -839,6 +841,7 @@ Partial Public Class Form1
             Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             Me.ToolStripButton_Scatterplot.Enabled = False
+            Me.ToolStripButton_SelectedSolutions.Enabled = False
 
             Select Case Me.mProblem.Method
 
@@ -1105,6 +1108,7 @@ Partial Public Class Form1
             If (Not IsNothing(Sim1)) Then
                 Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = True
                 Me.ToolStripButton_Scatterplot.Enabled = True
+                Me.ToolStripButton_SelectedSolutions.Enabled = True
                 Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
             End If
 
@@ -1570,6 +1574,24 @@ Partial Public Class Form1
 
 #Region "Lösungsauswahl"
 
+    ''' <summary>
+    ''' Button to show selected Solutions clicked
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks></remarks>
+    Private Sub ToolStripButton_SelectedSolutions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_SelectedSolutions.Click
+        'Lösungsdialog initialisieren
+        If (IsNothing(Me.solutionDialog)) Then
+            Me.solutionDialog = New SolutionDialog(Me.mProblem)
+        End If
+
+        'Lösungsdialog anzeigen
+        Call Me.solutionDialog.Show()
+        Call Me.solutionDialog.BringToFront()
+    End Sub
+
+
     'Klick auf Serie in Diagramm
     '***************************
     Public Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -1643,7 +1665,7 @@ Partial Public Class Form1
 
     'Lösungsauswahl zurücksetzen
     '***************************
-    Public Sub clearSelection()
+    Public Sub clearSelectedSolutions()
 
         'Serie der ausgewählten Lösungen löschen
         '=======================================
@@ -1668,9 +1690,45 @@ Partial Public Class Form1
 
     End Sub
 
+    ''' <summary>
+    ''' Lösungsauswahl aktualisieren
+    ''' </summary>
+    ''' <param name="selectedSolution_IDs">Array von Lösungs-IDs</param>
+    ''' <remarks></remarks>
+    Public Sub updateSelectedSolutions(ByVal selectedSolution_IDs() As Integer)
+
+        'Selektierte Lösungen neu setzen
+        Call Sim1.OptResult.clearSelectedSolutions()
+        For Each id As Integer In selectedSolution_IDs
+            Call Sim1.OptResult.selectSolution(id)
+        Next
+
+        'Im Hauptdiagramm neu zeichnen
+        Call Me.Hauptdiagramm1.LöscheAusgewählteLösungen()
+        For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+            Call Me.Hauptdiagramm1.ZeichneAusgewählteLösung(ind)
+        Next
+
+        'In den Scatterplot-Matrizen neu zeichnen
+        If (Not IsNothing(Me.scatterplot1)) Then
+            Call scatterplot1.clearSelection()
+            For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+                Call Me.scatterplot1.showSelectedSolution(ind)
+            Next
+        End If
+
+        If (Not IsNothing(Me.scatterplot2)) Then
+            Call scatterplot2.clearSelection()
+            For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+                Call Me.scatterplot2.showSelectedSolution(ind)
+            Next
+        End If
+
+    End Sub
+
     'ausgewählte Lösungen simulieren und in Wave anzeigen
     '****************************************************
-    Public Sub showWave(ByVal checkedSolutions As Collection)
+    Public Sub simulateSelectedSolutions(ByVal checkedSolution_IDs() As Integer)
 
         Dim isOK As Boolean
         Dim isSWMM As Boolean
@@ -1703,7 +1761,7 @@ Partial Public Class Form1
 
             'Lösung per Checkbox ausgewählt?
             '-------------------------------
-            If (Not checkedSolutions.Contains(ind.ID.ToString())) Then
+            If (Not checkedSolution_IDs.Contains(ind.ID)) Then
                 Continue For
             End If
 
@@ -2014,6 +2072,7 @@ Partial Public Class Form1
 
                     'Ergebnis-Buttons
                     Me.ToolStripButton_Scatterplot.Enabled = True
+                    Me.ToolStripButton_SelectedSolutions.Enabled = True
                     Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
 
                     'Start-Button deaktivieren

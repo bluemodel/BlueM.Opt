@@ -46,22 +46,25 @@ Partial Public Class SolutionDialog
 
     'Properties
     '**********
-    Private ReadOnly Property checkedSolutions() As Collection
+    Private ReadOnly Property checkedSolutions() As Integer()
         Get
-            checkedSolutions = New Collection()
+            Dim solution_IDs As Integer()
+            ReDim solution_IDs(-1)
             For Each row As DataGridViewRow In Me.DataGridView1.Rows
                 If (row.Cells(0).Value = "True") Then
-                    checkedSolutions.Add(row.HeaderCell.Value, row.HeaderCell.Value)
+                    ReDim Preserve solution_IDs(solution_IDs.Length)
+                    solution_IDs(solution_IDs.Length - 1) = row.HeaderCell.Value
                 End If
             Next
-            Return checkedSolutions
+            Return solution_IDs
         End Get
     End Property
 
     'Events
     '******
-    Public Event WaveClicked(ByVal checkedSolutions As Collection)
-    Public Event ClearClicked()
+    Public Event SelectedSolutionsSimulationRequested(ByVal checkedSolutions() As Integer)
+    Public Event SelectedSolutionsChanged(ByVal selectedSolutions() As Integer)
+    Public Event SelectedSolutionsCleared()
 
 
     ''' <summary>
@@ -152,8 +155,9 @@ Partial Public Class SolutionDialog
 
         'Handler einrichten
         '==================
-        AddHandler Me.WaveClicked, AddressOf Form1.showWave
-        AddHandler Me.ClearClicked, AddressOf Form1.clearSelection
+        AddHandler Me.SelectedSolutionsSimulationRequested, AddressOf Form1.simulateSelectedSolutions
+        AddHandler Me.SelectedSolutionsCleared, AddressOf Form1.clearSelectedSolutions
+        AddHandler Me.SelectedSolutionsChanged, AddressOf Form1.updateSelectedSolutions
 
     End Sub
 
@@ -292,6 +296,22 @@ Partial Public Class SolutionDialog
 
     End Sub
 
+    'Nicht angehakte Lösungen aus Lösungsauwahl entfernen
+    '****************************************************
+    Private Sub ToolStripButton_unselect_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_unselect.Click
+
+        'Zeilen löschen
+        For Each row As DataGridViewRow In Me.DataGridView1.Rows
+            If (row.Cells(0).Value = "False") Then
+                Me.DataGridView1.Rows.Remove(row)
+            End If
+        Next
+
+        'Event auslösen
+        RaiseEvent SelectedSolutionsChanged(Me.checkedSolutions)
+
+    End Sub
+
     'Lösungsauswahl zurücksetzen
     '***************************
     Private Sub ToolStripButton_Clear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Clear.Click
@@ -303,19 +323,19 @@ Partial Public Class SolutionDialog
         Call Me.Hide()
 
         'Event auslösen
-        RaiseEvent ClearClicked()
+        RaiseEvent SelectedSolutionsCleared()
 
     End Sub
 
-    'Wave anzeigen
-    '*************
-    Private Sub ToolStripButton_Wave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Wave.Click
+    'Ausgewählte Lösungen simulieren
+    '*******************************
+    Private Sub ToolStripButton_Simulate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Wave.Click
 
         'Cursor
         Cursor = Cursors.WaitCursor
 
         'Event auslösen
-        RaiseEvent WaveClicked(Me.checkedSolutions)
+        RaiseEvent SelectedSolutionsSimulationRequested(Me.checkedSolutions)
 
         'Cursor
         Cursor = Cursors.Default

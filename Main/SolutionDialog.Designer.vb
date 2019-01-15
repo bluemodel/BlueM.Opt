@@ -24,11 +24,12 @@ Partial Class SolutionDialog
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(SolutionDialog))
         Me.DataGridView1 = New System.Windows.Forms.DataGridView
+        Me.Selection = New System.Windows.Forms.DataGridViewCheckBoxColumn
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
         Me.ToolStripButton_Wave = New System.Windows.Forms.ToolStripButton
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.ToolStripButton_Clear = New System.Windows.Forms.ToolStripButton
-        Me.Selection = New System.Windows.Forms.DataGridViewCheckBoxColumn
+        Me.ToolStripButton_unselect = New System.Windows.Forms.ToolStripButton
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -48,9 +49,16 @@ Partial Class SolutionDialog
         Me.DataGridView1.Size = New System.Drawing.Size(601, 282)
         Me.DataGridView1.TabIndex = 0
         '
+        'Selection
+        '
+        Me.Selection.FalseValue = "False"
+        Me.Selection.HeaderText = "Selection"
+        Me.Selection.Name = "Selection"
+        Me.Selection.TrueValue = "True"
+        '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_Wave, Me.ToolStripSeparator1, Me.ToolStripButton_Clear})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_Wave, Me.ToolStripSeparator1, Me.ToolStripButton_unselect, Me.ToolStripButton_Clear})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(601, 25)
@@ -60,11 +68,12 @@ Partial Class SolutionDialog
         'ToolStripButton_Wave
         '
         Me.ToolStripButton_Wave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton_Wave.Image = Global.BlueM.Opt.My.Resources.Resources.wave
+        Me.ToolStripButton_Wave.Image = Global.BlueM.Opt.My.Resources.Resources.table_lightning
         Me.ToolStripButton_Wave.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton_Wave.Name = "ToolStripButton_Wave"
         Me.ToolStripButton_Wave.Size = New System.Drawing.Size(23, 22)
-        Me.ToolStripButton_Wave.Text = "Simulate the selected solutions and display the results in Wave"
+        Me.ToolStripButton_Wave.Text = "Simulate the checked solutions and display the results in Wave"
+        Me.ToolStripButton_Wave.ToolTipText = "Simulate the checked solutions and display the results in Wave"
         '
         'ToolStripSeparator1
         '
@@ -74,18 +83,21 @@ Partial Class SolutionDialog
         'ToolStripButton_Clear
         '
         Me.ToolStripButton_Clear.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton_Clear.Image = Global.BlueM.Opt.My.Resources.Resources.cancel
+        Me.ToolStripButton_Clear.Image = Global.BlueM.Opt.My.Resources.Resources.table_delete
         Me.ToolStripButton_Clear.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton_Clear.Name = "ToolStripButton_Clear"
         Me.ToolStripButton_Clear.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_Clear.Text = "Unselect all solutions"
         '
-        'Selection
+        'ToolStripButton_unselect
         '
-        Me.Selection.FalseValue = "False"
-        Me.Selection.HeaderText = "Selection"
-        Me.Selection.Name = "Selection"
-        Me.Selection.TrueValue = "True"
+        Me.ToolStripButton_unselect.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton_unselect.Image = Global.BlueM.Opt.My.Resources.Resources.table_row_delete
+        Me.ToolStripButton_unselect.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton_unselect.Name = "ToolStripButton_unselect"
+        Me.ToolStripButton_unselect.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton_unselect.Text = "Unselect the unchecked solutions"
+        Me.ToolStripButton_unselect.ToolTipText = "Unselect the unchecked solutions"
         '
         'SolutionDialog
         '
@@ -111,4 +123,5 @@ Partial Class SolutionDialog
     Friend WithEvents ToolStripButton_Clear As System.Windows.Forms.ToolStripButton
     Friend WithEvents SpalteAuswahl As System.Windows.Forms.DataGridViewCheckBoxColumn
     Friend WithEvents Selection As System.Windows.Forms.DataGridViewCheckBoxColumn
+    Friend WithEvents ToolStripButton_unselect As System.Windows.Forms.ToolStripButton
 End Class
