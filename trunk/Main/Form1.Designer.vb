@@ -68,6 +68,7 @@ Partial Class Form1
         Me.ToolStripMenuItem_Tchart2CSV = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripButton_Monitor = New System.Windows.Forms.ToolStripButton
         Me.ToolStripButton_Scatterplot = New System.Windows.Forms.ToolStripButton
+        Me.ToolStripButton_SelectedSolutions = New System.Windows.Forms.ToolStripButton
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip
         Me.Hauptdiagramm1 = New BlueM.Opt.Diagramm.Hauptdiagramm
         Me.EVO_Opt_Verlauf1 = New BlueM.Opt.EVO_Opt_Verlauf
@@ -281,7 +282,7 @@ Partial Class Form1
         '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_New, ToolStripSeparator7, Me.ToolStripSplitButton_Settings, ToolStripSeparator5, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripButton_Scatterplot, ToolStripSeparator8})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_New, ToolStripSeparator7, Me.ToolStripSplitButton_Settings, ToolStripSeparator5, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripButton_Scatterplot, ToolStripSeparator8, Me.ToolStripButton_SelectedSolutions})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(722, 25)
@@ -358,7 +359,7 @@ Partial Class Form1
         'ToolStripSplitButton_Diagramm
         '
         Me.ToolStripSplitButton_Diagramm.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_TChartEdit, Me.ToolStripMenuItem_TChartSave, Me.ToolStripMenuItem_TChart2PNG, Me.ToolStripMenuItem_Tchart2CSV})
-        Me.ToolStripSplitButton_Diagramm.Image = Global.BlueM.Opt.My.Resources.Resources.wave
+        Me.ToolStripSplitButton_Diagramm.Image = Global.BlueM.Opt.My.Resources.Resources.chart_curve
         Me.ToolStripSplitButton_Diagramm.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripSplitButton_Diagramm.Name = "ToolStripSplitButton_Diagramm"
         Me.ToolStripSplitButton_Diagramm.Size = New System.Drawing.Size(68, 22)
@@ -415,6 +416,16 @@ Partial Class Form1
         Me.ToolStripButton_Scatterplot.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_Scatterplot.Text = "Scatterplot"
         Me.ToolStripButton_Scatterplot.ToolTipText = "Display scatterplot matrix"
+        '
+        'ToolStripButton_SelectedSolutions
+        '
+        Me.ToolStripButton_SelectedSolutions.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton_SelectedSolutions.Image = Global.BlueM.Opt.My.Resources.Resources.table
+        Me.ToolStripButton_SelectedSolutions.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton_SelectedSolutions.Name = "ToolStripButton_SelectedSolutions"
+        Me.ToolStripButton_SelectedSolutions.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton_SelectedSolutions.Text = "Show selected solutions window"
+        Me.ToolStripButton_SelectedSolutions.ToolTipText = "Show selected solutions window"
         '
         'StatusStrip1
         '
@@ -782,4 +793,5 @@ Partial Class Form1
     Private WithEvents ToolStripMenuItem_SettingsSave As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents BachModeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripButton_SelectedSolutions As System.Windows.Forms.ToolStripButton
 End Class

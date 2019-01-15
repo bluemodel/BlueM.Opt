@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{FF1D5494-1205-4F3E-BD65-ADB8C6BD04D4}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -285,8 +285,13 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\BlueM.png" />
-    <Content Include="Resources\EVO.ico" />
-    <Content Include="Resources\page_white.png" />
+    <None Include="Resources\chart_curve.png" />
+    <None Include="Resources\EVO.ico" />
+    <None Include="Resources\page_white.png" />
+    <None Include="Resources\table_row_delete.png" />
+    <None Include="Resources\table_lightning.png" />
+    <None Include="Resources\table_delete.png" />
+    <None Include="Resources\table.png" />
     <None Include="Resources\page_white_put.png" />
     <None Include="Resources\page_white_get.png" />
     <None Include="Resources\wrench.png" />
@@ -296,9 +301,7 @@
     <None Include="Resources\database_connect.png" />
     <None Include="Resources\database_go.png" />
     <None Include="Resources\database_save.png" />
-    <None Include="Resources\cancel.png" />
     <None Include="Resources\icon_teechart.png" />
-    <None Include="Resources\wave.ico" />
     <None Include="Resources\scatterplot.ico" />
   </ItemGroup>
   <ItemGroup>
