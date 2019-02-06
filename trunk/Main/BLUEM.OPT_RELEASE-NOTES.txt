@@ -17,6 +17,7 @@ CHANGED:
 * Streamlined namespaces and assembly names
 FIXED:
 * Account for the possibility of negative model parameters when writing to the input files
+* Current values of objective functions that should be maximized are now also sign-reversed (#303)
 REMOVED:
 * Removed compatibility with BlueM.MPC, the development of which has been discontinued
 

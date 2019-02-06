@@ -594,6 +594,10 @@ Public Class Problem
                             If (WerteArray(13).Trim() <> "") Then
                                 .hasIstWert = True
                                 .IstWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
+                                'BUG 303: Reverse the sign for objective functions that should be maximized
+                                If .Richtung = EVO_DIRECTION.Maximization Then
+                                    .IstWert = .IstWert * -1
+                                End If
                             Else
                                 .hasIstWert = False
                             End If
@@ -634,6 +638,10 @@ Public Class Problem
                             If (WerteArray(12).Trim() <> "") Then
                                 .hasIstWert = True
                                 .IstWert = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
+                                'BUG 303: Reverse the sign for objective functions that should be maximized
+                                If .Richtung = EVO_DIRECTION.Maximization Then
+                                    .IstWert = .IstWert * -1
+                                End If
                             Else
                                 .hasIstWert = False
                             End If
@@ -679,6 +687,10 @@ Public Class Problem
                             If (WerteArray(13).Trim() <> "") Then
                                 .hasIstWert = True
                                 .IstWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
+                                'BUG 303: Reverse the sign for objective functions that should be maximized
+                                If .Richtung = EVO_DIRECTION.Maximization Then
+                                    .IstWert = .IstWert * -1
+                                End If
                             Else
                                 .hasIstWert = False
                             End If
@@ -805,6 +817,10 @@ Public Class Problem
                             If (WerteArray(5).Trim() <> "") Then
                                 .hasIstWert = True
                                 .IstWert = Convert.ToDouble(WerteArray(5).Trim(), Common.Provider.FortranProvider)
+                                'BUG 303: Reverse the sign for objective functions that should be maximized
+                                If .Richtung = EVO_DIRECTION.Maximization Then
+                                    .IstWert = .IstWert * -1
+                                End If
                             Else
                                 .hasIstWert = False
                             End If
