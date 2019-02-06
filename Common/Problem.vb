@@ -179,7 +179,7 @@ Public Class Problem
                 Case Is > 1
                     Return EVO_MODE.Multi_Objective
                 Case Else
-                    Throw New Exception("Es sind keine PrimaryObjective-Functions definiert!")
+                    Throw New Exception("No primary objective functions are defined!")
             End Select
         End Get
     End Property
@@ -365,7 +365,7 @@ Public Class Problem
     ''' <summary>
     ''' Optimierungsparameter (*.OPT-Datei) einlesen
     ''' </summary>
-    ''' <remarks>http://130.83.196.154/BlueM/wiki/index.php/OPT-Datei</remarks>
+    ''' <remarks>http://wiki.bluemodel.org/index.php/OPT-Datei</remarks>
     Private Sub Read_OPT()
 
         'Format:
@@ -437,7 +437,7 @@ Public Class Problem
     ''' <summary>
     ''' Modellparameter (*.MOD-Datei) einlesen
     ''' </summary>
-    ''' <remarks>http://130.83.196.154/BlueM/wiki/index.php/MOD-Datei</remarks>
+    ''' <remarks>http://wiki-bluemodel.org/index.php/MOD-Datei</remarks>
     Private Sub Read_MOD()
 
         'Format:
@@ -505,7 +505,7 @@ Public Class Problem
     ''' </summary>
     ''' <param name="SimStart">Startzeitpunkt der Simulation</param>
     ''' <param name="SimEnde">Endzeitpunkt der Simulation</param>
-    ''' <remarks>http://130.83.196.220/bluem/wiki/index.php/ZIE-Datei</remarks>
+    ''' <remarks>http://wiki.bluemodel.org/index.php/ZIE-Datei</remarks>
     Private Sub Read_ZIE(ByVal SimStart As DateTime, ByVal SimEnde As DateTime)
 
         Const AnzSpalten_ObjFSeries As Integer = 13                 'Anzahl Spalten Reihenvergleich in der ZIE-Datei
@@ -568,7 +568,7 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFSeries + 1) Then
-                            Throw New Exception("Block Reihenvergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
+                            Throw New Exception("The block ""Series"" in the ZIE input file has the wrong number of columns!")
                         End If
 
                         'ObjectiveFunction instanzieren
@@ -619,7 +619,7 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValue + 1) Then
-                            Throw New Exception("Block Wertevergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
+                            Throw New Exception("The block ""Values"" in the ZIE input file has the wrong number of columns!")
                         End If
 
                         'ObjectiveFunction instanzieren
@@ -659,7 +659,7 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValueFromSeries + 1) Then
-                            Throw New Exception("Block ReihenWertevergleich in der ZIE-Datei hat die falsche Anzahl Spalten!")
+                            Throw New Exception("The block ""ValueFromSeries"" in the ZIE input file has the wrong number of columns!")
                         End If
 
                         'ObjectiveFunction instanzieren
@@ -710,7 +710,7 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFSKos + 1) Then
-                            Throw New Exception("Block 'SKos' in der ZIE-Datei hat die falsche Anzahl Spalten!")
+                            Throw New Exception("The block ""SKos"" in the ZIE input file has the wrong number of columns!")
                         End If
 
                         'Spalten einlesen
@@ -753,7 +753,7 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFEcology + 1) Then
-                            Throw New Exception("Block 'Ecology' in der ZIE-Datei hat die falsche Anzahl Spalten!")
+                            Throw New Exception("The block ""Ecology"" in the ZIE input file has the wrong number of columns!")
                         End If
 
                         'Spalten einlesen
@@ -794,7 +794,7 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFAggregate + 1) Then
-                            Throw New Exception("Block 'Aggregierte Ziele' in der ZIE-Datei hat die falsche Anzahl Spalten!")
+                            Throw New Exception("The block ""Aggregate"" in the ZIE input file has the wrong number of columns!")
                         End If
 
                         'ObjectiveFunction instanzieren
@@ -914,14 +914,14 @@ Public Class Problem
         'Zeitraum der Referenzreihe überprüfen
         If (RefReihe.StartDate > EvalStart Or RefReihe.EndDate < EvalEnde) Then
             'Referenzreihe deckt Evaluierungszeitraum nicht ab
-            Throw New Exception("Die Referenzreihe '" & dateipfad & "' deckt den Evaluierungszeitraum nicht ab!")
+            Throw New Exception("The reference series '" & dateipfad & "' does not cover the evaluation period!")
         Else
             'Referenzreihe auf Evaluierungszeitraum kürzen
             Call RefReihe.Cut(EvalStart, EvalEnde)
         End If
 
         'Referenzreihe umbenennen
-        RefReihe.Title += " (Referenz)"
+        RefReihe.Title += " (reference)"
 
         Return RefReihe
 
@@ -932,7 +932,7 @@ Public Class Problem
     ''' </summary>
     ''' <param name="SimStart">Startzeitpunkt der Simulation</param>
     ''' <param name="SimEnde">Endzeitpunkt der Simulation</param>
-    ''' <remarks>http://130.83.196.154/BlueM/wiki/index.php/CON-Datei</remarks>
+    ''' <remarks>http://wiki.bluemodel.org/index.php/CON-Datei</remarks>
     Private Sub Read_CON(ByVal SimStart As DateTime, ByVal SimEnde As DateTime)
 
         'Format:
@@ -962,7 +962,7 @@ Public Class Problem
                     WerteArray = Zeile.Split("|")
                     'Kontrolle
                     If (WerteArray.GetUpperBound(0) <> AnzSpalten + 1) Then
-                        Throw New Exception("Die CON-Datei hat die falsche Anzahl Spalten!")
+                        Throw New Exception("The CON input file has the wrong number of columns!")
                     End If
                     'Neues Constraint anlegen
                     ReDim Preserve Me.List_Constraintfunctions(i)
@@ -992,9 +992,9 @@ Public Class Problem
             '---------
             For i = 0 To Me.NumConstraints - 1
                 With Me.List_Constraintfunctions(i)
-                    If (Not .Typ = "Wert" And Not .Typ = "Reihe") Then Throw New Exception("Constraints: GrenzTyp muss entweder 'Wert' oder 'Reihe' sein!")
-                    If (Not .Datei = "WEL") Then Throw New Exception("Constraints: Als Datei wird momentan nur 'WEL' unterstützt!")
-                    If (Not .GrenzPos = "Obergrenze" And Not .GrenzPos = "Untergrenze") Then Throw New Exception("Constraints: Für Oben/Unten muss entweder 'Obergrenze' oder 'Untergrenze' angegeben sein!")
+                    If (Not .Typ = "Wert" And Not .Typ = "Reihe") Then Throw New Exception("Constraints: ThreshType must be either 'Wert' or 'Reihe'!")
+                    If (Not .Datei = "WEL") Then Throw New Exception("Constraints: Only 'WEL' file format is currently supported!")
+                    If (Not .GrenzPos = "Obergrenze" And Not .GrenzPos = "Untergrenze") Then Throw New Exception("Constraints: Lower/Upper must be wither 'Obergrenze' or 'Untergrenze'!")
                 End With
             Next
 
@@ -1016,7 +1016,7 @@ Public Class Problem
                                 Dim ZRE As New Wave.ZRE(Me.mWorkDir & .GrenzReiheDatei)
                                 .GrenzReihe = ZRE.getTimeSeries(0)
                             Case Else
-                                Throw New Exception("Das Format der Grenzwertreihe '" & .GrenzReiheDatei & "' wurde nicht erkannt!")
+                                Throw New Exception("Constraints: The file format of the threshold series '" & .GrenzReiheDatei & "' is not supported!")
                         End Select
 
                         'Zeitraum der Grenzwertreihe überprüfen
@@ -1026,14 +1026,14 @@ Public Class Problem
 
                         If (GrenzStart > SimStart Or GrenzEnde < SimEnde) Then
                             'Grenzwertreihe deckt Simulationszeitraum nicht ab
-                            Throw New Exception("Die Grenzwertreihe '" & .GrenzReiheDatei & "' deckt den Simulationszeitraum nicht ab!")
+                            Throw New Exception("Constraints: The threshold series '" & .GrenzReiheDatei & "' does not cover the simulation period!")
                         Else
                             'Zielreihe auf Simulationszeitraum kürzen
                             Call .GrenzReihe.Cut(SimStart, SimEnde)
                         End If
 
                         'Grenzwertreihe umbenennen
-                        .GrenzReihe.Title += " (Grenze)"
+                        .GrenzReihe.Title += " (threshold)"
 
                     End If
                 End With
@@ -1049,7 +1049,7 @@ Public Class Problem
     ''' <summary>
     ''' Kombinatorik (*.CES) einlesen
     ''' </summary>
-    ''' <remarks>Nur bei Kombinatorik verwendet. http://130.83.196.154/BlueM/wiki/index.php/CES-Datei</remarks>
+    ''' <remarks>Nur bei Kombinatorik verwendet. http://wiki.bluemodel.org/index.php/CES-Datei</remarks>
     Private Sub Read_CES()
 
         Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & BlueM.Opt.Common.Problem.FILEEXT_CES
@@ -1155,11 +1155,11 @@ Public Class Problem
         Next
 
         If Not isValid_A Then
-            Throw New Exception("Für einen OptParameter ist kein Modellparameter vorhanden!")
+            Throw New Exception("At least one optimization parameter is missing corresponding model parameters!")
         End If
 
         If Not isValid_B Then
-            Throw New Exception("Ein Modellparameter ist keinem OptParameter zugewiesen!")
+            Throw New Exception("At least one model parameter is not assigned to an optimization parameter!")
         End If
 
     End Sub
@@ -1172,7 +1172,7 @@ Public Class Problem
 
         For i = 0 To List_OptParameter.GetUpperBound(0)
             If Not List_OptParameter(i).RWert <= List_OptParameter(i).Max Or Not List_OptParameter(i).RWert >= List_OptParameter(i).Min Then
-                Throw New Exception("Der Optimierungsparameter " & List_OptParameter(i).Bezeichnung & " in der .OPT Datei liegt nicht innerhalb der dort genannten Grenzen.")
+                Throw New Exception("The start value of the optimization parameter " & List_OptParameter(i).Bezeichnung & " is not within the defined value range!")
             End If
         Next
     End Sub
