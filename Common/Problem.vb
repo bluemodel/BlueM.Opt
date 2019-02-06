@@ -511,7 +511,7 @@ Public Class Problem
         Const AnzSpalten_ObjFSeries As Integer = 13                 'Anzahl Spalten Reihenvergleich in der ZIE-Datei
         Const AnzSpalten_ObjFValue As Integer = 12                  'Anzahl Spalten Wertevergleich in der ZIE-Datei
         Const AnzSpalten_ObjFValueFromSeries As Integer = 13        'Anzahl Spalten Reihenwertevergleich in der ZIE-Datei
-        Const AnzSpalten_ObjFAggregate As Integer = 4               'Anzahl Spalten Aggregierte Ziele in der ZIE-Datei
+        Const AnzSpalten_ObjFAggregate As Integer = 5               'Anzahl Spalten Aggregierte Ziele in der ZIE-Datei
         Const AnzSpalten_ObjFSKos As Integer = 5                    'Anzahl Spalten SKos in der ZIE-Datei
         Const AnzSpalten_ObjFEcology As Integer = 5                 'Anzahl Spalten SKos in der ZIE-Datei
 
@@ -802,6 +802,13 @@ Public Class Problem
                             Else
                                 .Richtung = Common.EVO_DIRECTION.Minimization
                             End If
+                            If (WerteArray(5).Trim() <> "") Then
+                                .hasIstWert = True
+                                .IstWert = Convert.ToDouble(WerteArray(5).Trim(), Common.Provider.FortranProvider)
+                            Else
+                                .hasIstWert = False
+                            End If
+
                         End With
 
                         'Neue ObjectiveFunction abspeichern
