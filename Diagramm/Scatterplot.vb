@@ -309,13 +309,10 @@ Partial Public Class Scatterplot
                             shape1.Title = "Area of improvement"
 
                             'Shape formatieren
-                            shape1.Color = Color.Black
-                            shape1.Brush.Style = Drawing2D.HatchStyle.DarkUpwardDiagonal
-                            shape1.Brush.Color = Color.Black
-                            shape1.Brush.ForegroundColor = Color.White
-                            shape1.Brush.Transparency = 75
+                            shape1.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer)) 'Light Green, 75% transparent
+                            shape1.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer)) 'Light Green, 75% transparent
                             shape1.Pen.Transparency = 0
-                            shape1.Pen.Color = Color.Red
+                            shape1.Pen.Color = Color.Green
                             shape1.Pen.Width = 1
 
                             If (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert And _
@@ -330,7 +327,7 @@ Partial Public Class Scatterplot
                             ElseIf (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert) Then
                                 'Nur X-Wert:
                                 '-----------
-                                shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
+                                    shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
                                 shape1.X1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert
                                 shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
                                 shape1.Y1 = max(j) * 1.1 ^ (max(j) / Math.Abs(max(j)))
@@ -340,7 +337,7 @@ Partial Public Class Scatterplot
                                 '-----------
                                 shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
                                 shape1.X1 = max(i) * 1.1 ^ (max(i) / Math.Abs(max(i)))
-                                shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
+                                    shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
                                 shape1.Y1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).IstWert
                             End If
 
