@@ -279,6 +279,7 @@ Public Class Testprobleme
             'Check_SH: 
             Me.mProblem.List_ObjectiveFunctions(i) = New Common.Objectivefunction_Value()
             Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective = True
+            Me.mProblem.List_ObjectiveFunctions(i).Richtung = EVO_DIRECTION.Minimization
         Next
         ReDim Me.mProblem.List_Constraintfunctions(Me.mAnzConstraints - 1)
         For i = 0 To Me.mProblem.NumConstraints - 1
