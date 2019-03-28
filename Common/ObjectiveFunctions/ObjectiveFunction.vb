@@ -278,13 +278,26 @@ Public MustInherit Class ObjectiveFunction
                 '--------------
                 'Mittelwert bilden
                 Dim Qobs_quer, zaehler, nenner As Double
+                Qobs_quer = RefReihe.Average
+                zaehler = 0.0
+                nenner = 0.0
                 For i = 0 To SimReihe.Length - 1
-                    Qobs_quer += RefReihe.Values(i)
+                    zaehler += (RefReihe.Values(i) - SimReihe.Values(i)) ^ 2
+                    nenner += (RefReihe.Values(i) - Qobs_quer) ^ 2
                 Next
-                Qobs_quer = Qobs_quer / (SimReihe.Length)
+                'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
+                QWert = zaehler / nenner
+
+            Case "LnNashSutt"
+                'Logarithmic Nash Sutcliffe
+                '--------------------------
+                Dim Qobs_quer, zaehler, nenner As Double
+                Qobs_quer = RefReihe.Average
+                zaehler = 0.0
+                nenner = 0.0
                 For i = 0 To SimReihe.Length - 1
-                    zaehler += (RefReihe.Values(i) - SimReihe.Values(i)) * (RefReihe.Values(i) - SimReihe.Values(i))
-                    nenner += (RefReihe.Values(i) - Qobs_quer) * (RefReihe.Values(i) - Qobs_quer)
+                    zaehler += (Math.Log(RefReihe.Values(i)) - Math.Log(SimReihe.Values(i))) ^ 2
+                    nenner += (Math.Log(RefReihe.Values(i)) - Math.Log(Qobs_quer)) ^ 2
                 Next
                 'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
                 QWert = zaehler / nenner
