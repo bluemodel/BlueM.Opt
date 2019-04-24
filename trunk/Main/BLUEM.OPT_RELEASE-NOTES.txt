@@ -12,8 +12,10 @@ NEW:
   * streamlined the button images on the selected solutions dialog
 CHANGED:
 * Switched target framework to .NET Framework 3.5
-* Updated Talsim-NG engine to v3.1.0.2
-* Added file extension *.TEM for TALSIM-NG datasets
+* TALSIM-NG:
+  * Updated Talsim-NG engine to v3.1.0.2
+  * Added file extension *.TEM to dataset list
+  * Added support for reading results from *.TEMP.WEL files
 * Added support for current values for objective functions of type "Aggregate"
   -> requires a new column "CurValue" in the ZIE input file
 * Streamlined namespaces and assembly names
