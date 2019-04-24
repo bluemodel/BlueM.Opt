@@ -12,7 +12,7 @@ NEW:
   * streamlined the button images on the selected solutions dialog
 CHANGED:
 * Switched target framework to .NET Framework 3.5
-* Updated Talsim-NG engine to v3.0.1.7
+* Updated Talsim-NG engine to v3.1.0.2
 * Added support for current values for objective functions of type "Aggregate"
   -> requires a new column "CurValue" in the ZIE input file
 * Streamlined namespaces and assembly names
