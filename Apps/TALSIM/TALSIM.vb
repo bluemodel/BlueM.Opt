@@ -65,7 +65,7 @@ Public Class Talsim
                                         "TGG", "TAL", "HYA", "TRS", "EZG", "EIN", "URB", _
                                         "VER", "RUE", "BEK", "BOA", "BOD", "LNZ", "EFL", _
                                         "DIF", "FKA", "SCE", "QAB", "UPD", "OPF", "KAL", _
-                                        "HYO"})
+                                        "HYO", "TEM"})
 
             Return exts
 
