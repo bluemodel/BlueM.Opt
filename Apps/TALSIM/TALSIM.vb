@@ -44,6 +44,7 @@ Public Class Talsim
     'Misc
     '----
     Private useKWL As Boolean       'gibt an, ob die KTR.WEL-Datei benutzt wird
+    Private useTEMPWEL As Boolean   'gibt an, ob die TEMP.WEL-Datei benutzt wird
 
     '**** Multithreading ****
     Dim MyTalsimThreads() As TalsimThread
@@ -98,6 +99,7 @@ Public Class Talsim
         'Daten belegen
         '-------------
         Me.useKWL = False
+        Me.useTEMPWEL = False
 
         'Pfad zu talsimw64.exe bestimmen
         '-------------------------------
@@ -149,6 +151,14 @@ Public Class Talsim
         For Each objective In Me.mProblem.List_ObjectiveFunctions
             If (objective.Datei = "KTR.WEL") Then
                 Me.useKWL = True
+                Exit For
+            End If
+        Next
+
+        'TEMP.WEL: Feststellen, ob irgendeine Zielfunktion die TEMP.WEL-Datei benutzt
+        For Each objective In Me.mProblem.List_ObjectiveFunctions
+            If (objective.Datei = "TEMP.WEL") Then
+                Me.useTEMPWEL = True
                 Exit For
             End If
         Next
@@ -427,18 +437,26 @@ Public Class Talsim
         'ggf. KWL-Datei einlesen
         '-----------------------
         If (Me.useKWL) Then
-
             Dim KWLpath As String = Me.WorkDir_Current & Me.Datensatz & ".KTR.WEL"
-
             Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
 
             'Reihen zu Simulationsergebnis hinzufügen
             For Each zre As Wave.TimeSeries In KWLtmp.TimeSeries
                 Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
-
         End If
 
+        'ggf. TEMP.WEL-Datei einlesen
+        '----------------------------
+        If (Me.useTEMPWEL) Then
+            Dim TEMPWELpath As String = Me.WorkDir_Current & Me.Datensatz & ".TEMP.WEL"
+            Dim tempwel As Wave.WEL = New Wave.WEL(TEMPWELpath, True)
+
+            'Reihen zu Simulationsergebnis hinzufügen
+            For Each zre As Wave.TimeSeries In tempwel.TimeSeries
+                Me.SimErgebnis.Reihen.Add(zre.Title, zre)
+            Next
+        End If
     End Sub
 
 #End Region 'Evaluierung
