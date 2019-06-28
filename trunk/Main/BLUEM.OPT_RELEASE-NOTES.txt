@@ -20,6 +20,7 @@ CHANGED:
   -> requires a new column "CurValue" in the ZIE input file
 * Streamlined namespaces and assembly names
 FIXED:
+* BlueM.Sim and TALSIM-NG: read only the required series from result files (speed and memory improvement)
 * Account for the possibility of negative model parameters when writing to the input files
 * Current values of objective functions that should be maximized are now also sign-reversed (#303)
 REMOVED:
