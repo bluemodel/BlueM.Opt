@@ -29,6 +29,7 @@ Imports System.IO
 Imports System.Threading
 Imports IHWB.BlueM.DllAdapter
 Imports BlueM
+Imports BlueM.Opt.Common
 
 '*******************************************************************************
 '*******************************************************************************
@@ -392,16 +393,36 @@ Public Class BlueMSim
     '-------------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
-        'TODO: hier nur die Reihen einlesen, die auch für objfunctions gebraucht werden
-
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
 
+        'Benötigte SimReihen zusammenstellen
+        'TODO: das braucht eigentlich nicht nach jeder Simulation nochmal neu getan zu werden
+        Dim SimReihen As New Dictionary(Of String, List(Of String)) '{file: [series]}
+        SimReihen.Add("WEL", New List(Of String))
+        If Me.useKWL Then
+            SimReihen.Add("KWL", New List(Of String))
+        End If
+        For Each objfunc As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+            If objfunc.GetObjType = ObjectiveFunction.ObjectiveType.Series Or _
+                objfunc.GetObjType = ObjectiveFunction.ObjectiveType.ValueFromSeries Then
+                If Not SimReihen(objfunc.Datei.ToUpper()).Contains(objfunc.SimGr) Then
+                    SimReihen(objfunc.Datei.ToUpper()).Add(objfunc.SimGr)
+                End If
+            End If
+        Next
+
         'WEL-Datei einlesen
         '------------------
-        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir_Current & Me.Datensatz & ".WEL", True)
+        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir_Current & Me.Datensatz & ".WEL")
 
-        'Reihen zu Simulationsergebnis hinzufügen
+        'Benötigte Reihen für Import selektieren
+        For Each series As String In SimReihen("WEL")
+            WELtmp.selectSeries(series)
+        Next
+        'Datei einlesen
+        WELtmp.Read_File()
+        'Zeitreihen übernehmen
         For Each zre As Wave.TimeSeries In WELtmp.TimeSeries
             Me.SimErgebnis.Reihen.Add(zre.Title, zre)
         Next
@@ -411,10 +432,15 @@ Public Class BlueMSim
         If (Me.useKWL) Then
 
             Dim KWLpath As String = Me.WorkDir_Current & Me.Datensatz & ".KWL"
+            Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath)
 
-            Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
-
-            'Reihen zu Simulationsergebnis hinzufügen
+            'Benötigte Reihen für Import selektieren
+            For Each series As String In SimReihen("KWL")
+                KWLtmp.selectSeries(series)
+            Next
+            'Datei einlesen
+            KWLtmp.Read_File()
+            'Zeitreihen übernehmen
             For Each zre As Wave.TimeSeries In KWLtmp.TimeSeries
                 Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
@@ -495,20 +521,20 @@ Public Class BlueMSim
     '*****************************************
     Private Function Read_PRB(ByVal DateiPfad As String, ByVal ZielGr As String, ByRef PRB(,) As Object) As Boolean
 
-    Dim ZeileStart As Integer = 0
-    Dim AnzZeil As Integer = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
-    Dim j As Integer = 0
-    Dim Zeile As String
+        Dim ZeileStart As Integer = 0
+        Dim AnzZeil As Integer = 26                   'Anzahl der Zeilen ist immer 26, definiert durch MAXSTZ in BM
+        Dim j As Integer = 0
+        Dim Zeile As String
         Read_PRB = True
 
-    Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-    Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-    Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+        Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
-    'Array redimensionieren
+        'Array redimensionieren
         ReDim PRB(AnzZeil - 1, 1)
 
-    'Anfangszeile suchen
+        'Anfangszeile suchen
         Do
             Zeile = StrRead.ReadLine.ToString
             If (Zeile.Contains("+ Wahrscheinlichkeitskeitsverteilung: " & ZielGr)) Then
@@ -516,7 +542,7 @@ Public Class BlueMSim
             End If
         Loop Until StrRead.Peek() = -1
 
-    'Zeile mit Spaltenüberschriften überspringen
+        'Zeile mit Spaltenüberschriften überspringen
         Zeile = StrRead.ReadLine.ToString
 
         For j = 0 To AnzZeil - 1
@@ -528,19 +554,19 @@ Public Class BlueMSim
         StrRead.Close()
         FiStr.Close()
 
-    'Überflüssige Stützstellen (P) entfernen
-    '---------------------------------------
-    'Anzahl Stützstellen bestimmen
-    Dim stuetz As Integer = 0
-    Dim P_vorher As Double = -99
+        'Überflüssige Stützstellen (P) entfernen
+        '---------------------------------------
+        'Anzahl Stützstellen bestimmen
+        Dim stuetz As Integer = 0
+        Dim P_vorher As Double = -99
         For j = 0 To PRB.GetUpperBound(0)
             If (j = 0 Or Not PRB(j, 1) = P_vorher) Then
                 stuetz += 1
                 P_vorher = PRB(j, 1)
             End If
         Next
-    'Werte in neues Array schreiben
-    Dim PRBtmp(stuetz - 1, 1) As Object
+        'Werte in neues Array schreiben
+        Dim PRBtmp(stuetz - 1, 1) As Object
         stuetz = 0
         For j = 0 To PRB.GetUpperBound(0)
             If (j = 0 Or Not PRB(j, 1) = P_vorher) Then

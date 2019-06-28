@@ -29,6 +29,7 @@ Imports System.IO
 Imports System.Threading
 Imports System.Globalization
 Imports BlueM
+Imports BlueM.Opt.Common
 
 ''' <summary>
 ''' Class TALSIM for carrying out simulations using TALSIM
@@ -190,7 +191,7 @@ Public Class Talsim
 
             If line.Length = 0 Then Continue Do
 
-            If line.Contains("=") And Not (line.StartsWith("*") Or line.StartsWith("#") Or line.StartsWith("["))
+            If line.Contains("=") And Not (line.StartsWith("*") Or line.StartsWith("#") Or line.StartsWith("[")) Then
                 kvp = line.Split("=")
                 settings.Add(kvp(0).ToUpper(), kvp(1).ToUpper())
             End If
@@ -202,7 +203,7 @@ Public Class Talsim
         If Not settings.ContainsKey("WEL") Then
             Throw New Exception("Key ""WEL"" not found in .ALL file!")
         End If
-        If Not settings("WEL") = "J"
+        If Not settings("WEL") = "J" Then
             Throw New Exception("Die Ganglinienausgabe ist in der .ALL Datei nicht eingeschaltet! Es muss 'WEL=J' eingestellt sein!")
         End If
 
@@ -211,8 +212,8 @@ Public Class Talsim
             Throw New Exception("Key ""SimStart"" and/or ""SimEnd"" not found in .ALL file!")
         End If
         'store SimStart and SimEnd
-        Me.SimStart = DateTime.ParseExact(settings("SIMSTART"), dateformat, New NumberformatInfo())
-        Me.SimEnde = DateTime.ParseExact(settings("SIMEND"), dateformat, New NumberformatInfo())
+        Me.SimStart = DateTime.ParseExact(settings("SIMSTART"), dateformat, New NumberFormatInfo())
+        Me.SimEnde = DateTime.ParseExact(settings("SIMEND"), dateformat, New NumberFormatInfo())
 
         If Not settings.ContainsKey("TIMESTEP_MIN") Then
             Throw New Exception("Key ""TimeStep_min"" not found in .ALL file!")
@@ -420,16 +421,39 @@ Public Class Talsim
     ''' <remarks></remarks>
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
-        'TODO: hier nur die Reihen einlesen, die auch für objfunctions gebraucht werden
-
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
 
+        'Benötigte SimReihen zusammenstellen
+        'TODO: das braucht eigentlich nicht nach jeder Simulation nochmal neu getan zu werden
+        Dim SimReihen As New Dictionary(Of String, List(Of String)) '{file: [series]}
+        SimReihen.Add("WEL", New List(Of String))
+        If Me.useKWL Then
+            SimReihen.Add("KTR.WEL", New List(Of String))
+        End If
+        If Me.useTEMPWEL Then
+            SimReihen.Add("TEMP.WEL", New List(Of String))
+        End If
+        For Each objfunc As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+            If objfunc.GetObjType = ObjectiveFunction.ObjectiveType.Series Or _
+                objfunc.GetObjType = ObjectiveFunction.ObjectiveType.ValueFromSeries Then
+                If Not SimReihen(objfunc.Datei.ToUpper()).Contains(objfunc.SimGr) Then
+                    SimReihen(objfunc.Datei.ToUpper()).Add(objfunc.SimGr)
+                End If
+            End If
+        Next
+
         'WEL-Datei einlesen
         '------------------
-        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir_Current & Me.Datensatz & ".WEL", True)
+        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir_Current & Me.Datensatz & ".WEL")
 
-        'Reihen zu Simulationsergebnis hinzufügen
+        'Benötigte Reihen für Import selektieren
+        For Each series As String In SimReihen("WEL")
+            WELtmp.selectSeries(series)
+        Next
+        'Datei einlesen
+        WELtmp.Read_File()
+        'Zeitreihen übernehmen
         For Each zre As Wave.TimeSeries In WELtmp.TimeSeries
             Me.SimErgebnis.Reihen.Add(zre.Title, zre)
         Next
@@ -438,9 +462,15 @@ Public Class Talsim
         '-----------------------
         If (Me.useKWL) Then
             Dim KWLpath As String = Me.WorkDir_Current & Me.Datensatz & ".KTR.WEL"
-            Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath, True)
+            Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath)
 
-            'Reihen zu Simulationsergebnis hinzufügen
+            'Benötigte Reihen für Import selektieren
+            For Each series As String In SimReihen("KTR.WEL")
+                KWLtmp.selectSeries(series)
+            Next
+            'Datei einlesen
+            KWLtmp.Read_File()
+            'Zeitreihen übernehmen
             For Each zre As Wave.TimeSeries In KWLtmp.TimeSeries
                 Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
@@ -450,9 +480,15 @@ Public Class Talsim
         '----------------------------
         If (Me.useTEMPWEL) Then
             Dim TEMPWELpath As String = Me.WorkDir_Current & Me.Datensatz & ".TEMP.WEL"
-            Dim tempwel As Wave.WEL = New Wave.WEL(TEMPWELpath, True)
+            Dim tempwel As Wave.WEL = New Wave.WEL(TEMPWELpath)
 
-            'Reihen zu Simulationsergebnis hinzufügen
+            'Benötigte Reihen für Import selektieren
+            For Each series As String In SimReihen("TEMP.WEL")
+                tempwel.selectSeries(series)
+            Next
+            'Datei einlesen
+            tempwel.Read_File()
+            'Zeitreihen übernehmen
             For Each zre As Wave.TimeSeries In tempwel.TimeSeries
                 Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
