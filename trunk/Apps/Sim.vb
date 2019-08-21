@@ -860,7 +860,8 @@ Public MustInherit Class Sim
                 Throw New Exception("Der ganzzahlige Teil des Modellparameters '" & Me.mProblem.List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
             End If
             'Anzahl verfügbarer Nachkommastellen = (Anzahl Zeichen) - (Anzahl Vorkommastellen) - (Punkt)
-            AnzNachkomma = AnzZeichen - WertStr.Length - 1
+            'Math.Round() akzeptiert max 15 Nachkommastellen
+            AnzNachkomma = Math.Min(AnzZeichen - WertStr.Length - 1, 15)
             'Bei negativen Werten noch ein Zeichen für das Minuszeichen abziehen
             If Me.Akt.ModPara(i) < 0 Then
                 AnzNachkomma -= 1
