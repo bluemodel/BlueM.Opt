@@ -176,8 +176,6 @@ Public Class Talsim
         Dim kvp As String()
         Dim settings As New Dictionary(Of String, String)
 
-        Const dateformat As String = "dd.MM.yyyy HH:mm"
-
         'open the .ALL file
         '------------------
         Dim Datei As String = Me.WorkDir_Original & Me.Datensatz & ".ALL"
@@ -211,9 +209,20 @@ Public Class Talsim
         If Not settings.ContainsKey("SIMSTART") Or Not settings.ContainsKey("SIMEND") Then
             Throw New Exception("Key ""SimStart"" and/or ""SimEnd"" not found in .ALL file!")
         End If
-        'store SimStart and SimEnd
-        Me.SimStart = DateTime.ParseExact(settings("SIMSTART"), dateformat, New NumberFormatInfo())
-        Me.SimEnde = DateTime.ParseExact(settings("SIMEND"), dateformat, New NumberFormatInfo())
+        'parse and store SimStart and SimEnd
+        'date format can be "dd.MM.yyyy HH:mm" or "dd/MM/yyyy HH:mm"
+        Me.SimStart = New DateTime(settings("SIMSTART").Substring(6, 4), _
+                                   settings("SIMSTART").Substring(3, 2), _
+                                   settings("SIMSTART").Substring(0, 2), _
+                                   settings("SIMSTART").Substring(11, 2), _
+                                   settings("SIMSTART").Substring(14, 2), _
+                                   0)
+        Me.SimEnde = New DateTime(settings("SIMEND").Substring(6, 4), _
+                                   settings("SIMEND").Substring(3, 2), _
+                                   settings("SIMEND").Substring(0, 2), _
+                                   settings("SIMEND").Substring(11, 2), _
+                                   settings("SIMEND").Substring(14, 2), _
+                                   0)
 
         If Not settings.ContainsKey("TIMESTEP_MIN") Then
             Throw New Exception("Key ""TimeStep_min"" not found in .ALL file!")
