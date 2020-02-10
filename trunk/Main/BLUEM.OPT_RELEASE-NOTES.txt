@@ -5,6 +5,7 @@ Version 1.7.1
 -------------
 CHANGED:
 * Objective function values of functions that are to be maximized are no longer displayed as negative values (#724)
+* TALSIM-NG: updated sydrodomain.ini and engine to v3.1.1.1
 FIXED:
 * TALSIM-NG: support different possible date formats in the ALL file
 
