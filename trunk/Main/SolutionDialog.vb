@@ -187,7 +187,7 @@ Partial Public Class SolutionDialog
 
         'Ziele
         For Each featurevalue As Double In ind.Objectives
-            cellvalues(i) = featurevalue
+            cellvalues(i) = featurevalue * Me.mProblem.List_ObjectiveFunctions(i - 1).Richtung
             i += 1
         Next
 
@@ -236,7 +236,7 @@ Partial Public Class SolutionDialog
 
         'Ziele
         For Each featurevalue As Double In ind.Objectives
-            cellvalues(i) = featurevalue
+            cellvalues(i) = featurevalue * Me.mProblem.List_ObjectiveFunctions(i - 1).Richtung
             i += 1
         Next
 

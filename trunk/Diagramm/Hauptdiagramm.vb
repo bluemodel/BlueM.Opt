@@ -177,11 +177,11 @@ Public Class Hauptdiagramm
             End If
             Select Case Me.mProblem.Method
                 Case BlueM.Opt.Common.METH_PES
-                    Call serie.Add(runde * Me.mSettings.PES.N_Gen * Me.mSettings.PES.N_Nachf + gen * Me.mSettings.PES.N_Nachf + nachf, ind.PrimObjectives(0), ind.ID.ToString(), Farbe)
+                    Call serie.Add(runde * Me.mSettings.PES.N_Gen * Me.mSettings.PES.N_Nachf + gen * Me.mSettings.PES.N_Nachf + nachf, ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.ID.ToString(), Farbe)
                 Case BlueM.Opt.Common.METH_HYBRID, BlueM.Opt.Common.METH_CES
-                    Call serie.Add(runde * Me.mSettings.CES.N_Generations * Me.mSettings.CES.N_Children + gen * Me.mSettings.CES.N_Children + nachf, ind.PrimObjectives(0), ind.ID.ToString(), Farbe)
+                    Call serie.Add(runde * Me.mSettings.CES.N_Generations * Me.mSettings.CES.N_Children + gen * Me.mSettings.CES.N_Children + nachf, ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.ID.ToString(), Farbe)
                 Case BlueM.Opt.Common.METH_METAEVO
-                    Call serie.Add(runde * Me.mSettings.MetaEvo.NumberGenerations * Me.mSettings.MetaEvo.PopulationSize + gen * Me.mSettings.MetaEvo.PopulationSize + nachf, ind.PrimObjectives(0), ind.ID.ToString(), Farbe)
+                    Call serie.Add(runde * Me.mSettings.MetaEvo.NumberGenerations * Me.mSettings.MetaEvo.PopulationSize + gen * Me.mSettings.MetaEvo.PopulationSize + nachf, ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.ID.ToString(), Farbe)
                 Case Else
                     Throw New Exception("Drawing function not defined for this single objective method!")
             End Select
@@ -196,7 +196,7 @@ Public Class Hauptdiagramm
                 Else
                     serie = Me.getSeriesPoint("Population", "Orange", , , ColEach)
                 End If
-                Call serie.Add(ind.PrimObjectives(0), ind.PrimObjectives(1), ind.ID.ToString(), Farbe)
+                Call serie.Add(ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.PrimObjectives(1) * Me.mProblem.List_PrimObjectiveFunctions(1).Richtung, ind.ID.ToString(), Farbe)
 
             Else
                 '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
@@ -207,7 +207,7 @@ Public Class Hauptdiagramm
                 Else
                     serie3D = Me.getSeries3DPoint("Population", "Orange", , , ColEach)
                 End If
-                Call serie3D.Add(ind.PrimObjectives(0), ind.PrimObjectives(1), ind.PrimObjectives(2), ind.ID.ToString(), Farbe)
+                Call serie3D.Add(ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.PrimObjectives(1) * Me.mProblem.List_PrimObjectiveFunctions(1).Richtung, ind.PrimObjectives(2) * Me.mProblem.List_PrimObjectiveFunctions(2).Richtung, ind.ID.ToString(), Farbe)
             End If
         End If
     End Sub
@@ -233,7 +233,7 @@ Public Class Hauptdiagramm
             'SingleObjective
             'xxxxxxxxxxxxxxx
             serie = Me.getSeriesPoint("Start value", farbe)
-            Call serie.Add(1, ind.PrimObjectives(0), ind.ID.ToString())
+            Call serie.Add(1, ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.ID.ToString())
         Else
             'MultiObjective
             'xxxxxxxxxxxxxx
@@ -241,14 +241,14 @@ Public Class Hauptdiagramm
                 '2D-Diagramm
                 '------------------------------------------------------------------------
                 serie = Me.getSeriesPoint("Start value", farbe)
-                Call serie.Add(ind.PrimObjectives(0), ind.PrimObjectives(1), ind.ID.ToString())
+                Call serie.Add(ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.PrimObjectives(1) * Me.mProblem.List_PrimObjectiveFunctions(1).Richtung, ind.ID.ToString())
 
             Else
                 '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                 '------------------------------------------------------------------------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
                 serie3D = Me.getSeries3DPoint("Start value", farbe)
-                Call serie3D.Add(ind.PrimObjectives(0), ind.PrimObjectives(1), ind.PrimObjectives(2), ind.ID.ToString())
+                Call serie3D.Add(ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.PrimObjectives(1) * Me.mProblem.List_PrimObjectiveFunctions(1).Richtung, ind.PrimObjectives(2) * Me.mProblem.List_PrimObjectiveFunctions(2).Richtung, ind.ID.ToString())
             End If
         End If
     End Sub
@@ -274,9 +274,9 @@ Public Class Hauptdiagramm
             serie_inv.Clear()
             For i = 0 To values.GetUpperBound(0)
                 If pop(i).Is_Feasible Then
-                    serie.Add(values(i, 0), values(i, 1), pop(i).ID.ToString())
+                    serie.Add(values(i, 0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, values(i, 1) * Me.mProblem.List_PrimObjectiveFunctions(1).Richtung, pop(i).ID.ToString())
                 Else
-                    serie_inv.Add(values(i, 0), values(i, 1), pop(i).ID.ToString())
+                    serie_inv.Add(values(i, 0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, values(i, 1) * Me.mProblem.List_PrimObjectiveFunctions(1).Richtung, pop(i).ID.ToString())
                 End If
 
             Next i
@@ -290,9 +290,9 @@ Public Class Hauptdiagramm
             serie3D_inv.Clear()
             For i = 0 To values.GetUpperBound(0)
                 If pop(i).Is_Feasible Then
-                    serie3D.Add(values(i, 0), values(i, 1), values(i, 2), pop(i).ID.ToString())
+                    serie3D.Add(values(i, 0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, values(i, 1) * Me.mProblem.List_PrimObjectiveFunctions(1).Richtung, values(i, 2) * Me.mProblem.List_PrimObjectiveFunctions(2).Richtung, pop(i).ID.ToString())
                 Else
-                    serie3D_inv.Add(values(i, 0), values(i, 1), values(i, 2), pop(i).ID.ToString())
+                    serie3D_inv.Add(values(i, 0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, values(i, 1) * Me.mProblem.List_PrimObjectiveFunctions(1).Richtung, values(i, 2) * Me.mProblem.List_PrimObjectiveFunctions(2).Richtung, pop(i).ID.ToString())
                 End If
             Next i
         End If
@@ -354,7 +354,7 @@ Public Class Hauptdiagramm
                 colorline1.AllowDrag = False
                 colorline1.Draw3D = True
                 colorline1.Axis = Me.Axes.Bottom
-                colorline1.Value = Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).IstWert
+                colorline1.Value = Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).IstWert * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).Richtung
             End If
         End If
 
@@ -366,7 +366,7 @@ Public Class Hauptdiagramm
                 colorline1.AllowDrag = False
                 colorline1.Draw3D = True
                 colorline1.Axis = Me.Axes.Left
-                colorline1.Value = Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).IstWert
+                colorline1.Value = Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).IstWert * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Richtung
             End If
         End If
 
@@ -380,7 +380,7 @@ Public Class Hauptdiagramm
                 'colorline1.AllowDrag = False
                 'colorline1.Draw3D = True
                 'colorline1.Axis = Me.Axes.Depth
-                'colorline1.Value = Me.mProblem.List_Featurefunctions(Me.ZielIndexZ).IstWert
+                'colorline1.Value = Me.mProblem.List_Featurefunctions(Me.ZielIndexZ).IstWert * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Richtung
             End If
         End If
 
@@ -413,10 +413,10 @@ Public Class Hauptdiagramm
             serie.Marks.ArrowLength = 10
             If (Me.ZielIndexX = -1) Then
                 'X-Achse ist Simulations-ID (Single-Objective)
-                serie.Add(ind.ID, ind.Objectives(Me.ZielIndexY), ind.ID.ToString())
+                serie.Add(ind.ID, ind.Objectives(Me.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Richtung, ind.ID.ToString())
             Else
                 'X- und Y-Achsen sind beides Zielwerte
-                serie.Add(ind.Objectives(Me.ZielIndexX), ind.Objectives(Me.ZielIndexY), ind.ID.ToString())
+                serie.Add(ind.Objectives(Me.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).Richtung, ind.Objectives(Me.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Richtung, ind.ID.ToString())
             End If
 
         Else
@@ -424,7 +424,7 @@ Public Class Hauptdiagramm
             '-----------
             Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = Me.getSeries3DPoint("Selected solutions", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-            serie3D.Add(ind.Objectives(Me.ZielIndexX), ind.Objectives(Me.ZielIndexY), ind.Objectives(Me.ZielIndexZ), ind.ID.ToString())
+            serie3D.Add(ind.Objectives(Me.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).Richtung, ind.Objectives(Me.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Richtung, ind.Objectives(Me.ZielIndexZ) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Richtung, ind.ID.ToString())
             serie3D.Marks.Visible = True
             serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie3D.Marks.Transparency = 50
