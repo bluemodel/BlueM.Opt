@@ -1972,7 +1972,7 @@ Partial Public Class Form1
                                     serie = Me.Hauptdiagramm1.getSeriesPoint("Population (invalid)", "Gray")
                                 End If
                                 'Zeichnen
-                                serie.Add(ind.ID, ind.Objectives(Me.Hauptdiagramm1.ZielIndexX), ind.ID.ToString())
+                                serie.Add(ind.ID, ind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, ind.ID.ToString())
                             ElseIf (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                                 '2D
                                 '--
@@ -1983,7 +1983,7 @@ Partial Public Class Form1
                                     serie = Me.Hauptdiagramm1.getSeriesPoint("Population (invalid)", "Gray")
                                 End If
                                 'Zeichnen
-                                serie.Add(ind.Objectives(Me.Hauptdiagramm1.ZielIndexX), ind.Objectives(Me.Hauptdiagramm1.ZielIndexY), ind.ID.ToString())
+                                serie.Add(ind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, ind.Objectives(Me.Hauptdiagramm1.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Richtung, ind.ID.ToString())
                             Else
                                 '3D
                                 '--
@@ -1994,7 +1994,7 @@ Partial Public Class Form1
                                     serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Population (invalid)", "Gray")
                                 End If
                                 'Zeichnen
-                                serie3D.Add(ind.Objectives(Me.Hauptdiagramm1.ZielIndexX), ind.Objectives(Me.Hauptdiagramm1.ZielIndexY), ind.Objectives(Me.Hauptdiagramm1.ZielIndexZ), ind.ID.ToString())
+                                serie3D.Add(ind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, ind.Objectives(Me.Hauptdiagramm1.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Richtung, ind.Objectives(Me.Hauptdiagramm1.ZielIndexZ) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexZ).Richtung, ind.ID.ToString())
                             End If
 
                         Next
@@ -2012,12 +2012,12 @@ Partial Public Class Form1
                                 '2D
                                 '--
                                 serie = Me.Hauptdiagramm1.getSeriesPoint("Secondary population", "Green")
-                                serie.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY), sekpopind.ID.ToString())
+                                serie.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Richtung, sekpopind.ID.ToString())
                             Else
                                 '3D
                                 '--
                                 serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Secondary population", "Green")
-                                serie3D.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID.ToString())
+                                serie3D.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexZ) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexZ).Richtung, sekpopind.ID.ToString())
                             End If
                         Next
 
@@ -2050,14 +2050,14 @@ Partial Public Class Form1
                                 Dim serie2 As Steema.TeeChart.Styles.Points
                                 serie2 = Me.Hauptdiagramm1.getSeriesPoint("Nadir point", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
                                 serie2.Clear()
-                                serie2.Add(nadir(0), nadir(1), "Nadir point")
+                                serie2.Add(nadir(0) * Me.mProblem.List_ObjectiveFunctions(0).Richtung, nadir(1) * Me.mProblem.List_ObjectiveFunctions(1).Richtung, "Nadir point")
                             Else
                                 '3D
                                 '--
                                 Dim serie3 As Steema.TeeChart.Styles.Points3D
                                 serie3 = Me.Hauptdiagramm1.getSeries3DPoint("Nadir point", "Blue", Steema.TeeChart.Styles.PointerStyles.Diamond)
                                 serie3.Clear()
-                                serie3.Add(nadir(0), nadir(1), nadir(2), "Nadir point")
+                                serie3.Add(nadir(0) * Me.mProblem.List_ObjectiveFunctions(0).Richtung, nadir(1) * Me.mProblem.List_ObjectiveFunctions(1).Richtung, nadir(2) * Me.mProblem.List_ObjectiveFunctions(2).Richtung, "Nadir point")
                             End If
 
                             'Hypervolumen in Monitordiagramm eintragen
@@ -2141,12 +2141,12 @@ Partial Public Class Form1
                         '2D
                         '--
                         serie = Me.Hauptdiagramm1.getSeriesPoint("Comparison result", "Blue")
-                        serie.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY), "Vergleichsergebnis " & sekpopind.ID)
+                        serie.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Richtung, "Vergleichsergebnis " & sekpopind.ID)
                     Else
                         '3D
                         '--
                         serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Comparison result", "Blue")
-                        serie3D.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY), sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexZ), sekpopind.ID & " (Vergleichsergebnis)")
+                        serie3D.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexZ) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexZ).Richtung, sekpopind.ID & " (Vergleichsergebnis)")
                     End If
                 Next
 

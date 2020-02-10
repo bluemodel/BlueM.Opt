@@ -3,6 +3,8 @@ BlueM.Opt Release Notes
 ===============================================================
 Version 1.7.1
 -------------
+CHANGED:
+* Objective function values of functions that are to be maximized are no longer displayed as negative values (#724)
 FIXED:
 * TALSIM-NG: support different possible date formats in the ALL file
 
