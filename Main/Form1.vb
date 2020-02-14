@@ -184,7 +184,7 @@ Partial Public Class Form1
         '---------
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Anwendung.Items.Clear()
-        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SCAN, ANW_SWMM, ANW_TALSIM, ANW_TESTPROBLEMS, ANW_TSP}) 'ANW_SMUSI entfernt (Bug 265)
+        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SCAN, ANW_SWMM, ANW_TALSIM, ANW_TESTPROBLEMS, ANW_TSP, ANW_GENERIC}) 'ANW_SMUSI entfernt (Bug 265)
         Me.ComboBox_Anwendung.SelectedIndex = 0
 
         'Datensatz
@@ -532,6 +532,10 @@ Partial Public Class Form1
                     Me.ComboBox_Methode.Enabled = True
                     Me.ComboBox_Methode.SelectedIndex = 0
                     'Button_Start.Enabled = True
+
+                Case ANW_GENERIC 'Generic simulation application
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Sim1 = New BlueM.Opt.Apps.Generic()
 
             End Select
 
