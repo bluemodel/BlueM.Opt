@@ -1,20 +1,20 @@
 'BlueM.Opt
 'Copyright (C) BlueM Dev Group
 'Website: <https://www.bluemodel.org>
-'
+' 
 'This program is free software: you can redistribute it and/or modify
 'it under the terms of the GNU General Public License as published by
 'the Free Software Foundation, either version 3 of the License, or
 '(at your option) any later version.
-'
+' 
 'This program is distributed in the hope that it will be useful,
 'but WITHOUT ANY WARRANTY; without even the implied warranty of
 'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 'GNU General Public License for more details.
-'
+' 
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
-'
+' 
 Imports System.Xml
 Imports System.Xml.Serialization
 Imports BlueM.Opt.Common.Constants
@@ -145,7 +145,7 @@ Partial Public Class Form1
         '---------
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Anwendung.Items.Clear()
-        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SWMM, ANW_TALSIM, ANW_TALSIM5, ANW_TESTPROBLEMS, ANW_TSP}) 'ANW_SMUSI entfernt (#184)
+        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SWMM, ANW_TALSIM, ANW_TALSIM5, ANW_GENERIC, ANW_TESTPROBLEMS, ANW_TSP}) 'ANW_SMUSI entfernt (#184)
         Me.ComboBox_Anwendung.SelectedIndex = 0
 
         'Datensatz
@@ -304,8 +304,8 @@ Partial Public Class Form1
         If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
 
             Try
-                'Settings aus Datei laden
-                Call Me.loadSettings(OpenFileDialog1.FileName)
+            'Settings aus Datei laden
+            Call Me.loadSettings(OpenFileDialog1.FileName)
 
             Catch ex As Exception
                 MsgBox("Error while reading settings:" & ex.Message, MsgBoxStyle.Exclamation)
@@ -331,13 +331,13 @@ Partial Public Class Form1
             Throw New Exception("The loaded settings use a different optimization mode (single-/multiobjective) and are not compatible!")
         End If
 
-        'Geladene Settings überall neu setzen
+            'Geladene Settings überall neu setzen
         Me.mSettings = settings
-        Me.EVO_Einstellungen1.setSettings(Me.mSettings)
-        Me.Hauptdiagramm1.setSettings(Me.mSettings)
-        If (Not IsNothing(Me.Sim1)) Then
-            Me.Sim1.setSettings(Me.mSettings)
-        End If
+            Me.EVO_Einstellungen1.setSettings(Me.mSettings)
+            Me.Hauptdiagramm1.setSettings(Me.mSettings)
+            If (Not IsNothing(Me.Sim1)) Then
+                Me.Sim1.setSettings(Me.mSettings)
+            End If
 
     End Sub
 
@@ -471,6 +471,10 @@ Partial Public Class Form1
                     Me.ComboBox_Methode.Enabled = True
                     Me.ComboBox_Methode.SelectedIndex = 0
                     'Button_Start.Enabled = True
+
+                Case ANW_GENERIC 'Generic simulation application
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    Sim1 = New BlueM.Opt.Apps.Generic()
 
             End Select
 
@@ -616,7 +620,7 @@ Partial Public Class Form1
 
         'Alten Datensatz dem Dialog zuweisen
         If Not IsNothing(Sim1.WorkDir_Original) Then
-            OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
+        OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
             OpenFileDialog1.FileName = IO.Path.Combine(Sim1.WorkDir_Original, Sim1.Datensatz & "." & Sim1.DatensatzDateiendungen(0))
         End If
 
@@ -665,68 +669,68 @@ Partial Public Class Form1
 
         Try
 
-            'Zurücksetzen
-            '------------
+        'Zurücksetzen
+        '------------
 
-            'Tooltip
-            Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
+        'Tooltip
+        Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
 
-            'Datensatz-Reset
-            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
+        'Datensatz-Reset
+        Me.MenuItem_DatensatzZurücksetzen.Enabled = False
 
-            'gewählten Datensatz an Anwendung übergeben
-            '------------------------------------------
-            Select Case Me.Anwendung
+        'gewählten Datensatz an Anwendung übergeben
+        '------------------------------------------
+        Select Case Me.Anwendung
 
-                Case ANW_TESTPROBLEMS
+            Case ANW_TESTPROBLEMS
 
-                    'Testproblem setzen
-                    Testprobleme1.setTestproblem(selectedDatensatz)
+                'Testproblem setzen
+                Testprobleme1.setTestproblem(selectedDatensatz)
 
-                    'Tooltip anzeigen
-                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
+                'Tooltip anzeigen
+                Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
 
-                Case Else '(Alle Sim-Anwendungen)
+            Case Else '(Alle Sim-Anwendungen)
 
-                    'Benutzereinstellungen aktualisieren
-                    Try
-                        'place selected dataset at the end of the list
-                        If (My.Settings.MRUSimDatensaetze.Contains(selectedDatensatz)) Then
-                            My.Settings.MRUSimDatensaetze.Remove(selectedDatensatz)
-                        End If
-                        My.Settings.MRUSimDatensaetze.Add(selectedDatensatz)
-                        'save user settings
-                        Call My.Settings.Save()
-                    Catch ex As Exception
-                        'TODO: log My.Settings.MRUSimDatensaetze error
-                    End Try
+                'Benutzereinstellungen aktualisieren
+                Try
+                    'place selected dataset at the end of the list
+                    If (My.Settings.MRUSimDatensaetze.Contains(selectedDatensatz)) Then
+                        My.Settings.MRUSimDatensaetze.Remove(selectedDatensatz)
+                    End If
+                    My.Settings.MRUSimDatensaetze.Add(selectedDatensatz)
+                    'save user settings
+                    Call My.Settings.Save()
+                Catch ex As Exception
+                    'TODO: log My.Settings.MRUSimDatensaetze error
+                End Try
 
-                    'Datensatz Combobox aktualisieren
-                    Call Me.Datensatz_populateCombo()
+                'Datensatz Combobox aktualisieren
+                Call Me.Datensatz_populateCombo()
 
-                    'Auswahl setzen (falls von ausserhalb)
-                    Me.IsInitializing = True
-                    Me.ComboBox_Datensatz.SelectedItem = selectedDatensatz
-                    Me.IsInitializing = False
+                'Auswahl setzen (falls von ausserhalb)
+                Me.IsInitializing = True
+                Me.ComboBox_Datensatz.SelectedItem = selectedDatensatz
+                Me.IsInitializing = False
 
-                    'Datensatz setzen
-                    Call Sim1.setDatensatz(selectedDatensatz)
+                'Datensatz setzen
+                Call Sim1.setDatensatz(selectedDatensatz)
 
-                    'Tooltip anzeigen
-                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, selectedDatensatz)
+                'Tooltip anzeigen
+                Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, selectedDatensatz)
 
-            End Select
+        End Select
 
-            'Methodenauswahl aktivieren und zurücksetzen
-            '-------------------------------------------
-            Me.Label_Methode.Enabled = True
-            Me.ComboBox_Methode.Enabled = True
-            Me.IsInitializing = True
-            Me.ComboBox_Methode.SelectedItem = ""
-            Me.IsInitializing = False
+        'Methodenauswahl aktivieren und zurücksetzen
+        '-------------------------------------------
+        Me.Label_Methode.Enabled = True
+        Me.ComboBox_Methode.Enabled = True
+        Me.IsInitializing = True
+        Me.ComboBox_Methode.SelectedItem = ""
+        Me.IsInitializing = False
 
-            'Progress zurücksetzen
-            Call Me.mProgress.Initialize()
+        'Progress zurücksetzen
+        Call Me.mProgress.Initialize()
 
             'log
             Common.Log.AddMessage(Common.Log.levels.info, $"Set dataset to {selectedDatensatz}")
@@ -1595,7 +1599,7 @@ Partial Public Class Form1
             'select solution in the custom plot
             If (Not IsNothing(Me.customPlot)) Then
                 Call Me.customPlot.showSelectedSolution(ind)
-            End If
+        End If
         End If
 
         'Lösungsdialog nach vorne bringen
@@ -1819,30 +1823,30 @@ Partial Public Class Form1
 
         Try
 
-            'Datei-öffnen Dialog anzeigen
-            Me.OpenFileDialog1.Filter = "Access databases (*.mdb)|*.mdb"
-            Me.OpenFileDialog1.Title = "Select result DB"
-            Me.OpenFileDialog1.FileName = ""
-            Me.OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-            diagresult = Me.OpenFileDialog1.ShowDialog()
+        'Datei-öffnen Dialog anzeigen
+        Me.OpenFileDialog1.Filter = "Access databases (*.mdb)|*.mdb"
+        Me.OpenFileDialog1.Title = "Select result DB"
+        Me.OpenFileDialog1.FileName = ""
+        Me.OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
+        diagresult = Me.OpenFileDialog1.ShowDialog()
+
+        If (diagresult = Windows.Forms.DialogResult.OK) Then
+
+            sourceFile = Me.OpenFileDialog1.FileName
+
+            'MDBImportDialog
+            '---------------
+            Dim importDialog As New BlueM.Opt.OptResult.MDBImportDialog(Me.mProblem)
+
+            diagresult = importDialog.ShowDialog()
 
             If (diagresult = Windows.Forms.DialogResult.OK) Then
 
-                sourceFile = Me.OpenFileDialog1.FileName
+                'Cursor Wait
+                Cursor = Cursors.WaitCursor
 
-                'MDBImportDialog
-                '---------------
-                Dim importDialog As New BlueM.Opt.OptResult.MDBImportDialog(Me.mProblem)
-
-                diagresult = importDialog.ShowDialog()
-
-                If (diagresult = Windows.Forms.DialogResult.OK) Then
-
-                    'Cursor Wait
-                    Cursor = Cursors.WaitCursor
-
-                    'Daten einlesen
-                    '==============
+                'Daten einlesen
+                '==============
                     Sim1.OptResult = New OptResult.OptResult(sourceFile, Me.mProblem, createNewMdb:=False)
                     Sim1.OptResult.db_load(sourceFile)
 
@@ -2023,8 +2027,8 @@ Partial Public Class Form1
                     'Start-Button deaktivieren
                     Me.Button_Start.Enabled = False
 
-                    'Simulationen vorbereiten (weil möglicherweise vorher noch nicht geschehen!)
-                    Call Me.Sim1.prepareSimulation()
+                'Simulationen vorbereiten (weil möglicherweise vorher noch nicht geschehen!)
+                Call Me.Sim1.prepareSimulation()
 
                 End If
 
@@ -2035,8 +2039,8 @@ Partial Public Class Form1
 
         Finally
 
-            'Cursor Default
-            Cursor = Cursors.Default
+                'Cursor Default
+                Cursor = Cursors.Default
 
         End Try
 
@@ -2052,32 +2056,32 @@ Partial Public Class Form1
 
         Try
 
-            'Datei-öffnen Dialog anzeigen
-            Me.OpenFileDialog1.Filter = "Access-Database (*.mdb)|*.mdb"
-            Me.OpenFileDialog1.Title = "Result comparison: select optimization result"
-            Me.OpenFileDialog1.FileName = ""
-            Me.OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-            diagresult = Me.OpenFileDialog1.ShowDialog()
+        'Datei-öffnen Dialog anzeigen
+        Me.OpenFileDialog1.Filter = "Access-Database (*.mdb)|*.mdb"
+        Me.OpenFileDialog1.Title = "Result comparison: select optimization result"
+        Me.OpenFileDialog1.FileName = ""
+        Me.OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
+        diagresult = Me.OpenFileDialog1.ShowDialog()
 
-            If (diagresult = Windows.Forms.DialogResult.OK) Then
+        If (diagresult = Windows.Forms.DialogResult.OK) Then
 
-                sourceFile = Me.OpenFileDialog1.FileName
+            sourceFile = Me.OpenFileDialog1.FileName
 
-                'Abfrage
-                diagresult = MsgBox("Should the optimization parameters of the comparison result be loaded as well?" & eol _
+            'Abfrage
+            diagresult = MsgBox("Should the optimization parameters of the comparison result be loaded as well?" & eol _
                                 & "(This requires that the optimization parameter definition of both results are identical!)", MsgBoxStyle.YesNo)
 
-                If (diagresult = Windows.Forms.DialogResult.Yes) Then
-                    loadOptparameters = True
-                Else
-                    loadOptparameters = False
-                End If
+            If (diagresult = Windows.Forms.DialogResult.Yes) Then
+                loadOptparameters = True
+            Else
+                loadOptparameters = False
+            End If
 
-                'Cursor Wait
-                Cursor = Cursors.WaitCursor
+            'Cursor Wait
+            Cursor = Cursors.WaitCursor
 
-                'Daten einlesen
-                '==============
+            'Daten einlesen
+            '==============
                 Sim1.OptResultRef = New BlueM.Opt.OptResult.OptResult(Me.Sim1.Datensatz, Me.mProblem, createNewMdb:=False)
                 Sim1.OptResultRef.db_load(sourceFile, loadOptparameters)
 
@@ -2137,8 +2141,8 @@ Partial Public Class Form1
 
                     'Anzeige in Messagebox
                     MsgBox("Hypervolume difference to comparison result:" & eol _
-                        & indicatorDiff.ToString() & eol _
-                        & "(Value was copied to the clipboard)", MsgBoxStyle.Information, "Hypervolume")
+                            & indicatorDiff.ToString() & eol _
+                            & "(Value was copied to the clipboard)", MsgBoxStyle.Information, "Hypervolume")
 
                 End If
 

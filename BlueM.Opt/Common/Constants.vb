@@ -41,6 +41,7 @@ Public Module Constants
     Public Const ANW_TALSIM5 As String = "TALSIM5"
     Public Const ANW_TESTPROBLEMS As String = "Testproblems"
     Public Const ANW_TSP As String = "Traveling Salesman"
+    Public Const ANW_GENERIC As String = "Generic"
 
     'Optimierungsmethoden
     Public Const METH_PES As String = "PES"
