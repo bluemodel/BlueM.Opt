@@ -55,9 +55,9 @@ Public Class Problem
     ''' </summary>
     Public Const FILEEXT_MOD As String = "MOD"
     ''' <summary>
-    ''' Erweiterung der Datei mit den Zielfunktionen (*.ZIE)
+    ''' Erweiterung der Datei mit den Zielfunktionen (*.OBF)
     ''' </summary>
-    Public Const FILEEXT_ZIE As String = "ZIE"
+    Public Const FILEEXT_OBF As String = "OBF"
     ''' <summary>
     ''' Erweiterung der Datei mit den Constraints (*.CON)
     ''' </summary>
@@ -333,7 +333,7 @@ Public Class Problem
         'EVO-Eingabedateien einlesen
         '---------------------------
         'Zielfunktionen einlesen
-        Call Me.Read_ZIE(simstart, simende)
+        Call Me.Read_OBF(simstart, simende)
 
         'Constraints einlesen
         Call Me.Read_CON(simstart, simende)
@@ -501,27 +501,34 @@ Public Class Problem
     End Sub
 
     ''' <summary>
-    ''' ObjectiveFunctions (*.ZIE) einlesen
+    ''' ObjectiveFunctions (*.OBF) einlesen
     ''' </summary>
     ''' <param name="SimStart">Startzeitpunkt der Simulation</param>
     ''' <param name="SimEnde">Endzeitpunkt der Simulation</param>
-    ''' <remarks>http://wiki.bluemodel.org/index.php/ZIE-Datei</remarks>
-    Private Sub Read_ZIE(ByVal SimStart As DateTime, ByVal SimEnde As DateTime)
+    ''' <remarks>http://wiki.bluemodel.org/index.php/OBF-file</remarks>
+    Private Sub Read_OBF(ByVal SimStart As DateTime, ByVal SimEnde As DateTime)
 
-        Const AnzSpalten_ObjFSeries As Integer = 13                 'Anzahl Spalten Reihenvergleich in der ZIE-Datei
-        Const AnzSpalten_ObjFValue As Integer = 12                  'Anzahl Spalten Wertevergleich in der ZIE-Datei
-        Const AnzSpalten_ObjFValueFromSeries As Integer = 13        'Anzahl Spalten Reihenwertevergleich in der ZIE-Datei
-        Const AnzSpalten_ObjFAggregate As Integer = 5               'Anzahl Spalten Aggregierte Ziele in der ZIE-Datei
-        Const AnzSpalten_ObjFSKos As Integer = 5                    'Anzahl Spalten SKos in der ZIE-Datei
-        Const AnzSpalten_ObjFEcology As Integer = 5                 'Anzahl Spalten SKos in der ZIE-Datei
+        Const AnzSpalten_ObjFSeries As Integer = 13                 'Anzahl Spalten Reihenvergleich in der OBF-Datei
+        Const AnzSpalten_ObjFValue As Integer = 12                  'Anzahl Spalten Wertevergleich in der OBF-Datei
+        Const AnzSpalten_ObjFValueFromSeries As Integer = 13        'Anzahl Spalten Reihenwertevergleich in der OBF-Datei
+        Const AnzSpalten_ObjFAggregate As Integer = 5               'Anzahl Spalten Aggregierte Ziele in der OBF-Datei
+        Const AnzSpalten_ObjFSKos As Integer = 5                    'Anzahl Spalten SKos in der OBF-Datei
+        Const AnzSpalten_ObjFEcology As Integer = 5                 'Anzahl Spalten SKos in der OBF-Datei
 
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
 
+        'Path to file
+        Dim filepath As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_OBF
+
+        'Catch files with the old file extension ".ZIE" (used in v1.7 and older)
+        If Not System.IO.File.Exists(filepath) And IO.File.Exists(Me.mWorkDir & Me.Datensatz & ".ZIE") Then
+            Throw New Exception("Please rename the input file for the objective functions from '" & Me.Datensatz & ".ZIE' to '" & Me.Datensatz & "." & FILEEXT_OBF & "'." & eol & "The file extension has changed since v1.8")
+        End If
+
         'Open the file
-        Dim ZIE_Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_ZIE
-        Dim FiStr As New FileStream(ZIE_Datei, FileMode.Open, IO.FileAccess.Read)
+        Dim FiStr As New FileStream(filepath, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         ReDim Me.List_ObjectiveFunctions(-1)
@@ -568,14 +575,14 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFSeries + 1) Then
-                            Throw New Exception("The block ""Series"" in the ZIE input file has the wrong number of columns!")
+                            Throw New Exception("The block ""Series"" in the OBF input file has the wrong number of columns!")
                         End If
 
                         'ObjectiveFunction instanzieren
                         Dim Objective_Series As New Common.ObjectiveFunction_Series()
 
                         'Gemeinsame Spalten einlesen
-                        Call Me.Read_ZIE_CommonColumns(Objective_Series, Zeile)
+                        Call Me.Read_OBF_CommonColumns(Objective_Series, Zeile)
 
                         'Restliche Spalten einlesen
                         With Objective_Series
@@ -619,14 +626,14 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValue + 1) Then
-                            Throw New Exception("The block ""Values"" in the ZIE input file has the wrong number of columns!")
+                            Throw New Exception("The block ""Values"" in the OBF input file has the wrong number of columns!")
                         End If
 
                         'ObjectiveFunction instanzieren
                         Dim Objective_Value As New Common.Objectivefunction_Value()
 
                         'Gemeinsame Spalten einlesen
-                        Call Me.Read_ZIE_CommonColumns(Objective_Value, Zeile)
+                        Call Me.Read_OBF_CommonColumns(Objective_Value, Zeile)
 
                         'Restliche Spalten einlesen
                         With Objective_Value
@@ -659,14 +666,14 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValueFromSeries + 1) Then
-                            Throw New Exception("The block ""ValueFromSeries"" in the ZIE input file has the wrong number of columns!")
+                            Throw New Exception("The block ""ValueFromSeries"" in the OBF input file has the wrong number of columns!")
                         End If
 
                         'ObjectiveFunction instanzieren
                         Dim Objective_ValueFromSeries As New Common.ObjectiveFunction_ValueFromSeries()
 
                         'Gemeinsame Spalten einlesen
-                        Call Me.Read_ZIE_CommonColumns(Objective_ValueFromSeries, Zeile)
+                        Call Me.Read_OBF_CommonColumns(Objective_ValueFromSeries, Zeile)
 
                         'Restliche Spalten einlesen
                         With Objective_ValueFromSeries
@@ -710,7 +717,7 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFSKos + 1) Then
-                            Throw New Exception("The block ""SKos"" in the ZIE input file has the wrong number of columns!")
+                            Throw New Exception("The block ""SKos"" in the OBF input file has the wrong number of columns!")
                         End If
 
                         'Spalten einlesen
@@ -753,7 +760,7 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFEcology + 1) Then
-                            Throw New Exception("The block ""Ecology"" in the ZIE input file has the wrong number of columns!")
+                            Throw New Exception("The block ""Ecology"" in the OBF input file has the wrong number of columns!")
                         End If
 
                         'Spalten einlesen
@@ -794,7 +801,7 @@ Public Class Problem
 
                         'Kontrolle
                         If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFAggregate + 1) Then
-                            Throw New Exception("The block ""Aggregate"" in the ZIE input file has the wrong number of columns!")
+                            Throw New Exception("The block ""Aggregate"" in the OBF input file has the wrong number of columns!")
                         End If
 
                         'ObjectiveFunction instanzieren
@@ -834,7 +841,7 @@ Public Class Problem
 
                     Case Else
 
-                        Throw New Exception("Could not read the ZIE file! Please check the file format.")
+                        Throw New Exception("Could not read the OBF file! Please check the file format.")
 
                 End Select
 
@@ -856,12 +863,12 @@ Public Class Problem
     End Sub
 
     ''' <summary>
-    ''' Liest die Spalten 1 bis 8 der ZIE-Datei ein
+    ''' Liest die Spalten 1 bis 8 der OBF-Datei ein
     ''' </summary>
     ''' <param name="objective">objective function in der die Werte abgelegt werden sollen</param>
-    ''' <param name="zeile">Zeile der ZIE-Datei</param>
+    ''' <param name="zeile">Zeile der OBF-Datei</param>
     ''' <remarks></remarks>
-    Private Sub Read_ZIE_CommonColumns(ByRef objective As BlueM.Opt.Common.ObjectiveFunction, ByVal zeile As String)
+    Private Sub Read_OBF_CommonColumns(ByRef objective As BlueM.Opt.Common.ObjectiveFunction, ByVal zeile As String)
 
         Dim WerteArray() As String
 
