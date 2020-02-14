@@ -1,0 +1,334 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FF1D5494-1205-4F3E-BD65-ADB8C6BD04D4}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ApplicationIcon>Resources\EVO.ico</ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>BlueM.Opt</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>WinExe</OutputType>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionStrict>Off</OptionStrict>
+    <RootNamespace>BlueM.Opt</RootNamespace>
+    <StartupObject>BlueM.Opt.My.MyApplication</StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <MyType>WindowsForms</MyType>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <PublishUrl>http://localhost/BlueM.Opt/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>..\..\bin\x86\Debug\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DefineConstants>Win32 = True</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>BlueM.Opt.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\..\bin\x86\Release\</OutputPath>
+    <DefineConstants>Win32 = True</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>BlueM.Opt.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\..\bin\x64\Debug\</OutputPath>
+    <DefineConstants>Win32 = True</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>BlueM.Opt.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>..\..\bin\x64\Release\</OutputPath>
+    <DefineConstants>Win32 = True</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>BlueM.Opt.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+    </Reference>
+    <Reference Include="TeeChart, Version=4.1.2011.4192, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Diagramm\Resources\TeeChart.dll</HintPath>
+    </Reference>
+    <ProjectReference Include="..\..\Wave\Wave.vbproj">
+      <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
+      <Name>Wave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Algos\DDS\DDS.csproj">
+      <Project>{9FA5A4C7-3AA9-420C-9F01-9F1683E36A79}</Project>
+      <Name>DDS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Algos\ES\ES.vbproj">
+      <Project>{58356A07-425E-4C91-ACB8-17B9286C9417}</Project>
+      <Name>ES</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Algos\HookeAndJeeves\HookeAndJeeves.vbproj">
+      <Project>{23224EFA-343B-4C13-AE6E-5D1D8A03007D}</Project>
+      <Name>HookeAndJeeves</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Algos\IController\IController.vbproj">
+      <Project>{1DBD183A-A900-4841-88FE-6258FD472C60}</Project>
+      <Name>IController</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Algos\MetaEvo\MetaEvo.csproj">
+      <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
+      <Name>MetaEvo</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Algos\SensiPlot\SensiPlot.vbproj">
+      <Project>{A9272445-616D-4B4F-ACFF-DE6F5591AF63}</Project>
+      <Name>SensiPlot</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Algos\TSP\TSP.vbproj">
+      <Project>{6FCD5583-4A2A-4298-8A48-D46FAEFC5D7C}</Project>
+      <Name>TSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Apps\BlueM.Opt.Apps.vbproj">
+      <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
+      <Name>BlueM.Opt.Apps</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\BlueM.Opt.Common.vbproj">
+      <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
+      <Name>BlueM.Opt.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Diagramm\BlueM.Opt.Diagramm.vbproj">
+      <Project>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</Project>
+      <Name>BlueM.Opt.Diagramm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MO_Indicators\MO_Indicators\BlueM.Opt.MO_Indicators.csproj">
+      <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
+      <Name>BlueM.Opt.MO_Indicators</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OptResult\BlueM.Opt.OptResult.vbproj">
+      <Project>{A7B7B98D-94BE-47DB-954F-BBA2C1F53663}</Project>
+      <Name>BlueM.Opt.OptResult</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutBox.Designer.vb">
+      <DependentUpon>AboutBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="AboutBox.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SolutionDialog.Designer.vb">
+      <DependentUpon>SolutionDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="SolutionDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EVO_Einstellungen.Designer.vb">
+      <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EVO_Einstellungen.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EVO_Opt_Verlauf.Designer.vb">
+      <DependentUpon>EVO_Opt_Verlauf.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EVO_Opt_Verlauf.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.vb">
+      <DependentUpon>Form1.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="EVO_Einstellungen.resX">
+      <DependentUpon>EVO_Einstellungen.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EVO_Opt_Verlauf.resX">
+      <DependentUpon>EVO_Opt_Verlauf.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resX">
+      <DependentUpon>Form1.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <SubType>Designer</SubType>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_excel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings+Settings_General.datasource" />
+    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_CES.datasource" />
+    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_DDS.datasource" />
+    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_HookeJeeves.datasource" />
+    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_MetaBlueM.Opt.datasource" />
+    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_PES+Settings_Pop.datasource" />
+    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_PES+Settings_Schrittweite.datasource" />
+    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_PES.datasource" />
+    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_Sensiplot.datasource" />
+    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_TSP.datasource" />
+    <None Include="My Project\Settings.settings">
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Resources\icon_png.png" />
+    <EmbeddedResource Include="AboutBox.resx">
+      <DependentUpon>AboutBox.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\licenses.licx" />
+    <EmbeddedResource Include="SolutionDialog.resx">
+      <DependentUpon>SolutionDialog.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Content Include="LICENSE.TXT">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </Content>
+    <Content Include="BLUEM.OPT_RELEASE-NOTES.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\BlueM.png" />
+    <None Include="Resources\chart_curve.png" />
+    <None Include="Resources\EVO.ico" />
+    <None Include="Resources\page_white.png" />
+    <None Include="Resources\table_row_delete.png" />
+    <None Include="Resources\table_lightning.png" />
+    <None Include="Resources\table_delete.png" />
+    <None Include="Resources\table.png" />
+    <None Include="Resources\page_white_put.png" />
+    <None Include="Resources\page_white_get.png" />
+    <None Include="Resources\wrench.png" />
+    <None Include="Resources\monitor.png" />
+    <None Include="Resources\database.png" />
+    <None Include="Resources\chart_curve_edit.png" />
+    <None Include="Resources\database_connect.png" />
+    <None Include="Resources\database_go.png" />
+    <None Include="Resources\database_save.png" />
+    <None Include="Resources\icon_teechart.png" />
+    <None Include="Resources\scatterplot.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>copy $(SolutionDir)Wave\lib\SydroZre\SydroZreI.dll $(TargetDir)SydroZreI.dll
+copy $(SolutionDir)Wave\lib\IntelFortran\libifcoremd.dll $(TargetDir)libifcoremd.dll
+copy $(SolutionDir)Wave\lib\IntelFortran\libifportmd.dll $(TargetDir)libifportmd.dll
+copy $(SolutionDir)Wave\lib\IntelFortran\libmmd.dll $(TargetDir)libmmd.dll
+copy $(SolutionDir)Wave\lib\MathNet\MathNet.Numerics.license.txt $(TargetDir)MathNet.Numerics.license.txt
+copy $(SolutionDir)Wave\lib\Ionic.Zip\Ionic.Zip.license.txt $(TargetDir)Ionic.Zip.license.txt</PostBuildEvent>
+  </PropertyGroup>
+</Project>

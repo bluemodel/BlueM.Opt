@@ -1,0 +1,148 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{58356A07-425E-4C91-ACB8-17B9286C9417}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>BlueM.Opt.Algos.ES</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionStrict>Off</OptionStrict>
+    <RootNamespace>BlueM.Opt.Algos.ES</RootNamespace>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <MyType>Windows</MyType>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>Win32 = True</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>BlueM.Opt.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>Win32 = True</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>BlueM.Opt.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>Win32 = True</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>BlueM.Opt.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>Win32 = True</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DocumentationFile>BlueM.Opt.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="TeeChart, Version=4.1.2011.4192, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Diagramm\Resources\TeeChart.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ESController.vb" />
+    <Compile Include="Functions.vb" />
+    <Compile Include="Hypervolumen.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="PES.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CES.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Apps\BlueM.Opt.Apps.vbproj">
+      <Project>{2DCFE99E-CBFE-4CCC-93E7-A6D628B16DEC}</Project>
+      <Name>BlueM.Opt.Apps</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\BlueM.Opt.Common.vbproj">
+      <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>
+      <Name>BlueM.Opt.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Diagramm\BlueM.Opt.Diagramm.vbproj">
+      <Project>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</Project>
+      <Name>BlueM.Opt.Diagramm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MO_Indicators\MO_Indicators\BlueM.Opt.MO_Indicators.csproj">
+      <Project>{A56DFA12-8680-4C7A-B6BB-406D4D3FE156}</Project>
+      <Name>BlueM.Opt.MO_Indicators</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\OptResult\BlueM.Opt.OptResult.vbproj">
+      <Project>{A7B7B98D-94BE-47DB-954F-BBA2C1F53663}</Project>
+      <Name>BlueM.Opt.OptResult</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IController\IController.vbproj">
+      <Project>{1DBD183A-A900-4841-88FE-6258FD472C60}</Project>
+      <Name>IController</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
