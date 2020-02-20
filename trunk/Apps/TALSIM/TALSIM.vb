@@ -221,13 +221,16 @@ Public Class Talsim
                                    settings("SIMEND").Substring(11, 2), _
                                    settings("SIMEND").Substring(14, 2), _
                                    0)
-
         If Not settings.ContainsKey("TIMESTEP_MIN") Then
             Throw New Exception("Key ""TimeStep_min"" not found in .ALL file!")
         End If
         'store timestep length
         'TODO: what if TIMESTEP_MONTH=J?
         Me.SimDT = New TimeSpan(0, settings("TIMESTEP_MIN"), 0)
+
+        'WORKAROUND: Talsim always omits the last two timesteps from the results file.
+        'Subtract two timesteps from the simulation end in order to allow proper validation of input files
+        Me.SimEnde = Me.SimEnde - Me.SimDT - Me.SimDT
 
     End Sub
 
