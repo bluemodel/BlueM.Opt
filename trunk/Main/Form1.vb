@@ -573,8 +573,6 @@ Partial Public Class Form1
     '*********************
     Private Sub Datensatz_initUI()
 
-        Dim pfad As String
-
         'UI aktivieren
         Me.Label_Datensatz.Enabled = True
         Me.ComboBox_Datensatz.Enabled = True
@@ -609,20 +607,6 @@ Partial Public Class Form1
 
                 'Browse-Button aktivieren
                 Me.Button_BrowseDatensatz.Enabled = True
-
-                'zuletzt benutzten Datensatz setzen?
-                If (Me.ComboBox_Datensatz.Items.Count > 0) Then
-                    'obersten (zuletzt genutzten) Datensatz auswählen
-                    pfad = Me.ComboBox_Datensatz.Items(0)
-                    'Datensatz setzen
-                    Cursor = Cursors.WaitCursor
-                    Try
-                        Call Sim1.setDatensatz(pfad)
-                    Catch
-                        'failed
-                    End Try
-                    Cursor = Cursors.Default
-                End If
 
         End Select
 
