@@ -231,6 +231,7 @@ Public Class Talsim
         'WORKAROUND: Talsim always omits the last two timesteps from the results file.
         'Subtract two timesteps from the simulation end in order to allow proper validation of input files
         Me.SimEnde = Me.SimEnde - Me.SimDT - Me.SimDT
+        MsgBox("TALSIM-NG dataset: Simulation results are always two timesteps shorter than the simulation end date!" & eol & "Setting internally used simulation end date to " & Me.SimEnde, MsgBoxStyle.Information)
 
     End Sub
 
