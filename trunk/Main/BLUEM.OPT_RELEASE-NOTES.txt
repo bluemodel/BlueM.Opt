@@ -6,6 +6,7 @@ Version 1.8.0
 CHANGED:
 * Changed the extension of the input file for defining the objective functions from "ZIE" to "OBF"
 FIXED:
+* TALSIM-NG: take into consideration that the last timestep in the result files is always two timesteps before the simulation end date
 * Added checks and error messages when the evaluation end period of an objective function is later than the simulation end date
 
 Version 1.7.1
