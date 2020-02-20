@@ -593,6 +593,10 @@ Public Class Problem
                             End If
                             If WerteArray(10).Trim() <> "" Then
                                 .EvalEnde = WerteArray(10).Trim()
+                                'Check
+                                If .EvalEnde > SimEnde Then
+                                    Throw New Exception("The end of the evaluation period of the objective function '" & .Bezeichnung & "' (" & .EvalEnde & ") is later than the simulation end (" & SimEnde & "!")
+                                End If
                             Else
                                 .EvalEnde = SimEnde
                             End If
@@ -684,6 +688,10 @@ Public Class Problem
                             End If
                             If WerteArray(10).Trim() <> "" Then
                                 .EvalEnde = WerteArray(10).Trim()
+                                'Check
+                                If .EvalEnde > SimEnde Then
+                                    Throw New Exception("The end of the evaluation period of the objective function '" & .Bezeichnung & "' (" & .EvalEnde & ") is later than the simulation end (" & SimEnde & "!")
+                                End If
                             Else
                                 .EvalEnde = SimEnde
                             End If
