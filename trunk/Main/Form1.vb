@@ -1777,6 +1777,9 @@ Partial Public Class Form1
                         If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Series) Then
                             With CType(objective, Common.ObjectiveFunction_Series)
                                 'Referenzreihen nur jeweils ein Mal zeichnen
+                                'TODO: Dieselbe Referenzreihe könnte aber mehrfach mit jeweils 
+                                '      unterschiedlichen Evaluierungszeiträumen definiert sein.
+                                '      Dann sollte sie auch mehrfach gezeichnet werden.
                                 If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
                                     RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
                                     'Referenzreihe in Wave laden
