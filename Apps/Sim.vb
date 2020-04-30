@@ -484,7 +484,12 @@ Public MustInherit Class Sim
 
         'Simulationsergebnis einlesen und verarbeiten
         '--------------------------------------------
-        Call Me.SIM_Ergebnis_auswerten(ind, storeInDB)
+        Try
+            Call Me.SIM_Ergebnis_auswerten(ind, storeInDB)
+        Catch e As Exception
+            BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("ERROR: Failed to evaluate simulation: " & eol & e.Message)
+            Return False
+        End Try
 
         Return isOK
 
@@ -584,15 +589,22 @@ Public MustInherit Class Sim
                     tmpind = inds(n_ind_Ready)
 
                     'Individuum auswerten
-                    Me.SIM_Ergebnis_auswerten(tmpind, storeInDB)
+                    Try
+                        Call Me.SIM_Ergebnis_auswerten(tmpind, storeInDB)
 
-                    'Individuum per Event zurückgeben
-                    RaiseEvent IndividuumEvaluated(tmpind, n_ind_Ready)
+                        'Individuum per Event zurückgeben
+                        RaiseEvent IndividuumEvaluated(tmpind, n_ind_Ready)
+
+                        isOK(n_ind_Ready) = True
+
+                    Catch e As Exception
+                        BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("ERROR: Failed to evaluate simulation: " & eol & e.Message)
+                        isOK(n_ind_Ready) = False
+                        SIM_Eval_is_OK = False
+                    End Try
 
                     'HACK: zurückkopieren (nötig?)
                     inds(n_ind_Ready) = tmpind
-
-                    isOK(n_ind_Ready) = True
 
                     'Prüfen, ob alle Individuen fertig
                     If (n_ind_Ready = n_individuals - 1) Then
