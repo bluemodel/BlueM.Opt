@@ -456,9 +456,10 @@ Public Class Problem
         'Anzahl der Parameter feststellen
         Do
             Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                AnzParam += 1
+            If Zeile.Trim().Length = 0 Or Zeile.Trim().StartsWith("*") Then
+                Continue Do
             End If
+            AnzParam += 1
         Loop Until StrRead.Peek() = -1
 
         ReDim Me.List_ModellParameter(AnzParam - 1)
@@ -472,22 +473,23 @@ Public Class Problem
 
         Do
             Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                array = Zeile.Split("|")
-                'Werte zuweisen
-                With Me.List_ModellParameter(i)
-                    .OptParameter = array(1).Trim()
-                    .Bezeichnung = array(2).Trim()
-                    .Einheit = array(3).Trim()
-                    .Datei = array(4).Trim()
-                    .Element = array(5).Trim()
-                    .ZeileNr = Convert.ToInt16(array(6).Trim())
-                    .SpVon = Convert.ToInt16(array(7).Trim())
-                    .SpBis = Convert.ToInt16(array(8).Trim())
-                    .Faktor = Convert.ToDouble(array(9).Trim(), Common.Provider.FortranProvider)
-                End With
-                i += 1
+            If Zeile.Trim().Length = 0 Or Zeile.Trim().StartsWith("*") Then
+                Continue Do
             End If
+            array = Zeile.Split("|")
+            'Werte zuweisen
+            With Me.List_ModellParameter(i)
+                .OptParameter = array(1).Trim()
+                .Bezeichnung = array(2).Trim()
+                .Einheit = array(3).Trim()
+                .Datei = array(4).Trim()
+                .Element = array(5).Trim()
+                .ZeileNr = Convert.ToInt16(array(6).Trim())
+                .SpVon = Convert.ToInt16(array(7).Trim())
+                .SpBis = Convert.ToInt16(array(8).Trim())
+                .Faktor = Convert.ToDouble(array(9).Trim(), Common.Provider.FortranProvider)
+            End With
+            i += 1
         Loop Until StrRead.Peek() = -1
 
         StrRead.Close()
