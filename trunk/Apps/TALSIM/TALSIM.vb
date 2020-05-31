@@ -463,9 +463,9 @@ Public Class Talsim
             WELtmp.selectSeries(series)
         Next
         'Datei einlesen
-        WELtmp.Read_File()
+        WELtmp.readFile()
         'Zeitreihen übernehmen
-        For Each zre As Wave.TimeSeries In WELtmp.TimeSeries
+        For Each zre As Wave.TimeSeries In WELtmp.TimeSeriesCollection.Values
             Me.SimErgebnis.Reihen.Add(zre.Title, zre)
         Next
 
@@ -480,9 +480,9 @@ Public Class Talsim
                 KWLtmp.selectSeries(series)
             Next
             'Datei einlesen
-            KWLtmp.Read_File()
+            KWLtmp.readFile()
             'Zeitreihen übernehmen
-            For Each zre As Wave.TimeSeries In KWLtmp.TimeSeries
+            For Each zre As Wave.TimeSeries In KWLtmp.TimeSeriesCollection.Values
                 Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
         End If
@@ -498,9 +498,9 @@ Public Class Talsim
                 tempwel.selectSeries(series)
             Next
             'Datei einlesen
-            tempwel.Read_File()
+            tempwel.readFile()
             'Zeitreihen übernehmen
-            For Each zre As Wave.TimeSeries In tempwel.TimeSeries
+            For Each zre As Wave.TimeSeries In tempwel.TimeSeriesCollection.Values
                 Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
         End If

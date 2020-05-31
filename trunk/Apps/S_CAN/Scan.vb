@@ -130,6 +130,9 @@ Public Class Scan
         '----------
         ReDim Me.zeitreihen(Me.stoffe.GetUpperBound(0) - 1)
 
+        Dim ts As Wave.TimeSeries
+        Dim dates As List(Of DateTime) = input.TimeSeriesCollection.First.Value.Dates.ToList()
+
         'Schleife über Stoffe
         For k = 1 To Me.stoffe.GetUpperBound(0)
 
@@ -138,21 +141,22 @@ Public Class Scan
             Dim tmpWert As Double
 
             'Schleife über Zeitschritte
-            For i = 0 To input.TimeSeries(0).Length - 1
+            For i = 0 To dates.Count - 1
                 tmpWert = 0
 
-                'Schleife über Wellenlängen
-                For j = 2 To input.TimeSeries.GetUpperBound(0)
-                    tmpWert += input.TimeSeries(j).Values(i) * Parameter(input.TimeSeries(j).Title)(stoffe(k))
+                'Schleife über Wellenlängen (alle ausser der 1. Zeitreihe im Input)
+                For j = 2 To input.TimeSeriesCollection.Count - 1
+                    ts = input.TimeSeriesCollection.ElementAt(j).Value
+                    tmpWert += ts.Values(i) * Parameter(ts.Title)(stoffe(k))
                 Next
 
                 tmpWert += Parameter("Konst")(stoffe(k))
 
-                Me.zeitreihen(k - 1).AddNode(input.TimeSeries(0).Dates(i), tmpWert)
+                Me.zeitreihen(k - 1).AddNode(dates(i), tmpWert)
 
             Next
 
-        Next
+            Next
 
         Return True
 
@@ -189,8 +193,8 @@ Public Class Scan
         inputdatei = Me.WorkDir_Current & Me.Datensatz & "_input.WEL"
         Me.input = New Wave.WEL(inputdatei, True)
 
-        Me.SimStart = Me.input.TimeSeries(0).StartDate
-        Me.SimEnde = Me.input.TimeSeries(0).Enddate
+        Me.SimStart = Me.input.TimeSeriesCollection.First.Value.StartDate
+        Me.SimEnde = Me.input.TimeSeriesCollection.First.Value.EndDate
         'Me.SimDT
 
     End Sub
