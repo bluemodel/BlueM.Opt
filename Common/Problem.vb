@@ -925,8 +925,12 @@ Public Class Problem
         Dim RefReihe As Wave.TimeSeries
 
         'Referenzreihe aus Datei einlesen
-        Dim dateiobjekt As Wave.FileFormatBase = Wave.FileFactory.getDateiInstanz(dateipfad)
-        RefReihe = dateiobjekt.getTimeSeries(refgroesse)
+        Dim dateiobjekt As Wave.FileFormatBase = Wave.FileFactory.getFileInstance(dateipfad)
+        If refgroesse = "" Then
+            RefReihe = dateiobjekt.getTimeSeries()
+        Else
+            RefReihe = dateiobjekt.getTimeSeries(refgroesse)
+        End If
 
         'Zeitraum der Referenzreihe überprüfen
         If (RefReihe.StartDate > EvalStart Or RefReihe.EndDate < EvalEnde) Then
