@@ -148,7 +148,7 @@ Public Class Talsim
 
         'KTR.WEL: Feststellen, ob irgendeine Zielfunktion die KTR.WEL-Datei benutzt
         For Each objective In Me.mProblem.List_ObjectiveFunctions
-            If (objective.Datei = "KTR.WEL") Then
+            If objective.Datei.ToUpper() = "KTR.WEL" Then
                 Me.useKWL = True
                 Exit For
             End If
@@ -156,9 +156,18 @@ Public Class Talsim
 
         'TEMP.WEL: Feststellen, ob irgendeine Zielfunktion die TEMP.WEL-Datei benutzt
         For Each objective In Me.mProblem.List_ObjectiveFunctions
-            If (objective.Datei = "TEMP.WEL") Then
+            If objective.Datei.ToUpper() = "TEMP.WEL" Then
                 Me.useTEMPWEL = True
                 Exit For
+            End If
+        Next
+
+        'Prüfen, ob irgendwelche Constraints KTR.WEL oder TEMP.WEL benötigen
+        For Each constr As Constraintfunction In Me.mProblem.List_Constraintfunctions
+            If constr.Datei.ToUpper() = "KTR.WEL" Then
+                Me.useKWL = True
+            ElseIf constr.Datei.ToUpper() = "TEMP.WEL" Then
+                Me.useTEMPWEL = True
             End If
         Next
 
@@ -451,6 +460,11 @@ Public Class Talsim
                 If Not SimReihen(objfunc.Datei.ToUpper()).Contains(objfunc.SimGr) Then
                     SimReihen(objfunc.Datei.ToUpper()).Add(objfunc.SimGr)
                 End If
+            End If
+        Next
+        For Each constr As Constraintfunction In Me.mProblem.List_Constraintfunctions
+            If Not SimReihen(constr.Datei.ToUpper()).Contains(constr.SimGr) Then
+                SimReihen(constr.Datei.ToUpper()).Add(constr.SimGr)
             End If
         Next
 

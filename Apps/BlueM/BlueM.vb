@@ -161,7 +161,13 @@ Public Class BlueMSim
         'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
         '------------------------------------------------------------------
         For Each objective In Me.mProblem.List_ObjectiveFunctions
-            If (objective.Datei = "KWL") Then
+            If objective.Datei.ToUpper() = "KWL" Then
+                Me.useKWL = True
+                Exit For
+            End If
+        Next
+        For Each constr As Constraintfunction In Me.mProblem.List_Constraintfunctions
+            If constr.Datei.ToUpper() = "KWL" Then
                 Me.useKWL = True
                 Exit For
             End If
@@ -404,11 +410,16 @@ Public Class BlueMSim
             SimReihen.Add("KWL", New List(Of String))
         End If
         For Each objfunc As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-            If objfunc.GetObjType = ObjectiveFunction.ObjectiveType.Series Or _
+            If objfunc.GetObjType = ObjectiveFunction.ObjectiveType.Series Or
                 objfunc.GetObjType = ObjectiveFunction.ObjectiveType.ValueFromSeries Then
                 If Not SimReihen(objfunc.Datei.ToUpper()).Contains(objfunc.SimGr) Then
                     SimReihen(objfunc.Datei.ToUpper()).Add(objfunc.SimGr)
                 End If
+            End If
+        Next
+        For Each constr As Constraintfunction In Me.mProblem.List_Constraintfunctions
+            If Not SimReihen(constr.Datei.ToUpper()).Contains(constr.SimGr) Then
+                SimReihen(constr.Datei.ToUpper()).Add(constr.SimGr)
             End If
         Next
 
