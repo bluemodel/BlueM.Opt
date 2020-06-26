@@ -330,6 +330,8 @@ copy $(SolutionDir)Wave\lib\IntelFortran\libifcoremd.dll $(TargetDir)libifcoremd
 copy $(SolutionDir)Wave\lib\IntelFortran\libifportmd.dll $(TargetDir)libifportmd.dll
 copy $(SolutionDir)Wave\lib\IntelFortran\libmmd.dll $(TargetDir)libmmd.dll
 copy $(SolutionDir)Wave\lib\MathNet\MathNet.Numerics.license.txt $(TargetDir)MathNet.Numerics.license.txt
-copy $(SolutionDir)Wave\lib\Ionic.Zip\Ionic.Zip.license.txt $(TargetDir)Ionic.Zip.license.txt</PostBuildEvent>
+copy $(SolutionDir)Wave\lib\Ionic.Zip\Ionic.Zip.license.txt $(TargetDir)Ionic.Zip.license.txt
+xcopy $(SolutionDir)Wave\lib\SQLite\x86 $(TargetDir)x86 /i /y
+xcopy $(SolutionDir)Wave\lib\SQLite\x64 $(TargetDir)x64 /i /y</PostBuildEvent>
   </PropertyGroup>
 </Project>
