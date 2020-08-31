@@ -1,0 +1,62 @@
+Talsim-NG simulation engine changelog
+*************************************
+
+Version 3.1.1.8
+---------------
+* Change regarding cascading sub-basins (raster datasets):
+  * Sub-basins soil layers are now directly connected and upstream sub-basins discharge their interflow and deep interflow into respective soil layers downstream.
+  * Upstream sub-basins check soil capacity of downstream sub-basins and reduce interflow & deep interflow if capacity is insufficient.
+  * This behavior is on by default, but can be switched off by setting SoilInterconnected=0 in the ALL-file.
+* Added an optional RFD (rainfall distribution) dataset file, which allows for weighted assignment of multiple rainfall stations to one sub-basin.
+  See http://www.talsim.de/docs/index.php/RFD-Datei
+* Added a new option "Soil" to the ALL-file for outputting soil moisture for individual soil layers to a separate BOF.WEL result file. 
+  See section [FILES] in http://www.talsim.de/docs/index.php/ALL-Datei
+* Added more options for WEL output. The option "ResultForStates" in the ALL-file can now be populated using group placeholders such as QQQ, BODEN, QEZG, EVAPO, STOFF
+  See section [FILES] in http://www.talsim.de/docs/index.php/ALL-Datei
+* Added more outputs for sub-basins ("UIS": Upstream interflow into soil, "EXC": Excess/overflow from soil moisture calculation) to WEL output
+* Improvemenets to output in BLZ file
+
+Version 3.1.1.7
+---------------
+* Changed the calculation order of interception and depression losses (interception is now calculated first).
+* Added interception losses ("_INC") and depression losses ("_DEL") for sub-basins to WEL output.
+* Added a check and error message for when a sub-basin's values for imperviousness, beta1 and beta2 do not add up to 1.0. #77
+* Changes regarding cascading sub-basins (raster datasets):
+  * Division of surface runoff from upstream sub-basins into proportions of natural and urban areas are now determined by current sub-basin.
+  * Fixed surface runoff from cascading sub-basins being lost due to interception and different degrees of imperviousness. #76
+
+Version 3.1.1.6
+---------------
+* Internal dynamic time step in SPEIBELI set to a minimum of 1s for soil moisture calculation, preventing some rare balance errors.
+* Fixed deep interflow and deep groundwater being switched off if one EZG element has both options not activated even though other EZGs have
+
+Version 3.1.1.5
+---------------
+* Fixed bug #70 in soil moisture calculation: 
+  Soil moisture was not reset during iteration so that soil moisture resumed 
+  with wrong values from previous iteration instead of soil moisture from previous timestep.
+  
+Version 3.1.1.4
+---------------
+* Added new calibration factors WP, NFK and LK. Also moved BF0 to section [BFKALIB] in KAL file. #53
+* Added a new calibration parameter "BodenTypAenderung" #53
+
+Version 3.1.1.3
+---------------
+* Simplified routines for reading BIN files, removed extended BIN format (BXL) #58
+* Switched to Intel Fortran Compiler v19.1
+* Switched to floating-point model "strict" #51
+
+Version 3.1.1.2
+---------------
+* Bugfix Evapotranspiration internal calculation. More than one object now possible. #34
+
+Version 3.1.1.1
+---------------
+* Erweiterung englischer Fehlermeldungen.
+
+Version 3.1.1.0
+---------------
+* Fehlerbehebung bei Deep Interflow und Deep Groundwater, die bei bestimmten Konstellationen doppelt gezählt wurden.
+
+
