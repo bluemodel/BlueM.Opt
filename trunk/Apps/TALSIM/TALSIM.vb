@@ -146,19 +146,15 @@ Public Class Talsim
         'TALSIM-spezifische Weiterverarbeitung von ZielReihen:
         Dim objective As Common.ObjectiveFunction
 
-        'KTR.WEL: Feststellen, ob irgendeine Zielfunktion die KTR.WEL-Datei benutzt
+        'Feststellen, ob irgendeine Zielfunktion die KTR.WEL-Datei oder die TEMP.WEL-Datei benutzt
         For Each objective In Me.mProblem.List_ObjectiveFunctions
-            If objective.Datei.ToUpper() = "KTR.WEL" Then
-                Me.useKWL = True
-                Exit For
-            End If
-        Next
-
-        'TEMP.WEL: Feststellen, ob irgendeine Zielfunktion die TEMP.WEL-Datei benutzt
-        For Each objective In Me.mProblem.List_ObjectiveFunctions
-            If objective.Datei.ToUpper() = "TEMP.WEL" Then
-                Me.useTEMPWEL = True
-                Exit For
+            If Not IsNothing(objective.Datei) Then
+                If objective.Datei.ToUpper() = "KTR.WEL" Then
+                    Me.useKWL = True
+                    'TEMP.WEL: Feststellen, ob irgendeine Zielfunktion die TEMP.WEL-Datei benutzt
+                ElseIf objective.Datei.ToUpper() = "TEMP.WEL" Then
+                    Me.useTEMPWEL = True
+                End If
             End If
         Next
 
