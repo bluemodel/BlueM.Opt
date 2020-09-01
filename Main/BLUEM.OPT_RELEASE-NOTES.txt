@@ -6,6 +6,8 @@ Version 1.8.1
 CHANGED:
 * Updated Wave to v1.8.0 r637
 * TALSIM-NG: updated sydrodomain.ini and engine to v3.1.1.8
+FIXED:
+* TALSIM-NG: fix error when reading datasets with aggregate objective functions
 
 Version 1.8.0
 -------------
