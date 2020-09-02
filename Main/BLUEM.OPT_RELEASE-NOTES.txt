@@ -1,6 +1,13 @@
 ﻿===============================================================
 BlueM.Opt Release Notes
 ===============================================================
+Version 1.8.2
+-------------
+CHANGED:
+* SensiPlot: added an option for saving the datasets of individual solutions in subfolders
+FIXED:
+* SensiPlot: fixed the IDs of solutions not starting at 1
+
 Version 1.8.1
 -------------
 CHANGED:

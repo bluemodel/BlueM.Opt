@@ -18,7 +18,7 @@ Partial Class EVO_Einstellungen
     'Das Verändern mit dem Windows Form-Designer ist nicht möglich.
     'Das Verändern mit dem Code-Editor ist nicht möglich.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim Label_CES_MemSize As System.Windows.Forms.Label
         Dim Label_CES_NMembers_SecPop_PES As System.Windows.Forms.Label
         Dim Label_CES_NExchange_secPop_PES As System.Windows.Forms.Label
@@ -67,179 +67,180 @@ Partial Class EVO_Einstellungen
         Dim GroupBox_Diagramm As System.Windows.Forms.GroupBox
         Dim Label_CES_k_Value As System.Windows.Forms.Label
         Me.BindingSource_CES = New System.Windows.Forms.BindingSource(Me.components)
-        Me.CheckBox_drawOnlyCurrentGen = New System.Windows.Forms.CheckBox
+        Me.CheckBox_drawOnlyCurrentGen = New System.Windows.Forms.CheckBox()
         Me.BindingSource_General = New System.Windows.Forms.BindingSource(Me.components)
-        Me.TabControl1 = New System.Windows.Forms.TabControl
-        Me.TabPage_General = New System.Windows.Forms.TabPage
-        Me.GroupBox_Sim = New System.Windows.Forms.GroupBox
-        Me.CheckBox_useMultithreading = New System.Windows.Forms.CheckBox
-        Me.TabPage_PES = New System.Windows.Forms.TabPage
-        Me.PES_Label_OptModus = New System.Windows.Forms.Label
+        Me.TabControl1 = New System.Windows.Forms.TabControl()
+        Me.TabPage_General = New System.Windows.Forms.TabPage()
+        Me.GroupBox_Sim = New System.Windows.Forms.GroupBox()
+        Me.CheckBox_useMultithreading = New System.Windows.Forms.CheckBox()
+        Me.TabPage_PES = New System.Windows.Forms.TabPage()
+        Me.PES_Label_OptModus = New System.Windows.Forms.Label()
         Me.BindingSource_PES = New System.Windows.Forms.BindingSource(Me.components)
-        Me.PES_Combo_Strategie = New System.Windows.Forms.ComboBox
-        Me.PES_Combo_Startparameter = New System.Windows.Forms.ComboBox
-        Me.PES_Combo_DnMutation = New System.Windows.Forms.ComboBox
-        Me.PES_Numeric_DnStart = New System.Windows.Forms.NumericUpDown
+        Me.PES_Combo_Strategie = New System.Windows.Forms.ComboBox()
+        Me.PES_Combo_Startparameter = New System.Windows.Forms.ComboBox()
+        Me.PES_Combo_DnMutation = New System.Windows.Forms.ComboBox()
+        Me.PES_Numeric_DnStart = New System.Windows.Forms.NumericUpDown()
         Me.BindingSource_PES_Schrittweite = New System.Windows.Forms.BindingSource(Me.components)
-        Me.PES_Checkbox_isDnVektor = New System.Windows.Forms.CheckBox
-        Me.GroupBox_Generationen = New System.Windows.Forms.GroupBox
-        Me.PES_Numeric_AnzNachf = New System.Windows.Forms.NumericUpDown
-        Me.PES_Numeric_AnzEltern = New System.Windows.Forms.NumericUpDown
-        Me.PES_Numeric_AnzGen = New System.Windows.Forms.NumericUpDown
-        Me.LabelAnzEltern = New System.Windows.Forms.Label
-        Me.GroupBox_Eltern = New System.Windows.Forms.GroupBox
-        Me.PES_Combo_OptEltern = New System.Windows.Forms.ComboBox
-        Me.PES_Checkbox_isTournamentSelection = New System.Windows.Forms.CheckBox
-        Me.PES_Numeric_Rekombxy = New System.Windows.Forms.NumericUpDown
-        Me.LabelRekombxy1 = New System.Windows.Forms.Label
-        Me.LabelRekombxy3 = New System.Windows.Forms.Label
-        Me.GroupBox_SekPop = New System.Windows.Forms.GroupBox
-        Me.PES_CheckBox_SekPop_isBegrenzung = New System.Windows.Forms.CheckBox
+        Me.PES_Checkbox_isDnVektor = New System.Windows.Forms.CheckBox()
+        Me.GroupBox_Generationen = New System.Windows.Forms.GroupBox()
+        Me.PES_Numeric_AnzNachf = New System.Windows.Forms.NumericUpDown()
+        Me.PES_Numeric_AnzEltern = New System.Windows.Forms.NumericUpDown()
+        Me.PES_Numeric_AnzGen = New System.Windows.Forms.NumericUpDown()
+        Me.LabelAnzEltern = New System.Windows.Forms.Label()
+        Me.GroupBox_Eltern = New System.Windows.Forms.GroupBox()
+        Me.PES_Combo_OptEltern = New System.Windows.Forms.ComboBox()
+        Me.PES_Checkbox_isTournamentSelection = New System.Windows.Forms.CheckBox()
+        Me.PES_Numeric_Rekombxy = New System.Windows.Forms.NumericUpDown()
+        Me.LabelRekombxy1 = New System.Windows.Forms.Label()
+        Me.LabelRekombxy3 = New System.Windows.Forms.Label()
+        Me.GroupBox_SekPop = New System.Windows.Forms.GroupBox()
+        Me.PES_CheckBox_SekPop_isBegrenzung = New System.Windows.Forms.CheckBox()
         Me.BindingSource_PES_SekPop = New System.Windows.Forms.BindingSource(Me.components)
-        Me.PES_Numeric_nInteract = New System.Windows.Forms.NumericUpDown
-        Me.PES_Numeric_MaxMemberSekPop = New System.Windows.Forms.NumericUpDown
-        Me.LabelMaxMemberSekPop = New System.Windows.Forms.Label
-        Me.PES_Checkbox_isPopul = New System.Windows.Forms.CheckBox
+        Me.PES_Numeric_nInteract = New System.Windows.Forms.NumericUpDown()
+        Me.PES_Numeric_MaxMemberSekPop = New System.Windows.Forms.NumericUpDown()
+        Me.LabelMaxMemberSekPop = New System.Windows.Forms.Label()
+        Me.PES_Checkbox_isPopul = New System.Windows.Forms.CheckBox()
         Me.BindingSource_PES_Pop = New System.Windows.Forms.BindingSource(Me.components)
-        Me.PES_GroupBox_Populationen = New System.Windows.Forms.GroupBox
-        Me.PES_Numeric_AnzRunden = New System.Windows.Forms.NumericUpDown
-        Me.PES_Numeric_AnzPop = New System.Windows.Forms.NumericUpDown
-        Me.PES_Numeric_AnzPopEltern = New System.Windows.Forms.NumericUpDown
-        Me.PES_Combo_PopEltern = New System.Windows.Forms.ComboBox
-        Me.PES_Combo_PopStrategie = New System.Windows.Forms.ComboBox
-        Me.PES_Combo_PopPenalty = New System.Windows.Forms.ComboBox
+        Me.PES_GroupBox_Populationen = New System.Windows.Forms.GroupBox()
+        Me.PES_Numeric_AnzRunden = New System.Windows.Forms.NumericUpDown()
+        Me.PES_Numeric_AnzPop = New System.Windows.Forms.NumericUpDown()
+        Me.PES_Numeric_AnzPopEltern = New System.Windows.Forms.NumericUpDown()
+        Me.PES_Combo_PopEltern = New System.Windows.Forms.ComboBox()
+        Me.PES_Combo_PopStrategie = New System.Windows.Forms.ComboBox()
+        Me.PES_Combo_PopPenalty = New System.Windows.Forms.ComboBox()
         Me.BindingSource_PES_PopPenaltyOptions = New System.Windows.Forms.BindingSource(Me.components)
-        Me.TabPage_CES = New System.Windows.Forms.TabPage
-        Me.CES_Label_OptModusText = New System.Windows.Forms.Label
-        Me.CES_Label_OptModus = New System.Windows.Forms.Label
-        Me.CES_CheckBox_UseSecPop_CES = New System.Windows.Forms.CheckBox
-        Me.GroupBox_CES_SecPop = New System.Windows.Forms.GroupBox
-        Me.CES_CheckBox_isSecPopRestriction = New System.Windows.Forms.CheckBox
-        Me.Label_CES_NMembersSecPop = New System.Windows.Forms.Label
-        Me.CES_Numeric_n_exchange_SecPop = New System.Windows.Forms.NumericUpDown
-        Me.CES_Numeric_n_member_SecPop = New System.Windows.Forms.NumericUpDown
-        Me.CES_GroupBox_Hybrid = New System.Windows.Forms.GroupBox
-        Me.CES_Numeric_n_MemSize = New System.Windows.Forms.NumericUpDown
-        Me.CES_Combo_MemStrategy = New System.Windows.Forms.ComboBox
-        Me.CES_CheckBox_UseSecPop_PES = New System.Windows.Forms.CheckBox
-        Me.CES_CheckBox_StartPESPop = New System.Windows.Forms.CheckBox
-        Me.CES_Numeric_n_member_SecPop_PES = New System.Windows.Forms.NumericUpDown
-        Me.CES_Numeric_NExchange_SecPop_PES = New System.Windows.Forms.NumericUpDown
-        Me.CES_Combo_HybridType = New System.Windows.Forms.ComboBox
-        Me.CES_CheckBox_RealOptimisation = New System.Windows.Forms.CheckBox
-        Me.GroupBoxCES = New System.Windows.Forms.GroupBox
-        Me.CES_Numeric_k_Value = New System.Windows.Forms.NumericUpDown
-        Me.CES_Numeric_MutRate = New System.Windows.Forms.NumericUpDown
-        Me.CES_Combo_Reproduction = New System.Windows.Forms.ComboBox
-        Me.CES_Numeric_n_Children = New System.Windows.Forms.NumericUpDown
-        Me.CES_Numeric_n_Parents = New System.Windows.Forms.NumericUpDown
-        Me.CES_Combo_Mutation = New System.Windows.Forms.ComboBox
-        Me.CES_Numeric_n_Generations = New System.Windows.Forms.NumericUpDown
-        Me.CES_Combo_Selection = New System.Windows.Forms.ComboBox
-        Me.CES_Combo_IniValues = New System.Windows.Forms.ComboBox
-        Me.TabPage_HookeJeeves = New System.Windows.Forms.TabPage
-        Me.HJ_Numeric_DeltaFinish = New System.Windows.Forms.NumericUpDown
+        Me.TabPage_CES = New System.Windows.Forms.TabPage()
+        Me.CES_Label_OptModusText = New System.Windows.Forms.Label()
+        Me.CES_Label_OptModus = New System.Windows.Forms.Label()
+        Me.CES_CheckBox_UseSecPop_CES = New System.Windows.Forms.CheckBox()
+        Me.GroupBox_CES_SecPop = New System.Windows.Forms.GroupBox()
+        Me.CES_CheckBox_isSecPopRestriction = New System.Windows.Forms.CheckBox()
+        Me.Label_CES_NMembersSecPop = New System.Windows.Forms.Label()
+        Me.CES_Numeric_n_exchange_SecPop = New System.Windows.Forms.NumericUpDown()
+        Me.CES_Numeric_n_member_SecPop = New System.Windows.Forms.NumericUpDown()
+        Me.CES_GroupBox_Hybrid = New System.Windows.Forms.GroupBox()
+        Me.CES_Numeric_n_MemSize = New System.Windows.Forms.NumericUpDown()
+        Me.CES_Combo_MemStrategy = New System.Windows.Forms.ComboBox()
+        Me.CES_CheckBox_UseSecPop_PES = New System.Windows.Forms.CheckBox()
+        Me.CES_CheckBox_StartPESPop = New System.Windows.Forms.CheckBox()
+        Me.CES_Numeric_n_member_SecPop_PES = New System.Windows.Forms.NumericUpDown()
+        Me.CES_Numeric_NExchange_SecPop_PES = New System.Windows.Forms.NumericUpDown()
+        Me.CES_Combo_HybridType = New System.Windows.Forms.ComboBox()
+        Me.CES_CheckBox_RealOptimisation = New System.Windows.Forms.CheckBox()
+        Me.GroupBoxCES = New System.Windows.Forms.GroupBox()
+        Me.CES_Numeric_k_Value = New System.Windows.Forms.NumericUpDown()
+        Me.CES_Numeric_MutRate = New System.Windows.Forms.NumericUpDown()
+        Me.CES_Combo_Reproduction = New System.Windows.Forms.ComboBox()
+        Me.CES_Numeric_n_Children = New System.Windows.Forms.NumericUpDown()
+        Me.CES_Numeric_n_Parents = New System.Windows.Forms.NumericUpDown()
+        Me.CES_Combo_Mutation = New System.Windows.Forms.ComboBox()
+        Me.CES_Numeric_n_Generations = New System.Windows.Forms.NumericUpDown()
+        Me.CES_Combo_Selection = New System.Windows.Forms.ComboBox()
+        Me.CES_Combo_IniValues = New System.Windows.Forms.ComboBox()
+        Me.TabPage_HookeJeeves = New System.Windows.Forms.TabPage()
+        Me.HJ_Numeric_DeltaFinish = New System.Windows.Forms.NumericUpDown()
         Me.BindingSource_HookeJeeves = New System.Windows.Forms.BindingSource(Me.components)
-        Me.HJ_Numeric_DeltaStart = New System.Windows.Forms.NumericUpDown
-        Me.HJ_CheckBox_DNVektor = New System.Windows.Forms.CheckBox
-        Me.TabPage_MetaEvo = New System.Windows.Forms.TabPage
-        Me.GroupBox_MetaEvo_TransferOptions = New System.Windows.Forms.GroupBox
-        Me.MetaEvo_Numeric_NumberResults = New System.Windows.Forms.NumericUpDown
+        Me.HJ_Numeric_DeltaStart = New System.Windows.Forms.NumericUpDown()
+        Me.HJ_CheckBox_DNVektor = New System.Windows.Forms.CheckBox()
+        Me.TabPage_MetaEvo = New System.Windows.Forms.TabPage()
+        Me.GroupBox_MetaEvo_TransferOptions = New System.Windows.Forms.GroupBox()
+        Me.MetaEvo_Numeric_NumberResults = New System.Windows.Forms.NumericUpDown()
         Me.BindingSource_MetaEvo = New System.Windows.Forms.BindingSource(Me.components)
-        Me.GroupBox_MetaEvo_LocalOptions = New System.Windows.Forms.GroupBox
-        Me.MetaEvo_Numeric_HJStepsize = New System.Windows.Forms.NumericUpDown
-        Me.MetaEvo_Combo_OpMode = New System.Windows.Forms.ComboBox
-        Me.GroupBox_MetaEvo_MySQLOptions = New System.Windows.Forms.GroupBox
-        Me.MetaEvo_TextBox_MySQL_DB = New System.Windows.Forms.TextBox
-        Me.MetaEvo_TextBox_MySQL_Password = New System.Windows.Forms.TextBox
-        Me.MetaEvo_TextBox_MySQL_User = New System.Windows.Forms.TextBox
-        Me.MetaEvo_TextBox_MySQL_Host = New System.Windows.Forms.TextBox
-        Me.GroupBox_MetaEvo_BasicOptions = New System.Windows.Forms.GroupBox
-        Me.MetaEvo_Numeric_PopulationSize = New System.Windows.Forms.NumericUpDown
-        Me.MetaEvo_Numeric_Numbergenerations = New System.Windows.Forms.NumericUpDown
-        Me.MetaEvo_Combo_Role = New System.Windows.Forms.ComboBox
-        Me.TabPage_DDS = New System.Windows.Forms.TabPage
-        Me.DDS_CheckBox_RandomStartparameters = New System.Windows.Forms.CheckBox
+        Me.GroupBox_MetaEvo_LocalOptions = New System.Windows.Forms.GroupBox()
+        Me.MetaEvo_Numeric_HJStepsize = New System.Windows.Forms.NumericUpDown()
+        Me.MetaEvo_Combo_OpMode = New System.Windows.Forms.ComboBox()
+        Me.GroupBox_MetaEvo_MySQLOptions = New System.Windows.Forms.GroupBox()
+        Me.MetaEvo_TextBox_MySQL_DB = New System.Windows.Forms.TextBox()
+        Me.MetaEvo_TextBox_MySQL_Password = New System.Windows.Forms.TextBox()
+        Me.MetaEvo_TextBox_MySQL_User = New System.Windows.Forms.TextBox()
+        Me.MetaEvo_TextBox_MySQL_Host = New System.Windows.Forms.TextBox()
+        Me.GroupBox_MetaEvo_BasicOptions = New System.Windows.Forms.GroupBox()
+        Me.MetaEvo_Numeric_PopulationSize = New System.Windows.Forms.NumericUpDown()
+        Me.MetaEvo_Numeric_Numbergenerations = New System.Windows.Forms.NumericUpDown()
+        Me.MetaEvo_Combo_Role = New System.Windows.Forms.ComboBox()
+        Me.TabPage_DDS = New System.Windows.Forms.TabPage()
+        Me.DDS_CheckBox_RandomStartparameters = New System.Windows.Forms.CheckBox()
         Me.BindingSource_DDS = New System.Windows.Forms.BindingSource(Me.components)
-        Me.DDS_Numeric_maxiter = New System.Windows.Forms.NumericUpDown
-        Me.DDS_Numeric_r_val = New System.Windows.Forms.NumericUpDown
-        Me.TabPage_SensiPlot = New System.Windows.Forms.TabPage
-        Me.SensiPlot_CheckBox_wave = New System.Windows.Forms.CheckBox
+        Me.DDS_Numeric_maxiter = New System.Windows.Forms.NumericUpDown()
+        Me.DDS_Numeric_r_val = New System.Windows.Forms.NumericUpDown()
+        Me.TabPage_SensiPlot = New System.Windows.Forms.TabPage()
+        Me.SensiPlot_CheckBox_SaveResults = New System.Windows.Forms.CheckBox()
         Me.BindingSource_Sensiplot = New System.Windows.Forms.BindingSource(Me.components)
-        Me.SensiPlot_Label_NumSteps = New System.Windows.Forms.Label
-        Me.SensiPlot_NumericUpDown_NumSteps = New System.Windows.Forms.NumericUpDown
-        Me.SensiPlot_GroupBox_Modus = New System.Windows.Forms.GroupBox
-        Me.SensiPlot_RadioButton_Discrete = New System.Windows.Forms.RadioButton
-        Me.SensiPlot_RadioButton_NormalDistribution = New System.Windows.Forms.RadioButton
-        Me.SensiPlot_Label_Objectives = New System.Windows.Forms.Label
-        Me.SensiPlot_ListBox_Objectives = New System.Windows.Forms.ListBox
-        Me.SensiPlot_Label_OptParameter = New System.Windows.Forms.Label
-        Me.SensiPlot_ListBox_OptParameter = New System.Windows.Forms.ListBox
-        Me.TabPage_TSP = New System.Windows.Forms.TabPage
-        Me.TSP_ComboBox_prob_instance = New System.Windows.Forms.ComboBox
+        Me.SensiPlot_CheckBox_wave = New System.Windows.Forms.CheckBox()
+        Me.SensiPlot_Label_NumSteps = New System.Windows.Forms.Label()
+        Me.SensiPlot_NumericUpDown_NumSteps = New System.Windows.Forms.NumericUpDown()
+        Me.SensiPlot_GroupBox_Modus = New System.Windows.Forms.GroupBox()
+        Me.SensiPlot_RadioButton_Discrete = New System.Windows.Forms.RadioButton()
+        Me.SensiPlot_RadioButton_NormalDistribution = New System.Windows.Forms.RadioButton()
+        Me.SensiPlot_Label_Objectives = New System.Windows.Forms.Label()
+        Me.SensiPlot_ListBox_Objectives = New System.Windows.Forms.ListBox()
+        Me.SensiPlot_Label_OptParameter = New System.Windows.Forms.Label()
+        Me.SensiPlot_ListBox_OptParameter = New System.Windows.Forms.ListBox()
+        Me.TabPage_TSP = New System.Windows.Forms.TabPage()
+        Me.TSP_ComboBox_prob_instance = New System.Windows.Forms.ComboBox()
         Me.BindingSource_TSP = New System.Windows.Forms.BindingSource(Me.components)
-        Me.TSP_Label_Instance = New System.Windows.Forms.Label
-        Me.TSP_ComboBox_Mutationoperator = New System.Windows.Forms.ComboBox
-        Me.TSP_Label_Mutationoperator = New System.Windows.Forms.Label
-        Me.TSP_Label_Reproductionoperator = New System.Windows.Forms.Label
-        Me.TSP_ComboBox_Reproductionoperator = New System.Windows.Forms.ComboBox
-        Me.TSP_Numeric_n_generations = New System.Windows.Forms.NumericUpDown
-        Me.TSP_Label_n_generations = New System.Windows.Forms.Label
-        Me.TSP_Numeric_n_children = New System.Windows.Forms.NumericUpDown
-        Me.TSP_Label_n_children = New System.Windows.Forms.Label
-        Me.TSP_Numeric_n_parents = New System.Windows.Forms.NumericUpDown
-        Me.TSP_Label_n_parents = New System.Windows.Forms.Label
-        Me.TSP_Numeric_n_cities = New System.Windows.Forms.NumericUpDown
-        Me.TSP_Label_n_cities = New System.Windows.Forms.Label
+        Me.TSP_Label_Instance = New System.Windows.Forms.Label()
+        Me.TSP_ComboBox_Mutationoperator = New System.Windows.Forms.ComboBox()
+        Me.TSP_Label_Mutationoperator = New System.Windows.Forms.Label()
+        Me.TSP_Label_Reproductionoperator = New System.Windows.Forms.Label()
+        Me.TSP_ComboBox_Reproductionoperator = New System.Windows.Forms.ComboBox()
+        Me.TSP_Numeric_n_generations = New System.Windows.Forms.NumericUpDown()
+        Me.TSP_Label_n_generations = New System.Windows.Forms.Label()
+        Me.TSP_Numeric_n_children = New System.Windows.Forms.NumericUpDown()
+        Me.TSP_Label_n_children = New System.Windows.Forms.Label()
+        Me.TSP_Numeric_n_parents = New System.Windows.Forms.NumericUpDown()
+        Me.TSP_Label_n_parents = New System.Windows.Forms.Label()
+        Me.TSP_Numeric_n_cities = New System.Windows.Forms.NumericUpDown()
+        Me.TSP_Label_n_cities = New System.Windows.Forms.Label()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox
-        Label_CES_MemSize = New System.Windows.Forms.Label
-        Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label
-        Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label
-        Label_CES_MemRank = New System.Windows.Forms.Label
-        Label_CES_Hybrid_Type = New System.Windows.Forms.Label
-        Label_CES_MutationRate = New System.Windows.Forms.Label
-        Label_CES_Reproduction = New System.Windows.Forms.Label
-        Label_CES_NExchangeSecPop = New System.Windows.Forms.Label
-        Label_CES_NChildren = New System.Windows.Forms.Label
-        Label_CES_NParents = New System.Windows.Forms.Label
-        Label_CES_NGenerations = New System.Windows.Forms.Label
-        Label_CES_Mutation = New System.Windows.Forms.Label
-        Label_CES_Selection = New System.Windows.Forms.Label
-        Label_CES_IniValues = New System.Windows.Forms.Label
-        Label_OptModus = New System.Windows.Forms.Label
-        LabelStrategie = New System.Windows.Forms.Label
-        LabelStartwerte = New System.Windows.Forms.Label
-        LabelMutation = New System.Windows.Forms.Label
-        LabelStartSchrittweite = New System.Windows.Forms.Label
-        LabelAnzNachf = New System.Windows.Forms.Label
-        LabelAnzGen = New System.Windows.Forms.Label
-        Label2 = New System.Windows.Forms.Label
-        LabelInteract = New System.Windows.Forms.Label
-        LabelAnzRunden = New System.Windows.Forms.Label
-        LabelAnzPop = New System.Windows.Forms.Label
-        LabelAnzPopEltern = New System.Windows.Forms.Label
-        LabelOptPopEltern = New System.Windows.Forms.Label
-        LabelPopStrategie = New System.Windows.Forms.Label
-        LabelPopPenalty = New System.Windows.Forms.Label
-        Label_Line = New System.Windows.Forms.Label
-        Label3 = New System.Windows.Forms.Label
-        Label1 = New System.Windows.Forms.Label
-        Label11 = New System.Windows.Forms.Label
-        Label5 = New System.Windows.Forms.Label
-        Label10 = New System.Windows.Forms.Label
-        Label13 = New System.Windows.Forms.Label
-        Label14 = New System.Windows.Forms.Label
-        Label15 = New System.Windows.Forms.Label
-        Label16 = New System.Windows.Forms.Label
-        Label18 = New System.Windows.Forms.Label
-        Label20 = New System.Windows.Forms.Label
-        Label19 = New System.Windows.Forms.Label
-        Label_Meta11 = New System.Windows.Forms.Label
-        Label_Meta5 = New System.Windows.Forms.Label
-        Label_Meta10 = New System.Windows.Forms.Label
-        GroupBox_Diagramm = New System.Windows.Forms.GroupBox
-        Label_CES_k_Value = New System.Windows.Forms.Label
+        Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox()
+        Label_CES_MemSize = New System.Windows.Forms.Label()
+        Label_CES_NMembers_SecPop_PES = New System.Windows.Forms.Label()
+        Label_CES_NExchange_secPop_PES = New System.Windows.Forms.Label()
+        Label_CES_MemRank = New System.Windows.Forms.Label()
+        Label_CES_Hybrid_Type = New System.Windows.Forms.Label()
+        Label_CES_MutationRate = New System.Windows.Forms.Label()
+        Label_CES_Reproduction = New System.Windows.Forms.Label()
+        Label_CES_NExchangeSecPop = New System.Windows.Forms.Label()
+        Label_CES_NChildren = New System.Windows.Forms.Label()
+        Label_CES_NParents = New System.Windows.Forms.Label()
+        Label_CES_NGenerations = New System.Windows.Forms.Label()
+        Label_CES_Mutation = New System.Windows.Forms.Label()
+        Label_CES_Selection = New System.Windows.Forms.Label()
+        Label_CES_IniValues = New System.Windows.Forms.Label()
+        Label_OptModus = New System.Windows.Forms.Label()
+        LabelStrategie = New System.Windows.Forms.Label()
+        LabelStartwerte = New System.Windows.Forms.Label()
+        LabelMutation = New System.Windows.Forms.Label()
+        LabelStartSchrittweite = New System.Windows.Forms.Label()
+        LabelAnzNachf = New System.Windows.Forms.Label()
+        LabelAnzGen = New System.Windows.Forms.Label()
+        Label2 = New System.Windows.Forms.Label()
+        LabelInteract = New System.Windows.Forms.Label()
+        LabelAnzRunden = New System.Windows.Forms.Label()
+        LabelAnzPop = New System.Windows.Forms.Label()
+        LabelAnzPopEltern = New System.Windows.Forms.Label()
+        LabelOptPopEltern = New System.Windows.Forms.Label()
+        LabelPopStrategie = New System.Windows.Forms.Label()
+        LabelPopPenalty = New System.Windows.Forms.Label()
+        Label_Line = New System.Windows.Forms.Label()
+        Label3 = New System.Windows.Forms.Label()
+        Label1 = New System.Windows.Forms.Label()
+        Label11 = New System.Windows.Forms.Label()
+        Label5 = New System.Windows.Forms.Label()
+        Label10 = New System.Windows.Forms.Label()
+        Label13 = New System.Windows.Forms.Label()
+        Label14 = New System.Windows.Forms.Label()
+        Label15 = New System.Windows.Forms.Label()
+        Label16 = New System.Windows.Forms.Label()
+        Label18 = New System.Windows.Forms.Label()
+        Label20 = New System.Windows.Forms.Label()
+        Label19 = New System.Windows.Forms.Label()
+        Label_Meta11 = New System.Windows.Forms.Label()
+        Label_Meta5 = New System.Windows.Forms.Label()
+        Label_Meta10 = New System.Windows.Forms.Label()
+        GroupBox_Diagramm = New System.Windows.Forms.GroupBox()
+        Label_CES_k_Value = New System.Windows.Forms.Label()
         CType(Me.BindingSource_CES, System.ComponentModel.ISupportInitialize).BeginInit()
         GroupBox_Diagramm.SuspendLayout()
         CType(Me.BindingSource_General, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -757,7 +758,7 @@ Partial Class EVO_Einstellungen
         'TabControl1
         '
         Me.TabControl1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage_General)
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
         Me.TabControl1.Controls.Add(Me.TabPage_CES)
@@ -845,7 +846,7 @@ Partial Class EVO_Einstellungen
         Me.PES_Label_OptModus.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.PES_Label_OptModus.Location = New System.Drawing.Point(77, 9)
         Me.PES_Label_OptModus.Name = "PES_Label_OptModus"
-        Me.PES_Label_OptModus.Size = New System.Drawing.Size(47, 17)
+        Me.PES_Label_OptModus.Size = New System.Drawing.Size(38, 13)
         Me.PES_Label_OptModus.TabIndex = 1
         Me.PES_Label_OptModus.Text = "Mode"
         '
@@ -1000,7 +1001,7 @@ Partial Class EVO_Einstellungen
         Me.PES_Checkbox_isTournamentSelection.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_PES, "RecombXYEnabled", True, System.Windows.Forms.DataSourceUpdateMode.Never))
         Me.PES_Checkbox_isTournamentSelection.Location = New System.Drawing.Point(11, 81)
         Me.PES_Checkbox_isTournamentSelection.Name = "PES_Checkbox_isTournamentSelection"
-        Me.PES_Checkbox_isTournamentSelection.Size = New System.Drawing.Size(131, 17)
+        Me.PES_Checkbox_isTournamentSelection.Size = New System.Drawing.Size(128, 17)
         Me.PES_Checkbox_isTournamentSelection.TabIndex = 5
         Me.PES_Checkbox_isTournamentSelection.Text = "Tournament selection"
         Me.PES_Checkbox_isTournamentSelection.UseVisualStyleBackColor = True
@@ -1058,7 +1059,7 @@ Partial Class EVO_Einstellungen
         Me.PES_CheckBox_SekPop_isBegrenzung.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_PES_SekPop, "Is_Begrenzung", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.PES_CheckBox_SekPop_isBegrenzung.Location = New System.Drawing.Point(10, 45)
         Me.PES_CheckBox_SekPop_isBegrenzung.Name = "PES_CheckBox_SekPop_isBegrenzung"
-        Me.PES_CheckBox_SekPop_isBegrenzung.Size = New System.Drawing.Size(124, 17)
+        Me.PES_CheckBox_SekPop_isBegrenzung.Size = New System.Drawing.Size(121, 17)
         Me.PES_CheckBox_SekPop_isBegrenzung.TabIndex = 2
         Me.PES_CheckBox_SekPop_isBegrenzung.Text = "Limit size of sec pop"
         Me.PES_CheckBox_SekPop_isBegrenzung.UseVisualStyleBackColor = True
@@ -1235,7 +1236,7 @@ Partial Class EVO_Einstellungen
         Me.CES_Label_OptModusText.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.CES_Label_OptModusText.Location = New System.Drawing.Point(81, 10)
         Me.CES_Label_OptModusText.Name = "CES_Label_OptModusText"
-        Me.CES_Label_OptModusText.Size = New System.Drawing.Size(81, 17)
+        Me.CES_Label_OptModusText.Size = New System.Drawing.Size(64, 13)
         Me.CES_Label_OptModusText.TabIndex = 57
         Me.CES_Label_OptModusText.Text = "OptModus"
         '
@@ -1257,7 +1258,7 @@ Partial Class EVO_Einstellungen
         Me.CES_CheckBox_UseSecPop_CES.Location = New System.Drawing.Point(4, 312)
         Me.CES_CheckBox_UseSecPop_CES.Name = "CES_CheckBox_UseSecPop_CES"
         Me.CES_CheckBox_UseSecPop_CES.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CES_CheckBox_UseSecPop_CES.Size = New System.Drawing.Size(153, 17)
+        Me.CES_CheckBox_UseSecPop_CES.Size = New System.Drawing.Size(150, 17)
         Me.CES_CheckBox_UseSecPop_CES.TabIndex = 56
         Me.CES_CheckBox_UseSecPop_CES.Text = "Use secondary Population"
         Me.CES_CheckBox_UseSecPop_CES.UseVisualStyleBackColor = True
@@ -1283,7 +1284,7 @@ Partial Class EVO_Einstellungen
         Me.CES_CheckBox_isSecPopRestriction.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_CES, "Is_SecPopRestriction", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.CES_CheckBox_isSecPopRestriction.Location = New System.Drawing.Point(7, 35)
         Me.CES_CheckBox_isSecPopRestriction.Name = "CES_CheckBox_isSecPopRestriction"
-        Me.CES_CheckBox_isSecPopRestriction.Size = New System.Drawing.Size(127, 17)
+        Me.CES_CheckBox_isSecPopRestriction.Size = New System.Drawing.Size(124, 17)
         Me.CES_CheckBox_isSecPopRestriction.TabIndex = 57
         Me.CES_CheckBox_isSecPopRestriction.Text = "Restrict SecPop size"
         Me.CES_CheckBox_isSecPopRestriction.UseVisualStyleBackColor = True
@@ -1374,7 +1375,7 @@ Partial Class EVO_Einstellungen
         Me.CES_CheckBox_UseSecPop_PES.Location = New System.Drawing.Point(7, 138)
         Me.CES_CheckBox_UseSecPop_PES.Name = "CES_CheckBox_UseSecPop_PES"
         Me.CES_CheckBox_UseSecPop_PES.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CES_CheckBox_UseSecPop_PES.Size = New System.Drawing.Size(153, 17)
+        Me.CES_CheckBox_UseSecPop_PES.Size = New System.Drawing.Size(150, 17)
         Me.CES_CheckBox_UseSecPop_PES.TabIndex = 13
         Me.CES_CheckBox_UseSecPop_PES.Text = "Use secondary Population"
         Me.CES_CheckBox_UseSecPop_PES.UseVisualStyleBackColor = True
@@ -1386,7 +1387,7 @@ Partial Class EVO_Einstellungen
         Me.CES_CheckBox_StartPESPop.Location = New System.Drawing.Point(7, 103)
         Me.CES_CheckBox_StartPESPop.Name = "CES_CheckBox_StartPESPop"
         Me.CES_CheckBox_StartPESPop.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CES_CheckBox_StartPESPop.Size = New System.Drawing.Size(139, 17)
+        Me.CES_CheckBox_StartPESPop.Size = New System.Drawing.Size(136, 17)
         Me.CES_CheckBox_StartPESPop.TabIndex = 13
         Me.CES_CheckBox_StartPESPop.Text = "Start with Pop Mutation"
         Me.CES_CheckBox_StartPESPop.UseVisualStyleBackColor = True
@@ -1433,7 +1434,7 @@ Partial Class EVO_Einstellungen
         Me.CES_CheckBox_RealOptimisation.Location = New System.Drawing.Point(4, 422)
         Me.CES_CheckBox_RealOptimisation.Name = "CES_CheckBox_RealOptimisation"
         Me.CES_CheckBox_RealOptimisation.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CES_CheckBox_RealOptimisation.Size = New System.Drawing.Size(157, 17)
+        Me.CES_CheckBox_RealOptimisation.Size = New System.Drawing.Size(154, 17)
         Me.CES_CheckBox_RealOptimisation.TabIndex = 11
         Me.CES_CheckBox_RealOptimisation.Text = "Including Real Optimisation"
         Me.CES_CheckBox_RealOptimisation.UseVisualStyleBackColor = True
@@ -1617,7 +1618,7 @@ Partial Class EVO_Einstellungen
         Me.HJ_CheckBox_DNVektor.Enabled = False
         Me.HJ_CheckBox_DNVektor.Location = New System.Drawing.Point(15, 76)
         Me.HJ_CheckBox_DNVektor.Name = "HJ_CheckBox_DNVektor"
-        Me.HJ_CheckBox_DNVektor.Size = New System.Drawing.Size(136, 17)
+        Me.HJ_CheckBox_DNVektor.Size = New System.Drawing.Size(133, 17)
         Me.HJ_CheckBox_DNVektor.TabIndex = 2
         Me.HJ_CheckBox_DNVektor.Text = "mit Schrittweitenvektor"
         '
@@ -1832,7 +1833,7 @@ Partial Class EVO_Einstellungen
         Me.DDS_CheckBox_RandomStartparameters.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_DDS, "RandomStartparameters", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.DDS_CheckBox_RandomStartparameters.Location = New System.Drawing.Point(161, 66)
         Me.DDS_CheckBox_RandomStartparameters.Name = "DDS_CheckBox_RandomStartparameters"
-        Me.DDS_CheckBox_RandomStartparameters.Size = New System.Drawing.Size(18, 17)
+        Me.DDS_CheckBox_RandomStartparameters.Size = New System.Drawing.Size(15, 14)
         Me.DDS_CheckBox_RandomStartparameters.TabIndex = 5
         Me.DDS_CheckBox_RandomStartparameters.UseVisualStyleBackColor = True
         '
@@ -1867,6 +1868,7 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_SensiPlot
         '
+        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_CheckBox_SaveResults)
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_CheckBox_wave)
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_Label_NumSteps)
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_NumericUpDown_NumSteps)
@@ -1883,22 +1885,34 @@ Partial Class EVO_Einstellungen
         Me.TabPage_SensiPlot.Text = "SensiPlot"
         Me.TabPage_SensiPlot.UseVisualStyleBackColor = True
         '
+        'SensiPlot_CheckBox_SaveResults
+        '
+        Me.SensiPlot_CheckBox_SaveResults.AutoSize = True
+        Me.SensiPlot_CheckBox_SaveResults.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "Save_Results", True))
+        Me.SensiPlot_CheckBox_SaveResults.Location = New System.Drawing.Point(9, 518)
+        Me.SensiPlot_CheckBox_SaveResults.Name = "SensiPlot_CheckBox_SaveResults"
+        Me.SensiPlot_CheckBox_SaveResults.Size = New System.Drawing.Size(180, 17)
+        Me.SensiPlot_CheckBox_SaveResults.TabIndex = 16
+        Me.SensiPlot_CheckBox_SaveResults.Text = "Save individual solution datasets"
+        Me.ToolTip1.SetToolTip(Me.SensiPlot_CheckBox_SaveResults, "Copies the entire dataset of each individual solutions to a subdirectory")
+        Me.SensiPlot_CheckBox_SaveResults.UseVisualStyleBackColor = True
+        '
+        'BindingSource_Sensiplot
+        '
+        Me.BindingSource_Sensiplot.DataSource = GetType(BlueM.Opt.Common.Settings_Sensiplot)
+        '
         'SensiPlot_CheckBox_wave
         '
         Me.SensiPlot_CheckBox_wave.AutoSize = True
         Me.SensiPlot_CheckBox_wave.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "Show_Wave", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.SensiPlot_CheckBox_wave.Location = New System.Drawing.Point(9, 495)
         Me.SensiPlot_CheckBox_wave.Name = "SensiPlot_CheckBox_wave"
-        Me.SensiPlot_CheckBox_wave.Size = New System.Drawing.Size(132, 17)
+        Me.SensiPlot_CheckBox_wave.Size = New System.Drawing.Size(129, 17)
         Me.SensiPlot_CheckBox_wave.TabIndex = 15
         Me.SensiPlot_CheckBox_wave.Text = "Show results in Wave"
-        Me.ToolTip1.SetToolTip(Me.SensiPlot_CheckBox_wave, "Show the hydrographs of all simulation results in BlueM.Wave after the sensitivit" & _
-                "y analysis has completed")
+        Me.ToolTip1.SetToolTip(Me.SensiPlot_CheckBox_wave, "Show the hydrographs of all simulation results in BlueM.Wave after the sensitivit" &
+        "y analysis has completed")
         Me.SensiPlot_CheckBox_wave.UseVisualStyleBackColor = True
-        '
-        'BindingSource_Sensiplot
-        '
-        Me.BindingSource_Sensiplot.DataSource = GetType(BlueM.Opt.Common.Settings_Sensiplot)
         '
         'SensiPlot_Label_NumSteps
         '
@@ -1936,7 +1950,7 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_RadioButton_Discrete.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "SensiType_Discrete", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.SensiPlot_RadioButton_Discrete.Location = New System.Drawing.Point(9, 42)
         Me.SensiPlot_RadioButton_Discrete.Name = "SensiPlot_RadioButton_Discrete"
-        Me.SensiPlot_RadioButton_Discrete.Size = New System.Drawing.Size(67, 17)
+        Me.SensiPlot_RadioButton_Discrete.Size = New System.Drawing.Size(64, 17)
         Me.SensiPlot_RadioButton_Discrete.TabIndex = 10
         Me.SensiPlot_RadioButton_Discrete.TabStop = True
         Me.SensiPlot_RadioButton_Discrete.Text = "Discrete"
@@ -1949,7 +1963,7 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_RadioButton_NormalDistribution.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_Sensiplot, "SensiTypeNormalDistributionEnabled", True, System.Windows.Forms.DataSourceUpdateMode.Never))
         Me.SensiPlot_RadioButton_NormalDistribution.Location = New System.Drawing.Point(9, 19)
         Me.SensiPlot_RadioButton_NormalDistribution.Name = "SensiPlot_RadioButton_NormalDistribution"
-        Me.SensiPlot_RadioButton_NormalDistribution.Size = New System.Drawing.Size(114, 17)
+        Me.SensiPlot_RadioButton_NormalDistribution.Size = New System.Drawing.Size(111, 17)
         Me.SensiPlot_RadioButton_NormalDistribution.TabIndex = 9
         Me.SensiPlot_RadioButton_NormalDistribution.Text = "Normal distribution"
         Me.SensiPlot_RadioButton_NormalDistribution.UseVisualStyleBackColor = True
@@ -2163,7 +2177,7 @@ Partial Class EVO_Einstellungen
         'GroupBox_Einstellungen
         '
         Me.GroupBox_Einstellungen.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.GroupBox_Einstellungen.Controls.Add(Me.TabControl1)
         Me.GroupBox_Einstellungen.Location = New System.Drawing.Point(0, 0)
         Me.GroupBox_Einstellungen.Name = "GroupBox_Einstellungen"
@@ -2395,4 +2409,5 @@ Partial Class EVO_Einstellungen
     Private WithEvents BindingSource_DDS As System.Windows.Forms.BindingSource
     Private WithEvents BindingSource_Sensiplot As System.Windows.Forms.BindingSource
     Friend WithEvents BindingSource_TSP As System.Windows.Forms.BindingSource
+    Friend WithEvents SensiPlot_CheckBox_SaveResults As CheckBox
 End Class
