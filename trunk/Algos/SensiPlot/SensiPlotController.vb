@@ -131,7 +131,7 @@ Public Class SensiPlotController
         '-------------------
         Randomize()
 
-        n = 1
+        n = 0
 
         'Äussere Schleife (2. OptParameter)
         '----------------------------------
@@ -232,6 +232,14 @@ Public Class SensiPlotController
                         End If
                     End If
 
+                    'Save dataset with results
+                    If Me.mySettings.SensiPlot.Save_Results Then
+                        Dim resultdir As String = IO.Path.Combine(Sim1.WorkDir_Original, "solution_" & n)
+                        My.Computer.FileSystem.CreateDirectory(resultdir)
+                        For Each file As String In My.Computer.FileSystem.GetFiles(Sim1.WorkDir_Current)
+                            My.Computer.FileSystem.CopyFile(file, IO.Path.Combine(resultdir, IO.Path.GetFileName(file)), True)
+                        Next
+                    End If
                 End If
 
                 System.Windows.Forms.Application.DoEvents()

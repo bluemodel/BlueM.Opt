@@ -39,6 +39,7 @@ Public Class Settings_Sensiplot
     Private _Selected_SensiType As SensiType
     Private _Num_Steps As Integer
     Private _show_Wave As Boolean
+    Private _save_Results As Boolean
 
     <XmlIgnore()> _
     Public Property Selected_OptParameters() As Collections.Generic.List(Of Integer)
@@ -115,6 +116,15 @@ Public Class Settings_Sensiplot
         End Set
     End Property
 
+    Public Property Save_Results() As Boolean
+        Get
+            Return _save_Results
+        End Get
+        Set(value As Boolean)
+            _save_Results = value
+        End Set
+    End Property
+
     Public Sub New()
         Me._Selected_OptParameters = New Collections.Generic.List(Of Integer)
     End Sub
@@ -130,6 +140,7 @@ Public Class Settings_Sensiplot
         Me.Selected_SensiType = SensiType.discrete
         Me.Num_Steps = 10
         Me.Show_Wave = False
+        Me.Save_Results = False
 
     End Sub
 
