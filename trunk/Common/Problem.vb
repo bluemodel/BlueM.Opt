@@ -524,11 +524,6 @@ Public Class Problem
         'Path to file
         Dim filepath As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_OBF
 
-        'Catch files with the old file extension ".ZIE" (used in v1.7 and older)
-        If Not System.IO.File.Exists(filepath) And IO.File.Exists(Me.mWorkDir & Me.Datensatz & ".ZIE") Then
-            Throw New Exception("Please rename the input file for the objective functions from '" & Me.Datensatz & ".ZIE' to '" & Me.Datensatz & "." & FILEEXT_OBF & "'." & eol & "The file extension has changed since v1.8")
-        End If
-
         'Open the file
         Dim FiStr As New FileStream(filepath, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))

@@ -7,6 +7,7 @@ CHANGED:
 * SensiPlot: added an option for saving the datasets of individual solutions in subfolders
 FIXED:
 * SensiPlot: fixed the IDs of solutions not starting at 1
+* TALSIM-NG: allow ZIE, PRO and QUA files as part of the dataset
 
 Version 1.8.1
 -------------
