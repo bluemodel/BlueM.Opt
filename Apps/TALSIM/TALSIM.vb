@@ -63,11 +63,11 @@ Public Class Talsim
         Get
             Dim exts As New Collections.Specialized.StringCollection()
 
-            exts.AddRange(New String() {"ALL", "SYS", "FKT", "KTR", "EXT", "JGG", "WGG", _
-                                        "TGG", "TAL", "HYA", "TRS", "EZG", "EIN", "URB", _
-                                        "VER", "RUE", "BEK", "BOA", "BOD", "LNZ", "EFL", _
-                                        "DIF", "FKA", "SCE", "QAB", "UPD", "OPF", "KAL", _
-                                        "HYO", "TEM"})
+            exts.AddRange(New String() {"ALL", "SYS", "FKT", "KTR", "EXT", "JGG", "WGG",
+                                        "TGG", "TAL", "HYA", "TRS", "EZG", "EIN", "URB",
+                                        "VER", "RUE", "BEK", "BOA", "BOD", "LNZ", "EFL",
+                                        "DIF", "FKA", "SCE", "QAB", "UPD", "OPF", "KAL",
+                                        "HYO", "TEM", "ZIE", "QUA", "PRO"})
 
             Return exts
 
