@@ -331,7 +331,7 @@ Public Class EVO_Einstellungen
 
 #Region "Events"
 
-    Private Sub SensiPlot_Validate() Handles SensiPlot_ListBox_OptParameter.SelectedIndexChanged, SensiPlot_ListBox_Objectives.SelectedIndexChanged, SensiPlot_RadioButton_Discrete.CheckedChanged
+    Private Sub SensiPlot_Validate() Handles SensiPlot_ListBox_OptParameter.SelectedIndexChanged, SensiPlot_ListBox_Objectives.SelectedIndexChanged, SensiPlot_RadioButton_ModeEvenDistribution.CheckedChanged
 
         If (Me.isInitializing) Then Exit Sub
 
@@ -354,14 +354,14 @@ Public Class EVO_Einstellungen
 
         'bei 2 OptParametern geht nur diskret!
         If (Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count = 2 And _
-            Me.SensiPlot_RadioButton_NormalDistribution.Checked) Then
+            Me.SensiPlot_RadioButton_ModeRandom.Checked) Then
             MsgBox("Bei mehr als einem OptParameter muss 'Diskret' als Modus ausgewählt sein!", MsgBoxStyle.Exclamation, "SensiPlot")
-            Me.SensiPlot_RadioButton_Discrete.Checked = True
+            Me.SensiPlot_RadioButton_ModeEvenDistribution.Checked = True
             Exit Sub
         End If
 
-        Me.SensiPlot_RadioButton_Discrete.DataBindings("Checked").WriteValue()
-        Me.SensiPlot_RadioButton_NormalDistribution.DataBindings("Checked").WriteValue()
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.DataBindings("Checked").WriteValue()
+        Me.SensiPlot_RadioButton_ModeRandom.DataBindings("Checked").WriteValue()
 
         'SelectedOptParameters einlesen
         Me.mSettings.SensiPlot.Selected_OptParameters.Clear()

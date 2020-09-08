@@ -30,18 +30,18 @@ Imports System.Xml.Serialization
 Public Class Settings_Sensiplot
 
     Public Enum SensiType As Integer
-        discrete = 1
-        normaldistribution = 2
+        evenDistribution = 1
+        randomDistribution = 2
     End Enum
 
     Private _Selected_OptParameters As Collections.Generic.List(Of Integer)
     Private _Selected_Objective As Integer
-    Private _Selected_SensiType As SensiType
+    Private _selected_Mode As SensiType
     Private _Num_Steps As Integer
     Private _show_Wave As Boolean
     Private _save_Results As Boolean
 
-    <XmlIgnore()> _
+    <XmlIgnore()>
     Public Property Selected_OptParameters() As Collections.Generic.List(Of Integer)
         Get
             Return _Selected_OptParameters
@@ -51,7 +51,7 @@ Public Class Settings_Sensiplot
         End Set
     End Property
 
-    <XmlIgnore()> _
+    <XmlIgnore()>
     Public Property Selected_Objective() As Integer
         Get
             Return _Selected_Objective
@@ -61,39 +61,39 @@ Public Class Settings_Sensiplot
         End Set
     End Property
 
-    Public Property Selected_SensiType() As SensiType
+    Public Property Selected_Mode() As SensiType
         Get
-            Return _Selected_SensiType
+            Return _selected_Mode
         End Get
         Set(ByVal value As SensiType)
-            _Selected_SensiType = value
+            _selected_Mode = value
         End Set
     End Property
 
-    <XmlIgnore()> _
-    Public Property SensiType_Discrete() As Boolean
+    <XmlIgnore()>
+    Public Property ModeEvenDistribution() As Boolean
         Get
-            Return (Me.Selected_SensiType = SensiType.discrete)
+            Return (Me.Selected_Mode = SensiType.evenDistribution)
         End Get
         Set(ByVal value As Boolean)
             If (value = True) Then
-                Me.Selected_SensiType = SensiType.discrete
+                Me.Selected_Mode = SensiType.evenDistribution
             Else
-                Me.Selected_SensiType = SensiType.normaldistribution
+                Me.Selected_Mode = SensiType.randomDistribution
             End If
         End Set
     End Property
 
-    <XmlIgnore()> _
-    Public Property SensiType_NormalDistribution() As Boolean
+    <XmlIgnore()>
+    Public Property ModeRandomDistribution() As Boolean
         Get
-            Return (Me.Selected_SensiType = SensiType.normaldistribution)
+            Return (Me.Selected_Mode = SensiType.randomDistribution)
         End Get
         Set(ByVal value As Boolean)
             If (value = True) Then
-                Me.Selected_SensiType = SensiType.normaldistribution
+                Me.Selected_Mode = SensiType.randomDistribution
             Else
-                Me.Selected_SensiType = SensiType.discrete
+                Me.Selected_Mode = SensiType.evenDistribution
             End If
         End Set
     End Property
@@ -129,7 +129,7 @@ Public Class Settings_Sensiplot
         Me._Selected_OptParameters = New Collections.Generic.List(Of Integer)
     End Sub
 
-    Public ReadOnly Property SensiTypeNormalDistributionEnabled As Boolean
+    Public ReadOnly Property ModeRandomDistributionEnabled As Boolean
         Get
             Return (Me.Selected_OptParameters.Count < 2)
         End Get
@@ -137,7 +137,7 @@ Public Class Settings_Sensiplot
 
     Public Sub setStandard()
 
-        Me.Selected_SensiType = SensiType.discrete
+        Me.Selected_Mode = SensiType.evenDistribution
         Me.Num_Steps = 10
         Me.Show_Wave = False
         Me.Save_Results = False
