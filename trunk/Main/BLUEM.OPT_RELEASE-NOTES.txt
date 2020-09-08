@@ -5,8 +5,8 @@ Version 1.8.2
 -------------
 CHANGED:
 * SensiPlot: added an option for saving the datasets of individual solutions in subfolders
-* Sensiplot: minor improvements to interface
-* Sensiplot: max number of steps increased to 1000
+* SensiPlot: minor improvements to interface
+* SensiPlot: max number of steps increased to 1000
 FIXED:
 * SensiPlot: fixed the IDs of solutions not starting at 1
 * TALSIM-NG: allow ZIE, PRO and QUA files as part of the dataset
