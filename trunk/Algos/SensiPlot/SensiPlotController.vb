@@ -139,10 +139,10 @@ Public Class SensiPlotController
 
             '2. OptParameterwert variieren
             If (Anz_SensiPara > 1) Then
-                Select Case Me.mySettings.SensiPlot.Selected_SensiType
-                    Case Common.Settings_Sensiplot.SensiType.normaldistribution
+                Select Case Me.mySettings.SensiPlot.Selected_Mode
+                    Case Common.Settings_Sensiplot.SensiType.randomDistribution
                         Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Xn = Rnd()
-                    Case Common.Settings_Sensiplot.SensiType.discrete
+                    Case Common.Settings_Sensiplot.SensiType.evenDistribution
                         Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Xn = i / (Me.mySettings.SensiPlot.Num_Steps - 1)
                 End Select
             End If
@@ -155,10 +155,10 @@ Public Class SensiPlotController
                 If (Me.stopped) Then Exit Sub
 
                 '1. OptParameterwert variieren
-                Select Case Me.mySettings.SensiPlot.Selected_SensiType
-                    Case Common.Settings_Sensiplot.SensiType.normaldistribution
+                Select Case Me.mySettings.SensiPlot.Selected_Mode
+                    Case Common.Settings_Sensiplot.SensiType.randomDistribution
                         Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(0)).Xn = Rnd()
-                    Case Common.Settings_Sensiplot.SensiType.discrete
+                    Case Common.Settings_Sensiplot.SensiType.evenDistribution
                         Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(0)).Xn = j / (Me.mySettings.SensiPlot.Num_Steps - 1)
                 End Select
 

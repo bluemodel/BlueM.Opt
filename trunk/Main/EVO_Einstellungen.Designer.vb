@@ -170,8 +170,8 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_Label_NumSteps = New System.Windows.Forms.Label()
         Me.SensiPlot_NumericUpDown_NumSteps = New System.Windows.Forms.NumericUpDown()
         Me.SensiPlot_GroupBox_Modus = New System.Windows.Forms.GroupBox()
-        Me.SensiPlot_RadioButton_Discrete = New System.Windows.Forms.RadioButton()
-        Me.SensiPlot_RadioButton_NormalDistribution = New System.Windows.Forms.RadioButton()
+        Me.SensiPlot_RadioButton_ModeEvenDistribution = New System.Windows.Forms.RadioButton()
+        Me.SensiPlot_RadioButton_ModeRandom = New System.Windows.Forms.RadioButton()
         Me.SensiPlot_Label_Objectives = New System.Windows.Forms.Label()
         Me.SensiPlot_ListBox_Objectives = New System.Windows.Forms.ListBox()
         Me.SensiPlot_Label_OptParameter = New System.Windows.Forms.Label()
@@ -1927,15 +1927,18 @@ Partial Class EVO_Einstellungen
         '
         Me.SensiPlot_NumericUpDown_NumSteps.DataBindings.Add(New System.Windows.Forms.Binding("Value", Me.BindingSource_Sensiplot, "Num_Steps", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.SensiPlot_NumericUpDown_NumSteps.Location = New System.Drawing.Point(93, 459)
+        Me.SensiPlot_NumericUpDown_NumSteps.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.SensiPlot_NumericUpDown_NumSteps.Minimum = New Decimal(New Integer() {2, 0, 0, 0})
         Me.SensiPlot_NumericUpDown_NumSteps.Name = "SensiPlot_NumericUpDown_NumSteps"
         Me.SensiPlot_NumericUpDown_NumSteps.Size = New System.Drawing.Size(56, 20)
         Me.SensiPlot_NumericUpDown_NumSteps.TabIndex = 13
         Me.SensiPlot_NumericUpDown_NumSteps.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.SensiPlot_NumericUpDown_NumSteps.Value = New Decimal(New Integer() {2, 0, 0, 0})
         '
         'SensiPlot_GroupBox_Modus
         '
-        Me.SensiPlot_GroupBox_Modus.Controls.Add(Me.SensiPlot_RadioButton_Discrete)
-        Me.SensiPlot_GroupBox_Modus.Controls.Add(Me.SensiPlot_RadioButton_NormalDistribution)
+        Me.SensiPlot_GroupBox_Modus.Controls.Add(Me.SensiPlot_RadioButton_ModeEvenDistribution)
+        Me.SensiPlot_GroupBox_Modus.Controls.Add(Me.SensiPlot_RadioButton_ModeRandom)
         Me.SensiPlot_GroupBox_Modus.Location = New System.Drawing.Point(6, 380)
         Me.SensiPlot_GroupBox_Modus.Name = "SensiPlot_GroupBox_Modus"
         Me.SensiPlot_GroupBox_Modus.Size = New System.Drawing.Size(209, 70)
@@ -1943,30 +1946,30 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_GroupBox_Modus.TabStop = False
         Me.SensiPlot_GroupBox_Modus.Text = "Mode"
         '
-        'SensiPlot_RadioButton_Discrete
+        'SensiPlot_RadioButton_ModeEvenDistribution
         '
-        Me.SensiPlot_RadioButton_Discrete.AutoSize = True
-        Me.SensiPlot_RadioButton_Discrete.Checked = True
-        Me.SensiPlot_RadioButton_Discrete.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "SensiType_Discrete", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
-        Me.SensiPlot_RadioButton_Discrete.Location = New System.Drawing.Point(9, 42)
-        Me.SensiPlot_RadioButton_Discrete.Name = "SensiPlot_RadioButton_Discrete"
-        Me.SensiPlot_RadioButton_Discrete.Size = New System.Drawing.Size(64, 17)
-        Me.SensiPlot_RadioButton_Discrete.TabIndex = 10
-        Me.SensiPlot_RadioButton_Discrete.TabStop = True
-        Me.SensiPlot_RadioButton_Discrete.Text = "Discrete"
-        Me.SensiPlot_RadioButton_Discrete.UseVisualStyleBackColor = True
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.AutoSize = True
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.Checked = True
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "ModeEvenDistribution", True))
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.Location = New System.Drawing.Point(9, 42)
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.Name = "SensiPlot_RadioButton_ModeEvenDistribution"
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.Size = New System.Drawing.Size(108, 17)
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.TabIndex = 10
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.TabStop = True
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.Text = "Evenly distributed"
+        Me.SensiPlot_RadioButton_ModeEvenDistribution.UseVisualStyleBackColor = True
         '
-        'SensiPlot_RadioButton_NormalDistribution
+        'SensiPlot_RadioButton_ModeRandom
         '
-        Me.SensiPlot_RadioButton_NormalDistribution.AutoSize = True
-        Me.SensiPlot_RadioButton_NormalDistribution.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "SensiType_NormalDistribution", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
-        Me.SensiPlot_RadioButton_NormalDistribution.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_Sensiplot, "SensiTypeNormalDistributionEnabled", True, System.Windows.Forms.DataSourceUpdateMode.Never))
-        Me.SensiPlot_RadioButton_NormalDistribution.Location = New System.Drawing.Point(9, 19)
-        Me.SensiPlot_RadioButton_NormalDistribution.Name = "SensiPlot_RadioButton_NormalDistribution"
-        Me.SensiPlot_RadioButton_NormalDistribution.Size = New System.Drawing.Size(111, 17)
-        Me.SensiPlot_RadioButton_NormalDistribution.TabIndex = 9
-        Me.SensiPlot_RadioButton_NormalDistribution.Text = "Normal distribution"
-        Me.SensiPlot_RadioButton_NormalDistribution.UseVisualStyleBackColor = True
+        Me.SensiPlot_RadioButton_ModeRandom.AutoSize = True
+        Me.SensiPlot_RadioButton_ModeRandom.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "ModeRandomDistribution", True))
+        Me.SensiPlot_RadioButton_ModeRandom.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_Sensiplot, "ModeRandomDistributionEnabled", True))
+        Me.SensiPlot_RadioButton_ModeRandom.Location = New System.Drawing.Point(9, 19)
+        Me.SensiPlot_RadioButton_ModeRandom.Name = "SensiPlot_RadioButton_ModeRandom"
+        Me.SensiPlot_RadioButton_ModeRandom.Size = New System.Drawing.Size(123, 17)
+        Me.SensiPlot_RadioButton_ModeRandom.TabIndex = 9
+        Me.SensiPlot_RadioButton_ModeRandom.Text = "Randomly distributed"
+        Me.SensiPlot_RadioButton_ModeRandom.UseVisualStyleBackColor = True
         '
         'SensiPlot_Label_Objectives
         '
@@ -2368,8 +2371,8 @@ Partial Class EVO_Einstellungen
     Private WithEvents SensiPlot_Label_OptParameter As System.Windows.Forms.Label
     Private WithEvents SensiPlot_ListBox_OptParameter As System.Windows.Forms.ListBox
     Private WithEvents SensiPlot_ListBox_Objectives As System.Windows.Forms.ListBox
-    Private WithEvents SensiPlot_RadioButton_Discrete As System.Windows.Forms.RadioButton
-    Private WithEvents SensiPlot_RadioButton_NormalDistribution As System.Windows.Forms.RadioButton
+    Private WithEvents SensiPlot_RadioButton_ModeEvenDistribution As System.Windows.Forms.RadioButton
+    Private WithEvents SensiPlot_RadioButton_ModeRandom As System.Windows.Forms.RadioButton
     Private WithEvents SensiPlot_Label_NumSteps As System.Windows.Forms.Label
     Private WithEvents SensiPlot_NumericUpDown_NumSteps As System.Windows.Forms.NumericUpDown
     Private WithEvents SensiPlot_Label_Objectives As System.Windows.Forms.Label
