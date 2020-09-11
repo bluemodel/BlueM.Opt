@@ -10,6 +10,7 @@ CHANGED:
 FIXED:
 * SensiPlot: fixed the IDs of solutions not starting at 1
 * TALSIM-NG: allow ZIE, PRO and QUA files as part of the dataset
+* Enable scroll bars for all tabs in the settings pane
 
 Version 1.8.1
 -------------

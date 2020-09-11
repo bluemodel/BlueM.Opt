@@ -777,6 +777,7 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_General
         '
+        Me.TabPage_General.AutoScroll = True
         Me.TabPage_General.Controls.Add(GroupBox_Diagramm)
         Me.TabPage_General.Controls.Add(Me.GroupBox_Sim)
         Me.TabPage_General.Location = New System.Drawing.Point(4, 22)
@@ -830,7 +831,6 @@ Partial Class EVO_Einstellungen
         Me.TabPage_PES.Controls.Add(Me.GroupBox_SekPop)
         Me.TabPage_PES.Controls.Add(Me.PES_Checkbox_isPopul)
         Me.TabPage_PES.Controls.Add(Me.PES_GroupBox_Populationen)
-        Me.TabPage_PES.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabPage_PES.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_PES.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_PES.Name = "TabPage_PES"
@@ -1564,6 +1564,7 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_HookeJeeves
         '
+        Me.TabPage_HookeJeeves.AutoScroll = True
         Me.TabPage_HookeJeeves.BackColor = System.Drawing.Color.Transparent
         Me.TabPage_HookeJeeves.Controls.Add(Label3)
         Me.TabPage_HookeJeeves.Controls.Add(Me.HJ_Numeric_DeltaFinish)
@@ -1624,6 +1625,7 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_MetaEvo
         '
+        Me.TabPage_MetaEvo.AutoScroll = True
         Me.TabPage_MetaEvo.BackColor = System.Drawing.Color.Transparent
         Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_TransferOptions)
         Me.TabPage_MetaEvo.Controls.Add(Me.GroupBox_MetaEvo_LocalOptions)
@@ -1811,6 +1813,7 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_DDS
         '
+        Me.TabPage_DDS.AutoScroll = True
         Me.TabPage_DDS.Controls.Add(Me.DDS_CheckBox_RandomStartparameters)
         Me.TabPage_DDS.Controls.Add(Label11)
         Me.TabPage_DDS.Controls.Add(Me.DDS_Numeric_maxiter)
@@ -1868,6 +1871,7 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_SensiPlot
         '
+        Me.TabPage_SensiPlot.AutoScroll = True
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_CheckBox_SaveResults)
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_CheckBox_wave)
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_Label_NumSteps)
@@ -1878,8 +1882,8 @@ Partial Class EVO_Einstellungen
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_Label_OptParameter)
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_ListBox_OptParameter)
         Me.TabPage_SensiPlot.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_SensiPlot.Margin = New System.Windows.Forms.Padding(0)
         Me.TabPage_SensiPlot.Name = "TabPage_SensiPlot"
-        Me.TabPage_SensiPlot.Padding = New System.Windows.Forms.Padding(3)
         Me.TabPage_SensiPlot.Size = New System.Drawing.Size(221, 668)
         Me.TabPage_SensiPlot.TabIndex = 5
         Me.TabPage_SensiPlot.Text = "SensiPlot"
@@ -1889,7 +1893,7 @@ Partial Class EVO_Einstellungen
         '
         Me.SensiPlot_CheckBox_SaveResults.AutoSize = True
         Me.SensiPlot_CheckBox_SaveResults.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "Save_Results", True))
-        Me.SensiPlot_CheckBox_SaveResults.Location = New System.Drawing.Point(9, 518)
+        Me.SensiPlot_CheckBox_SaveResults.Location = New System.Drawing.Point(6, 515)
         Me.SensiPlot_CheckBox_SaveResults.Name = "SensiPlot_CheckBox_SaveResults"
         Me.SensiPlot_CheckBox_SaveResults.Size = New System.Drawing.Size(180, 17)
         Me.SensiPlot_CheckBox_SaveResults.TabIndex = 16
@@ -1905,7 +1909,7 @@ Partial Class EVO_Einstellungen
         '
         Me.SensiPlot_CheckBox_wave.AutoSize = True
         Me.SensiPlot_CheckBox_wave.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "Show_Wave", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
-        Me.SensiPlot_CheckBox_wave.Location = New System.Drawing.Point(9, 495)
+        Me.SensiPlot_CheckBox_wave.Location = New System.Drawing.Point(6, 492)
         Me.SensiPlot_CheckBox_wave.Name = "SensiPlot_CheckBox_wave"
         Me.SensiPlot_CheckBox_wave.Size = New System.Drawing.Size(129, 17)
         Me.SensiPlot_CheckBox_wave.TabIndex = 15
@@ -1917,7 +1921,7 @@ Partial Class EVO_Einstellungen
         'SensiPlot_Label_NumSteps
         '
         Me.SensiPlot_Label_NumSteps.AutoSize = True
-        Me.SensiPlot_Label_NumSteps.Location = New System.Drawing.Point(6, 462)
+        Me.SensiPlot_Label_NumSteps.Location = New System.Drawing.Point(3, 459)
         Me.SensiPlot_Label_NumSteps.Name = "SensiPlot_Label_NumSteps"
         Me.SensiPlot_Label_NumSteps.Size = New System.Drawing.Size(67, 13)
         Me.SensiPlot_Label_NumSteps.TabIndex = 14
@@ -1974,7 +1978,7 @@ Partial Class EVO_Einstellungen
         'SensiPlot_Label_Objectives
         '
         Me.SensiPlot_Label_Objectives.AutoSize = True
-        Me.SensiPlot_Label_Objectives.Location = New System.Drawing.Point(6, 198)
+        Me.SensiPlot_Label_Objectives.Location = New System.Drawing.Point(3, 195)
         Me.SensiPlot_Label_Objectives.Name = "SensiPlot_Label_Objectives"
         Me.SensiPlot_Label_Objectives.Size = New System.Drawing.Size(147, 13)
         Me.SensiPlot_Label_Objectives.TabIndex = 6
@@ -1991,7 +1995,7 @@ Partial Class EVO_Einstellungen
         'SensiPlot_Label_OptParameter
         '
         Me.SensiPlot_Label_OptParameter.AutoSize = True
-        Me.SensiPlot_Label_OptParameter.Location = New System.Drawing.Point(6, 3)
+        Me.SensiPlot_Label_OptParameter.Location = New System.Drawing.Point(3, 0)
         Me.SensiPlot_Label_OptParameter.Name = "SensiPlot_Label_OptParameter"
         Me.SensiPlot_Label_OptParameter.Size = New System.Drawing.Size(195, 13)
         Me.SensiPlot_Label_OptParameter.TabIndex = 4
@@ -2007,6 +2011,7 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_TSP
         '
+        Me.TabPage_TSP.AutoScroll = True
         Me.TabPage_TSP.Controls.Add(Me.TSP_ComboBox_prob_instance)
         Me.TabPage_TSP.Controls.Add(Me.TSP_Label_Instance)
         Me.TabPage_TSP.Controls.Add(Me.TSP_ComboBox_Mutationoperator)
