@@ -98,6 +98,7 @@ Public Class TalsimThread
 
             'TALSIM starten
             Dim errfile As String = IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".err")
+            Dim errmsg As String
             Dim simendfile As String = IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".SIMEND")
             Dim proc As Process
             Dim startInfo As New ProcessStartInfo()
@@ -110,6 +111,9 @@ Public Class TalsimThread
             'Carry out up to 5 simulation attempts, because TALSIM sometimes blocks access to the time series files in multithreading mode
             Dim n_attempts As Integer = 5
             For i_attempt As Integer = 1 To n_attempts
+
+                errmsg = ""
+                Me.SimIsOK = False
 
                 'start
                 proc = Process.Start(startInfo)
@@ -129,21 +133,10 @@ Public Class TalsimThread
                     Exit For
                 End If
 
-                If i_attempt < n_attempts Then
-                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("TALSIM simulation attempt " & i_attempt & " was unsuccessful, trying again...")
-                    System.Threading.Thread.Sleep(100)
-                Else
-                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("TALSIM simulation attempt " & i_attempt & " was unsuccessful, parameter set will be discarded!")
-                End If
-
-            Next
-
-            If Not Me.SimIsOK Then
-
                 'if .ERR file exists, simulation finished with errors
                 If IO.File.Exists(errfile) Then
                     'read err-file
-                    Dim errmsg As String = "TALSIM simulation ended with errors:"
+                    errmsg = "Thread " & Me.Thread_ID & ": " & "TALSIM simulation ended with errors:"
                     filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
                     strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
                     Do
@@ -152,16 +145,24 @@ Public Class TalsimThread
                     Loop Until strread.Peek = -1
                     strread.Close()
                     filestr.Close()
-
-                    Throw New Exception(errmsg)
                 End If
 
                 'if .SIMEND does not exist, simulation aborted prematurely
                 If Not IO.File.Exists(simendfile) Then
-                    Throw New Exception("Thread " & Me.Thread_ID & ": " & "TALSIM simulation aborted prematurely!")
+                    errmsg = "Thread " & Me.Thread_ID & ": " & "TALSIM simulation aborted prematurely!"
                 End If
 
-            End If
+                'Log error message
+                BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend(errmsg)
+
+                If i_attempt < n_attempts Then
+                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Thread " & Me.Thread_ID & ": " & "TALSIM simulation attempt " & i_attempt & " was unsuccessful, trying again...")
+                    System.Threading.Thread.Sleep(100)
+                Else
+                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Thread " & Me.Thread_ID & ": " & "TALSIM simulation attempt " & i_attempt & " was unsuccessful, parameter set will be discarded!")
+                End If
+
+            Next
 
         Catch ex As Exception
 
