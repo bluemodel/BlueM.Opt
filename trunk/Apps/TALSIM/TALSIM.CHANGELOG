@@ -1,6 +1,23 @@
 Talsim-NG simulation engine changelog
 *************************************
 
+Version 3.1.2.1
+---------------
+* Fixed linear storage cascades producing wrong results when there was an internal timestep iteration #87
+* Fixed snow routine producing wrong results when there was an internal timestep iteration #87
+* Fixed transport elements producing wrong results when there was an internal timestep iteration #87
+* Fixed soil moisture calculation producing wrong results when there was an internal timestep iteration #87
+* Improved estimation of downstream soil capacity when SoilInterconnected=1 by iterating each timestep at least once.
+* SoilInterconnected default setting if not specified in the ALL file is now off
+
+Version 3.1.2.0
+---------------
+* Fixed each time step being calculated twice, which was causing wrong results for some calculations #85
+
+Version 3.1.1.9
+---------------
+* Fixed negative snow heights in results #72
+
 Version 3.1.1.8
 ---------------
 * Change regarding cascading sub-basins (raster datasets):

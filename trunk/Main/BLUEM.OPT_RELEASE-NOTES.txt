@@ -4,6 +4,8 @@ BlueM.Opt Release Notes
 Version 1.8.2
 -------------
 CHANGED:
+* TALSIM-NG: updated engine to v3.1.2.1
+* TALSIM-NG: improved error handling and logging
 * SensiPlot: added an option for saving the datasets of individual solutions in subfolders
 * SensiPlot: minor improvements to interface
 * SensiPlot: max number of steps increased to 1000
