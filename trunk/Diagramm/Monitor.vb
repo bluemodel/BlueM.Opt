@@ -97,7 +97,7 @@ Partial Public Class Monitor
     ''' </summary>
     ''' <param name="text">der Text</param>
     Public Sub LogAppend(ByVal text As String)
-        Call Me.LogAppendText(Format((DateTime.Now - starttime).TotalSeconds, "###,###,##0.00") & ": " & text & BlueM.Opt.Common.Constants.eol)
+        Call Me.LogAppendText(DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss") & ": " & text & BlueM.Opt.Common.Constants.eol)
         System.Windows.Forms.Application.DoEvents()
     End Sub
 
