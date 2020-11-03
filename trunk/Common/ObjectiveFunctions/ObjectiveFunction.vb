@@ -291,13 +291,16 @@ Public MustInherit Class ObjectiveFunction
             Case "LnNashSutt"
                 'Logarithmic Nash Sutcliffe
                 '--------------------------
-                Dim Qobs_quer, zaehler, nenner As Double
+                Dim Qobs_quer, zaehler, nenner, Qobs, Qsim, minValue As Double
                 Qobs_quer = RefReihe.Average
+                minValue = Qobs_quer / 100.0 ' define a minimum value, to prevent Math.Log(0) = -Infinity
                 zaehler = 0.0
                 nenner = 0.0
                 For i = 0 To SimReihe.Length - 1
-                    zaehler += (Math.Log(RefReihe.Values(i)) - Math.Log(SimReihe.Values(i))) ^ 2
-                    nenner += (Math.Log(RefReihe.Values(i)) - Math.Log(Qobs_quer)) ^ 2
+                    Qobs = Math.Max(minValue, RefReihe.Values(i))
+                    Qsim = Math.Max(minValue, SimReihe.Values(i))
+                    zaehler += (Math.Log(Qobs) - Math.Log(Qsim)) ^ 2
+                    nenner += (Math.Log(Qobs) - Math.Log(Qobs_quer)) ^ 2
                 Next
                 'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
                 QWert = zaehler / nenner
