@@ -6,7 +6,7 @@ Version 1.8.3
 CHANGED:
 * Objective function LnNashSutt now uses a minimum value of avg(Qobs) / 100.0 for both observed and simulated values
   in order to prevent -Infinity as a result of calculating the logarithm of 0.
-* TALSIM-NG: updated engine to v3.1.4.4
+* TALSIM-NG: updated engine to v3.1.4.5
 
 Version 1.8.2
 -------------
