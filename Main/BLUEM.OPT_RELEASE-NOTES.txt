@@ -1,6 +1,12 @@
 ﻿===============================================================
 BlueM.Opt Release Notes
 ===============================================================
+Version 1.8.3
+-------------
+CHANGED:
+* Objective function LnNashSutt now uses a minimum value of avg(Qobs) / 100.0 for both observed and simulated values
+  in order to prevent -Infinity as a result of calculating the logarithm of 0.
+
 Version 1.8.2
 -------------
 CHANGED:
