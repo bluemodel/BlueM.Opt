@@ -1,6 +1,43 @@
 Talsim-NG simulation engine changelog
 *************************************
 
+in development
+--------------
+* Changes to soil property definition #82:
+  * Default soil parameters are now stored in sydrodomain.ini for different bulk density classes
+  * Bulk density can be specified and calibrated
+  * Land use can affect bulk density
+  * New functionality is only activated when using the new file formats for BOA and LNZ files (see http://www.talsim.de/docs/index.php/ASCII-Datensatz)
+
+Version 3.1.4.4
+---------------
+* Allow specifying "KGRP" as element type in OPF-file
+* Fix time series on network paths not being found
+
+Version 3.1.4.3
+---------------
+* Fix crash when writing to error file for certain error numbers
+
+Version 3.1.4.2
+---------------
+* Fixed negative soil moisture #104
+
+Version 3.1.4.1
+---------------
+* Fixed reservoir surface functions (precipitation, evaporation, seepage) are now scaled to m3/s
+
+Version 3.1.4.0
+---------------
+* Fixed input time series not being read correctly when using a monthly simulation time step #97
+* Minimum/maximum supported date range is now 01.01.0001 to 31.12.9999 #96
+* Added support for calculating crop water requirements and deficits (requires LNZ file format 2.0 and BOA file format 2.0)
+
+Version 3.1.3.0
+---------------
+* Added support for timeseries in SYDRO SQLite-format (*.db)
+  * Requires new format v1.5 for EXT-file (see http://www.talsim.de/docs/index.php/EXT-Datei)
+* Fixed crash when Max=N is specified in ALL file
+
 Version 3.1.2.1
 ---------------
 * Fixed linear storage cascades producing wrong results when there was an internal timestep iteration #87
