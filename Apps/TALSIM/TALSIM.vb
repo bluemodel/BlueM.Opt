@@ -214,17 +214,17 @@ Public Class Talsim
         End If
         'parse and store SimStart and SimEnd
         'date format can be "dd.MM.yyyy HH:mm" or "dd/MM/yyyy HH:mm"
-        Me.SimStart = New DateTime(settings("SIMSTART").Substring(6, 4), _
-                                   settings("SIMSTART").Substring(3, 2), _
-                                   settings("SIMSTART").Substring(0, 2), _
-                                   settings("SIMSTART").Substring(11, 2), _
-                                   settings("SIMSTART").Substring(14, 2), _
+        Me.SimStart = New DateTime(settings("SIMSTART").Substring(6, 4),
+                                   settings("SIMSTART").Substring(3, 2),
+                                   settings("SIMSTART").Substring(0, 2),
+                                   settings("SIMSTART").Substring(11, 2),
+                                   settings("SIMSTART").Substring(14, 2),
                                    0)
-        Me.SimEnde = New DateTime(settings("SIMEND").Substring(6, 4), _
-                                   settings("SIMEND").Substring(3, 2), _
-                                   settings("SIMEND").Substring(0, 2), _
-                                   settings("SIMEND").Substring(11, 2), _
-                                   settings("SIMEND").Substring(14, 2), _
+        Me.SimEnde = New DateTime(settings("SIMEND").Substring(6, 4),
+                                   settings("SIMEND").Substring(3, 2),
+                                   settings("SIMEND").Substring(0, 2),
+                                   settings("SIMEND").Substring(11, 2),
+                                   settings("SIMEND").Substring(14, 2),
                                    0)
         If Not settings.ContainsKey("TIMESTEP_MIN") Then
             Throw New Exception("Key ""TimeStep_min"" not found in .ALL file!")
@@ -232,11 +232,6 @@ Public Class Talsim
         'store timestep length
         'TODO: what if TIMESTEP_MONTH=J?
         Me.SimDT = New TimeSpan(0, settings("TIMESTEP_MIN"), 0)
-
-        'WORKAROUND: Talsim always omits the last two timesteps from the results file.
-        'Subtract two timesteps from the simulation end in order to allow proper validation of input files
-        Me.SimEnde = Me.SimEnde - Me.SimDT - Me.SimDT
-        MsgBox("TALSIM-NG dataset: Simulation results are always two timesteps shorter than the simulation end date!" & eol & "Setting internally used simulation end date to " & Me.SimEnde, MsgBoxStyle.Information)
 
     End Sub
 

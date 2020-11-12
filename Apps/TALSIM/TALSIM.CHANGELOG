@@ -9,6 +9,18 @@ in development
   * Land use can affect bulk density
   * New functionality is only activated when using the new file formats for BOA and LNZ files (see http://www.talsim.de/docs/index.php/ASCII-Datensatz)
 
+Version 3.1.4.8
+---------------
+* Fix missing timesteps in results at end of simulation #9
+
+Version 3.1.4.7
+---------------
+* Update state saving/reading (hotstart) functionality. Does not yet work for KTR and CWR! #112
+
+Version 3.1.4.6
+---------------
+* Crop Water Requirements: yield response to water calculated using empirical function from FAO is now clamped to between 0 and 1
+
 Version 3.1.4.5
 ---------------
 * Fix calibration parameter NFK not being considered when setting BF0, 
