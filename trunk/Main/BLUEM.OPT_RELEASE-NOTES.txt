@@ -1,6 +1,13 @@
 ﻿===============================================================
 BlueM.Opt Release Notes
 ===============================================================
+Version 1.8.4
+-------------
+CHANGED:
+* TALSIM-NG: updated engine to v3.1.4.8
+* TALSIM-NG: internally used simulation end date is no longer reduced by two time steps
+
+CHANGED:
 Version 1.8.3
 -------------
 CHANGED:
