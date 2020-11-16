@@ -673,8 +673,10 @@ Partial Public Class Form1
         OpenFileDialog1.Title = "Select dataset"
 
         'Alten Datensatz dem Dialog zuweisen
-        OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-        OpenFileDialog1.FileName = Sim1.WorkDir_Original & Sim1.Datensatz & "." & Sim1.DatensatzDateiendungen(0)
+        If Not IsNothing(Sim1.WorkDir_Original) Then
+            OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
+            OpenFileDialog1.FileName = IO.Path.Combine(Sim1.WorkDir_Original, Sim1.Datensatz & "." & Sim1.DatensatzDateiendungen(0))
+        End If
 
         'Dialog öffnen
         DiagResult = OpenFileDialog1.ShowDialog()
@@ -1104,8 +1106,8 @@ Partial Public Class Form1
 
             'Settings in temp-Verzeichnis speichern
             Dim dir As String
-            dir = My.Computer.FileSystem.SpecialDirectories.Temp & "\"
-            Me.saveSettings(dir & "Settings.xml")
+            dir = My.Computer.FileSystem.SpecialDirectories.Temp
+            Me.saveSettings(IO.Path.Combine(dir, "Settings.xml"))
 
             'Event auslösen (BatchMode)
             If (Me.mSettings.General.BatchMode) Then
@@ -1716,7 +1718,7 @@ Partial Public Class Form1
 
         Dim isOK As Boolean
         Dim isSWMM As Boolean
-        Dim WorkDir_Prev As String
+        Dim WorkDir_Prev, WorkDir As String
 
         Dim zre As Wave.TimeSeries
         Dim SimSeries As New Collection                 'zu zeichnende Simulationsreihen
@@ -1731,10 +1733,9 @@ Partial Public Class Form1
         'Wait cursor
         Cursor = Cursors.WaitCursor
 
-        'Simulationen in Originalverzeichnis ausführen (ohne Threads),
+        'Simulationen in eigenen Unterverzeichnissen ausführen (ohne Threads),
         'WorDir_Current aber merken, und am Ende wieder zurücksetzen!
         WorkDir_Prev = Sim1.WorkDir_Current
-        Sim1.WorkDir_Current = Sim1.WorkDir_Original
 
         'Wave instanzieren
         Dim Wave1 As New Wave.Wave()
@@ -1748,6 +1749,14 @@ Partial Public Class Form1
             If (Not checkedSolution_IDs.Contains(ind.ID)) Then
                 Continue For
             End If
+
+            'WorkDir einrichten
+            WorkDir = IO.Path.Combine(Sim1.WorkDir_Original, "solution_" & ind.ID.ToString("0000"))
+            If Not IO.Directory.Exists(WorkDir) Then
+                IO.Directory.CreateDirectory(WorkDir)
+            End If
+            Sim1.copyDateset(WorkDir)
+            Sim1.WorkDir_Current = WorkDir
 
             'Individuum in Sim evaluieren (ohne in DB zu speichern, da es ja bereits drin ist)
             isOK = Sim1.Evaluate(ind, False)

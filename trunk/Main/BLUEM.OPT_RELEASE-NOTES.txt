@@ -1,6 +1,12 @@
 ﻿===============================================================
 BlueM.Opt Release Notes
 ===============================================================
+Version 1.8.5
+-------------
+CHANGED:
+* Simulation applications: simulations of selected solutions are now always carried out in subfolders named "solution_XXXX"
+* SensiPlot: if the option "Save individual datasets" is activated, simulations are carried out in subfolders named "sensiplot_XXXX"
+
 Version 1.8.4
 -------------
 CHANGED:

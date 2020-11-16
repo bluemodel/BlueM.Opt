@@ -86,9 +86,7 @@ Public Class SensiPlotController
         Dim SimReihe As Wave.TimeSeries
         Dim SimReihen As Collection
         Dim Wave1 As Wave.Wave
-
-        'Simulationen in Originalverzeichnis ausführen (keine Threads)
-        Sim1.WorkDir_Current = Sim1.WorkDir_Original
+        Dim WorkDir As String
 
         'Instanzieren
         SimReihen = New Collection()
@@ -204,6 +202,20 @@ Public Class SensiPlotController
                     'OptParameter ins Individuum kopieren
                     ind.OptParameter = Me.myProblem.List_OptParameter
 
+                    'WorkDir einrichten
+                    If Me.mySettings.SensiPlot.Save_Results Then
+                        'Unterverzeichnis einrichten
+                        WorkDir = IO.Path.Combine(Sim1.WorkDir_Original, "sensiplot_" & n.ToString("0000"))
+                        If Not IO.Directory.Exists(WorkDir) Then
+                            IO.Directory.CreateDirectory(WorkDir)
+                        End If
+                        Sim1.copyDateset(WorkDir)
+                        Sim1.WorkDir_Current = WorkDir
+                    Else
+                        'Simulation in Originalverzeichnis ausführen
+                        Sim1.WorkDir_Current = Sim1.WorkDir_Original
+                    End If
+
                     'Individuum in Sim evaluieren
                     isOK = Sim1.Evaluate(ind)
 
@@ -232,14 +244,6 @@ Public Class SensiPlotController
                         End If
                     End If
 
-                    'Save dataset with results
-                    If Me.mySettings.SensiPlot.Save_Results Then
-                        Dim resultdir As String = IO.Path.Combine(Sim1.WorkDir_Original, "solution_" & n)
-                        My.Computer.FileSystem.CreateDirectory(resultdir)
-                        For Each file As String In My.Computer.FileSystem.GetFiles(Sim1.WorkDir_Current)
-                            My.Computer.FileSystem.CopyFile(file, IO.Path.Combine(resultdir, IO.Path.GetFileName(file)), True)
-                        Next
-                    End If
                 End If
 
                 System.Windows.Forms.Application.DoEvents()

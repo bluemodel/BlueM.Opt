@@ -1895,10 +1895,10 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_CheckBox_SaveResults.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "Save_Results", True))
         Me.SensiPlot_CheckBox_SaveResults.Location = New System.Drawing.Point(6, 515)
         Me.SensiPlot_CheckBox_SaveResults.Name = "SensiPlot_CheckBox_SaveResults"
-        Me.SensiPlot_CheckBox_SaveResults.Size = New System.Drawing.Size(180, 17)
+        Me.SensiPlot_CheckBox_SaveResults.Size = New System.Drawing.Size(141, 17)
         Me.SensiPlot_CheckBox_SaveResults.TabIndex = 16
-        Me.SensiPlot_CheckBox_SaveResults.Text = "Save individual solution datasets"
-        Me.ToolTip1.SetToolTip(Me.SensiPlot_CheckBox_SaveResults, "Copies the entire dataset of each individual solutions to a subdirectory")
+        Me.SensiPlot_CheckBox_SaveResults.Text = "Save individual datasets"
+        Me.ToolTip1.SetToolTip(Me.SensiPlot_CheckBox_SaveResults, "If activated, simulations are carried out in subfolders named ""sensiplot_XXXX""")
         Me.SensiPlot_CheckBox_SaveResults.UseVisualStyleBackColor = True
         '
         'BindingSource_Sensiplot

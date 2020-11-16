@@ -109,7 +109,7 @@ Public Class Talsim
 
         If (Not File.Exists(exe_path)) Then
             'use default location instead
-            exe_path = System.Windows.Forms.Application.StartupPath() & "\TALSIM\talsimw64.exe"
+            exe_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "TALSIM\talsimw64.exe")
             If My.Settings.TALSIM_path.Trim() <> "" Then
                 MsgBox("UserSetting for TALSIM_path " & My.Settings.TALSIM_path & " was not found." & vbCrLf & "Using default " & exe_path & " instead.", MsgBoxStyle.Information)
             End If
@@ -181,7 +181,7 @@ Public Class Talsim
 
         'open the .ALL file
         '------------------
-        Dim Datei As String = Me.WorkDir_Original & Me.Datensatz & ".ALL"
+        Dim Datei As String = IO.Path.Combine(Me.WorkDir_Original, Me.Datensatz & ".ALL")
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -461,7 +461,7 @@ Public Class Talsim
 
         'WEL-Datei einlesen
         '------------------
-        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir_Current & Me.Datensatz & ".WEL")
+        Dim WELtmp As Wave.WEL = New Wave.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".WEL"))
 
         'Benötigte Reihen für Import selektieren
         For Each series As String In SimReihen("WEL")
@@ -477,7 +477,7 @@ Public Class Talsim
         'ggf. KWL-Datei einlesen
         '-----------------------
         If (Me.useKWL) Then
-            Dim KWLpath As String = Me.WorkDir_Current & Me.Datensatz & ".KTR.WEL"
+            Dim KWLpath As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".KTR.WEL")
             Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath)
 
             'Benötigte Reihen für Import selektieren
@@ -495,7 +495,7 @@ Public Class Talsim
         'ggf. TEMP.WEL-Datei einlesen
         '----------------------------
         If (Me.useTEMPWEL) Then
-            Dim TEMPWELpath As String = Me.WorkDir_Current & Me.Datensatz & ".TEMP.WEL"
+            Dim TEMPWELpath As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".TEMP.WEL")
             Dim tempwel As Wave.WEL = New Wave.WEL(TEMPWELpath)
 
             'Benötigte Reihen für Import selektieren

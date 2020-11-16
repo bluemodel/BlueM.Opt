@@ -82,7 +82,7 @@ Public Class Scan
         Dim StrReadSync As TextReader
 
         'Parameter einlesen
-        parameterdatei = Me.WorkDir_Current & Me.Datensatz & ".PAR"
+        parameterdatei = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".PAR")
 
         FiStr = New FileStream(parameterdatei, FileMode.Open, IO.FileAccess.Read)
         StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -190,7 +190,7 @@ Public Class Scan
 
         Dim inputdatei As String
 
-        inputdatei = Me.WorkDir_Current & Me.Datensatz & "_input.WEL"
+        inputdatei = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & "_input.WEL")
         Me.input = New Wave.WEL(inputdatei, True)
 
         Me.SimStart = Me.input.FileTimeSeries.First.Value.StartDate

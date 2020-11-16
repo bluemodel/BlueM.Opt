@@ -116,7 +116,7 @@ Public Class BlueMSim
 
         'Pfad zu BlueM.DLL bestimmen
         '---------------------------
-        dll_path = System.Windows.Forms.Application.StartupPath() & "\BlueM\BlueM.dll"
+        dll_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "BlueM\BlueM.dll")
 
         If (Not File.Exists(dll_path)) Then
             Throw New Exception("BlueM.dll nicht gefunden!")
@@ -189,7 +189,7 @@ Public Class BlueMSim
 
         'ALL-Datei öffnen
         '----------------
-        Dim Datei As String = Me.WorkDir_Original & Me.Datensatz & ".ALL"
+        Dim Datei As String = IO.Path.Combine(Me.WorkDir_Original, Me.Datensatz & ".ALL")
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -249,7 +249,7 @@ Public Class BlueMSim
 
         Dim i As Integer
 
-        Dim FiStr As FileStream = New FileStream(WorkDir_Current & Datensatz & ".ver", FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim FiStr As FileStream = New FileStream(IO.Path.Combine(WorkDir_Current, Datensatz & ".ver"), FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         'Anzahl der Parameter feststellen
@@ -339,7 +339,7 @@ Public Class BlueMSim
         Try
 
             'Datensatz übergeben und initialisieren
-            Call bluem_dll(0).Initialize(Me.WorkDir_Current & Me.Datensatz)
+            Call bluem_dll(0).Initialize(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz))
 
             Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(0).GetSimulationEndDate())
 
@@ -425,7 +425,7 @@ Public Class BlueMSim
 
         'WEL-Datei einlesen
         '------------------
-        Dim WELtmp As Wave.WEL = New Wave.WEL(Me.WorkDir_Current & Me.Datensatz & ".WEL")
+        Dim WELtmp As Wave.WEL = New Wave.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".WEL"))
 
         'Benötigte Reihen für Import selektieren
         For Each series As String In SimReihen("WEL")
@@ -442,7 +442,7 @@ Public Class BlueMSim
         '-----------------------
         If (Me.useKWL) Then
 
-            Dim KWLpath As String = Me.WorkDir_Current & Me.Datensatz & ".KWL"
+            Dim KWLpath As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".KWL")
             Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath)
 
             'Benötigte Reihen für Import selektieren
@@ -475,7 +475,7 @@ Public Class BlueMSim
         'Dim SimReihe As Object(,) = {}
 
         ''Simulationsergebnis auslesen
-        'IsOK = Read_PRB(WorkDir & Datensatz & ".PRB", ziel.SimGr, SimReihe)
+        'IsOK = Read_PRB(IO.Path.Combine(WorkDir, Datensatz & ".PRB"), ziel.SimGr, SimReihe)
 
         ''Diff
         ''----
@@ -680,7 +680,7 @@ Public Class BlueMSim
         Dim DateiPfad As String
         Dim SplitZeile() As String
 
-        DateiPfad = WorkDir_Current & Datensatz & ".ver"
+        DateiPfad = IO.Path.Combine(WorkDir_Current, Datensatz & ".ver")
         'Datei öffnen
         Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))

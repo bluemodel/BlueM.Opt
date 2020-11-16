@@ -232,7 +232,7 @@ Public Class ObjectiveFunction_SKos
         ReDim TRS_Array(-1)
 
         'Dim TRS_Array(,) As Object = {}
-        Dim Datei As String = WorkDir & Me.mProblem.Datensatz & ".TRS"
+        Dim Datei As String = IO.Path.Combine(WorkDir, Me.mProblem.Datensatz & ".TRS")
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -382,7 +382,7 @@ Public Class ObjectiveFunction_SKos
     Private Sub Read_TAL(ByRef TAl_Array(,) As Object, ByRef WorkDir As String)
 
         'Dim TAL_Array(,) As Object = {}
-        Dim Datei As String = WorkDir & Me.mProblem.Datensatz & ".TAL"
+        Dim Datei As String = IO.Path.Combine(WorkDir, Me.mProblem.Datensatz & ".TAL")
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
