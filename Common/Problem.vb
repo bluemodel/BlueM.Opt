@@ -373,7 +373,7 @@ Public Class Problem
         '*| Bezeichnung  | Einh. | Anfangsw. |  Min   |  Max   | Beziehung |  Objekt  | Zeitpunkt |
         '*|-<---------->-|-<--->-|-<------->-|-<---->-|-<---->-|-<------->-|-<------>-|-<------->-|
 
-        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_OPT
+        Dim Datei As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & FILEEXT_OPT)
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -445,7 +445,7 @@ Public Class Problem
         '*| OptParameter | Bezeichnung  | Einh. | Datei | Elem  | Zeile | von | bis | Faktor |
         '*|-<---------->-|-<---------->-|-<--->-|-<--->-|-<--->-|-<--->-|-<->-|-<->-|-<---->-|
 
-        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_MOD
+        Dim Datei As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & FILEEXT_MOD)
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -522,7 +522,7 @@ Public Class Problem
         Dim WerteArray() As String
 
         'Path to file
-        Dim filepath As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_OBF
+        Dim filepath As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & FILEEXT_OBF)
 
         'Open the file
         Dim FiStr As New FileStream(filepath, FileMode.Open, IO.FileAccess.Read)
@@ -611,7 +611,7 @@ Public Class Problem
                             End If
 
                             'Referenzreihe einlesen
-                            .RefReihe = Me.Read_ZIE_RefReihe(Me.mWorkDir & .RefReiheDatei, .RefGr, .EvalStart, .EvalEnde)
+                            .RefReihe = Me.Read_ZIE_RefReihe(IO.Path.Combine(Me.mWorkDir, .RefReiheDatei), .RefGr, .EvalStart, .EvalEnde)
 
                         End With
 
@@ -963,7 +963,7 @@ Public Class Problem
         Dim WerteArray() As String
         Const AnzSpalten As Integer = 9
 
-        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & FILEEXT_CON
+        Dim Datei As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & FILEEXT_CON)
 
         If (File.Exists(Datei)) Then
 
@@ -1026,10 +1026,10 @@ Public Class Problem
                         ext = System.IO.Path.GetExtension(.GrenzReiheDatei)
                         Select Case (ext.ToUpper)
                             Case ".WEL"
-                                Dim WEL As New Wave.WEL(Me.mWorkDir & .GrenzReiheDatei)
+                                Dim WEL As New Wave.WEL(IO.Path.Combine(Me.mWorkDir, .GrenzReiheDatei))
                                 .GrenzReihe = WEL.getTimeSeries(.GrenzGr)
                             Case ".ZRE"
-                                Dim ZRE As New Wave.ZRE(Me.mWorkDir & .GrenzReiheDatei)
+                                Dim ZRE As New Wave.ZRE(IO.Path.Combine(Me.mWorkDir, .GrenzReiheDatei))
                                 .GrenzReihe = ZRE.getTimeSeries(0)
                             Case Else
                                 Throw New Exception("Constraints: The file format of the threshold series '" & .GrenzReiheDatei & "' is not supported!")
@@ -1068,7 +1068,7 @@ Public Class Problem
     ''' <remarks>Nur bei Kombinatorik verwendet. http://wiki.bluemodel.org/index.php/CES-Datei</remarks>
     Private Sub Read_CES()
 
-        Dim Datei As String = Me.mWorkDir & Me.Datensatz & "." & BlueM.Opt.Common.Problem.FILEEXT_CES
+        Dim Datei As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & BlueM.Opt.Common.Problem.FILEEXT_CES)
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))

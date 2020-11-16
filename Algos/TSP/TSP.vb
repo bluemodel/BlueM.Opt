@@ -126,8 +126,8 @@ Public Class TSP
         End Select
 
         If pngExport = True Then
-            Directory.CreateDirectory(Directory.GetCurrentDirectory & "\TSP_Export").ToString()
-            ExPath = Directory.GetCurrentDirectory & "\TSP_Export\"
+            Directory.CreateDirectory(IO.Path.Combine(Directory.GetCurrentDirectory, "TSP_Export"))
+            ExPath = IO.Path.Combine(Directory.GetCurrentDirectory, "TSP_Export")
         End If
 
     End Sub

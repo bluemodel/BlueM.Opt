@@ -316,10 +316,10 @@ Public Class OptResult
         '---------------------------------------------------
 
         'Datenbankpfad
-        Me.db_path = My.Computer.FileSystem.SpecialDirectories.Temp & "\EVO.mdb"
+        Me.db_path = IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "EVO.mdb")
 
         'Pfad zur Vorlage
-        Dim db_source_path As String = System.Windows.Forms.Application.StartupPath() & "\EVO.mdb"
+        Dim db_source_path As String = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "EVO.mdb")
 
         'Datei kopieren
         My.Computer.FileSystem.CopyFile(db_source_path, Me.db_path, True)

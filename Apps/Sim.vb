@@ -120,8 +120,8 @@ Public MustInherit Class Sim
 
     ''' <summary>
     ''' Wird ausgelöst, wenn ein Individuum,
-	''' das in einem Array an die Evaluate() Methode übergeben wurde,
-	''' erfolgreich evaluiert wurde
+    ''' das in einem Array an die Evaluate() Methode übergeben wurde,
+    ''' erfolgreich evaluiert wurde
     ''' </summary>
     ''' <param name="ind">das evaluierte Individuum</param>
     ''' <param name="i_Nachf">0-basierte Nachfahren-Nummer</param>
@@ -214,8 +214,8 @@ Public MustInherit Class Sim
             'Datensatzname bestimmen
             Me.Datensatz = Path.GetFileNameWithoutExtension(pfad)
             'Arbeitsverzeichnis bestimmen
-            Me.WorkDir_Current = Path.GetDirectoryName(pfad) & "\"
-            Me.WorkDir_Original = Path.GetDirectoryName(pfad) & "\"
+            Me.WorkDir_Current = Path.GetDirectoryName(pfad)
+            Me.WorkDir_Original = Path.GetDirectoryName(pfad)
         Else
             Throw New Exception("Der Datensatz '" & pfad & "' existiert nicht!")
         End If
@@ -827,7 +827,7 @@ Public MustInherit Class Sim
         For i = 0 To Me.mProblem.List_ModellParameter.GetUpperBound(0)
             WriteCheck = True
 
-            DateiPfad = Me.WorkDir_Current & Me.Datensatz & "." & Me.mProblem.List_ModellParameter(i).Datei
+            DateiPfad = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & "." & Me.mProblem.List_ModellParameter(i).Datei)
             'Datei öffnen
             FiStr = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
             StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -1020,39 +1020,42 @@ Public MustInherit Class Sim
     End Property
 
     ''' <summary>
+    ''' Kopiert alle Datensatz-Dateien vom Original WorkDir in das angegebene Zielverzeichnis
+    ''' </summary>
+    ''' <param name="destination">Zielverzeichnis</param>
+    Public Sub copyDateset(destination As String)
+
+        Dim relPaths() As String
+
+        'zu kopierende Dateien bestimmen
+        relPaths = Me.getDatensatzFiles(Me.WorkDir_Original)
+
+        'Dateien kopieren
+        For Each relPath As String In relPaths
+            My.Computer.FileSystem.CopyFile(IO.Path.Combine(Me.WorkDir_Original, relPath), IO.Path.Combine(destination, relPath), True)
+        Next
+
+    End Sub
+
+    ''' <summary>
     ''' Datensätze für Multithreading kopieren
     ''' </summary>
     ''' <returns>True wenn fertig</returns>
-    ''' <remarks>Erstellt im bin-Ordner Verzeichnisse Thread_0 bis Thread_n</remarks>
+    ''' <remarks>Erstellt im bin-Ordner Verzeichnisse Thread_0 bis Thread_n mit Kopien des Original-Datensatzes</remarks>
     Private Function createThreadWorkDirs() As Boolean
 
         Dim i As Integer
         Dim isOK As Boolean
-        Dim Source, Dest, relPaths() As String
+        Dim threadDir As String
         Dim binPath As String = System.Windows.Forms.Application.StartupPath()
-
-        Source = Me.WorkDir_Original
-        Dest = binPath & "\Thread_0\"
 
         'Alte Thread-Ordner löschen
         isOK = Me.deleteThreadWorkDirs()
 
-        'zu kopierende Dateien bestimmen
-        relPaths = Me.getDatensatzFiles(Source)
-
-        'Dateien in Ordner Thread_0 kopieren
-        For Each relPath As String In relPaths
-            My.Computer.FileSystem.CopyFile(Source & relPath, Dest & relPath, True)
-        Next
-
-        'Für die weiteren Threads den Ordner Thread_0 kopieren
-        Source = binPath & "\Thread_0\"
-
-        For i = 1 To Me.n_Threads - 1
-
-            Dest = binPath & "\Thread_" & i.ToString() & "\"
-            My.Computer.FileSystem.CopyDirectory(Source, Dest, True)
-
+        'Datensatz in alle Thread-Ordner kopieren
+        For i = 0 To Me.n_Threads - 1
+            threadDir = IO.Path.Combine(binPath, "Thread_" & i)
+            Call Me.copyDateset(threadDir)
         Next
 
         Return True
@@ -1096,8 +1099,8 @@ Public MustInherit Class Sim
         'Unterverzeichnisse rekursiv durchsuchen
         Dirs = DirInfo.GetDirectories("*.*")
         For Each dir As IO.DirectoryInfo In Dirs
-            '.svn-Verzeichnisse überspringen
-            If (dir.Name <> ".svn") Then
+            'versteckte und solution- sowie sensiplot-Verzeichnisse überspringen
+            If Not (dir.Name.StartsWith(".") Or dir.Name.StartsWith("solution_") Or dir.Name.StartsWith("sensiplot_")) Then
                 'Pfade aus Unterverzeichnis holen
                 subpaths = Me.getDatensatzFiles(dir.FullName)
                 'Pfade zu Array hinzufügen
@@ -1125,7 +1128,7 @@ Public MustInherit Class Sim
 
         For i = 0 To 9
 
-            dir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & i.ToString() & "\"
+            dir = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "Thread_" & i.ToString())
 
             If Directory.Exists(dir) Then
                 Call BlueM.Opt.Common.FileHelper.purgeReadOnly(dir)
@@ -1145,7 +1148,7 @@ Public MustInherit Class Sim
 
         Dim dir As String
 
-        dir = System.Windows.Forms.Application.StartupPath() & "\Thread_" & Thread_ID.ToString() & "\"
+        dir = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "Thread_" & Thread_ID.ToString())
 
         Return dir
 

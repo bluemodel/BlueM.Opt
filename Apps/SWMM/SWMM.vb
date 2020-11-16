@@ -26,7 +26,7 @@
 '--------------------------------------------------------------------------------------------
 '
 Imports System.IO
-Imports IHWB.SWMM.DllAdapter
+Imports IHWB.SWMM.DLLAdapter
 Imports System.Threading
 
 '*******************************************************************************
@@ -104,7 +104,7 @@ Public Class SWMM
 
         'Pfad zu SWMM5.DLL bestimmen
         '---------------------------
-        dll_path = System.Windows.Forms.Application.StartupPath() & "\SWMM\SWMM5.dll"
+        dll_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "SWMM\SWMM5.dll")
 
         If (Not File.Exists(dll_path)) Then
             Throw New Exception("SWMM.dll nicht gefunden!")
@@ -153,7 +153,7 @@ Public Class SWMM
 
         'INP-Datei öffnen
         '----------------
-        Dim Datei As String = Me.WorkDir_Original & Me.Datensatz & ".inp"
+        Dim Datei As String = IO.Path.Combine(Me.WorkDir_Original, Me.Datensatz & ".inp")
 
         Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
         Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
@@ -227,7 +227,7 @@ Public Class SWMM
 
         Try
 
-			Call swmm_dll(0).Initialize(Me.WorkDir_Current & Me.Datensatz)
+            Call swmm_dll(0).Initialize(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz))
             Call swmm_dll(0).Start(1)
 
             Dim elapsedTime As Double = 0.0
@@ -242,7 +242,7 @@ Public Class SWMM
             ''überprüfen, ob Simulation erfolgreich
             ''-------------------------------------
             ''rpt-Datei öffnen
-            'Dim FiStr As FileStream = New FileStream(Me.WorkDir_Current & Me.Datensatz & ".rpt", FileMode.Open, IO.FileAccess.ReadWrite)
+            'Dim FiStr As FileStream = New FileStream(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".rpt"), FileMode.Open, IO.FileAccess.ReadWrite)
             'Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
             'Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
@@ -331,149 +331,149 @@ Public Class SWMM
         'Einlesen des Binaerfiles mit den Ganglinien spaeter dazunehmen 
         Dim DateiPfad As String
         Dim Zeile As String
-        
+
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
 
         'Ablauf
-         'Durchgehen aller ObjectiveFunctions - Objekte
-         'Einlesen in das Objekt SimErgebnis
+        'Durchgehen aller ObjectiveFunctions - Objekte
+        'Einlesen in das Objekt SimErgebnis
 
-         For Each obj As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-            
+        For Each obj As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+
             'Unterscheidung nach ObjectiveType
             Select Case obj.GetObjType
-               Case Common.ObjectiveFunction.ObjectiveType.Series
+                Case Common.ObjectiveFunction.ObjectiveType.Series
                   'TODO
                   'Zeitreihe einlesen
-               Case Common.ObjectiveFunction.ObjectiveType.Value
-                  'TODO: Umbauen, so dass Datei nicht jedes mal geoeffnet werden muss
-                  '.RPT-Datei oeffnen
-                  DateiPfad = WorkDir_Current & Datensatz & "." & obj.Datei
-                  Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
-                  Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-                  Dim KeyWord_Block As String, KeyWord_SimGr As String
-                  Dim NoSpalte As Short
-                  Dim tmpValue As Double
-                  Dim blnValueAdded As Boolean
-                  'Datei durchgehen und mit Block und Spaltenangabe aus obj den gesuchten Wert ermitteln
-                  'und diesen dann in Sim_Ergebnis schreiben
-                  Dim objValue As Common.Objectivefunction_Value
-                  objValue = obj
-                  Select Case objValue.Block
-                     Case "NodeFlooding"
-                        KeyWord_Block = "  Node Flooding Summary"
-                        Select Case objValue.Spalte
-                           Case "HoursFlooded"
-                              NoSpalte = 2
-                           Case "FloodVolume"
-                              NoSpalte = 6
-                           Case Else
-                              Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
-                        End Select
-                     Case "StorageVolume"
-                        KeyWord_Block = "  Storage Volume Summary"
-                        Select Case objValue.Spalte
-                           Case "AvgVolume"
-                              NoSpalte = 2
-                           Case "AvgPctFull"
-                              NoSpalte = 3
-                           Case "MaxVolume"
-                              NoSpalte = 4
-                           Case "MaxPctFull"
-                              NoSpalte = 5
-                           Case "MaxOutflow"
-                              NoSpalte = 8
-                           Case Else
-                              Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
-                        End Select
-                     Case "OutfallLoad"
-                        KeyWord_Block = "  Outfall Loading Summary"
-                        Select Case objValue.Spalte
-                           Case "MaxFlow"
-                              NoSpalte = 4
-                           Case "FlowVolume"
-                              NoSpalte = 5
-                           Case "Pollutant_01"
-                              NoSpalte = 6
-                           Case "Pollutant_02"
-                              NoSpalte = 7
-                           Case "Pollutant_03"
-                              NoSpalte = 8
-                           Case "Pollutant_04"
-                              NoSpalte = 9
-                           Case "Pollutant_05"
-                              NoSpalte = 10
-                           Case "Pollutant_06"
-                              NoSpalte = 11
-                           Case Else
-                              Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
-                        End Select
-                     Case "LinkFlow"
-                        KeyWord_Block = "  Link Flow Summary"
-                     Case "ConduitSurcharge"
-                        KeyWord_Block = "  Conduit Surcharge Summary"
-                     Case "Pumping"
-                        KeyWord_Block = "  Pumping Summary"
-                        Select Case objValue.Spalte
-                           Case "OnlineTime"
-                              NoSpalte = 2
-                           Case "TotalEnergy"
-                              NoSpalte = 6
-                              Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
-                        End Select
-                     Case Else
-                        Throw New Exception("Das Schluesselword für den Block ist ungueltig")
-                  End Select
-                  'Datei durchgehen und nach Schluesselwort suchen
-                  blnValueAdded = False
-                  Do
-                     KeyWord_SimGr = "  " & objValue.SimGr
-                     Zeile = StrRead.ReadLine.ToString
-                     If (Zeile.StartsWith(KeyWord_Block)) Then
-                        Zeile = StrRead.ReadLine.ToString    'Es folgt immer eine Zeile mit Sternen
-                        Zeile = StrRead.ReadLine.ToString    'und dann noch eine Leerzeile
-                        Do
-                           Zeile = StrRead.ReadLine.ToString
-                           If (Zeile.StartsWith(KeyWord_SimGr)) Then
-                              tmpValue = Convert.ToDouble(Zeile.Split(" ", options:=StringSplitOptions.RemoveEmptyEntries)(NoSpalte - 1), Common.Provider.FortranProvider)
-                              Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
-                              blnValueAdded = True
-                              Exit Do
-                           'Falls keine Nodes überstaut sind bei Node Flooding Summary muss geährleistet werden,
-                           'dass der Wert 0 übergeben wird. 
-                           'Select Case objValue.Block
-                           '   Case "NodeFlooding"
-                           '      If Zeile.TrimStart.StartsWith("No nodes were flooded.") Then
-                           '         tmpValue = 0.0
-                           '         Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
-                           '         blnValueAdded = True
-                           '         Exit Do
-                              'Case Else
-                           'End Select
-                           'Wenn die SimGr nicht im Block auftaucht muss tmpvalue = 0 gesetzt werden
-                           ElseIf Zeile.TrimStart.StartsWith("**********************") Then    'nächster Block beginnt
-                              tmpValue = 0.0
-                              Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
-                              blnValueAdded = True
-                              Exit Do
-                           End If
-                        Loop Until StrRead.Peek() = -1
-                     End If
-                     If blnValueAdded Then Exit Do
-                  Loop Until StrRead.Peek() = -1
-                  StrRead.Close()
-                  FiStr.Close()
+                Case Common.ObjectiveFunction.ObjectiveType.Value
+                    'TODO: Umbauen, so dass Datei nicht jedes mal geoeffnet werden muss
+                    '.RPT-Datei oeffnen
+                    DateiPfad = IO.Path.Combine(WorkDir_Current, Datensatz & "." & obj.Datei)
+                    Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
+                    Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+                    Dim KeyWord_Block As String, KeyWord_SimGr As String
+                    Dim NoSpalte As Short
+                    Dim tmpValue As Double
+                    Dim blnValueAdded As Boolean
+                    'Datei durchgehen und mit Block und Spaltenangabe aus obj den gesuchten Wert ermitteln
+                    'und diesen dann in Sim_Ergebnis schreiben
+                    Dim objValue As Common.Objectivefunction_Value
+                    objValue = obj
+                    Select Case objValue.Block
+                        Case "NodeFlooding"
+                            KeyWord_Block = "  Node Flooding Summary"
+                            Select Case objValue.Spalte
+                                Case "HoursFlooded"
+                                    NoSpalte = 2
+                                Case "FloodVolume"
+                                    NoSpalte = 6
+                                Case Else
+                                    Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
+                            End Select
+                        Case "StorageVolume"
+                            KeyWord_Block = "  Storage Volume Summary"
+                            Select Case objValue.Spalte
+                                Case "AvgVolume"
+                                    NoSpalte = 2
+                                Case "AvgPctFull"
+                                    NoSpalte = 3
+                                Case "MaxVolume"
+                                    NoSpalte = 4
+                                Case "MaxPctFull"
+                                    NoSpalte = 5
+                                Case "MaxOutflow"
+                                    NoSpalte = 8
+                                Case Else
+                                    Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
+                            End Select
+                        Case "OutfallLoad"
+                            KeyWord_Block = "  Outfall Loading Summary"
+                            Select Case objValue.Spalte
+                                Case "MaxFlow"
+                                    NoSpalte = 4
+                                Case "FlowVolume"
+                                    NoSpalte = 5
+                                Case "Pollutant_01"
+                                    NoSpalte = 6
+                                Case "Pollutant_02"
+                                    NoSpalte = 7
+                                Case "Pollutant_03"
+                                    NoSpalte = 8
+                                Case "Pollutant_04"
+                                    NoSpalte = 9
+                                Case "Pollutant_05"
+                                    NoSpalte = 10
+                                Case "Pollutant_06"
+                                    NoSpalte = 11
+                                Case Else
+                                    Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
+                            End Select
+                        Case "LinkFlow"
+                            KeyWord_Block = "  Link Flow Summary"
+                        Case "ConduitSurcharge"
+                            KeyWord_Block = "  Conduit Surcharge Summary"
+                        Case "Pumping"
+                            KeyWord_Block = "  Pumping Summary"
+                            Select Case objValue.Spalte
+                                Case "OnlineTime"
+                                    NoSpalte = 2
+                                Case "TotalEnergy"
+                                    NoSpalte = 6
+                                    Throw New Exception("Das Schluesselwort für die Spalte ist ungueltig!")
+                            End Select
+                        Case Else
+                            Throw New Exception("Das Schluesselword für den Block ist ungueltig")
+                    End Select
+                    'Datei durchgehen und nach Schluesselwort suchen
+                    blnValueAdded = False
+                    Do
+                        KeyWord_SimGr = "  " & objValue.SimGr
+                        Zeile = StrRead.ReadLine.ToString
+                        If (Zeile.StartsWith(KeyWord_Block)) Then
+                            Zeile = StrRead.ReadLine.ToString    'Es folgt immer eine Zeile mit Sternen
+                            Zeile = StrRead.ReadLine.ToString    'und dann noch eine Leerzeile
+                            Do
+                                Zeile = StrRead.ReadLine.ToString
+                                If (Zeile.StartsWith(KeyWord_SimGr)) Then
+                                    tmpValue = Convert.ToDouble(Zeile.Split(" ", options:=StringSplitOptions.RemoveEmptyEntries)(NoSpalte - 1), Common.Provider.FortranProvider)
+                                    Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                                    blnValueAdded = True
+                                    Exit Do
+                                    'Falls keine Nodes überstaut sind bei Node Flooding Summary muss geährleistet werden,
+                                    'dass der Wert 0 übergeben wird. 
+                                    'Select Case objValue.Block
+                                    '   Case "NodeFlooding"
+                                    '      If Zeile.TrimStart.StartsWith("No nodes were flooded.") Then
+                                    '         tmpValue = 0.0
+                                    '         Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                                    '         blnValueAdded = True
+                                    '         Exit Do
+                                    'Case Else
+                                    'End Select
+                                    'Wenn die SimGr nicht im Block auftaucht muss tmpvalue = 0 gesetzt werden
+                                ElseIf Zeile.TrimStart.StartsWith("**********************") Then    'nächster Block beginnt
+                                    tmpValue = 0.0
+                                    Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                                    blnValueAdded = True
+                                    Exit Do
+                                End If
+                            Loop Until StrRead.Peek() = -1
+                        End If
+                        If blnValueAdded Then Exit Do
+                    Loop Until StrRead.Peek() = -1
+                    StrRead.Close()
+                    FiStr.Close()
 
 
-               Case Common.ObjectiveFunction.ObjectiveType.ValueFromSeries
-                  'TODO
-               Case Else
-                  'TODO
+                Case Common.ObjectiveFunction.ObjectiveType.ValueFromSeries
+                    'TODO
+                Case Else
+                    'TODO
             End Select
-         Next
+        Next
 
-        
+
     End Sub
 
 #Region "Kombinatorik"

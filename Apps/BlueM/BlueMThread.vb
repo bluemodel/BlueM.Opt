@@ -59,7 +59,7 @@ Public Class BlueMSimThread
 
         Try
             'Datensatz übergeben und initialisieren
-            Call bluem_dll.Initialize(Me.WorkFolder & Me.DS_Name)
+            Call bluem_dll.Initialize(IO.Path.Combine(Me.WorkFolder, Me.DS_Name))
 
             Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll.GetSimulationEndDate())
 
