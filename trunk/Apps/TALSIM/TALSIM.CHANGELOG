@@ -9,6 +9,10 @@ in development
   * Land use can affect bulk density
   * New functionality is only activated when using the new file formats for BOA and LNZ files (see http://www.talsim.de/docs/index.php/ASCII-Datensatz)
 
+Version 3.1.4.9
+---------------
+* Fix Soil Name in BOA file not being recognized if not left-aligned
+
 Version 3.1.4.8
 ---------------
 * Fix missing timesteps in results at end of simulation #9
