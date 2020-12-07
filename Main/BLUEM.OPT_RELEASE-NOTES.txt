@@ -1,6 +1,11 @@
 ﻿===============================================================
 BlueM.Opt Release Notes
 ===============================================================
+Version 1.8.6
+-------------
+FIXED:
+* Prevent the user from loading incompatible settings (single-/multiobjective PES)
+
 Version 1.8.5
 -------------
 CHANGED:
