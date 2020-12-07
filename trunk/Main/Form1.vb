@@ -361,6 +361,7 @@ Partial Public Class Form1
     Public Sub loadSettings(ByVal filename As String)
 
         Dim serializer As New XmlSerializer(GetType(Common.Settings))
+        Dim settings As Common.Settings
 
         AddHandler serializer.UnknownElement, AddressOf serializerUnknownElement
         AddHandler serializer.UnknownAttribute, AddressOf serializerUnknownAttribute
@@ -371,9 +372,15 @@ Partial Public Class Form1
         Try
             'Deserialisieren
             'TODO: XmlDeserializationEvents ms-help://MS.VSCC.v90/MS.MSDNQTR.v90.en/fxref_system.xml/html/e0657840-5678-bf57-6e7a-1bd93b2b27d1.htm
-            Me.mSettings = CType(serializer.Deserialize(fs), Common.Settings)
+            settings = CType(serializer.Deserialize(fs), Common.Settings)
+
+            'Checks: PES OptMode has to be identical
+            If settings.PES.OptModus <> Me.mSettings.PES.OptModus Then
+                Throw New Exception("The loaded settings use a different optimization mode (single-/multiobjective) and are not compatible!")
+            End If
 
             'Geladene Settings überall neu setzen
+            Me.mSettings = settings
             Me.EVO_Einstellungen1.setSettings(Me.mSettings)
             Me.Hauptdiagramm1.setSettings(Me.mSettings)
             If (Not IsNothing(Me.Sim1)) Then
