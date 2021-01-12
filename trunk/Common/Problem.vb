@@ -383,10 +383,11 @@ Public Class Problem
 
         'Anzahl der Parameter feststellen
         Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                AnzParam += 1
+            Zeile = StrRead.ReadLine()
+            If Zeile.Trim().Length = 0 Or Zeile.StartsWith("*") Then
+                Continue Do
             End If
+            AnzParam += 1
         Loop Until StrRead.Peek() = -1
 
         ReDim List_OptParameter(AnzParam - 1)
@@ -399,29 +400,30 @@ Public Class Problem
         Dim Bez_str As String = ""
         Dim i As Integer = 0
         Do
-            Zeile = StrRead.ReadLine.ToString()
-            If (Zeile.StartsWith("*") = False) Then
-                'OptParameter instanzieren
-                List_OptParameter(i) = New BlueM.Opt.Common.OptParameter()
-                array = Zeile.Split("|")
-                'Werte zuweisen
-                List_OptParameter(i).Bezeichnung = array(1).Trim()
-                List_OptParameter(i).Einheit = array(2).Trim()
-                List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
-                List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Common.Provider.FortranProvider)
-                List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
-
-                'liegt eine Beziehung vor?
-                If (i > 0 And array.GetUpperBound(0) > 6) Then
-                    If Not array(6).Trim() = "" Then
-                        Me.List_OptParameter(i).Beziehung = Common.Constants.getRelationship(array(6).Trim())
-                    End If
-                End If
-
-                'Eingelesenen Startwert setzen
-                List_OptParameter(i).RWert = List_OptParameter(i).StartWert
-                i += 1
+            Zeile = StrRead.ReadLine()
+            If Zeile.Trim().Length = 0 Or Zeile.StartsWith("*") Then
+                Continue Do
             End If
+            'OptParameter instanzieren
+            List_OptParameter(i) = New BlueM.Opt.Common.OptParameter()
+            array = Zeile.Split("|")
+            'Werte zuweisen
+            List_OptParameter(i).Bezeichnung = array(1).Trim()
+            List_OptParameter(i).Einheit = array(2).Trim()
+            List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
+            List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Common.Provider.FortranProvider)
+            List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
+
+            'liegt eine Beziehung vor?
+            If (i > 0 And array.GetUpperBound(0) > 6) Then
+                If Not array(6).Trim() = "" Then
+                    Me.List_OptParameter(i).Beziehung = Common.Constants.getRelationship(array(6).Trim())
+                End If
+            End If
+
+            'Eingelesenen Startwert setzen
+            List_OptParameter(i).RWert = List_OptParameter(i).StartWert
+            i += 1
         Loop Until StrRead.Peek() = -1
 
         StrRead.Close()
@@ -455,8 +457,8 @@ Public Class Problem
 
         'Anzahl der Parameter feststellen
         Do
-            Zeile = StrRead.ReadLine.ToString()
-            If Zeile.Trim().Length = 0 Or Zeile.Trim().StartsWith("*") Then
+            Zeile = StrRead.ReadLine()
+            If Zeile.Trim().Length = 0 Or Zeile.StartsWith("*") Then
                 Continue Do
             End If
             AnzParam += 1
@@ -472,8 +474,8 @@ Public Class Problem
         Dim i As Integer = 0
 
         Do
-            Zeile = StrRead.ReadLine.ToString()
-            If Zeile.Trim().Length = 0 Or Zeile.Trim().StartsWith("*") Then
+            Zeile = StrRead.ReadLine()
+            If Zeile.Trim().Length = 0 Or Zeile.StartsWith("*") Then
                 Continue Do
             End If
             array = Zeile.Split("|")
@@ -536,7 +538,7 @@ Public Class Problem
             'Read the file
             i = 0
             Do
-                Zeile = StrRead.ReadLine.ToString()
+                Zeile = StrRead.ReadLine()
 
                 'Determine the current block / objective type
                 '--------------------------------------------
@@ -556,7 +558,7 @@ Public Class Problem
 
                 'Skip comment and empty lines
                 '----------------------------
-                If (Zeile.StartsWith("*") Or Not Zeile.Contains("|")) Then
+                If Zeile.Trim().Length = 0 Or Zeile.StartsWith("*") Then
                     Continue Do
                 End If
 
@@ -973,32 +975,33 @@ Public Class Problem
             i = 0
             Do
                 'Zeile einlesen
-                Zeile = StrRead.ReadLine.ToString()
-                If (Not Zeile.StartsWith("*") And Zeile.Contains("|")) Then
-                    WerteArray = Zeile.Split("|")
-                    'Kontrolle
-                    If (WerteArray.GetUpperBound(0) <> AnzSpalten + 1) Then
-                        Throw New Exception("The CON input file has the wrong number of columns!")
-                    End If
-                    'Neues Constraint anlegen
-                    ReDim Preserve Me.List_Constraintfunctions(i)
-                    Me.List_Constraintfunctions(i) = New Common.Constraintfunction()
-                    'Werte zuweisen
-                    With Me.List_Constraintfunctions(i)
-                        .Bezeichnung = WerteArray(1).Trim()
-                        .Typ = WerteArray(2).Trim()
-                        .Datei = WerteArray(3).Trim()
-                        .SimGr = WerteArray(4).Trim()
-                        .GrenzPos = WerteArray(5).Trim()
-                        .WertFunktion = WerteArray(6).Trim()
-                        If (WerteArray(7).Trim() <> "") Then
-                            .GrenzWert = Convert.ToDouble(WerteArray(7).Trim(), Common.Provider.FortranProvider)
-                        End If
-                        .GrenzGr = WerteArray(8).Trim()
-                        .GrenzReiheDatei = WerteArray(9).Trim()
-                    End With
-                    i += 1
+                Zeile = StrRead.ReadLine()
+                If Zeile.Trim().Length = 0 Or Zeile.StartsWith("*") Then
+                    Continue Do
                 End If
+                WerteArray = Zeile.Split("|")
+                'Kontrolle
+                If (WerteArray.GetUpperBound(0) <> AnzSpalten + 1) Then
+                    Throw New Exception("The CON input file has the wrong number of columns!")
+                End If
+                'Neues Constraint anlegen
+                ReDim Preserve Me.List_Constraintfunctions(i)
+                Me.List_Constraintfunctions(i) = New Common.Constraintfunction()
+                'Werte zuweisen
+                With Me.List_Constraintfunctions(i)
+                    .Bezeichnung = WerteArray(1).Trim()
+                    .Typ = WerteArray(2).Trim()
+                    .Datei = WerteArray(3).Trim()
+                    .SimGr = WerteArray(4).Trim()
+                    .GrenzPos = WerteArray(5).Trim()
+                    .WertFunktion = WerteArray(6).Trim()
+                    If (WerteArray(7).Trim() <> "") Then
+                        .GrenzWert = Convert.ToDouble(WerteArray(7).Trim(), Common.Provider.FortranProvider)
+                    End If
+                    .GrenzGr = WerteArray(8).Trim()
+                    .GrenzReiheDatei = WerteArray(9).Trim()
+                End With
+                i += 1
             Loop Until StrRead.Peek() = -1
 
             StrRead.Close()
