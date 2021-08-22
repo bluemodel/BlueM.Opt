@@ -938,6 +938,11 @@ Public Class Problem
             Call RefReihe.Cut(EvalStart, EvalEnde)
         End If
 
+        'Check reference series for NaN values
+        If RefReihe.Nodes.Count > RefReihe.NodesClean.Count Then
+            Throw New Exception("The reference series '" & dateipfad & "' contains NaN values, please remove all NaN values before use!")
+        End If
+
         'Referenzreihe umbenennen
         RefReihe.Title += " (reference)"
 
