@@ -2,6 +2,11 @@
 BlueM.Opt Release Notes
 ===============================================================
 
+Version 1.8.9
+-------------
+FIXED:
+* Updated Wave to v1.9.6 r741, fixing errors that could occur while setting the method
+
 Version 1.8.8
 -------------
 CHANGED:

@@ -122,7 +122,7 @@
       <HintPath>..\Diagramm\Resources\TeeChart.dll</HintPath>
     </Reference>
     <ProjectReference Include="..\..\Wave\Wave.vbproj">
-      <Project>{BCD1BBE3-5AB2-4C3F-AC12-43EB977C6F6F}</Project>
+      <Project>{ce4132a2-2e2f-4f54-b66d-1baa928d499e}</Project>
       <Name>Wave</Name>
     </ProjectReference>
     <ProjectReference Include="..\Algos\DDS\DDS.csproj">
