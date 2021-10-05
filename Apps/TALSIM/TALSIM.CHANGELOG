@@ -1,17 +1,57 @@
 Talsim-NG simulation engine changelog
 *************************************
 
-in development
---------------
-* Changes to soil property definition #82:
-  * Default soil parameters are now stored in sydrodomain.ini for different bulk density classes
-  * Bulk density can be specified and calibrated
-  * Land use can affect bulk density
-  * New functionality is only activated when using the new file formats for BOA and LNZ files (see http://www.talsim.de/docs/index.php/ASCII-Datensatz)
+Version 3.1.6
+-------------
+* Switched to semantic versioning system (MAJOR.MINOR.PATCH)
+* Scenario simulations: 
+  * Fix wrong results when an entry in the SCE file references itself with the parameter "ID tA"
+  * Fix negative inflow after 8640 timesteps #130
+  * Fix wrong water balance parameter output in BLZ when simulating multiple scenarios
+
+Version 3.1.5.8
+---------------
+* Scenario simulations: fix error while writing SCO output if ZPG element has WEl output switched on
+
+Version 3.1.5.7
+---------------
+* Objective function and BLZ output are aligned when using VOL as state. Also Error description 3112, 3113 and 3114 added in English.
+
+Version 3.1.5.6
+---------------
+* Version 3.1.2.0 caused errors in calculating control states when releases were made dependend on states that used current storage volumes because of a missing iteration step. Now fixed by using last known states in the control&states modul KTR
+
+Version 3.1.5.5
+---------------
+* The user can now determine whether control clusters are calculated at the end of the time step iteration by using the parameter Iteration. Default is no calculation after final calculation of system components.
+
+Version 3.1.5.4
+---------------
+* Reservoir balance is now calculated with doubles instead of singles and provides a much better representation of volume errors. Volume errors with singles were largely caused by reduced precision from single.
+* Fixed reservoir surface functions (precipitation, evaporation, seepage) properly scaled to m3/s, overwrites fix in 3.1.4.1
+
+Version 3.1.5.3
+---------------
+* Added calibration parameters for reducing the soil conductivity in the upper soil horizon due to low temperatures for imitating frozen soil conditions. 
+  Reduction starts at the temperature given by 'kfTempA_oC' and reduces linearly to 0.005 * original value at the temperature given by 'kfTempE_oC'.
+* Enhancement when changing bulk density through land use: now only WP, FC and SAT are adjusted, but not kf, since smaller kf due to higher density causes more retention and lower peaks, which is contraproductive.
+* faster checking of time series whether duplicate sources are used in the array of time series
+
+Version 3.1.5.2
+---------------
+* CWR Eta is now <= ETc. Before eta could be larger than etc under certain constellations. 
+
+Version 3.1.5.1
+---------------
+* CWR eva (soil evaporation) is reduced when the plant's ETc is smaller or still zero. Reason: Eva is always calculated even while ETc = 0 since soil evaporation does not need a plant!
+
+Version 3.1.5.0
+---------------
+* when using *.opf file the output into a *.fkt has three decimal places (had only one before)
 
 Version 3.1.4.9
 ---------------
-* Fix Soil Name in BOA file not being recognized if not left-aligned
+* recognizes *.BOA SoilName even if the soilname is not aligned to left.
 
 Version 3.1.4.8
 ---------------
