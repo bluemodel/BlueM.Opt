@@ -938,37 +938,54 @@ Public MustInherit Class Sim
         SimReihe = Me.SimErgebnis.Reihen(constr.SimGr)
 
         'Fallunterscheidung GrenzTyp (Wert/Reihe)
-        Select Case constr.Typ
+        Select Case constr.Typ.ToUpper()
 
-            Case "Wert"
-                'zuerst Simulationswert aus Simulationsergebnis berechnen
+            Case "WERT"
+                'Calculate SimValue from SimSeries
                 Dim SimWert As Double
-                SimWert = SimReihe.getWert(constr.WertFunktion)
+                Select Case constr.WertFunktion.ToUpper()
+                    Case "MAX", "MAXWERT"
+                        SimWert = SimReihe.Maximum
+                    Case "MIN", "MINWERT"
+                        SimWert = SimReihe.Minimum
+                    Case "AVG", "AVERAGE"
+                        SimWert = SimReihe.Average
+                    Case "START", "ANFWERT"
+                        SimWert = SimReihe.Values.First
+                    Case "END", "ENDWERT"
+                        SimWert = SimReihe.Values.Last
+                    Case "SUM", "SUMME"
+                        SimWert = SimReihe.Sum
+                    Case Else
+                        Throw New Exception($"Unknown value type '{constr.WertFunktion}' for constraint {constr.Bezeichnung}!")
+                End Select
 
                 'Grenzverletzung berechnen
-                If (constr.GrenzPos = "Obergrenze") Then
-                    CalculateConstraint = constr.GrenzWert - SimWert
+                Select Case constr.GrenzPos.ToUpper()
+                    Case "UPPER", "OBERGRENZE"
+                        CalculateConstraint = constr.GrenzWert - SimWert
+                    Case "LOWER", "UNTERGRENZE"
+                        CalculateConstraint = SimWert - constr.GrenzWert
+                    Case Else
+                        Throw New Exception($"Unknown bound '{constr.GrenzPos}' for constraint {constr.Bezeichnung}!")
+                End Select
 
-                ElseIf (constr.GrenzPos = "Untergrenze") Then
-                    CalculateConstraint = SimWert - constr.GrenzWert
-
-                End If
-
-            Case "Reihe"
+            Case "REIHE"
                 'BUG 112: TODO: Constraintberechnung bei einer Reihe!
                 'Es wird die Summe der Grenzwertverletzungen verwendet
                 Dim summe As Double = 0
 
                 For i = 0 To SimReihe.Length - 1
 
-                    If (constr.GrenzPos = "Obergrenze") Then
-                        summe += Math.Min(constr.GrenzReihe.Values(i) - SimReihe.Values(i), 0)
+                    Select Case constr.GrenzPos.ToUpper()
+                        Case "UPPER", "OBERGRENZE"
+                            summe += Math.Min(constr.GrenzReihe.Values(i) - SimReihe.Values(i), 0)
 
-                    ElseIf (constr.GrenzPos = "Untergrenze") Then
-                        summe += Math.Min(SimReihe.Values(i) - constr.GrenzReihe.Values(i), 0)
-
-                    End If
-
+                        Case "LOWER", "UNTERGRENZE"
+                            summe += Math.Min(SimReihe.Values(i) - constr.GrenzReihe.Values(i), 0)
+                        Case Else
+                            Throw New Exception($"Unknown bound '{constr.GrenzPos}' for constraint {constr.Bezeichnung}!")
+                    End Select
                 Next
 
                 CalculateConstraint = summe
