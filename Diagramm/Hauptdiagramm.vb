@@ -94,6 +94,7 @@ Public Class Hauptdiagramm
             .Chart.Axes.Bottom.Minimum = xachse.Minimum
             .Chart.Axes.Bottom.Maximum = xachse.Maximum
             .Chart.Axes.Bottom.Increment = xachse.Increment
+            .Chart.Axes.Bottom.Grid.Visible = True
             .Chart.Axes.Bottom.Labels.Style = Steema.TeeChart.AxisLabelStyle.Value
             'Y-Achse:
             yachse = Achsen(2)
