@@ -58,7 +58,6 @@ Public Class ObjectiveFunction_ValueFromSeries
     ''' <summary>
     ''' Gibt an wie der Wert, der mit dem Referenzwert verglichen werden soll, aus dem Simulationsergebnis berechnet werden soll.
     ''' </summary>
-    ''' <remarks>Nur bei Typ = "Wert". Erlaubte Werte: "MaxWert", "MinWert", "Average", "AnfWert", "EndWert". Siehe auch Wiki</remarks>
     Public WertFunktion As String
 
     ''' <summary>
@@ -74,7 +73,7 @@ Public Class ObjectiveFunction_ValueFromSeries
 
         'Check
         If Not SimErgebnis.Reihen.ContainsKey(Me.SimGr) Then
-            Throw New Exception("Unable to find SimResult '" & Me.SimGr & "' in simulation result! Please check the dataset.")
+            Throw New Exception("Unable to find '" & Me.SimGr & "' in simulation result! Please check the dataset.")
         End If
 
         'SimReihe aus SimErgebnis rausholen
@@ -83,8 +82,23 @@ Public Class ObjectiveFunction_ValueFromSeries
         'SimReihe auf Evaluierungszeitraum kürzen
         Call SimReihe.Cut(Me.EvalStart, Me.EvalEnde)
 
-        'SimReihe zu SimWert konvertieren
-        SimWert = SimReihe.getWert(Me.WertFunktion)
+        'Calculate SimValue from SimSeries
+        Select Case Me.WertFunktion.ToUpper()
+            Case "MAX", "MAXWERT"
+                SimWert = SimReihe.Maximum
+            Case "MIN", "MINWERT"
+                SimWert = SimReihe.Minimum
+            Case "AVG", "AVERAGE"
+                SimWert = SimReihe.Average
+            Case "START", "ANFWERT"
+                SimWert = SimReihe.Values.First
+            Case "END", "ENDWERT"
+                SimWert = SimReihe.Values.Last
+            Case "SUM", "SUMME"
+                SimWert = SimReihe.Sum
+            Case Else
+                Throw New Exception($"Unknown value type '{Me.WertFunktion}' for objective function {Me.Bezeichnung}!")
+        End Select
 
         'Wertevergleich durchführen
         QWert = ObjectiveFunction.compareValues(SimWert, Me.RefWert, Me.Funktion)

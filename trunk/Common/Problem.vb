@@ -1016,9 +1016,9 @@ Public Class Problem
             '---------
             For i = 0 To Me.NumConstraints - 1
                 With Me.List_Constraintfunctions(i)
-                    If (Not .Typ = "Wert" And Not .Typ = "Reihe") Then Throw New Exception("Constraints: ThreshType must be either 'Wert' or 'Reihe'!")
+                    If (Not {"VALUE", "SERIES", "WERT", "REIHE"}.Contains(.Typ.ToUpper())) Then Throw New Exception("Constraints: ThreshType must be either 'Value' or 'Series'!")
                     If (Not .Datei = "WEL") Then Throw New Exception("Constraints: Only 'WEL' file format is currently supported!")
-                    If (Not .GrenzPos = "Obergrenze" And Not .GrenzPos = "Untergrenze") Then Throw New Exception("Constraints: Lower/Upper must be wither 'Obergrenze' or 'Untergrenze'!")
+                    If (Not {"UPPER", "LOWER", "OBERGRENZE", "UNTERGRENZE"}.Contains(.GrenzPos.ToUpper())) Then Throw New Exception("Constraints: Bound must be wither 'Upper' or 'Lower'!")
                 End With
             Next
 
@@ -1028,7 +1028,7 @@ Public Class Problem
 
             For i = 0 To Me.NumConstraints - 1
                 With Me.List_Constraintfunctions(i)
-                    If (.Typ = "Reihe") Then
+                    If ({"SERIES", "REIHE"}.Contains(.Typ.ToUpper())) Then
 
                         'Dateiendung der Grenzwertdatei bestimmen und Reihe einlesen
                         ext = System.IO.Path.GetExtension(.GrenzReiheDatei)
@@ -1058,7 +1058,6 @@ Public Class Problem
 
                         'Grenzwertreihe umbenennen
                         .GrenzReihe.Title += " (threshold)"
-
                     End If
                 End With
             Next

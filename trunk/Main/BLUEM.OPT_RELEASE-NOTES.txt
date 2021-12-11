@@ -7,8 +7,9 @@ Version 1.9.0
 NEW:
 * New objective function KGE (Kling-Gupta efficiency) for comparing series
 * New objective functions NSE (Nash-Sutcliffe efficiency) and lnNSE (logarithmic NSE) for comparing series
+* New keywords for problem definition in OBF and CON files (old keywords still work)
+* New objective function names in OBF file (old names still work)
 CHANGED:
-* Objective function names changed (old names still work though), see wiki
 * Upgraded to TeeChart Pro version 4.2021.11.2
 * Updated BlueM.Wave to v1.11.0, now included as a subfolder
 
