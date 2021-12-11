@@ -61,6 +61,14 @@ Public Class Diagramm
 
 #Region "Diagrammfunktionen"
 
+    ''' <summary>
+    ''' Constructor overload which adds some default chart settings
+    ''' </summary>
+    Public Sub New()
+        MyBase.New()
+        Me.Chart.Axes.Bottom.Grid.Visible = True
+    End Sub
+
     'Diagramm zurücksetzen
     '*********************
     Public Sub Reset()
