@@ -355,35 +355,15 @@ Public MustInherit Class ObjectiveFunction
 
             Case "NASHSUTT"
                 'Modified Nash Sutcliffe (obsolete)
+                '1 - NSE
                 '----------------------------------
-                'Mittelwert bilden
-                Dim Qobs_quer, zaehler, nenner As Double
-                Qobs_quer = RefReihe.Average
-                zaehler = 0.0
-                nenner = 0.0
-                For i = 0 To SimReihe.Length - 1
-                    zaehler += (RefReihe.Values(i) - SimReihe.Values(i)) ^ 2
-                    nenner += (RefReihe.Values(i) - Qobs_quer) ^ 2
-                Next
-                'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
-                QWert = zaehler / nenner
+                QWert = 1.0 - compareSeries(SimReihe, RefReihe, "NSE")
 
             Case "LNNASHSUTT"
                 'Modified Logarithmic Nash Sutcliffe (obsolete)
+                '1 - lnNSE
                 '----------------------------------------------
-                Dim Qobs_quer, zaehler, nenner, Qobs, Qsim, minValue As Double
-                Qobs_quer = RefReihe.Average
-                minValue = Qobs_quer / 100.0 ' define a minimum value, to prevent Math.Log(0) = -Infinity
-                zaehler = 0.0
-                nenner = 0.0
-                For i = 0 To SimReihe.Length - 1
-                    Qobs = Math.Max(minValue, RefReihe.Values(i))
-                    Qsim = Math.Max(minValue, SimReihe.Values(i))
-                    zaehler += (Math.Log(Qobs) - Math.Log(Qsim)) ^ 2
-                    nenner += (Math.Log(Qobs) - Math.Log(Qobs_quer)) ^ 2
-                Next
-                'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
-                QWert = zaehler / nenner
+                QWert = 1.0 - compareSeries(SimReihe, RefReihe, "lnNSE")
 
             Case Else
                 Throw New Exception($"The objective function '{Funktion}' is not supported for series comparisons!")
