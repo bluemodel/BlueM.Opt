@@ -101,7 +101,7 @@ Public MustInherit Class ObjectiveFunction
     ''' <summary>
     ''' Name der Funktion, mit der der Objectivewert berechnet werden soll
     ''' </summary>
-    ''' <remarks>Erlaubte Werte: "AbQuad", "Diff", "n‹ber", "s‹ber", "nUnter", "sUnter", "Volf". Siehe auch Wiki</remarks>
+    ''' <remarks>Erlaubte Werte: "AbQuad", "Diff", "n‹ber", "s‹ber", "nUnter", "sUnter", "Volf", etc. Siehe auch Wiki</remarks>
     Public Funktion As String
 
     ''' <summary>
@@ -329,6 +329,32 @@ Public MustInherit Class ObjectiveFunction
                 kovar = 1 / (SimReihe.Length - 1) * kovar
                 'Bestimmtheitsmaﬂ = Korrelationskoeffizient^2
                 QWert = kovar ^ 2 / (var_x * var_y)
+
+            Case "KGE"
+                'Kling-Gupta efficiency
+                'https://permetrics.readthedocs.io/pages/regression/KGE.html
+                Dim corr, covar, avg_sim, avg_obs, std_sim, std_obs As Double
+                Dim n As Integer = SimReihe.Length
+
+                avg_sim = SimReihe.Average
+                avg_obs = RefReihe.Average
+
+                covar = 0
+                std_sim = 0
+                std_obs = 0
+                For i = 0 To n - 1
+                    covar += (SimReihe.Values(i) - avg_sim) * (RefReihe.Values(i) - avg_obs)
+                    std_sim += (SimReihe.Values(i) - avg_sim) ^ 2
+                    std_obs += (RefReihe.Values(i) - avg_obs) ^ 2
+                Next
+                std_sim = Math.Sqrt(1 / (n - 1) * std_sim)
+                std_obs = Math.Sqrt(1 / (n - 1) * std_obs)
+                covar = 1 / (n - 1) * covar
+                corr = covar / (std_sim * std_obs) 'correlation coefficient
+
+                Dim biasratio As Double = avg_sim / avg_obs
+                Dim variabilityratio As Double = (std_sim / avg_sim) / (std_obs / avg_obs)
+                QWert = 1 - Math.Sqrt((corr - 1) ^ 2 + (biasratio - 1) ^ 2 + (variabilityratio - 1) ^ 2)
 
             Case Else
                 Throw New Exception("Die Zielfunktion '" & Funktion & "' wird f¸r Reihenvergleiche nicht unterst¸tzt!")

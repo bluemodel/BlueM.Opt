@@ -4,6 +4,9 @@ BlueM.Opt Release Notes
 
 Version 1.8.11
 --------------
+NEW:
+* Added objective function KGE (Kling-Gupta efficiency) for comparing series
+CHANGED:
 * Upgraded to TeeChart Pro version 4.2021.11.2
 * Updated BlueM.Wave to v1.11.0, now included as a subfolder
 
