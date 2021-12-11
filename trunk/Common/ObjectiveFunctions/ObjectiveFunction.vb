@@ -159,20 +159,20 @@ Public MustInherit Class ObjectiveFunction
         Dim QWert As Double
 
         'Fallunterscheidung Zielfunktion
-        Select Case Funktion
+        Select Case Funktion.ToUpper()
 
-            Case "AbQuad"
-                'quadratische Abweichung
-                '-----------------------
+            Case "SE", "ABQUAD"
+                'squared error
+                '-------------
                 QWert = (RefWert - SimWert) ^ 2
 
-            Case "Diff"
-                'absolute Abweichung
-                '-------------------
+            Case "AE", "DIFF"
+                'absolute error
+                '--------------
                 QWert = Math.Abs(RefWert - SimWert)
 
             Case Else
-                Throw New Exception("Die Zielfunktion '" & Funktion & "' wird für Wertevergleiche nicht unterstützt!")
+                Throw New Exception($"The objective function '{Funktion}' is not supported for value comparisons!")
 
         End Select
 
@@ -195,31 +195,31 @@ Public MustInherit Class ObjectiveFunction
 
         'BUG 218: Kontrolle
         If (RefReihe.Length <> SimReihe.Length) Then
-            Throw New Exception("Die Reihen '" & SimReihe.Title & "' und '" & RefReihe.Title & "' sind nicht kompatibel! (Länge/Zeitschritt?) Siehe Bug 218")
+            Throw New Exception($"The series '{SimReihe.Title}' and '{RefReihe.Title}' are not compatible! Different length/timestep? (see Bug 218)")
         End If
 
         'Fallunterscheidung Zielfunktion
-        Select Case Funktion
+        Select Case Funktion.ToUpper()
 
-            Case "AbQuad"
-                'Summe der Fehlerquadrate
-                '------------------------
+            Case "SSE", "ABQUAD"
+                'Sum of squared errors
+                '---------------------
                 QWert = 0
                 For i = 0 To SimReihe.Length - 1
                     QWert += (RefReihe.Values(i) - SimReihe.Values(i)) ^ 2
                 Next
 
-            Case "Diff"
-                'Summe der Fehler
-                '----------------
+            Case "SAE", "DIFF"
+                'Sum of abolute errors
+                '---------------------
                 QWert = 0
                 For i = 0 To SimReihe.Length - 1
                     QWert += Math.Abs(RefReihe.Values(i) - SimReihe.Values(i))
                 Next
 
-            Case "Volf"
-                'Volumenfehler
-                '-------------
+            Case "BIAS", "VOLF"
+                'Absolute volume error
+                '---------------------
                 Dim VolSim As Double = 0
                 Dim VolZiel As Double = 0
                 For i = 0 To SimReihe.Length - 1
@@ -229,9 +229,9 @@ Public MustInherit Class ObjectiveFunction
                 'Differenz bilden und auf ZielVolumen beziehen
                 QWert = Math.Abs(VolZiel - VolSim) / VolZiel * 100
 
-            Case "nUnter"
-                'Relative Anzahl der Zeitschritte mit Unterschreitungen (in Prozent)
-                '-------------------------------------------------------------------
+            Case "NLT", "NUNTER"
+                'Relative number of timesteps where simulation is less than reference [%]
+                '------------------------------------------------------------------------
                 Dim nUnter As Integer = 0
                 For i = 0 To SimReihe.Length - 1
                     If (SimReihe.Values(i) < RefReihe.Values(i)) Then
@@ -240,9 +240,9 @@ Public MustInherit Class ObjectiveFunction
                 Next
                 QWert = nUnter / SimReihe.Length * 100
 
-            Case "sUnter"
-                'Summe der Unterschreitungen
-                '---------------------------
+            Case "SLT", "SUNTER"
+                'Sum of simulation values less than reference
+                '--------------------------------------------
                 Dim sUnter As Double = 0
                 For i = 0 To SimReihe.Length - 1
                     If (SimReihe.Values(i) < RefReihe.Values(i)) Then
@@ -251,9 +251,9 @@ Public MustInherit Class ObjectiveFunction
                 Next
                 QWert = sUnter
 
-            Case "nÜber"
-                'Relative Anzahl der Zeitschritte mit Überschreitungen (in Prozent)
-                '------------------------------------------------------------------
+            Case "NGT", "NÜBER"
+                'Relative number of timesteps where simulation is greater than reference [%]
+                '---------------------------------------------------------------------------
                 Dim nUeber As Integer = 0
                 For i = 0 To SimReihe.Length - 1
                     If (SimReihe.Values(i) > RefReihe.Values(i)) Then
@@ -262,9 +262,9 @@ Public MustInherit Class ObjectiveFunction
                 Next
                 QWert = nUeber / SimReihe.Length * 100
 
-            Case "sÜber"
-                'Summe der Überschreitungen
-                '--------------------------
+            Case "SGT", "SÜBER"
+                'Sum of simulation values greater than reference
+                '-----------------------------------------------
                 Dim sUeber As Double = 0
                 For i = 0 To SimReihe.Length - 1
                     If (SimReihe.Values(i) > RefReihe.Values(i)) Then
@@ -273,62 +273,59 @@ Public MustInherit Class ObjectiveFunction
                 Next
                 QWert = sUeber
 
-            Case "NashSutt"
-                'Nash Sutcliffe
-                '--------------
-                'Mittelwert bilden
-                Dim Qobs_quer, zaehler, nenner As Double
-                Qobs_quer = RefReihe.Average
+            Case "NSE"
+                'Nash-Sutcliffe efficiency
+                '-------------------------
+                Dim avg_obs, zaehler, nenner As Double
+                avg_obs = RefReihe.Average
                 zaehler = 0.0
                 nenner = 0.0
                 For i = 0 To SimReihe.Length - 1
                     zaehler += (RefReihe.Values(i) - SimReihe.Values(i)) ^ 2
-                    nenner += (RefReihe.Values(i) - Qobs_quer) ^ 2
+                    nenner += (RefReihe.Values(i) - avg_obs) ^ 2
                 Next
-                'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
-                QWert = zaehler / nenner
+                QWert = 1 - zaehler / nenner
 
-            Case "LnNashSutt"
-                'Logarithmic Nash Sutcliffe
-                '--------------------------
-                Dim Qobs_quer, zaehler, nenner, Qobs, Qsim, minValue As Double
-                Qobs_quer = RefReihe.Average
-                minValue = Qobs_quer / 100.0 ' define a minimum value, to prevent Math.Log(0) = -Infinity
+            Case "LNNSE"
+                'Logarithmic Nash-Sutcliffe efficiency
+                '-------------------------------------
+                Dim obs_avg, zaehler, nenner, Qobs, Qsim, minValue As Double
+                obs_avg = RefReihe.Average
+                minValue = obs_avg / 100.0 ' define a minimum value, to prevent Math.Log(0) = -Infinity
                 zaehler = 0.0
                 nenner = 0.0
                 For i = 0 To SimReihe.Length - 1
                     Qobs = Math.Max(minValue, RefReihe.Values(i))
                     Qsim = Math.Max(minValue, SimReihe.Values(i))
                     zaehler += (Math.Log(Qobs) - Math.Log(Qsim)) ^ 2
-                    nenner += (Math.Log(Qobs) - Math.Log(Qobs_quer)) ^ 2
+                    nenner += (Math.Log(Qobs) - Math.Log(obs_avg)) ^ 2
                 Next
-                'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
-                QWert = zaehler / nenner
+                QWert = 1 - zaehler / nenner
 
-            Case "Korr"
-                'Korrelationskoeffizient (lineare Regression)
-                'Es wird das Bestimmtheitsmaß r^2 zurückgegeben [0-1]
+            Case "DET", "KORR"
+                'Coefficient of determination r^2 (linear regression)
                 '----------------------------------------------------
-                Dim kovar, var_x, var_y, avg_x, avg_y As Double
-                'Mittelwerte
-                avg_x = SimReihe.getWert("Average")
-                avg_y = RefReihe.getWert("Average")
+                Dim covar, var_x, var_y, x_avg, y_avg As Double
+                Dim n As Integer = SimReihe.Length
+
+                x_avg = SimReihe.Average
+                y_avg = RefReihe.Average
                 'r^2 = sxy^2 / (sx^2 * sy^2)
-                'Standardabweichung: var_x = sx^2 = 1 / (n-1) * SUMME[(x_i - x_avg)^2]
-                'Kovarianz: kovar= sxy = 1 / (n-1) * SUMME[(x_i - x_avg) * (y_i - y_avg)]
-                kovar = 0
+                'standard deviation: var_x = sx^2 = 1 / (n-1) * SUMME[(x_i - x_avg)^2]
+                'covariance: covar= sxy = 1 / (n-1) * SUMME[(x_i - x_avg) * (y_i - y_avg)]
+                covar = 0
                 var_x = 0
                 var_y = 0
-                For i = 0 To SimReihe.Length - 1
-                    kovar += (SimReihe.Values(i) - avg_x) * (RefReihe.Values(i) - avg_y)
-                    var_x += (SimReihe.Values(i) - avg_x) ^ 2
-                    var_y += (RefReihe.Values(i) - avg_y) ^ 2
+                For i = 0 To n - 1
+                    covar += (SimReihe.Values(i) - x_avg) * (RefReihe.Values(i) - y_avg)
+                    var_x += (SimReihe.Values(i) - x_avg) ^ 2
+                    var_y += (RefReihe.Values(i) - y_avg) ^ 2
                 Next
-                var_x = 1 / (SimReihe.Length - 1) * var_x
-                var_y = 1 / (SimReihe.Length - 1) * var_y
-                kovar = 1 / (SimReihe.Length - 1) * kovar
-                'Bestimmtheitsmaß = Korrelationskoeffizient^2
-                QWert = kovar ^ 2 / (var_x * var_y)
+                var_x = 1 / (n - 1) * var_x
+                var_y = 1 / (n - 1) * var_y
+                covar = 1 / (n - 1) * covar
+                'coefficient of determination = correlation coefficient ^ 2
+                QWert = covar ^ 2 / (var_x * var_y)
 
             Case "KGE"
                 'Kling-Gupta efficiency
@@ -356,8 +353,40 @@ Public MustInherit Class ObjectiveFunction
                 Dim variabilityratio As Double = (std_sim / avg_sim) / (std_obs / avg_obs)
                 QWert = 1 - Math.Sqrt((corr - 1) ^ 2 + (biasratio - 1) ^ 2 + (variabilityratio - 1) ^ 2)
 
+            Case "NASHSUTT"
+                'Modified Nash Sutcliffe (obsolete)
+                '----------------------------------
+                'Mittelwert bilden
+                Dim Qobs_quer, zaehler, nenner As Double
+                Qobs_quer = RefReihe.Average
+                zaehler = 0.0
+                nenner = 0.0
+                For i = 0 To SimReihe.Length - 1
+                    zaehler += (RefReihe.Values(i) - SimReihe.Values(i)) ^ 2
+                    nenner += (RefReihe.Values(i) - Qobs_quer) ^ 2
+                Next
+                'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
+                QWert = zaehler / nenner
+
+            Case "LNNASHSUTT"
+                'Modified Logarithmic Nash Sutcliffe (obsolete)
+                '----------------------------------------------
+                Dim Qobs_quer, zaehler, nenner, Qobs, Qsim, minValue As Double
+                Qobs_quer = RefReihe.Average
+                minValue = Qobs_quer / 100.0 ' define a minimum value, to prevent Math.Log(0) = -Infinity
+                zaehler = 0.0
+                nenner = 0.0
+                For i = 0 To SimReihe.Length - 1
+                    Qobs = Math.Max(minValue, RefReihe.Values(i))
+                    Qsim = Math.Max(minValue, SimReihe.Values(i))
+                    zaehler += (Math.Log(Qobs) - Math.Log(Qsim)) ^ 2
+                    nenner += (Math.Log(Qobs) - Math.Log(Qobs_quer)) ^ 2
+                Next
+                'abgeänderte Nash-Sutcliffe Formel: 0 als Zielwert (1- weggelassen)
+                QWert = zaehler / nenner
+
             Case Else
-                Throw New Exception("Die Zielfunktion '" & Funktion & "' wird für Reihenvergleiche nicht unterstützt!")
+                Throw New Exception($"The objective function '{Funktion}' is not supported for series comparisons!")
 
         End Select
 
