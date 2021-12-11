@@ -69,10 +69,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="TeeChart, Version=4.1.2011.4192, Culture=neutral, PublicKeyToken=9c8126276c77bdb7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Diagramm\Resources\TeeChart.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algos.cs" />
@@ -135,6 +131,11 @@
     <Content Include="viewer\pictures\raw.jpg" />
     <Content Include="viewer\pictures\true.jpg" />
     <Content Include="viewer\README.TXT" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Steema.TeeChart.NET">
+      <Version>4.2021.11.2</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
