@@ -29,22 +29,14 @@
 '*******************************************************************************
 '**** Klasse EVO_Einstellungen                                              ****
 '****                                                                       ****
-'**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
-'****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'****                                                                       ****
-'**** November 2007                                                         ****
-'****                                                                       ****
-'**** Letzte Änderung: November 2007                                        ****
+'**** Autoren: Christoph Hübner, Felix Froehlich, Dirk Muschalla            ****
 '*******************************************************************************
 '*******************************************************************************
 
-Imports System.IO
 Imports BlueM.Opt.Common.Constants
 
 Public Class EVO_Einstellungen
-    Inherits System.Windows.Forms.UserControl
+    Inherits Windows.Forms.UserControl
 
 #Region "Eigenschaften"
 
@@ -269,7 +261,7 @@ Public Class EVO_Einstellungen
 
     End Sub
 
-        ''' <summary>
+    ''' <summary>
     ''' TabPages je nach Problem anzeigen/verstecken
     ''' </summary>
     Private Sub initTabPages()
@@ -353,7 +345,7 @@ Public Class EVO_Einstellungen
         End If
 
         'bei 2 OptParametern geht nur diskret!
-        If (Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count = 2 And _
+        If (Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count = 2 And
             Me.SensiPlot_RadioButton_ModeRandom.Checked) Then
             MsgBox("Bei mehr als einem OptParameter muss 'Diskret' als Modus ausgewählt sein!", MsgBoxStyle.Exclamation, "SensiPlot")
             Me.SensiPlot_RadioButton_ModeEvenDistribution.Checked = True
@@ -376,7 +368,7 @@ Public Class EVO_Einstellungen
 
     End Sub
 
-    Private Sub CES_HybridTypeChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CES_Combo_HybridType.SelectedIndexChanged
+    Private Sub CES_HybridTypeChanged(ByVal sender As Object, ByVal e As EventArgs) Handles CES_Combo_HybridType.SelectedIndexChanged
 
         If (Me.isInitializing) Then Exit Sub
 
@@ -423,24 +415,32 @@ Public Class EVO_Einstellungen
 
     End Sub
 
-    Private Sub PES_Combo_OptEltern_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PES_Combo_OptEltern.SelectedIndexChanged
-        'Sofortige Aktualisierung erzwingen!
-        Me.PES_Combo_OptEltern.DataBindings(0).WriteValue()
-    End Sub
+    ''' <summary>
+    ''' Ensure that combobox changes are saved to the data binding immediately
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub ComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles _
+        PES_Combo_OptEltern.SelectedIndexChanged,
+        PES_Combo_DnMutation.SelectedIndexChanged,
+        PES_Combo_Strategie.SelectedIndexChanged,
+        PES_Combo_Startparameter.SelectedIndexChanged,
+        PES_Combo_PopEltern.SelectedIndexChanged,
+        PES_Combo_PopStrategie.SelectedIndexChanged,
+        PES_Combo_PopPenalty.SelectedIndexChanged,
+        CES_Combo_IniValues.SelectedIndexChanged,
+        CES_Combo_Reproduction.SelectedIndexChanged,
+        CES_Combo_Selection.SelectedIndexChanged,
+        CES_Combo_Mutation.SelectedIndexChanged,
+        CES_Combo_MemStrategy.SelectedIndexChanged,
+        CES_Combo_HybridType.SelectedIndexChanged,
+        MetaEvo_Combo_Role.SelectedIndexChanged,
+        MetaEvo_Combo_OpMode.SelectedIndexChanged,
+        TSP_ComboBox_prob_instance.SelectedIndexChanged,
+        TSP_ComboBox_Reproductionoperator.SelectedIndexChanged,
+        TSP_ComboBox_Mutationoperator.SelectedIndexChanged
 
-    Private Sub CES_Combo_Reproduction_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CES_Combo_Reproduction.SelectedIndexChanged
-        'Sofortige Aktualisierung erzwingen
-        Me.CES_Combo_Reproduction.DataBindings(0).WriteValue()
-    End Sub
-
-    Private Sub MetaEvo_Combo_Role_SelectedIndexChanged( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles MetaEvo_Combo_Role.SelectedIndexChanged
-        'Sofortige Aktualisierung erzwingen
-        Me.MetaEvo_Combo_Role.DataBindings(0).WriteValue()
-    End Sub
-
-    Private Sub MetaEvo_Combo_OpMode_SelectedIndexChanged( ByVal sender As System.Object,  ByVal e As System.EventArgs) Handles MetaEvo_Combo_OpMode.SelectedIndexChanged
-        'Sofortige Aktualisierung erzwingen
-        Me.MetaEvo_Combo_OpMode.DataBindings(0).WriteValue()
+        CType(sender, ComboBox).DataBindings(0).WriteValue()
     End Sub
 
 #End Region 'Events
