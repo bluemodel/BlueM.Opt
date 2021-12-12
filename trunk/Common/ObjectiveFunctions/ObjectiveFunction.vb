@@ -209,6 +209,15 @@ Public MustInherit Class ObjectiveFunction
                     QWert += (RefReihe.Values(i) - SimReihe.Values(i)) ^ 2
                 Next
 
+            Case "MSE"
+                'Mean squared error
+                '------------------
+                QWert = 0
+                For i = 0 To SimReihe.Length - 1
+                    QWert += (RefReihe.Values(i) - SimReihe.Values(i)) ^ 2
+                Next
+                QWert = QWert / SimReihe.Length
+
             Case "SAE", "DIFF"
                 'Sum of abolute errors
                 '---------------------
@@ -216,6 +225,15 @@ Public MustInherit Class ObjectiveFunction
                 For i = 0 To SimReihe.Length - 1
                     QWert += Math.Abs(RefReihe.Values(i) - SimReihe.Values(i))
                 Next
+
+            Case "MAE"
+                'Mean abolute error
+                '------------------
+                QWert = 0
+                For i = 0 To SimReihe.Length - 1
+                    QWert += Math.Abs(RefReihe.Values(i) - SimReihe.Values(i))
+                Next
+                QWert = QWert / SimReihe.Length
 
             Case "BIAS", "VOLF"
                 'Absolute volume error
@@ -354,15 +372,15 @@ Public MustInherit Class ObjectiveFunction
                 QWert = 1 - Math.Sqrt((corr - 1) ^ 2 + (biasratio - 1) ^ 2 + (variabilityratio - 1) ^ 2)
 
             Case "NASHSUTT"
-                'Modified Nash Sutcliffe (obsolete)
+                'Modified Nash Sutcliffe (deprecated)
                 '1 - NSE
-                '----------------------------------
+                '------------------------------------
                 QWert = 1.0 - compareSeries(SimReihe, RefReihe, "NSE")
 
             Case "LNNASHSUTT"
-                'Modified Logarithmic Nash Sutcliffe (obsolete)
+                'Modified Logarithmic Nash Sutcliffe (deprecated)
                 '1 - lnNSE
-                '----------------------------------------------
+                '------------------------------------------------
                 QWert = 1.0 - compareSeries(SimReihe, RefReihe, "lnNSE")
 
             Case Else
