@@ -8,6 +8,8 @@ NEW:
 * New objective function KGE (Kling-Gupta efficiency) for comparing series
 * New objective functions NSE (Nash-Sutcliffe efficiency) and lnNSE (logarithmic NSE) for comparing series
 * New objective functions MAE (mean absolute error) and MSE (mean squared error) for comparing series
+FIXED:
+* Fixed optimization settings sometimes not being saved to file correctly
 CHANGED:
 * Changed keywords for problem definition in OBF and CON files (old keywords still work)
 * Changed objective function names in OBF file (old names still work)
