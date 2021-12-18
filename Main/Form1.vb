@@ -169,7 +169,7 @@ Partial Public Class Form1
         '---------
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Anwendung.Items.Clear()
-        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SCAN, ANW_SWMM, ANW_TALSIM, ANW_TESTPROBLEMS, ANW_TSP}) 'ANW_SMUSI entfernt (Bug 265)
+        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SWMM, ANW_TALSIM, ANW_TESTPROBLEMS, ANW_TSP}) 'ANW_SMUSI entfernt (Bug 265)
         Me.ComboBox_Anwendung.SelectedIndex = 0
 
         'Datensatz
@@ -482,13 +482,6 @@ Partial Public Class Form1
 
                     'Objekt der Klasse Talsim initialisieren
                     Sim1 = New BlueM.Opt.Apps.Talsim()
-
-
-                Case ANW_SCAN 'Anwendung S:CAN
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Objekt der Klasse Scan initialisieren
-                    Sim1 = New BlueM.Opt.Apps.Scan()
 
 
                 Case ANW_SWMM   'Anwendung SWMM
@@ -949,7 +942,7 @@ Partial Public Class Form1
         '=================
         Select Case Me.Anwendung
 
-            Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM, ANW_TALSIM
+            Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM
 
                 'Bei allen Sim-Anwendungen
                 '-----------------------------------------------------
@@ -1076,7 +1069,7 @@ Partial Public Class Form1
 
             Select Case Anwendung
 
-                Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM, ANW_TALSIM
+                Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM
                     'Sim-Anwendungen
 
                     'Simulationen vorbereiten
@@ -1299,7 +1292,7 @@ Partial Public Class Form1
 
                 Call Testprobleme1.DiagInitialise(Me.Hauptdiagramm1)
 
-            Case ANW_BLUEM, ANW_SMUSI, ANW_SCAN, ANW_SWMM, ANW_TALSIM
+            Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 Select Case Me.mProblem.Method

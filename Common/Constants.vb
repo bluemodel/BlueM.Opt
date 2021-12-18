@@ -56,7 +56,6 @@ Public Module Constants
     'Anwendungen
     Public Const ANW_BLUEM As String = "BlueM.Sim"
     Public Const ANW_SMUSI As String = "SMUSI"
-    Public Const ANW_SCAN As String = "S:CAN"
     Public Const ANW_SWMM As String = "SWMM"
     Public Const ANW_TALSIM As String = "TALSIM"
     Public Const ANW_TESTPROBLEMS As String = "Testproblems"

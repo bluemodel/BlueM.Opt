@@ -18,6 +18,7 @@ CHANGED:
 REMOVED:
 * Removed optimization methods CES and HYBRID #225
 * Removed objective function types SKos and Ecology #225
+* Removed application S::CAN #37
 
 Version 1.8.10
 --------------
