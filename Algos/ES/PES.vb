@@ -49,8 +49,6 @@ Public Class PES
     '**** TU Darmstadt                                                          ****
     '****                                                                       ****
     '**** Dezember 2003                                                         ****
-    '****                                                                       ****
-    '**** Letzte Änderung: Juli 2007                                            ****
     '*******************************************************************************
     '*******************************************************************************
 
@@ -187,7 +185,7 @@ Public Class PES
         If (settings.PES.N_Eltern < 1) Then
             Throw New Exception("The number of parents can not be less than 1!")
         End If
-        If (settings.PES.N_Nachf <= settings.PES.N_Eltern And Me.mProblem.Method <> "HYBRID") Then
+        If (settings.PES.N_Nachf <= settings.PES.N_Eltern) Then
             Throw New Exception("The number of parents must be less than the number of children!" & Chr(13) & Chr(10) & "Rechenberg (1973) recommends using ratios between 1:3 and 1:5.")
         End If
         If (settings.PES.N_Nachf < 1) Then
@@ -385,36 +383,6 @@ Public Class PES
 
     End Sub
 
-    'Überladen: Falls Startwerte aus CES kommen!
-    Public Sub EsStartvalues(ByVal is_Pop As Boolean, ByVal Parameter() As OptParameter, ByVal IndexElter As Integer)
-
-        Dim v As Integer
-
-        'Check
-        If (Parameter.Length <> Me.mProblem.List_OptParameter.Length) Then
-            Throw New Exception("Wrong number of parameters passed!")
-        End If
-
-        For v = 0 To Me.mProblem.NumOptParams - 1
-            If is_Pop = True Then
-                'Startwert für die Elternschrittweite wird zugewiesen
-                Dp(v, IndexElter, 0) = Parameter(v).Dn
-                'Startwert für die Eltern werden zugewiesen
-                '(alle gleich Anfangswerte)
-                Xp(v, IndexElter, 0) = Parameter(v).Xn
-            Else
-                'Startwert für die Elternschrittweite wird zugewiesen
-                De(v, IndexElter, 0) = Parameter(v).Dn
-                'Startwert für die Eltern werden zugewiesen
-                '(alle gleich Anfangswerte)
-                Xe(v, IndexElter, 0) = Parameter(v).Xn
-
-            End If
-        Next v
-
-        'Die Startparameter werden aus den PES_Parents aus der CES gesetzt
-    End Sub
-
     'ES_GET_PARAMETER - dient zur Rückgabe der mutierten Parameter
     '*************************************************************
     Public Function EsGetParameter() As OptParameter()
@@ -441,40 +409,6 @@ Public Class PES
         Return Bestwert
 
     End Function
-
-    'Function um PopReproduktion, PopMutation, Reproduktion und Mutio n direkt ablaufen zu lassen
-    '********************************************************************************************
-    Public Sub EsReproMut(ByVal CES_Dn As Double, ByVal is_Pop As Boolean)
-
-        If is_Pop = True Then
-
-            'POPULATIONS REPRODUKTIONSPROZESS
-            '################################
-            'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
-            Call EsPopReproduktion()
-
-            'POPULATIONS MUTATIONSPROZESS
-            '############################
-            'Mutieren der Ausgangswerte der Population
-            Call EsPopMutation()
-
-        End If
-
-        'REPRODUKTIONSPROZESS
-        '####################
-        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
-        Call EsReproduktion()
-
-        'MUTATIONSPROZESS
-        '################
-        'Mutieren der Ausgangswerte mit und ohne Vektor
-        If mSettings.PES.SetMutation.IsDnVektor = False Then
-            Call CES_Xn_Mutation(CES_Dn)
-        ElseIf mSettings.PES.SetMutation.IsDnVektor = True Then
-            Call EsMutation()
-        End If
-
-    End Sub
 
     'ES_POP_VARIA - REPRODUKTIONSPROZESS - ToDo: Beschreibung fehlt
     '*******************************************************************************
@@ -1091,85 +1025,6 @@ Public Class PES
         '-------------------------
         For v = 0 To Me.mProblem.NumOptParams - 1
             AktPara(v).Dn = DnTemp(v)
-            AktPara(v).Xn = XnTemp(v)
-        Next v
-
-    End Sub
-
-    'CES_Dn_Mutation mutiert das Dn für ein CES
-    '******************************************
-    Public Function CES_Dn_Mutation(ByVal Dn_CES As Double) As Double
-
-        Dim Z As Double
-
-        Dim DnTemp As Double             'Temporäre Schrittweiten für Nachkomme
-        Dim expo As Integer                  'Exponent für Schrittweite (+/-1)
-        Dim tau As Double
-
-        If (mSettings.PES.Mutationsop = PES_MUTATIONSOP.Rechenberg) Then
-            '+/-1
-            expo = (2 * Int(Rnd() + 0.5) - 1)
-            'Schrittweite wird mutiert
-            DnTemp = Dn_CES * galpha ^ expo
-        ElseIf (mSettings.PES.Mutationsop = PES_MUTATIONSOP.Schwefel) Then
-            tau = mSettings.PES.SetMutation.DnC / Math.Sqrt(Me.mProblem.NumOptParams)
-            'Normalverteilte Zufallszahl (SD = 1, mean = 0)
-            Z = Me.NormalDistributationRND(1.0, 0.0)
-            'Neue Schrittweite
-            DnTemp = Dn_CES * Math.Exp(tau * Z)
-            'Mindestschrittweite muss eingehalten werden
-            If DnTemp < mSettings.PES.SetMutation.DnEpsilon Then DnTemp = mSettings.PES.SetMutation.DnEpsilon
-        End If
-
-        Return DnTemp
-
-    End Function
-
-    'Verwedet das Mutiert Dn des CES und mutiert die Parameter
-    '*********************************************************
-    Public Sub CES_Xn_Mutation(ByVal Dn_CES As Double)
-
-        Dim v, i As Integer
-        Dim Z As Double
-
-        Dim XnTemp() As Double             'Temporäre Parameterwerte für Nachkomme
-
-        ReDim XnTemp(Me.mProblem.NumOptParams - 1)
-
-        'Mutation
-        '--------
-        For v = 0 To Me.mProblem.NumOptParams - 1
-            i = 0
-            Do
-                i += 1
-                'Abbruchkriterium
-                '----------------
-                If (i >= 1000) Then
-                    Throw New Exception("Unable to generate a valid parameter set!")
-                End If
-
-                'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(varanz)
-
-                'Z = System.Math.Sqrt(-2 * System.Math.Log(1 - Rnd()) / Anz.Para) * System.Math.Sin(6.2832 * Rnd())
-                If (mSettings.PES.Mutationsop = PES_MUTATIONSOP.Rechenberg) Then
-                    'Normalverteilte Zufallszahl mit Standardabweichung 1/sqr(var.anz), , Mittelwert 0
-                    Z = Me.NormalDistributationRND(1 / Math.Sqrt(Me.mProblem.NumOptParams), 0.0)
-                ElseIf (mSettings.PES.Mutationsop = PES_MUTATIONSOP.Schwefel) Then
-                    'Normalverteilte Zufallszahl mit Standardabweichung 1, Mittelwert 0
-                    Z = Me.NormalDistributationRND(1.0, 0.0)
-                End If
-                'Mutation wird durchgeführt
-                XnTemp(v) = AktPara(v).Xn + Dn_CES * Z
-
-                'Restriktion für die mutierten Werte
-            Loop While (XnTemp(v) < 0 Or XnTemp(v) > 1 Or Not checkBeziehung(v, XnTemp))
-
-        Next v
-
-        'Mutierte Werte übernehmen
-        '-------------------------
-        For v = 0 To Me.mProblem.NumOptParams - 1
-            AktPara(v).Dn = Dn_CES
             AktPara(v).Xn = XnTemp(v)
         Next v
 

@@ -36,8 +36,6 @@
 '**** TU Darmstadt                                                          ****
 '****                                                                       ****
 '**** November 2007                                                         ****
-'****                                                                       ****
-'**** Letzte Änderung: Juli 2009                                            ****
 '*******************************************************************************
 '*******************************************************************************
 
@@ -51,16 +49,6 @@ Public Class Settings
         Private mUseMultithreading As Boolean
         Private mMultithreadingAllowed As Boolean
         Private mDrawOnlyCurrentGeneration As Boolean
-        Private mBatchMode As Boolean
-
-        Public Property BatchMode() As Boolean
-            Get
-                Return mBatchMode
-            End Get
-            Set(ByVal value As Boolean)
-                mBatchMode = value
-            End Set
-        End Property
 
         ''' <summary>
         ''' Multithreading erlauben/verbieten und gleichzeitig ein-/ausschalten
@@ -109,13 +97,11 @@ Public Class Settings
             Me.MultithreadingAllowed = True
             Me.UseMultithreading = True
             Me.DrawOnlyCurrentGeneration = False
-            Me.BatchMode = False
         End Sub
     End Class
 
     Public General As Settings_General
     Public PES As Settings_PES
-    Public CES As Settings_CES
     Public HookeJeeves As Settings_HookeJeeves
     Public MetaEvo As Settings_MetaEvo
     Public DDS As Settings_DDS

@@ -179,10 +179,6 @@ Public Class Hauptdiagramm
             Select Case Me.mProblem.Method
                 Case BlueM.Opt.Common.METH_PES
                     Call serie.Add(runde * Me.mSettings.PES.N_Gen * Me.mSettings.PES.N_Nachf + gen * Me.mSettings.PES.N_Nachf + nachf, ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.ID.ToString(), Farbe)
-                Case BlueM.Opt.Common.METH_HYBRID, BlueM.Opt.Common.METH_CES
-                    Call serie.Add(runde * Me.mSettings.CES.N_Generations * Me.mSettings.CES.N_Children + gen * Me.mSettings.CES.N_Children + nachf, ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.ID.ToString(), Farbe)
-                Case BlueM.Opt.Common.METH_METAEVO
-                    Call serie.Add(runde * Me.mSettings.MetaEvo.NumberGenerations * Me.mSettings.MetaEvo.PopulationSize + gen * Me.mSettings.MetaEvo.PopulationSize + nachf, ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.ID.ToString(), Farbe)
                 Case Else
                     Throw New Exception("Drawing function not defined for this single objective method!")
             End Select

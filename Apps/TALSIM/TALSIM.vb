@@ -235,14 +235,6 @@ Public Class Talsim
 
     End Sub
 
-    ''' <summary>
-    ''' Liest die Verzweigungen
-    ''' </summary>
-    ''' <remarks>not used</remarks>
-    Protected Overrides Sub Read_Verzweigungen()
-
-    End Sub
-
 #End Region 'Eingabedateien lesen
 
 #Region "Evaluierung"
@@ -512,14 +504,6 @@ Public Class Talsim
     End Sub
 
 #End Region 'Evaluierung
-
-    ''' <summary>
-    ''' Schreibt die neuen Verzweigungen
-    ''' </summary>
-    ''' <remarks>not used</remarks>
-    Protected Overrides Sub Write_Verzweigungen()
-
-    End Sub
 
 #End Region 'Methoden
 

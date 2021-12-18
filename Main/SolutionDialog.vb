@@ -125,25 +125,11 @@ Partial Public Class SolutionDialog
             Me.DataGridView1.Columns.Add(column)
         Next
 
-        'Locations
-        '---------
-        cellstyle.BackColor = Color.AliceBlue
-
-        For Each Location As BlueM.Opt.Common.Locations.Struct_Lokation In Me.mProblem.List_Locations
-            column = New DataGridViewTextBoxColumn()
-            column.ReadOnly = True
-            column.HeaderText = Location.Name
-            column.HeaderCell.ToolTipText = "Location"
-            column.Name = Location.Name
-            column.DefaultCellStyle = cellstyle.Clone()
-            Me.DataGridView1.Columns.Add(column)
-        Next
-
         'OptParameter
         '------------
         cellstyle.BackColor = Color.LightGray
 
-        For Each OptPara As BlueM.Opt.Common.OptParameter In Me.mProblem.List_OptParameter_Save
+        For Each OptPara As BlueM.Opt.Common.OptParameter In Me.mProblem.List_OptParameter
             column = New DataGridViewTextBoxColumn()
             column.ReadOnly = True
             column.HeaderText = OptPara.Bezeichnung
@@ -166,12 +152,6 @@ Partial Public Class SolutionDialog
     ''' </summary>
     ''' <param name="ind">das ausgewählte Individuum</param>
     Public Sub addSolution(ByVal ind As Common.Individuum)
-
-        'Sonderfall CES-Individuum
-        If (TypeOf ind Is BlueM.Opt.Common.Individuum_CES) Then
-            Call Me.addSolution_CES(CType(ind, BlueM.Opt.Common.Individuum_CES))
-            Exit Sub
-        End If
 
         Dim i As Integer
         Dim cellvalues() As Object
@@ -202,76 +182,6 @@ Partial Public Class SolutionDialog
             cellvalues(i) = optpara
             i += 1
         Next
-
-        'Zeile erstellen
-        row = New DataGridViewRow()
-        row.CreateCells(Me.DataGridView1, cellvalues)
-        row.HeaderCell.Value = ind.ID.ToString()
-
-        'Zeile hinzufügen
-        Me.DataGridView1.Rows.Add(row)
-
-        'Spalten anpassen
-        Call Me.DataGridView1.AutoResizeColumns()
-
-    End Sub
-
-    ''' <summary>
-    ''' Ein CES-Individuum zur Lösungsauswahl hinzufügen
-    ''' </summary>
-    ''' <param name="ind">das ausgewählte CES-Individuum</param>
-    Private Sub addSolution_CES(ByVal ind As Common.Individuum_CES)
-
-        Dim i As Integer
-        Dim cellvalues() As Object
-        Dim row As DataGridViewRow
-
-        'Daten zusammenstellen
-        '---------------------
-        ReDim cellvalues(Me.DataGridView1.ColumnCount - 1)
-
-        cellvalues(0) = True
-
-        i = 1
-
-        'Ziele
-        For Each featurevalue As Double In ind.Objectives
-            cellvalues(i) = featurevalue * Me.mProblem.List_ObjectiveFunctions(i - 1).Richtung
-            i += 1
-        Next
-
-        'Constraints
-        For Each constraintvalue As Double In ind.Constraints
-            cellvalues(i) = constraintvalue
-            i += 1
-        Next
-
-        'Measures
-        For Each measure As String In ind.Measures
-            cellvalues(i) = measure
-            i += 1
-        Next
-
-        'OptParameter CES
-        Dim found As Boolean
-
-        Do While i < Me.DataGridView1.ColumnCount
-            found = False
-            For Each loc As Common.Individuum_CES.Location_Data In CType(ind, Common.Individuum_CES).Loc
-                For Each optpara As Common.OptParameter In loc.PES_OptPara
-                    If optpara.Bezeichnung = Me.DataGridView1.Columns(i).HeaderText Then
-                        cellvalues(i) = optpara.RWert
-                        found = True
-                    End If
-                    If (found) Then Exit For
-                Next
-                If (found) Then Exit For
-            Next
-            If (Not found) Then
-                cellvalues(i) = "---"
-            End If
-            i += 1
-        Loop
 
         'Zeile erstellen
         row = New DataGridViewRow()

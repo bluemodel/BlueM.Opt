@@ -106,8 +106,6 @@ Public MustInherit Class Sim
     Public OptResult As BlueM.Opt.OptResult.OptResult             'Optimierungsergebnis
     Public OptResultRef As BlueM.Opt.OptResult.OptResult          'Vergleichsergebnis
 
-    Public VerzweigungsDatei(,) As String                   'Gibt die PathSize an für jede Pfadstelle
-
     'Multithreading
     '--------------
     Public MustOverride ReadOnly Property MultithreadingSupported() As Boolean
@@ -241,25 +239,6 @@ Public MustInherit Class Sim
         'Original-WorkDir benutzen (bei Neustart wichtig)
         Me.WorkDir_Current = Me.WorkDir_Original
 
-        'Je nach Problem weitere Vorbereitungen treffen
-        Select Case Me.mProblem.Method
-
-            Case Common.METH_PES, Common.METH_METAEVO, Common.METH_SENSIPLOT
-                'nix
-
-            Case Common.METH_CES, Common.METH_HYBRID
-
-                'Verzweigungs Datei einlesen
-                Call Me.Read_Verzweigungen()
-                'Überprüfen der Kombinatorik
-                Call Me.mProblem.Validate_Combinatoric()
-                If (TypeOf Me Is BlueMSim) Then
-                    'Prüfen ob Kombinatorik und BlueM-Verzweigungsdatei zusammenpassen
-                    Call CType(Me, BlueMSim).Validate_CES_fits_to_VER()
-                End If
-
-        End Select
-
         'Aktuelle Parameterlisten dimensionieren
         ReDim Me.Akt.OptPara(Me.mProblem.NumOptParams - 1)
         ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
@@ -292,146 +271,7 @@ Public MustInherit Class Sim
     ''' </summary>
     Protected MustOverride Sub Read_SimParameter()
 
-    ''' <summary>
-    ''' Liest die Verzweigungen aus BlueM in ein Array ein
-    ''' und dimensioniert das Verzweigungsarray
-    ''' </summary>
-    Protected MustOverride Sub Read_Verzweigungen()
-
 #End Region 'Initialisierung
-
-#Region "Kombinatorik"
-
-    'Holt sich im Falle des Testmodus 1 den Pfad aus der .CES Datei
-    '**************************************************************
-    Public Sub get_TestPath(ByRef Path() As Integer)
-        Dim i, j As Integer
-
-        For i = 0 To Path.GetUpperBound(0)
-            Path(i) = -7
-            For j = 0 To Me.mProblem.List_Locations(i).List_Massnahmen.GetUpperBound(0)
-                If Me.mProblem.List_Locations(i).List_Massnahmen(j).TestModus = 1 Then
-                    Path(i) = j
-                End If
-            Next
-        Next
-
-    End Sub
-
-
-    'Holt sich im Falle des Testmodus 1 den Pfad aus der .CES Datei
-    '**************************************************************
-    Public Function TestPath() As Integer()
-
-        Dim Array(Me.mProblem.List_Locations.GetUpperBound(0)) As Integer
-
-        Dim i, j As Integer
-
-        For i = 0 To Array.GetUpperBound(0)
-            Dim count As Integer = 0
-            Array(i) = -7
-            For j = 0 To Me.mProblem.List_Locations(i).List_Massnahmen.GetUpperBound(0)
-                If (Me.mProblem.List_Locations(i).List_Massnahmen(j).TestModus = 1) Then
-                    Array(i) = j
-                    count += 1
-                End If
-            Next
-            If count > 1 Then Array(i) = -7
-        Next
-
-        TestPath = Array.Clone
-
-    End Function
-
-    'Die Elemente werden pro Location im Child gespeichert
-    '*****************************************************
-    Public Sub Identify_Measures_Elements_Parameters(ByVal No_Loc As Integer, ByVal No_Measure As Integer, ByRef Measure As String, ByRef Elements() As String, ByRef PES_OptPara() As Common.OptParameter)
-
-        Dim i, j As Integer
-        Dim x As Integer
-
-        '1. Die Maßnahme wird ermittelt
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        Measure = Me.mProblem.List_Locations(No_Loc).List_Massnahmen(No_Measure).Name
-        'ToDo: Measure aktuell ist hier noch redundant!
-        ReDim Preserve Akt.Measures(Me.mProblem.List_Locations.GetUpperBound(0))
-        Akt.Measures(No_Loc) = Measure
-
-        '2. Die Elemente werden Ermittelt
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        x = 0
-        For i = 0 To Me.mProblem.List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke.GetUpperBound(0)
-            If (Not Me.mProblem.List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(i) = "X") Then
-                ReDim Preserve Elements(x)
-                Elements(x) = Me.mProblem.List_Locations(No_Loc).List_Massnahmen(No_Measure).Bauwerke(i)
-                x += 1
-            End If
-        Next
-
-        '3. Die Parameter werden Ermittelt
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        x = 0
-        For i = 0 To Elements.GetUpperBound(0)
-            For j = 0 To Me.mProblem.List_OptParameter.GetUpperBound(0)
-                If Elements(i) = Left(Me.mProblem.List_OptParameter(j).Bezeichnung, 4) Then
-                    ReDim Preserve PES_OptPara(x)
-                    PES_OptPara(x) = Me.mProblem.List_OptParameter(j).Clone()
-                    x += 1
-                End If
-            Next
-        Next
-        If x = 0 Then ReDim Preserve PES_OptPara(-1)
-
-    End Sub
-
-    'Bereitet das SimModell für Kombinatorik Optimierung vor
-    '*******************************************************
-    Public Sub PREPARE_Evaluation_CES(ByRef ind As BlueM.Opt.Common.Individuum_CES)
-
-        'Setzt den Aktuellen Pfad
-        Akt.Path = ind.Path
-
-        'Aktuelle Parameterlisten neu dimensionieren
-        ReDim Me.Akt.OptPara(Me.mProblem.NumOptParams - 1)
-        ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
-
-        'Ermittelt das aktuelle_ON_OFF array
-        Call Prepare_Verzweigung_ON_OFF()
-
-        'Schreibt die neuen Verzweigungen
-        Call Me.Write_Verzweigungen()
-
-    End Sub
-
-    'Ermittelt das aktuelle Verzweigungsarray
-    '****************************************
-    Private Sub Prepare_Verzweigung_ON_OFF()
-        Dim j, x, y, z As Integer
-        Dim No As Integer
-
-        'Schreibt alle Bezeichnungen der Verzweigungen ins Array
-        For j = 0 To Akt.VER_ONOFF.GetUpperBound(0)
-            Akt.VER_ONOFF(j, 0) = VerzweigungsDatei(j, 0)
-        Next
-        'Weist die Werte das Pfades zu
-        For x = 0 To Akt.Path.GetUpperBound(0)
-            No = Akt.Path(x)
-            For y = 0 To Me.mProblem.List_Locations(x).List_Massnahmen(No).Schaltung.GetUpperBound(0)
-                For z = 0 To Akt.VER_ONOFF.GetUpperBound(0)
-                    If (Me.mProblem.List_Locations(x).List_Massnahmen(No).Schaltung(y, 0) = Akt.VER_ONOFF(z, 0)) Then
-                        Akt.VER_ONOFF(z, 1) = Me.mProblem.List_Locations(x).List_Massnahmen(No).Schaltung(y, 1)
-                    End If
-                Next
-            Next
-        Next
-
-    End Sub
-
-    'Schreibt die neuen Verzweigungen
-    '********************************
-    Protected MustOverride Sub Write_Verzweigungen()
-
-#End Region 'Kombinatorik
 
 #Region "Evaluierung"
 
@@ -450,31 +290,7 @@ Public MustInherit Class Sim
 
         'Simulation vorbereiten
         '----------------------
-        Select Case Me.mProblem.Method
-
-            Case METH_CES, METH_HYBRID
-                'Methoden CES und HYBRID
-                '-----------------------
-
-                'Bereitet das Sim für die Kombinatorik vor
-                Call Me.PREPARE_Evaluation_CES(ind)
-
-                'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                If (Me.mProblem.Method = METH_HYBRID _
-                    And Me.mSettings.CES.HybridType = HYBRID_TYPE.Mixed_Integer) Then
-                    If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(ind, BlueM.Opt.Common.Individuum_CES).Get_All_Loc_Elem)) Then
-                        Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
-                    End If
-                End If
-
-            Case Else
-                'Alle andere Methoden
-                '--------------------
-
-                'Bereitet das Sim für Parameteroptimierung vor
-                Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
-
-        End Select
+        Call Me.PREPARE_Evaluation_PES(ind.OptParameter)
 
         'Simulation ausführen
         '--------------------
@@ -544,33 +360,7 @@ Public MustInherit Class Sim
 
                     'Simulation vorbereiten
                     '----------------------
-                    Select Case Me.mProblem.Method
-
-                        Case METH_CES, METH_HYBRID
-                            'Methoden CES und HYBRID
-                            '-----------------------
-
-                            'Bereitet das Sim für die Kombinatorik vor
-                            Call Me.PREPARE_Evaluation_CES(inds(n_ind_Run))
-
-                            'HYBRID: Bereitet für die Optimierung mit den PES Parametern vor
-                            'TODO: Christoph: Dies ist die einzige Stelle im Sim, an der die Settings benötigt werden. Kann man das nicht umgehen?
-                            If (Me.mProblem.Method = METH_HYBRID _
-                                And Me.mSettings.CES.HybridType = HYBRID_TYPE.Mixed_Integer) Then
-                                If (Me.mProblem.Reduce_OptPara_and_ModPara(CType(inds(n_ind_Run), BlueM.Opt.Common.Individuum_CES).Get_All_Loc_Elem)) Then
-                                    Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
-                                End If
-                            End If
-
-                        Case Else
-                            'Alle anderen Methoden
-                            '---------------------
-
-                            'Bereitet das Sim für Parameteroptimierung vor
-                            Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
-
-
-                    End Select
+                    Call Me.PREPARE_Evaluation_PES(inds(n_ind_Run).OptParameter)
 
                     'Simulation ausführen
                     '--------------------
@@ -675,10 +465,6 @@ Public MustInherit Class Sim
 
         Dim i As Integer
 
-        'Aktuelle Parameterlisten neu dimensionieren (wegen HYBRID)
-        ReDim Me.Akt.OptPara(Me.mProblem.NumOptParams - 1)
-        ReDim Me.Akt.ModPara(Me.mProblem.List_ModellParameter.GetUpperBound(0))
-
         'Aktuelle Parameter speichern
         For i = 0 To Me.mProblem.NumOptParams - 1
             Me.Akt.OptPara(i) = OptParams(i).RWert
@@ -703,26 +489,6 @@ Public MustInherit Class Sim
 
         'Simulationsergebnis einlesen
         Call SIM_Ergebnis_Lesen()
-
-        'HACK: SKos und Ecology: Die Elemente werden an die Kalkulkulation übergeben
-        ' und das aktuelle WorkDir wird gesetzt
-        For Each obj As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-            If obj.GetObjType = Common.ObjectiveFunction.ObjectiveType.SKos Then
-                With CType(obj, Common.ObjectiveFunction_SKos)
-                    .Akt_Elemente = CType(ind, Common.Individuum_CES).Get_All_Loc_Elem
-                    .Akt_Path = CType(ind, Common.Individuum_CES).Path
-                    .WorkDir_Current = Me.WorkDir_Current
-                End With
-                Exit For
-            ElseIf obj.GetObjType = Common.ObjectiveFunction.ObjectiveType.Ecology Then
-                With CType(obj, Common.ObjectiveFunction_Ecology)
-                    .Akt_Elemente = CType(ind, Common.Individuum_CES).Get_All_Loc_Elem
-                    .Akt_Path = CType(ind, Common.Individuum_CES).Path
-                    .WorkDir_Current = Me.WorkDir_Current
-                End With
-                Exit For
-            End If
-        Next
 
         'ObjectiveFunctions berechnen
         For i = 0 To Me.mProblem.NumObjectives - 1
@@ -1191,9 +957,6 @@ Public MustInherit Class Sim
 
         'Arbeitsverzeichnis auf Original-Verzeichnis setzen
         Me.WorkDir_Current = Me.WorkDir_Original
-
-        'Parameterlisten zurücksetzen (nur bei CES erforderlich?!)
-        Call Me.mProblem.Reset_OptPara_and_ModPara()
 
         'Startwerte der OptParameter setzen
         For i = 0 To Me.mProblem.NumOptParams - 1

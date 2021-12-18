@@ -47,7 +47,7 @@ Public Class OptResult
     Private Datensatz As String
 
     'Das Problem
-    Private mProblem As BlueM.Opt.Common.Problem
+    Private mProblem As Common.Problem
 
     'Ergebnisdatenbank
     Public Ergebnisdb As Boolean = True              'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
@@ -76,7 +76,7 @@ Public Class OptResult
 
     'Konstruktor
     '***********
-    Public Sub New(ByVal Datensatzname As String, ByRef prob As BlueM.Opt.Common.Problem, Optional ByVal createNewMdb As Boolean = True)
+    Public Sub New(ByVal Datensatzname As String, ByRef prob As Common.Problem, Optional ByVal createNewMdb As Boolean = True)
 
         'Standardmäßig mit Optparametern
         Me.holdsOptparameters = True
@@ -148,12 +148,7 @@ Public Class OptResult
         Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone()
 
         'In DB speichern:
-        'Sonderfall für Individuum_CES:
-        If (TypeOf (Ind) Is Common.Individuum_CES) Then
-            Call Me.db_insert(CType(Ind, Common.Individuum_CES))
-        Else
-            Call Me.db_insert(Ind)
-        End If
+        Call Me.db_insert(Ind)
 
     End Sub
 
@@ -175,7 +170,7 @@ Public Class OptResult
 
     'Sekundäre Population hinzufügen
     '*******************************
-    Public Sub setSekPop(ByVal pop() As BlueM.Opt.Common.Individuum, ByVal _igen As Integer)
+    Public Sub setSekPop(ByVal pop() As Common.Individuum, ByVal _igen As Integer)
 
         Dim SekPop As Struct_SekPop
         Dim sekpopvalues(,) As Double
@@ -329,15 +324,13 @@ Public Class OptResult
 
         'Allgemeine Anpassungen
         Call Me.db_prepare()
+
         'Methodenspezifische Anpassungen
         Select Case Me.mProblem.Method
-            Case BlueM.Opt.Common.METH_PES, BlueM.Opt.Common.METH_METAEVO, BlueM.Opt.Common.METH_SENSIPLOT, BlueM.Opt.Common.METH_HOOKEJEEVES, BlueM.Opt.Common.METH_DDS
+            Case Common.METH_PES, Common.METH_METAEVO, Common.METH_SENSIPLOT, Common.METH_HOOKEJEEVES, Common.METH_DDS
                 Call Me.db_prepare_PES()
-            Case BlueM.Opt.Common.METH_CES
-                Call Me.db_prepare_CES()
-            Case BlueM.Opt.Common.METH_HYBRID
-                Call Me.db_prepare_PES()
-                Call Me.db_prepare_CES()
+            Case Else
+                Throw New NotImplementedException($"Method '{Me.mProblem.Method}' not implemented in OptResult.db_init()!")
         End Select
 
     End Sub
@@ -408,33 +401,6 @@ Public Class OptResult
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
-        command.ExecuteNonQuery()
-
-        Call db_disconnect()
-
-    End Sub
-
-    'Ergebnisdatenbank für CES vorbereiten
-    '*************************************
-    Private Sub db_prepare_CES()
-
-        Call db_connect()
-        Dim command As OleDbCommand = New OleDbCommand("", db)
-
-        'Tabelle 'Pfad'
-        '--------------
-        'Spalten festlegen:
-        Dim fieldnames As String = ""
-        Dim i As Integer
-
-        For i = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
-            If (i > 0) Then
-                fieldnames &= ", "
-            End If
-            fieldnames &= "[" & Me.mProblem.List_Locations(i).Name & "] TEXT"
-        Next
-        'Tabelle anpassen
-        command.CommandText = "ALTER TABLE Pfad ADD COLUMN " & fieldnames
         command.ExecuteNonQuery()
 
         Call db_disconnect()
@@ -512,88 +478,6 @@ Public Class OptResult
         Next
         command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
         command.ExecuteNonQuery()
-
-        Call db_disconnect()
-
-    End Function
-
-    'Eine CES/Hybrid-Lösung in die ErgebnisDB schreiben
-    '**************************************************
-    Private Overloads Function db_insert(ByVal ind As Common.Individuum_CES) As Boolean
-
-        Call db_connect()
-
-        Dim i, x, y As Integer
-
-        Dim command As OleDbCommand = New OleDbCommand("", db)
-
-        'Sim schreiben
-        '-------------
-        command.CommandText = "INSERT INTO Sim (ID, Name) VALUES (" & ind.ID & ", '" & Me.Datensatz & "')"
-        command.ExecuteNonQuery()
-
-        'QWerte schreiben 
-        '----------------
-        Dim fieldnames As String = ""
-        Dim fieldvalues As String = ""
-        For i = 0 To Me.mProblem.NumObjectives - 1
-            fieldnames &= ", [" & Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.Objectives(i).ToString(Common.Provider.FortranProvider)
-        Next
-        command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
-        command.ExecuteNonQuery()
-
-        'Constraints schreiben 
-        '---------------------
-        If (Me.mProblem.NumConstraints > 0) Then
-            fieldnames = ""
-            fieldvalues = ""
-            For i = 0 To Me.mProblem.NumConstraints - 1
-                fieldnames &= ", [" & Me.mProblem.List_Constraintfunctions(i).Bezeichnung & "]"
-                fieldvalues &= ", " & ind.Constraints(i).ToString(Common.Provider.FortranProvider)
-            Next
-            command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
-            command.ExecuteNonQuery()
-        End If
-
-        'Pfad schreiben
-        '--------------
-        fieldnames = ""
-        fieldvalues = ""
-        For i = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
-            fieldnames &= ", [" & Me.mProblem.List_Locations(i).Name & "]"
-            fieldvalues &= ", '" & ind.Measures(i) & "'"
-        Next
-        command.CommandText = "INSERT INTO Pfad (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
-        command.ExecuteNonQuery()
-
-        If (Me.mProblem.Method = BlueM.Opt.Common.METH_HYBRID) Then
-
-            Dim found As Boolean
-
-            'OptParameter schreiben
-            '----------------------
-            fieldnames = ""
-            fieldvalues = ""
-            For i = 0 To Me.mProblem.List_OptParameter_Save.GetUpperBound(0)
-                found = False
-                fieldnames &= ", [" & Me.mProblem.List_OptParameter_Save(i).Bezeichnung & "]"
-                For x = 0 To ind.Loc.GetUpperBound(0)
-                    For y = 0 To ind.Loc(x).PES_OptPara.GetUpperBound(0)
-                        If ind.Loc(x).PES_OptPara(y).Bezeichnung = Me.mProblem.List_OptParameter_Save(i).Bezeichnung Then
-                            fieldvalues &= ", " & ind.Loc(x).PES_OptPara(y).RWert.ToString(Common.Provider.FortranProvider)
-                            found = True
-                        End If
-                    Next
-                Next
-                If found = False Then
-                    fieldvalues &= ", " & "-7"
-                End If
-            Next
-            command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
-            command.ExecuteNonQuery()
-
-        End If
 
         Call db_disconnect()
 
@@ -734,14 +618,10 @@ Public Class OptResult
             Me.db_path = sourceFile
 
             Select Case Me.mProblem.Method
-                Case BlueM.Opt.Common.METH_PES, BlueM.Opt.Common.METH_HOOKEJEEVES, BlueM.Opt.Common.METH_SENSIPLOT, BlueM.Opt.Common.METH_METAEVO
+                Case Common.METH_PES, Common.METH_HOOKEJEEVES, Common.METH_SENSIPLOT, Common.METH_METAEVO
                     Call db_getIndividuen_PES()
-
-                Case BlueM.Opt.Common.METH_CES, BlueM.Opt.Common.METH_HYBRID
-                    Call db_getIndividuen_CES()
-
                 Case Else
-                    Throw New Exception("OptResult.db_load() for Method '" & Me.mProblem.Method & "' not yet implemented!")
+                    Throw New NotImplementedException($"Method '{Me.mProblem.Method}' not implemented in OptResult.db_load()!")
             End Select
 
             'Sekundärpopulationen laden
@@ -750,7 +630,7 @@ Public Class OptResult
             Return True
 
         Catch ex As Exception
-            MsgBox("Failed to load optimization result!" & BlueM.Opt.Common.eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Failed to load optimization result!" & Common.eol & ex.Message, MsgBoxStyle.Critical)
             Return False
         End Try
 
@@ -804,7 +684,7 @@ Public Class OptResult
                     'OptParameter
                     '------------
                     For j = 0 To Me.mProblem.NumOptParams - 1
-                        .OptParameter(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter_Save(j).Bezeichnung)
+                        .OptParameter(j).RWert = ds.Tables(0).Rows(i).Item(Me.mProblem.List_OptParameter(j).Bezeichnung)
                     Next
                 End If
 
@@ -812,78 +692,6 @@ Public Class OptResult
                 '-----------
                 For j = 0 To Me.mProblem.NumConstraints - 1
                     .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Constraintfunctions(j).Bezeichnung)
-                Next
-
-                'Features
-                '--------
-                For j = 0 To Me.mProblem.NumObjectives - 1
-                    .Objectives(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung)
-                Next
-
-            End With
-
-        Next
-
-    End Sub
-
-    'Alle Lösungen aus der DB als CES-Individuen einlesen
-    '****************************************************
-    Private Sub db_getIndividuen_CES()
-
-        Dim i, j As Integer
-        Dim numSolutions As Integer
-        Dim q As String = ""
-        Dim adapter As OleDbDataAdapter
-        Dim ds As DataSet
-
-        'Connect
-        Call db_connect()
-
-        'Alle Lösungen aus DB lesen
-        '--------------------------
-        Select Case Me.mProblem.Method
-            Case BlueM.Opt.Common.METH_CES
-                q = "SELECT Sim.ID, Pfad.*, QWerte.*, Constraints.* FROM ((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID"
-            Case BlueM.Opt.Common.METH_HYBRID
-                q = "SELECT Sim.ID, Pfad.*, OptParameter.*, QWerte.*, Constraints.* FROM (((Sim LEFT JOIN [Constraints] ON Sim.ID=Constraints.Sim_ID) INNER JOIN Pfad ON Sim.ID=Pfad.Sim_ID) INNER JOIN OptParameter ON Sim.ID=OptParameter.Sim_ID) INNER JOIN QWerte ON Sim.ID=QWerte.Sim_ID ORDER BY Sim.ID"
-        End Select
-
-        adapter = New OleDbDataAdapter(q, db)
-
-        ds = New DataSet("EVO")
-        numSolutions = adapter.Fill(ds, "Result")
-
-        'Disconnect
-        Call db_disconnect()
-
-        'Alle Lösungen als Individuen übernehmen
-        '---------------------------------------
-        ReDim Me.Solutions(numSolutions - 1)
-
-        For i = 0 To numSolutions - 1
-
-            Me.Solutions(i) = New Common.Individuum_CES("Solution", i)
-
-            With CType(Me.Solutions(i), Common.Individuum_CES)
-                'ID
-                '--
-                .ID = ds.Tables(0).Rows(i).Item("Sim.ID")
-
-                'OptParameter
-                '------------
-                'BUG 314: OptParameter aus DB in Individuum_CES einlesen?
-
-                'Constraints
-                '-----------
-                For j = 0 To Me.mProblem.NumConstraints - 1
-                    .Constraints(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Constraintfunctions(j).Bezeichnung)
-                Next
-
-                'Pfad
-                '----
-                ReDim .Measures(Me.mProblem.List_Locations.GetUpperBound(0))
-                For j = 0 To Me.mProblem.List_Locations.GetUpperBound(0)
-                    .Measures(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_Locations(j).Name)
                 Next
 
                 'Features

@@ -253,7 +253,6 @@
     <EmbeddedResource Include="My Project\TeeChart.licenses" />
     <None Include="app.config" />
     <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings+Settings_General.datasource" />
-    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_CES.datasource" />
     <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_DDS.datasource" />
     <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_HookeJeeves.datasource" />
     <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_MetaBlueM.Opt.datasource" />

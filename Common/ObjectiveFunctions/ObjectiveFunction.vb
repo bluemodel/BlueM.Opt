@@ -58,8 +58,6 @@ Public MustInherit Class ObjectiveFunction
         Value = 2
         ValueFromSeries = 3
         Aggregate = 5
-        SKos = 6
-        Ecology = 7
     End Enum
 
     ''' <summary>

@@ -46,7 +46,6 @@ Public MustInherit Class Individuum
     ''' <remarks></remarks>
     Public Enum Individuumsklassen As Integer
         Individuum_PES = 1
-        Individuum_CES = 2
     End Enum
 
     'Shared Variablen der Klasse
@@ -344,13 +343,6 @@ Public MustInherit Class Individuum
                 For i = 0 To length - 1
                     inds(i) = New Individuum_PES(type, 0)
                 Next
-
-            Case Individuumsklassen.Individuum_CES
-                inds = Array.CreateInstance(GetType(Individuum_CES), length)
-                For i = 0 To length - 1
-                    inds(i) = New Individuum_CES(type, 0)
-                Next
-
         End Select
 
         Return inds

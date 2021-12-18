@@ -156,7 +156,7 @@ Public Class Scan
 
             Next
 
-            Next
+        Next
 
         Return True
 
@@ -197,14 +197,6 @@ Public Class Scan
         Me.SimEnde = Me.input.FileTimeSeries.First.Value.EndDate
         'Me.SimDT
 
-    End Sub
-
-    Protected Overrides Sub Read_Verzweigungen()
-        'nix
-    End Sub
-
-    Protected Overrides Sub Write_Verzweigungen()
-        'nix
     End Sub
 
 End Class

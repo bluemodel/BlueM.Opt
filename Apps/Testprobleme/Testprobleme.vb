@@ -286,10 +286,8 @@ Public Class Testprobleme
             Me.mProblem.List_Constraintfunctions(i) = New Common.Constraintfunction()
         Next
         ReDim Me.mProblem.List_OptParameter(Me.mAnzParameter - 1)
-        ReDim Me.mProblem.List_OptParameter_Save(Me.mAnzParameter - 1)
         For i = 0 To Me.mProblem.NumOptParams - 1
             Me.mProblem.List_OptParameter(i) = Me.mOptPara(i)
-            Me.mProblem.List_OptParameter_Save(i) = Me.mOptPara(i)
         Next
 
     End Sub

@@ -67,14 +67,6 @@ Public Class EVO_Einstellungen
         Me.PES_Combo_PopEltern.DataSource = System.Enum.GetValues(GetType(EVO_POP_ELTERN))
         Me.PES_Combo_PopStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGY))
 
-        'CES
-        Me.CES_Combo_Reproduction.DataSource = System.Enum.GetValues(GetType(CES_REPRODOP))
-        Me.CES_Combo_Mutation.DataSource = System.Enum.GetValues(GetType(CES_MUTATION))
-        Me.CES_Combo_Selection.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGY))
-        Me.CES_Combo_IniValues.DataSource = System.Enum.GetValues(GetType(EVO_STARTPARAMETERS))
-        Me.CES_Combo_HybridType.DataSource = System.Enum.GetValues(GetType(HYBRID_TYPE))
-        Me.CES_Combo_MemStrategy.DataSource = System.Enum.GetValues(GetType(MEMORY_STRATEGY))
-
         'TSP
         Me.TSP_ComboBox_prob_instance.DataSource = System.Enum.GetValues(GetType(EnProblem))
         Me.TSP_ComboBox_Reproductionoperator.DataSource = System.Enum.GetValues(GetType(EnReprodOperator))
@@ -131,13 +123,6 @@ Public Class EVO_Einstellungen
 
             Me.BindingSource_PES_Pop.Clear()
             Me.BindingSource_PES_Pop.Add(Me.mSettings.PES.Pop)
-        End If
-
-        'CES
-        '---
-        If (Not IsNothing(Me.mSettings.CES)) Then
-            Me.BindingSource_CES.Clear()
-            Me.BindingSource_CES.Add(Me.mSettings.CES)
         End If
 
         'HookeJeeves
@@ -214,14 +199,6 @@ Public Class EVO_Einstellungen
                 Me.mSettings.DDS = New Common.Settings_DDS()
                 Me.mSettings.DDS.setStandard()
 
-            Case METH_CES, METH_HYBRID
-                'PES-Settings instanzieren
-                Me.mSettings.PES = New Common.Settings_PES()
-                Me.mSettings.PES.setStandard(Me.mProblem.Modus)
-                'CES-Settings instanzieren
-                Me.mSettings.CES = New Common.Settings_CES()
-                Me.mSettings.CES.setStandard(Me.mProblem.Method)
-
             Case METH_METAEVO
                 'MetaEvo-Settings instanzieren
                 Me.mSettings.MetaEvo = New Common.Settings_MetaEvo()
@@ -287,10 +264,6 @@ Public Class EVO_Einstellungen
 
                 Case METH_DDS
                     Me.TabControl1.TabPages.Add(Me.TabPage_DDS)
-
-                Case METH_CES, METH_HYBRID
-                    Me.TabControl1.TabPages.Add(Me.TabPage_PES)
-                    Me.TabControl1.TabPages.Add(Me.TabPage_CES)
 
                 Case METH_METAEVO
                     Me.TabControl1.TabPages.Add(Me.TabPage_MetaEvo)
@@ -368,53 +341,6 @@ Public Class EVO_Einstellungen
 
     End Sub
 
-    Private Sub CES_HybridTypeChanged(ByVal sender As Object, ByVal e As EventArgs) Handles CES_Combo_HybridType.SelectedIndexChanged
-
-        If (Me.isInitializing) Then Exit Sub
-
-        'Sofortige Aktualisierung erzwingen
-        Me.CES_Combo_HybridType.DataBindings(0).WriteValue()
-
-        'PES-Einstellungen ändern
-        Select Case Me.mSettings.CES.HybridType
-
-            Case HYBRID_TYPE.Mixed_Integer
-
-                'Generationen
-                Me.mSettings.PES.N_Gen = 1
-                Me.PES_Numeric_AnzGen.Enabled = False
-
-                'Eltern
-                Me.mSettings.PES.N_Eltern = 5
-                Me.PES_Numeric_AnzEltern.Enabled = True
-                Me.LabelAnzEltern.Text = "Maximal Zahl der Eltern:"
-
-                'Children
-                Me.mSettings.PES.N_Nachf = 1
-                Me.PES_Numeric_AnzNachf.Enabled = False
-
-            Case HYBRID_TYPE.Sequencial_1
-
-                'Generationen
-                Me.mSettings.PES.N_Gen = 10
-                Me.PES_Numeric_AnzGen.Enabled = True
-
-                'Eltern
-                Me.mSettings.PES.N_Eltern = 5
-                Me.PES_Numeric_AnzEltern.Enabled = True
-                Me.LabelAnzEltern.Text = "Anzahl der Eltern:"
-
-                'Children
-                Me.mSettings.PES.N_Nachf = 15
-                Me.PES_Numeric_AnzNachf.Enabled = True
-
-        End Select
-
-        'WICHTIG!
-        Call Me.refreshForm()
-
-    End Sub
-
     ''' <summary>
     ''' Ensure that combobox changes are saved to the data binding immediately
     ''' </summary>
@@ -428,12 +354,6 @@ Public Class EVO_Einstellungen
         PES_Combo_PopEltern.SelectedIndexChanged,
         PES_Combo_PopStrategie.SelectedIndexChanged,
         PES_Combo_PopPenalty.SelectedIndexChanged,
-        CES_Combo_IniValues.SelectedIndexChanged,
-        CES_Combo_Reproduction.SelectedIndexChanged,
-        CES_Combo_Selection.SelectedIndexChanged,
-        CES_Combo_Mutation.SelectedIndexChanged,
-        CES_Combo_MemStrategy.SelectedIndexChanged,
-        CES_Combo_HybridType.SelectedIndexChanged,
         MetaEvo_Combo_Role.SelectedIndexChanged,
         MetaEvo_Combo_OpMode.SelectedIndexChanged,
         TSP_ComboBox_prob_instance.SelectedIndexChanged,

@@ -397,26 +397,6 @@ Public Class Smusi
 
     End Sub
 
-#Region "Kombinatorik"
-
-    'Kombinatorik
-    '############
-
-    'Liest die Verzweigungen aus SMUSI in ein Array ein
-    'Und Dimensioniert das Verzweigungsarray
-    '*******************************************************
-    Protected Overrides Sub Read_Verzweigungen()
-
-    End Sub
-
-    'Schreibt die neuen Verzweigungen
-    '********************************
-    Protected Overrides Sub Write_Verzweigungen()
-
-    End Sub
-
-#End Region 'Kombinatorik
-
 #End Region 'Methoden
 
 End Class

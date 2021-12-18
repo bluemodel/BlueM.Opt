@@ -111,7 +111,6 @@
     <Compile Include="PES.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CES.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Apps\BlueM.Opt.Apps.vbproj">

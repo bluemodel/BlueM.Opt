@@ -56,18 +56,6 @@ Partial Public Class Form1
 
 #Region "Eigenschaften"
 
-    Public BatchCounter As Integer
-
-    ''' <summary>
-    ''' Wird im BatchMode ausgelöst, sobald die Settings eingelesen wurden (kurz vor Start)
-    ''' </summary>
-    Public Event OptimizationStarted()
-
-    ''' <summary>
-    ''' Wird im BatchMode ausgelöst, sobald die Optimierung beendet ist
-    ''' </summary>
-    Public Event OptimizationReady()
-
     Private IsInitializing As Boolean  'Gibt an, ob das Formular bereits fertig geladen wurde(beim Laden werden sämtliche Events ausgelöst)
 
     'Anwendung
@@ -156,9 +144,6 @@ Partial Public Class Form1
         'Monitor zentrieren
         Me.Monitor1.Location = New Drawing.Point(Me.Location.X + Me.Width / 2 - Me.Monitor1.Width / 2, Me.Location.Y + Me.Height / 2 - Me.Monitor1.Height / 2)
 
-        'BatchCounter initialisieren
-        Me.BatchCounter = 0
-
         'Formular initialisieren
         Call Me.INI()
 
@@ -200,7 +185,7 @@ Partial Public Class Form1
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Methode.Items.Clear()
-        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_CES, METH_HYBRID, METH_METAEVO, METH_SENSIPLOT, METH_HOOKEJEEVES, METH_DDS})
+        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_METAEVO, METH_SENSIPLOT, METH_HOOKEJEEVES, METH_DDS})
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'Einstellungen
@@ -896,38 +881,6 @@ Partial Public Class Form1
                     'TODO: Progress mit Standardwerten initialisieren
 
 
-                Case METH_CES, METH_HYBRID
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Funktioniert nur bei BlueM.Sim!
-                    If (Not Anwendung = ANW_BLUEM) Then
-                        Throw New Exception("CES/HYBRID currently only works with BlueM.Sim!")
-                    End If
-
-                    'ES-Controller instanzieren
-                    Me.controller = New BlueM.Opt.Algos.ES.ESController()
-
-                    'Ergebnis-Buttons
-                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
-
-                    If (Me.mProblem.Method = METH_HYBRID) Then
-
-                        'Original ModellParameter schreiben
-                        Call Sim1.Write_ModellParameter()
-
-                    End If
-
-                    'ggf. Testmodus einrichten
-                    '-------------------------
-                    'Bei Testmodus wird die Anzahl der Kinder und Generationen überschrieben
-                    If Not (Me.mProblem.CES_T_Modus = Common.Constants.CES_T_MODUS.No_Test) Then
-                        Call Me.mSettings.CES.setTestModus(Me.mProblem.CES_T_Modus, Sim1.TestPath, 1, 1, Me.mProblem.NumCombinations)
-                        Call Me.EVO_Einstellungen1.refreshForm()
-                    End If
-
-                    'TODO: Progress mit Standardwerten initialisieren
-
-
                 Case METH_METAEVO
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -1045,10 +998,6 @@ Partial Public Class Form1
 
     End Sub
 
-    Public Sub setBatchMode(ByVal _batchmode As Boolean)
-        Me.mSettings.General.BatchMode = _batchmode
-    End Sub
-
 #End Region 'Initialisierung der Anwendungen
 
 #Region "Ablaufkontrolle"
@@ -1116,12 +1065,6 @@ Partial Public Class Form1
             dir = My.Computer.FileSystem.SpecialDirectories.Temp
             Me.saveSettings(IO.Path.Combine(dir, "Settings.xml"))
 
-            'Event auslösen (BatchMode)
-            If (Me.mSettings.General.BatchMode) Then
-                Me.BatchCounter += 1
-                RaiseEvent OptimizationStarted()
-            End If
-
             'Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()
 
@@ -1170,11 +1113,6 @@ Partial Public Class Form1
                     Call controller.Start()
 
             End Select
-
-            If (Me.mSettings.General.BatchMode) Then
-                'Event auslösen 
-                RaiseEvent OptimizationReady()
-            End If
 
         Catch ex As Exception
 
@@ -1437,7 +1375,7 @@ Partial Public Class Form1
                         Call Me.Hauptdiagramm1.DiagInitialise(Anwendung, Achsen, Me.mProblem)
 
 
-                    Case Else 'PES, CES, HYBRID, HOOK & JEEVES, DDS
+                    Case Else 'PES, HOOK & JEEVES, DDS
                         'XXXXXXXXXXXXXXXXXXXXX
 
                         'Achsen:
@@ -1471,9 +1409,6 @@ Partial Public Class Form1
                                 'Bei DDS:
                                 Achse.Automatic = True
 
-                            Else
-                                'Bei CES etc.:
-                                Achse.Maximum = Me.mSettings.CES.N_Children * Me.mSettings.CES.N_Generations
                             End If
 
                             Achsen.Add(Achse)
@@ -2258,73 +2193,6 @@ Partial Public Class Form1
     ''' </summary>
     Protected Overrides Sub Finalize()
         MyBase.Finalize()
-    End Sub
-
-    Private Sub Start_CES_BatchMode(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BachModeToolStripMenuItem.Click
-
-        'Fuer die fortlaufende Log Datei muss:
-        'Me.Monitor1.Reset()
-        'hier im Form abgeschaltet werden
-        '"Die Evaluierung der Generation" abschalten
-        'im OptResult die Datenbank deaktivieren:
-        'Call Me.db_insert(CType(Ind, Common.Individuum_CES))
-        'Grenze einsetzen im ESController: "Abbruchkriterium"
-
-        Dim n_cycles As Integer = 15
-        'Dim ReprodItem As BlueM.Opt.Common.Constants.CES_REPRODOP
-        'Dim MutItem As BlueM.Opt.Common.Constants.CES_MUTATION
-
-        Dim i As Integer
-        'For Each ReprodItem In System.Enum.GetValues(GetType(BlueM.Opt.Common.Constants.CES_REPRODOP))
-        'For Each MutItem In System.Enum.GetValues(GetType(BlueM.Opt.Common.Constants.CES_MUTATION))
-        For i = 1 To n_cycles
-
-            Call Me.INI_App(ANW_BLUEM)
-            Call Me.INI_Datensatz("D:\xData\Erft_Final\MI_1O_1984\Erft.ALL")
-            Call Me.INI_Method(METH_HYBRID)
-            Call Me.loadSettings("D:\xData\Erft_Final\MI_1O_1984\Settings\Settings_batch.xml")
-
-            'BatchMode einschalten
-            Me.mSettings.General.BatchMode = True
-
-            'Settings ändern *************************************************
-            'Me.mSettings.CES.OptReprodOp = ReprodItem
-            'Me.mSettings.CES.OptMutOperator = MutItem
-
-            '*** Hier wird immer nur einer gesetzt! *****
-            'Me.mSettings.CES.OptReprodOp = CES_REPRODOP.Uniform_Crossover
-            'Me.mSettings.CES.K_Value = 3
-
-            'If Me.mSettings.CES.OptMutOperator = CES_MUTATION.RND_Switch Then
-            '    Me.mSettings.CES.Pr_MutRate = 7
-            'Else
-            '    Me.mSettings.CES.Pr_MutRate = 20
-            'End If
-
-            Me.mSettings.CES.Mem_Strategy = MEMORY_STRATEGY.E_Two_Loc_Down
-
-            '*****************************************************************
-
-            'Neue Settings ins Form schreiben (optional)
-            Call Me.EVO_Einstellungen1.refreshForm()
-
-            Call Monitor1.SelectTabLog()
-            Call Monitor1.Show()
-
-            Monitor1.LogAppend(Me.mSettings.CES.Mem_Strategy.ToString)
-            'Monitor1.LogAppend("MutOperator: " & Me.mSettings.CES.OptMutOperator.ToString)
-
-            Call Me.STARTEN()
-
-            'Qualität wird im Controller geprüft dann Stop Button
-            Call Monitor1.savelog("D:\xData\Erft_Final\MI_1O_1984\Batch\Batch ")
-
-            Call Button_New_Click(sender, e)
-
-        Next
-        'Next
-        'Next
-
     End Sub
 
 #End Region 'Methoden

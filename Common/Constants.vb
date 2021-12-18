@@ -64,8 +64,6 @@ Public Module Constants
 
     'Optimierungsmethoden
     Public Const METH_PES As String = "PES"
-    Public Const METH_CES As String = "CES"
-    Public Const METH_HYBRID As String = "HYBRID"
     Public Const METH_SENSIPLOT As String = "SensiPlot"
     Public Const METH_HOOKEJEEVES As String = "Hooke & Jeeves"
     Public Const METH_METAEVO As String = "MetaEvo"
@@ -94,23 +92,6 @@ Public Module Constants
     Public Enum EVO_STRATEGY As Integer
         Plus_Strategy = 1                                'Eltern + Nachfolger
         Comma_Strategy = 2                               'nur Nachfolger
-    End Enum
-
-    'Reproduktionsoperator
-    Public Enum CES_REPRODOP As Integer
-        One_Point_Crossover = 1
-        Two_Point_Crossover = 2
-        k_Point_Crossover = 3
-        Uniform_Crossover = 4
-        'Order_Crossover = 3
-        'Part_Mapped_Cross = 4
-    End Enum
-
-    'Mutationsoperator
-    Public Enum CES_MUTATION as Integer
-        RND_Switch = 1
-        Gene_Insertion = 2
-        'Dyn_Switch = 2
     End Enum
 
     'Option zur Erzeugung der Eltern
@@ -145,28 +126,6 @@ Public Module Constants
         Worst = 2                               'SingleObjective
         Crowding = 3                            'MultiObjective
         Span = 4                                'MultiObjective
-    End Enum
-
-    'Option zur Wahl des Hybrid Verfahrens
-    Public Enum HYBRID_TYPE as Integer
-        Mixed_Integer = 1                       'Mixed Integer durch Memory
-        Sequencial_1 = 2                        'Erst CES dann PES
-    End Enum
-
-    'Option zur Wahl des Hybrid Verfahrens
-    Public Enum CES_T_MODUS as Integer
-        No_Test = 0                       'Mixed Integer durch Memory
-        One_Combi = 1                        'Erst CES dann PES
-        All_Combis = 2                        'Erst CES dann PES
-    End Enum
-
-    'Option zur Wahl des Hybrid Verfahrens
-    Public Enum MEMORY_STRATEGY as Integer
-        A_Two_Loc_Up = -2
-        B_One_Loc_Up = -1
-        C_This_Loc = 0
-        D_One_Loc_Down = 1
-        E_Two_Loc_Down = 2
     End Enum
 
     'Beziehung
