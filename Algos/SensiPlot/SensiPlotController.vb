@@ -238,7 +238,7 @@ Public Class SensiPlotController
                             'SimReihe auslesen
                             SimReihe = Sim1.SimErgebnis.Reihen(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
                             'Lösungs-ID an Titel anhängen
-                            SimReihe.Title += " (Solution " & n.ToString() & ")"
+                            SimReihe.Title &= $" (Solution {n})"
                             'SimReihe zu Collection hinzufügen
                             SimReihen.Add(SimReihe)
                         End If

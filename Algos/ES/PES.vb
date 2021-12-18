@@ -339,7 +339,7 @@ Public Class PES
         'Dynamisches Array wird mit Werten belegt
         For i = 0 To Me.mProblem.NumOptParams - 1
             If (Me.mProblem.List_OptParameter(i).Xn < 0 Or Me.mProblem.List_OptParameter(i).Xn > 1) Then
-                Throw New Exception("The start value of the optimization parameter '" & Me.mProblem.List_OptParameter(i).Bezeichnung & "' is not between 0 und 1. It must be scaled to this range!")
+                Throw New Exception($"The start value of the optimization parameter '{Me.mProblem.List_OptParameter(i).Bezeichnung}' is not between 0 und 1. It must be scaled to this range!")
             End If
             AktPara(i) = Me.mProblem.List_OptParameter(i).Clone()
             'Startschrittweite übernehmen

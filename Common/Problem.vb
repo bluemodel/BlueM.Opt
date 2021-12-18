@@ -235,19 +235,19 @@ Public Class Problem
     Public ReadOnly Property Description() As String
         Get
             Dim msg As String
-            msg = "Objective Functions (" & Me.NumPrimObjective & " primary, " & Me.NumSecObjectives & " secondary):" & eol
+            msg = $"Objective Functions ({Me.NumPrimObjective} primary, {Me.NumSecObjectives} secondary):" & eol
             For Each obj As ObjectiveFunction In Me.List_ObjectiveFunctions
                 msg &= "* " & obj.Bezeichnung & eol
             Next
-            msg &= "Optimization parameters (" & Me.NumOptParams & "):" & eol
+            msg &= $"Optimization parameters ({Me.NumOptParams}):" & eol
             For Each optparam As OptParameter In Me.List_OptParameter
                 msg &= "* " & optparam.Bezeichnung & eol
             Next
-            msg &= "Model parameters (" & Me.NumModelParams & "):" & eol
+            msg &= $"Model parameters ({Me.NumModelParams}):" & eol
             For Each modparam As Struct_ModellParameter In Me.List_ModellParameter
                 msg &= "* " & modparam.Bezeichnung & eol
             Next
-            msg &= "Constraints (" & Me.NumConstraints & "):" & eol
+            msg &= $"Constraints ({Me.NumConstraints}):" & eol
             For Each constraint As Constraintfunction In Me.List_Constraintfunctions
                 msg &= "* " & constraint.Bezeichnung & eol
             Next
@@ -521,7 +521,7 @@ Public Class Problem
                                 .EvalEnde = WerteArray(10).Trim()
                                 'Check
                                 If .EvalEnde > SimEnde Then
-                                    Throw New Exception("The end of the evaluation period of the objective function '" & .Bezeichnung & "' (" & .EvalEnde & ") is later than the simulation end (" & SimEnde & "!")
+                                    Throw New Exception($"The end of the evaluation period of the objective function '{ .Bezeichnung}' ({ .EvalEnde}) is later than the simulation end ({SimEnde})!")
                                 End If
                             Else
                                 .EvalEnde = SimEnde
@@ -616,7 +616,7 @@ Public Class Problem
                                 .EvalEnde = WerteArray(10).Trim()
                                 'Check
                                 If .EvalEnde > SimEnde Then
-                                    Throw New Exception("The end of the evaluation period of the objective function '" & .Bezeichnung & "' (" & .EvalEnde & ") is later than the simulation end (" & SimEnde & "!")
+                                    Throw New Exception($"The end of the evaluation period of the objective function '{ .Bezeichnung}' ({ .EvalEnde}) is later than the simulation end ({SimEnde})!")
                                 End If
                             Else
                                 .EvalEnde = SimEnde
@@ -773,7 +773,7 @@ Public Class Problem
         'Zeitraum der Referenzreihe überprüfen
         If (RefReihe.StartDate > EvalStart Or RefReihe.EndDate < EvalEnde) Then
             'Referenzreihe deckt Evaluierungszeitraum nicht ab
-            Throw New Exception("The reference series '" & dateipfad & "' does not cover the evaluation period!")
+            Throw New Exception($"The reference series '{dateipfad}' does not cover the evaluation period!")
         Else
             'Referenzreihe auf Evaluierungszeitraum kürzen
             Call RefReihe.Cut(EvalStart, EvalEnde)
@@ -781,7 +781,7 @@ Public Class Problem
 
         'Check reference series for NaN values
         If RefReihe.Nodes.Count > RefReihe.NodesClean.Count Then
-            Throw New Exception("The reference series '" & dateipfad & "' contains NaN values, please remove all NaN values before use!")
+            Throw New Exception($"The reference series '{dateipfad}' contains NaN values, please remove all NaN values before use!")
         End If
 
         'Referenzreihe umbenennen
@@ -881,7 +881,7 @@ Public Class Problem
                                 Dim ZRE As New Wave.ZRE(IO.Path.Combine(Me.mWorkDir, .GrenzReiheDatei))
                                 .GrenzReihe = ZRE.getTimeSeries(0)
                             Case Else
-                                Throw New Exception("Constraints: The file format of the threshold series '" & .GrenzReiheDatei & "' is not supported!")
+                                Throw New Exception($"Constraints: The file format of the threshold series '{ .GrenzReiheDatei}' is not supported!")
                         End Select
 
                         'Zeitraum der Grenzwertreihe überprüfen
@@ -891,7 +891,7 @@ Public Class Problem
 
                         If (GrenzStart > SimStart Or GrenzEnde < SimEnde) Then
                             'Grenzwertreihe deckt Simulationszeitraum nicht ab
-                            Throw New Exception("Constraints: The threshold series '" & .GrenzReiheDatei & "' does not cover the simulation period!")
+                            Throw New Exception($"Constraints: The threshold series '{ .GrenzReiheDatei}' does not cover the simulation period!")
                         Else
                             'Zielreihe auf Simulationszeitraum kürzen
                             Call .GrenzReihe.Cut(SimStart, SimEnde)
@@ -965,7 +965,7 @@ Public Class Problem
 
         For i = 0 To List_OptParameter.GetUpperBound(0)
             If Not List_OptParameter(i).RWert <= List_OptParameter(i).Max Or Not List_OptParameter(i).RWert >= List_OptParameter(i).Min Then
-                Throw New Exception("The start value of the optimization parameter " & List_OptParameter(i).Bezeichnung & " is not within the defined value range!")
+                Throw New Exception($"The start value of the optimization parameter {List_OptParameter(i).Bezeichnung} is not within the defined value range!")
             End If
         Next
     End Sub

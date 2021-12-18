@@ -124,7 +124,7 @@ Public Class TSPController
 
                     For M = 1 To 4
                         Me.mySettings.TSP.MutOperator = M
-                        Me.myMonitor.LogAppend("ReprodOperator: " & Me.mySettings.TSP.ReprodOperator & "; MutationOperator: " & Me.mySettings.TSP.MutOperator)
+                        Me.myMonitor.LogAppend($"ReprodOperator: {Me.mySettings.TSP.ReprodOperator}; MutationOperator: {Me.mySettings.TSP.MutOperator}")
 
                         'n Wiederholungen
                         For i = 1 To TSP1.nTests
@@ -150,8 +150,8 @@ Public Class TSPController
                 Next
                 Time.Stop()
 
-                Me.myMonitor.LogAppend("Zahl der Berechnungen: " & j)
-                Me.myMonitor.LogAppend("Die Berechnung dauerte:   " & Time.Elapsed.Hours & "h  " & Time.Elapsed.Minutes & "m  " & Time.Elapsed.Seconds & "s     " & Time.Elapsed.Milliseconds & "ms")
+                Me.myMonitor.LogAppend($"Number of calculations: {j}")
+                Me.myMonitor.LogAppend($"Time elapsed: {Time.Elapsed.Hours}h {Time.Elapsed.Minutes}m {Time.Elapsed.Seconds}s {Time.Elapsed.Milliseconds}ms")
 
         End Select
     End Sub
@@ -217,8 +217,7 @@ Public Class TSPController
                 jepp += increm
                 Me.myProgress.iGen() = gen
                 If Batch_Mode = False Then
-                    Me.myMonitor.LogAppend("Gen.: " & gen & "; Länge: " & Conversion.Int(TSP1.ParentList(0).Penalty) & "; Faktor: " _
-                    & Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven))
+                    Me.myMonitor.LogAppend($"Gen.: {gen}; Length: {Conversion.Int(TSP1.ParentList(0).Penalty)}; Factor: {Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven)}")
                     'png Export
                     If TSP1.pngExport = True And Conversion.Int(TSP1.ParentList(0).Penalty) < PenaltyTMP Then
                         Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
@@ -253,8 +252,7 @@ Public Class TSPController
                 If Batch_Mode = False Then
                     Call Zeichnen_TSP(TSP1.ParentList(0).Image)
                     Me.myHauptDiagramm.Update()
-                    Me.myMonitor.LogAppend("Gen.: " & gen & "; Länge: " & Conversion.Int(TSP1.ParentList(0).Penalty) & "; Faktor: " _
-                    & Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven))
+                    Me.myMonitor.LogAppend($"Gen.: {gen}; Length: {Conversion.Int(TSP1.ParentList(0).Penalty)}; Factor: {Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven)}")
                     'png Export
                     If TSP1.pngExport = True Then
                         Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")

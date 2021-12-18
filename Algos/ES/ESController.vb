@@ -168,7 +168,7 @@ Public Class ESController
         'xxxxxxxxxxxxxxxx
         For PES1.PES_iAkt.iAktRunde = 0 To Me.mySettings.PES.Pop.N_Runden - 1
 
-            BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Starting round " & PES1.PES_iAkt.iAktRunde & "...")
+            BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Starting round {PES1.PES_iAkt.iAktRunde}...")
 
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
@@ -176,7 +176,7 @@ Public Class ESController
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 0 To Me.mySettings.PES.Pop.N_Popul - 1
 
-                BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Starting population " & PES1.PES_iAkt.iAktPop & "...")
+                BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Starting population {PES1.PES_iAkt.iAktPop}...")
 
                 'POPULATIONS REPRODUKTIONSPROZESS
                 '################################
@@ -192,7 +192,7 @@ Public Class ESController
                 'xxxxxxxxxxxxxxxxxxxxxx
                 For PES1.PES_iAkt.iAktGen = 0 To Me.mySettings.PES.N_Gen - 1
 
-                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Starting generation " & PES1.PES_iAkt.iAktGen & "...")
+                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Starting generation {PES1.PES_iAkt.iAktGen}...")
 
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
@@ -240,7 +240,7 @@ Public Class ESController
                             '----------------------------
                             If (Not isOK(i_Nachf)) Then
 
-                                BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Evaluation of child " & i_Nachf & " was unsuccessful, a new parameter set will be generated and evaluated...")
+                                BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Evaluation of child {i_Nachf} was unsuccessful, a new parameter set will be generated and evaluated...")
 
                                 Dim n_Tries As Integer = 0
 
@@ -288,7 +288,7 @@ Public Class ESController
                         Next
                         If errorcount > 0 Then
                             Dim msg As String
-                            msg = "Evaluation of " & errorcount & " children of the current generation failed, will generate and evaluate new parameter sets..."
+                            msg = $"Evaluation of {errorcount} children of the current generation failed, will generate and evaluate new parameter sets..."
                             BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend(msg)
                         End If
 
@@ -328,7 +328,7 @@ Public Class ESController
                     End If 'Ende alle Nachfahren (multithread)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Generation " & PES1.PES_iAkt.iAktGen & " completed.")
+                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Generation {PES1.PES_iAkt.iAktGen} completed.")
 
                     'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
                     'Die neuen Eltern werden generiert

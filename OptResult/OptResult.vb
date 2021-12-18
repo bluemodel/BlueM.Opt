@@ -164,7 +164,7 @@ Public Class OptResult
             End If
         Next
 
-        Throw New Exception("Unable to identify the solution with the ID " & ID & "!")
+        Throw New Exception($"Unable to identify the solution with the ID {ID}!")
 
     End Function
 
@@ -341,7 +341,7 @@ Public Class OptResult
 
         'Tabellen anpassen
         '=================
-        Dim i As Integer
+        Dim fieldnames As List(Of String)
 
         Call db_connect()
         Dim command As OleDbCommand = New OleDbCommand("", db)
@@ -349,30 +349,24 @@ Public Class OptResult
         'Tabelle 'QWerte'
         '----------------
         'Spalten festlegen:
-        Dim fieldnames As String = ""
-        For i = 0 To Me.mProblem.NumObjectives - 1
-            If (i > 0) Then
-                fieldnames &= ", "
-            End If
-            fieldnames &= "[" & Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung & "] DOUBLE"
+        fieldnames = New List(Of String)
+        For Each objfun As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+            fieldnames.Add($"[{objfun.Bezeichnung}] DOUBLE")
         Next
         'Tabelle anpassen
-        command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & fieldnames
+        command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & String.Join(", ", fieldnames) & ";"
         command.ExecuteNonQuery()
 
         'Tabelle 'Constraints'
         '----------------
         If (Me.mProblem.NumConstraints > 0) Then
             'Spalten festlegen:
-            fieldnames = ""
-            For i = 0 To Me.mProblem.NumConstraints - 1
-                If (i > 0) Then
-                    fieldnames &= ", "
-                End If
-                fieldnames &= "[" & Me.mProblem.List_Constraintfunctions(i).Bezeichnung & "] DOUBLE"
+            fieldnames = New List(Of String)
+            For Each constraint As Common.Constraintfunction In Me.mProblem.List_Constraintfunctions
+                fieldnames.Add($"[{constraint.Bezeichnung}] DOUBLE")
             Next
             'Tabelle anpassen
-            command.CommandText = "ALTER TABLE [Constraints] ADD COLUMN " & fieldnames
+            command.CommandText = "ALTER TABLE [Constraints] ADD COLUMN " & String.Join(", ", fieldnames) & ";"
             command.ExecuteNonQuery()
         End If
 
@@ -390,17 +384,12 @@ Public Class OptResult
         'Tabelle 'OptParameter'
         '----------------------
         'Spalten festlegen:
-        Dim fieldnames As String = ""
-        Dim i As Integer
-
-        For i = 0 To Me.mProblem.List_OptParameter.GetUpperBound(0)
-            If (i > 0) Then
-                fieldnames &= ", "
-            End If
-            fieldnames &= "[" & Me.mProblem.List_OptParameter(i).Bezeichnung & "] DOUBLE"
+        Dim fieldnames As New List(Of String)
+        For Each optpara As Common.OptParameter In Me.mProblem.List_OptParameter
+            fieldnames.Add($"[{optpara.Bezeichnung}] DOUBLE")
         Next
         'Tabelle anpassen
-        command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & fieldnames
+        command.CommandText = "ALTER TABLE OptParameter ADD COLUMN " & String.Join(", ", fieldnames) & ";"
         command.ExecuteNonQuery()
 
         Call db_disconnect()
@@ -436,47 +425,49 @@ Public Class OptResult
         Call db_connect()
 
         Dim i As Integer
+        Dim fieldnames As List(Of String)
+        Dim fieldvalues As List(Of String)
 
         Dim command As OleDbCommand = New OleDbCommand("", db)
 
         'Sim schreiben
         '-------------
-        command.CommandText = "INSERT INTO Sim (ID, Name) VALUES (" & ind.ID & ", '" & Me.Datensatz & "')"
+        command.CommandText = $"INSERT INTO Sim (ID, Name) VALUES ({ind.ID}, '{Me.Datensatz}');"
         command.ExecuteNonQuery()
 
         'QWerte schreiben 
         '----------------
-        Dim fieldnames As String = ""
-        Dim fieldvalues As String = ""
+        fieldnames = New List(Of String)
+        fieldvalues = New List(Of String)
         For i = 0 To Me.mProblem.NumObjectives - 1
-            fieldnames &= ", [" & Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.Objectives(i).ToString(Common.Provider.FortranProvider)
+            fieldnames.Add($"[{Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung}]")
+            fieldvalues.Add(ind.Objectives(i).ToString(Common.Provider.FortranProvider))
         Next
-        command.CommandText = "INSERT INTO QWerte (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
+        command.CommandText = "INSERT INTO QWerte (Sim_ID, " & String.Join(", ", fieldnames) & $") VALUES ({ind.ID}, " & String.Join(", ", fieldvalues) & ");"
         command.ExecuteNonQuery()
 
         'Constraints schreiben 
         '---------------------
         If (Me.mProblem.NumConstraints > 0) Then
-            fieldnames = ""
-            fieldvalues = ""
+            fieldnames = New List(Of String)
+            fieldvalues = New List(Of String)
             For i = 0 To Me.mProblem.NumConstraints - 1
-                fieldnames &= ", [" & Me.mProblem.List_Constraintfunctions(i).Bezeichnung & "]"
-                fieldvalues &= ", " & ind.Constraints(i).ToString(Common.Provider.FortranProvider)
+                fieldnames.Add($"[{Me.mProblem.List_Constraintfunctions(i).Bezeichnung}]")
+                fieldvalues.Add(ind.Constraints(i).ToString(Common.Provider.FortranProvider))
             Next
-            command.CommandText = "INSERT INTO [Constraints] (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
+            command.CommandText = "INSERT INTO [Constraints] (Sim_ID, " & String.Join(", ", fieldnames) & $") VALUES ({ind.ID}, " & String.Join(", ", fieldvalues) & ");"
             command.ExecuteNonQuery()
         End If
 
         'OptParameter schreiben
         '----------------------
-        fieldnames = ""
-        fieldvalues = ""
+        fieldnames = New List(Of String)
+        fieldvalues = New List(Of String)
         For i = 0 To Me.mProblem.List_OptParameter.GetUpperBound(0)
-            fieldnames &= ", [" & Me.mProblem.List_OptParameter(i).Bezeichnung & "]"
-            fieldvalues &= ", " & ind.OptParameter(i).RWert.ToString(Common.Provider.FortranProvider)
+            fieldnames.Add($"[{Me.mProblem.List_OptParameter(i).Bezeichnung}]")
+            fieldvalues.Add(ind.OptParameter(i).RWert.ToString(Common.Provider.FortranProvider))
         Next
-        command.CommandText = "INSERT INTO OptParameter (Sim_ID" & fieldnames & ") VALUES (" & ind.ID & fieldvalues & ")"
+        command.CommandText = "INSERT INTO OptParameter (Sim_ID, " & String.Join(", ", fieldnames) & $") VALUES ({ind.ID}, " & String.Join(", ", fieldvalues) & ");"
         command.ExecuteNonQuery()
 
         Call db_disconnect()
@@ -504,14 +495,14 @@ Public Class OptResult
             'zugehörige Sim_ID bestimmen
             bedingung = ""
             For j = 0 To Me.mProblem.NumPrimObjective - 1
-                bedingung &= " AND QWerte.[" & Me.mProblem.List_PrimObjectiveFunctions(j).Bezeichnung & "] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
+                bedingung &= $" AND QWerte.[{Me.mProblem.List_PrimObjectiveFunctions(j).Bezeichnung}] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
             Next
-            command.CommandText = "SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1" & bedingung & ")"
+            command.CommandText = $"SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1{bedingung});"
             Sim_ID = command.ExecuteScalar()
 
             If (Sim_ID > 0) Then
                 'SekPop Member speichern
-                command.CommandText = "INSERT INTO SekPop (Generation, Sim_ID) VALUES (" & igen & ", " & Sim_ID & ")"
+                command.CommandText = $"INSERT INTO SekPop (Generation, Sim_ID) VALUES ({igen}, {Sim_ID});"
                 command.ExecuteNonQuery()
             End If
         Next
@@ -552,7 +543,7 @@ Public Class OptResult
             Next
 
         Else
-            Throw New Exception("Secondary population of generation " & iGen & " not found in database!")
+            Throw New Exception($"Secondary population of generation {iGen} not found in database!")
         End If
 
         Return SekPop

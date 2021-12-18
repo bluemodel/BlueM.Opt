@@ -215,7 +215,7 @@ Public MustInherit Class Sim
             Me.WorkDir_Current = Path.GetDirectoryName(pfad)
             Me.WorkDir_Original = Path.GetDirectoryName(pfad)
         Else
-            Throw New Exception("Der Datensatz '" & pfad & "' existiert nicht!")
+            Throw New Exception($"Der Datensatz '{pfad}' existiert nicht!")
         End If
 
         'Simulationsdaten einlesen
@@ -451,7 +451,7 @@ Public MustInherit Class Sim
         End If
 
         OptTimePara.Stop()
-        'BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Die Evaluierung der Generation dauerte:   " & OptTimePara.Elapsed.Hours & "h  " & OptTimePara.Elapsed.Minutes & "m  " & OptTimePara.Elapsed.Seconds & "s     " & OptTimePara.Elapsed & "ms")
+        'BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Die Evaluierung der Generation dauerte:   {OptTimePara.Elapsed.Hours}h  {OptTimePara.Elapsed.Minutes}m  {OptTimePara.Elapsed.Seconds}s {OptTimePara.Elapsed}ms")
 
         Return isOK
 
@@ -619,7 +619,7 @@ Public MustInherit Class Sim
             'Zeile einlesen und splitten
             Zeile = Zeilen(Me.mProblem.List_ModellParameter(i).ZeileNr)
             If (Zeile.Length < Me.mProblem.List_ModellParameter(i).SpVon) Then
-                Throw New Exception("Der Modellparameter '" & Me.mProblem.List_ModellParameter(i).Bezeichnung & "' kann nicht geschrieben werden, da in der angegebenen Zeile und Spalte kein Platz ist!")
+                Throw New Exception($"Unable to write model parameter '{Me.mProblem.List_ModellParameter(i).Bezeichnung}', there is not enough space at the given line and column!")
             End If
             StrLeft = Zeile.Substring(0, Me.mProblem.List_ModellParameter(i).SpVon - 1)
             If (Zeile.Length > Me.mProblem.List_ModellParameter(i).SpBis) Then
@@ -635,7 +635,7 @@ Public MustInherit Class Sim
 
             If (WertStr.Length > AnzZeichen) Then
                 'Wert zu lang
-                Throw New Exception("Der ganzzahlige Teil des Modellparameters '" & Me.mProblem.List_ModellParameter(i).Bezeichnung & "' (" & WertStr & ") ist länger als die zur Verfügung stehende Anzahl von Zeichen!")
+                Throw New Exception($"The whole number part of the model parameter '{Me.mProblem.List_ModellParameter(i).Bezeichnung}' ({WertStr}) is longer than the number of available spaces!")
             End If
             'Anzahl verfügbarer Nachkommastellen = (Anzahl Zeichen) - (Anzahl Vorkommastellen) - (Punkt)
             'Math.Round() akzeptiert max 15 Nachkommastellen

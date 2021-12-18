@@ -111,7 +111,7 @@ Public Class Talsim
             'use default location instead
             exe_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "TALSIM\talsimw64.exe")
             If My.Settings.TALSIM_path.Trim() <> "" Then
-                MsgBox("UserSetting for TALSIM_path " & My.Settings.TALSIM_path & " was not found." & vbCrLf & "Using default " & exe_path & " instead.", MsgBoxStyle.Information)
+                MsgBox($"UserSetting for TALSIM_path {My.Settings.TALSIM_path} was not found.{eol}Using default {exe_path} instead.", MsgBoxStyle.Information)
             End If
         End If
 

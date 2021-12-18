@@ -149,7 +149,7 @@ Public Module Constants
             Case ">="
                 Return Relationship.larger_equal
             Case Else
-                Throw New Exception("Relationship '" & rel_str & "' not recognized!")
+                Throw New Exception($"Relationship '{rel_str}' not recognized!")
         End Select
     End Function
 

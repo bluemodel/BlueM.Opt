@@ -81,7 +81,7 @@ Public Class TalsimThread
             filestr.Close()
 
             'write a new run file
-            Dim runfilename As String = Me.DS_Name & "_" & Me.Thread_ID & ".run"
+            Dim runfilename As String = $"{Me.DS_Name}_{Me.Thread_ID}.run"
             runfile = IO.Path.Combine(IO.Path.GetDirectoryName(TalsimThread.exe_path), runfilename)
             Dim strwrite As New IO.StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
             For Each line In lines
@@ -118,7 +118,7 @@ Public Class TalsimThread
                 'start
                 proc = Process.Start(startInfo)
                 'DEBUG: write to log
-                'BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Thread " & Me.Thread_ID & ": " & startInfo.FileName & " " & startInfo.Arguments)
+                'BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Thread {Me.Thread_ID}: {startInfo.FileName} {startInfo.Arguments}")
                 'wait until finished
                 Do
                     isFinished = proc.WaitForExit(100)
@@ -136,7 +136,7 @@ Public Class TalsimThread
                 'if .ERR file exists, simulation finished with errors
                 If IO.File.Exists(errfile) Then
                     'read err-file
-                    errmsg = "Thread " & Me.Thread_ID & ": " & "TALSIM simulation ended with errors:"
+                    errmsg = $"Thread {Me.Thread_ID}: TALSIM simulation ended with errors:"
                     filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
                     strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
                     Do
@@ -149,17 +149,17 @@ Public Class TalsimThread
 
                 'if .SIMEND does not exist, simulation aborted prematurely
                 If Not IO.File.Exists(simendfile) Then
-                    errmsg = "Thread " & Me.Thread_ID & ": " & "TALSIM simulation aborted prematurely!"
+                    errmsg = $"Thread {Me.Thread_ID}: TALSIM simulation aborted prematurely!"
                 End If
 
                 'Log error message
                 BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend(errmsg)
 
                 If i_attempt < n_attempts Then
-                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Thread " & Me.Thread_ID & ": " & "TALSIM simulation attempt " & i_attempt & " was unsuccessful, trying again...")
+                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, trying again...")
                     System.Threading.Thread.Sleep(100)
                 Else
-                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("Thread " & Me.Thread_ID & ": " & "TALSIM simulation attempt " & i_attempt & " was unsuccessful, parameter set will be discarded!")
+                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, parameter set will be discarded!")
                 End If
 
             Next

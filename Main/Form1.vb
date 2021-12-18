@@ -386,12 +386,12 @@ Partial Public Class Form1
     '*******************************
     Private Sub serializerUnknownElement(ByVal sender As Object, ByVal e As XmlElementEventArgs)
         MsgBox("Error while reading settings:" & eol _
-            & "The element '" & e.Element.Name & "' is unknown!", MsgBoxStyle.Exclamation)
+            & $"The element '{e.Element.Name}' is unknown!", MsgBoxStyle.Exclamation)
     End Sub
 
     Private Sub serializerUnknownAttribute(ByVal sender As Object, ByVal e As XmlAttributeEventArgs)
         MsgBox("Error while reading settings:" & eol _
-            & "The attribute '" & e.Attr.Name & "' is unknown!", MsgBoxStyle.Exclamation)
+            & $"The attribute '{e.Attr.Name}' is unknown!", MsgBoxStyle.Exclamation)
     End Sub
 
 #End Region 'Settings-IO
@@ -654,7 +654,7 @@ Partial Public Class Form1
         Dim pfad As String
 
         'Dialog vorbereiten
-        OpenFileDialog1.Filter = Sim1.DatensatzDateiendungen(0) & " files (*." & Sim1.DatensatzDateiendungen(0) & ")|*." & Sim1.DatensatzDateiendungen(0)
+        OpenFileDialog1.Filter = $"{Sim1.DatensatzDateiendungen(0)} files (*.{Sim1.DatensatzDateiendungen(0)})|*.{Sim1.DatensatzDateiendungen(0)}"
         OpenFileDialog1.Title = "Select dataset"
 
         'Alten Datensatz dem Dialog zuweisen
@@ -1017,7 +1017,7 @@ Partial Public Class Form1
         Call StarteDurchlauf(AllOptTime)
 
         MsgBox("Optimization ended!", MsgBoxStyle.Information, "BlueM.Opt")
-        Me.Monitor1.LogAppend("The optimization took " & AllOptTime.Elapsed.Hours & "h " & AllOptTime.Elapsed.Minutes & "m " & AllOptTime.Elapsed.Seconds & "s " & AllOptTime.Elapsed.Milliseconds & "ms")
+        Me.Monitor1.LogAppend($"The optimization took {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
 
     End Sub
 
@@ -1486,7 +1486,7 @@ Partial Public Class Form1
             Me.scatterplot2 = New BlueM.Opt.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult, Sim1.OptResultRef)
         Else
             Cursor = Cursors.Default
-            MsgBox("There are already two scatterplot matrices open!" & eol & "Please close at least one of them first!", MsgBoxStyle.Information)
+            MsgBox($"There are already two scatterplot matrices open!{eol}Please close at least one of them first!", MsgBoxStyle.Information)
         End If
 
         Cursor = Cursors.Default
@@ -1739,7 +1739,7 @@ Partial Public Class Form1
                             Call SimSeries.Add(.SimGr, .SimGr)
                             zre = Sim1.SimErgebnis.Reihen(.SimGr).Clone()
                             'Lösungsnummer an Titel anhängen
-                            zre.Title &= " (Solution " & ind.ID.ToString() & ")"
+                            zre.Title &= $" (Solution {ind.ID})"
                             'Simreihe in Wave laden
                             Call Wave1.Import_Series(zre)
                         End If
@@ -2072,12 +2072,12 @@ Partial Public Class Form1
                         '2D
                         '--
                         serie = Me.Hauptdiagramm1.getSeriesPoint("Comparison result", "Blue")
-                        serie.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Richtung, "Vergleichsergebnis " & sekpopind.ID)
+                        serie.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Richtung, $"comparison result {sekpopind.ID}")
                     Else
                         '3D
                         '--
                         serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Comparison result", "Blue")
-                        serie3D.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexZ) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexZ).Richtung, sekpopind.ID & " (Vergleichsergebnis)")
+                        serie3D.Add(sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexX).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexY).Richtung, sekpopind.Objectives(Me.Hauptdiagramm1.ZielIndexZ) * Me.mProblem.List_ObjectiveFunctions(Me.Hauptdiagramm1.ZielIndexZ).Richtung, $"comparison result {sekpopind.ID}")
                     End If
                 Next
 

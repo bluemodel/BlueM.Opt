@@ -172,9 +172,9 @@ Public Class Hauptdiagramm
             'SingleObjective
             'xxxxxxxxxxxxxxx
             If (Not ind.Is_Feasible) Then
-                serie = Me.getSeriesPoint("Population " & (pop + 1).ToString() & " (invalid)", "Gray", , , ColEach)
+                serie = Me.getSeriesPoint($"Population {pop + 1} (invalid)", "Gray", , , ColEach)
             Else
-                serie = Me.getSeriesPoint("Population " & (pop + 1).ToString(), , , , ColEach)
+                serie = Me.getSeriesPoint($"Population {pop + 1}", , , , ColEach)
             End If
             Select Case Me.mProblem.Method
                 Case BlueM.Opt.Common.METH_PES
@@ -189,7 +189,7 @@ Public Class Hauptdiagramm
                 '2D-Diagramm
                 '------------------------------------------------------------------------
                 If (Not ind.Is_Feasible) Then
-                    serie = Me.getSeriesPoint("Population" & " (invalid)", "Gray", , , ColEach)
+                    serie = Me.getSeriesPoint("Population (invalid)", "Gray", , , ColEach)
                 Else
                     serie = Me.getSeriesPoint("Population", "Orange", , , ColEach)
                 End If
@@ -305,9 +305,9 @@ Public Class Hauptdiagramm
         If (Me.mProblem.NumPrimObjective = 1) Then
             'SingleObjective
             'xxxxxxxxxxxxxxx
-            serie = Me.getSeriesPoint("Population " & (pop + 1).ToString() & " (invalid)", "Gray")
+            serie = Me.getSeriesPoint($"Population {pop + 1} (invalid)", "Gray")
             serie.Clear()
-            serie = Me.getSeriesPoint("Population " & (pop + 1).ToString())
+            serie = Me.getSeriesPoint($"Population {pop + 1}")
             serie.Clear()
         Else
             'MultiObjective
@@ -371,7 +371,7 @@ Public Class Hauptdiagramm
         If (Me.ZielIndexZ <> -1) Then
             If (Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).hasIstWert) Then
                 'BUG 317: ColorLine auf Depth-Axis geht nicht!
-                MsgBox("The current value on the Z-axis (" & Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Bezeichnung & ") can not be displayed (Bug 317)", MsgBoxStyle.Information)
+                MsgBox($"The current value on the Z-axis ({Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Bezeichnung}) can not be displayed (Bug 317)", MsgBoxStyle.Information)
                 'colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
                 'colorline1.Pen.Color = System.Drawing.Color.Red
                 'colorline1.AllowDrag = False

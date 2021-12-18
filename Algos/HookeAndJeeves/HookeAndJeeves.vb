@@ -113,7 +113,7 @@ Public Class HookeAndJeeves
         'Dynamisches Array wird mit Werten belegt (Vektor der zu optimierenden Parameter)
         For i = 0 To intAnzahlParameter - 1
             If (OptParameter(i).Xn < 0 Or OptParameter(i).Xn > 1) Then
-                Throw New Exception("Der Startparameter " & i & " liegt nicht zwischen 0 und 1. Sie müssen hier skaliert vorliegen")
+                Throw New Exception($"The start parameter {i} is not between 0 and 1. It has to be scaled!")
             End If
             dblStartparameter(i) = OptParameter(i).Xn
         Next

@@ -230,7 +230,7 @@ Public Class EVO_Einstellungen
                 Me.mSettings.TSP.setStandard()
 
             Case Else
-                Throw New Exception("Unbekannte Methode '" & Me.mProblem.Method & "' in EVO_Einstellungen.Initialise()")
+                Throw New Exception($"Unknown method '{Me.mProblem.Method}' in EVO_Einstellungen.setProblem()!")
 
         End Select
 
@@ -275,7 +275,7 @@ Public Class EVO_Einstellungen
                     Me.TabControl1.TabPages.Add(Me.TabPage_TSP)
 
                 Case Else
-                    Throw New Exception("Unbekannte Methode '" & Me.mProblem.Method & "' in EVO_Einstellungen.Initialise()")
+                    Throw New Exception($"Unknown method '{Me.mProblem.Method}' in EVO_Einstellungen.initTabPages()!")
 
             End Select
 

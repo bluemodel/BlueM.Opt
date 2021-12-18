@@ -350,15 +350,15 @@ Partial Public Class Scatterplot
                     If (Me.ShowSekPopOnly) Then
                         'Nur Sekundäre Population
                         '------------------------
-                        serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint($"{xAchse}, {yAchse}", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind In Me.OptResult.getSekPop()
                             serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Richtung, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Richtung, ind.ID.ToString())
                         Next
                     Else
                         'Alle Lösungen
                         '-------------
-                        serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint($"{xAchse}, {yAchse}", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie_inv = .getSeriesPoint($"{xAchse}, {yAchse} (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
@@ -370,7 +370,7 @@ Partial Public Class Scatterplot
                             End If
                         Next
                         'draw sec pop
-                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint($"{xAchse}, {yAchse} (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind In Me.OptResult.getSekPop()
                             serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Richtung, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Richtung, ind.ID.ToString())
                         Next
@@ -388,7 +388,7 @@ Partial Public Class Scatterplot
                     'Vergleichsergebnis anzeigen
                     '===========================
                     If (Me.ShowRefResult) Then
-                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (comparison result)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint($"{xAchse}, {yAchse} (comparison result)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind In Me.OptResultRef.getSekPop()
                             serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Richtung, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Richtung, ind.ID & " (comparison result)")
                         Next
@@ -524,15 +524,15 @@ Partial Public Class Scatterplot
                     If (Me.ShowSekPopOnly) Then
                         'Nur Sekundäre Population
                         '------------------------
-                        serie = .getSeriesPoint(xAchse & ", " & yAchse, "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint($"{xAchse}, {yAchse}", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResult.getSekPop()
                             serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
                         Next
                     Else
                         'Alle Lösungen
                         '-------------
-                        serie = .getSeriesPoint(xAchse & ", " & yAchse, "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        serie_inv = .getSeriesPoint(xAchse & ", " & yAchse & " (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint($"{xAchse}, {yAchse}", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie_inv = .getSeriesPoint($"{xAchse}, {yAchse} (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResult.Solutions
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
@@ -544,7 +544,7 @@ Partial Public Class Scatterplot
                             End If
                         Next
                         'draw sec pop
-                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint($"{xAchse}, {yAchse} (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResult.getSekPop()
                             serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
                         Next
@@ -553,7 +553,7 @@ Partial Public Class Scatterplot
                     'Vergleichsergebnis anzeigen
                     '===========================
                     If (Me.ShowRefResult) Then
-                        serie = .getSeriesPoint(xAchse & ", " & yAchse & " (comparison result)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint($"{xAchse}, {yAchse} (comparison result)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
                             serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID & " (comparison result)")
                         Next
