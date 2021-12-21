@@ -325,8 +325,7 @@ Public Class SWMM
     '----------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
-        'BUG 414: TODO: Objectives durchgehen und erforderliche Werte
-        'in SimErgebnis speichern
+        'TODO: Objectives durchgehen und erforderliche Werte in SimErgebnis speichern (#2)
         'bisher nur Einlesen der RPT-Datei moeglich
         'Einlesen des Binaerfiles mit den Ganglinien spaeter dazunehmen 
         Dim DateiPfad As String

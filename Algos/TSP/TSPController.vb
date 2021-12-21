@@ -175,7 +175,7 @@ Public Class TSPController
         Dim increm As Integer = 100
         Dim jepp As Integer = 0
 
-        'BUG 212: Nach Klasse Diagramm auslagern!
+        'TODO: Nach Klasse Diagramm auslagern! (#145)
         Me.myHauptDiagramm.Export.Image.PNG.Width = 477
         Me.myHauptDiagramm.Export.Image.PNG.Height = 627
 

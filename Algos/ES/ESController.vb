@@ -350,7 +350,7 @@ Public Class ESController
                         'SekPop zeichnen
                         '---------------
                         If (Not IsNothing(Sim1)) Then
-                            'BUG 257: Umweg über Sim1.OptResult gehen, weil es im PES keine Individuum-IDs gibt
+                            'Umweg über Sim1.OptResult gehen, weil es im PES keine Individuum-IDs gibt (#177)
                             Call Me.myHauptDiagramm.ZeichneSekPopulation(Sim1.OptResult.getSekPop())
                         Else
                             Call Me.myHauptDiagramm.ZeichneSekPopulation(PES1.SekundärQb)

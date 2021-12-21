@@ -151,7 +151,7 @@ Public MustInherit Class ObjectiveFunction
     ''' <param name="RefWert">reference value</param>
     ''' <param name="Funktion">comparison function</param>
     ''' <returns>function value</returns>
-    ''' <remarks>BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!</remarks>
+    ''' <remarks>Konstante und gleiche Zeitschrittweiten vorausgesetzt! (#151)</remarks>
     Protected Shared Function compareValues(ByVal SimWert As Double, ByVal RefWert As Double, ByVal Funktion As String)
 
         Dim QWert As Double
@@ -185,15 +185,15 @@ Public MustInherit Class ObjectiveFunction
     ''' <param name="RefReihe">reference series</param>
     ''' <param name="Funktion">comparison function</param>
     ''' <returns>function value</returns>
-    ''' <remarks>BUG 218: Konstante und gleiche Zeitschrittweiten vorausgesetzt!</remarks>
+    ''' <remarks>Konstante und gleiche Zeitschrittweiten vorausgesetzt! (#151)</remarks>
     Protected Shared Function compareSeries(ByVal SimReihe As Wave.TimeSeries, ByVal RefReihe As Wave.TimeSeries, ByVal Funktion As String) As Double
 
         Dim QWert As Double
         Dim i As Integer
 
-        'BUG 218: Kontrolle
+        'Kontrolle (#151)
         If (RefReihe.Length <> SimReihe.Length) Then
-            Throw New Exception($"The series '{SimReihe.Title}' and '{RefReihe.Title}' are not compatible! Different length/timestep? (see Bug 218)")
+            Throw New Exception($"The series '{SimReihe.Title}' and '{RefReihe.Title}' are not compatible! Different length/timestep? (see #151)")
         End If
 
         'Fallunterscheidung Zielfunktion

@@ -512,7 +512,7 @@ Public Class Settings_PES
                 Case EVO_MODE.Single_Objective
                     Items = New EVO_POP_PENALTY() {EVO_POP_PENALTY.Average, EVO_POP_PENALTY.Worst}
                 Case EVO_MODE.Multi_Objective
-                    'BUG 264: Popgüte bei MultiObjective überflüssig?
+                    'TODO: Popgüte bei MultiObjective überflüssig? (#183)
                     Items = New EVO_POP_PENALTY() {EVO_POP_PENALTY.Crowding, EVO_POP_PENALTY.Span}
             End Select
             Return Items

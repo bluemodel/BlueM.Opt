@@ -782,7 +782,7 @@ Public Class PES
                         AktPara(v).Xn = Xe(v, Elter, PES_iAkt.iAktPop)
                     Next
                 Else
-                    'BUG 135
+                    '#68
                     Dim IndexEltern(mSettings.PES.N_Eltern - 1) As Integer          'Array mit Index der Eltern (Neighbourhood-Rekomb.)
                     Call Neighbourhood_Eltern(Elter, IndexEltern)
                     For v = 0 To Me.mProblem.NumOptParams - 1
@@ -1580,7 +1580,7 @@ Public Class PES
         Dim Nachbarn() As Struct_Neighbourhood
         Dim swap As Struct_Neighbourhood
 
-        'BUG 135 ganze Funktion
+        '#68 ganze Funktion
         ReDim Nachbarn(mSettings.PES.N_Eltern - 2)
 
         For i = 0 To IndexElter - 2

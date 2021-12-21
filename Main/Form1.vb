@@ -169,7 +169,7 @@ Partial Public Class Form1
         '---------
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Anwendung.Items.Clear()
-        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SWMM, ANW_TALSIM, ANW_TESTPROBLEMS, ANW_TSP}) 'ANW_SMUSI entfernt (Bug 265)
+        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SWMM, ANW_TALSIM, ANW_TESTPROBLEMS, ANW_TSP}) 'ANW_SMUSI entfernt (#184)
         Me.ComboBox_Anwendung.SelectedIndex = 0
 
         'Datensatz
@@ -1318,8 +1318,7 @@ Partial Public Class Form1
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
 
-                            'Achsenzuordnung
-                            'BUG 327!
+                            'Achsenzuordnung (#206)
                             For i = 0 To Me.mProblem.NumObjectives - 1
                                 If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
                                     Me.Hauptdiagramm1.ZielIndexX = i
@@ -1351,8 +1350,7 @@ Partial Public Class Form1
                             Achse.Maximum = 0
                             Achsen.Add(Achse)
 
-                            'Achsenzuordnung
-                            'BUG 327!
+                            'Achsenzuordnung (#206)
                             Me.Hauptdiagramm1.ZielIndexX = -1
                             For i = 0 To Me.mProblem.NumObjectives - 1
                                 If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
@@ -1659,7 +1657,7 @@ Partial Public Class Form1
         Dim SimSeries As New Collection                 'zu zeichnende Simulationsreihen
         Dim RefSeries As New Collection                 'zu zeichnende Referenzreihen
 
-        'BUG 379: Optimierung muss pausiert sein!
+        'Optimierung muss pausiert sein! (#220)
         If (Me.isRun And Not Me.isPause) Then
             MsgBox("Please pause the optimization first in order to evaluate the selected solutions!", MsgBoxStyle.Exclamation, "BlueM.Opt")
             Exit Sub

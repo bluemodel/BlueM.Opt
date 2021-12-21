@@ -219,7 +219,7 @@ Public Class SensiPlotController
                     'Individuum in Sim evaluieren
                     isOK = Sim1.Evaluate(ind)
 
-                    'BUG 253: Verletzte Constraints bei SensiPlot kenntlich machen?
+                    'TODO: Verletzte Constraints bei SensiPlot kenntlich machen? (#173)
 
                     'Erfolgreich evaluiertes Individuum in Diagramm eintragen
                     If (isOK) Then

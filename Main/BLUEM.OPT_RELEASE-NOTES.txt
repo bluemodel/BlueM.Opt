@@ -20,6 +20,8 @@ REMOVED:
 * Removed objective function types SKos and Ecology #225
 * Removed application S::CAN #37
 
+NOTE: Due to a migration to a different issue tracking system, issue numbers have changed. Old numbers are denoted by BUG, new numbers by #
+
 Version 1.8.10
 --------------
 CHANGED:
@@ -37,7 +39,7 @@ CHANGED:
 * Upgraded to .NET Framework 4.8
 * Updated Wave to v1.9.5 r740
 FIXED:
-* NaN values in reference series used for calculating objective functions now produce a proper error message #747
+* NaN values in reference series used for calculating objective functions now produce a proper error message (BUG 747)
 
 Version 1.8.7
 -------------
@@ -105,7 +107,7 @@ FIXED:
 Version 1.7.1
 -------------
 CHANGED:
-* Objective function values of functions that are to be maximized are no longer displayed as negative values (#724)
+* Objective function values of functions that are to be maximized are no longer displayed as negative values (BUG 724)
 * TALSIM-NG: updated sydrodomain.ini and engine to v3.1.1.1
 FIXED:
 * TALSIM-NG: support different possible date formats in the ALL file
@@ -131,7 +133,7 @@ CHANGED:
 FIXED:
 * BlueM.Sim and TALSIM-NG: read only the required series from result files (speed and memory improvement)
 * Account for the possibility of negative model parameters when writing to the input files
-* Current values of objective functions that should be maximized are now also sign-reversed (#303)
+* Current values of objective functions that should be maximized are now also sign-reversed (BUG 303)
 REMOVED:
 * Removed compatibility with BlueM.MPC, the development of which has been discontinued
 

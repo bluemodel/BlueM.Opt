@@ -415,7 +415,7 @@ Public Class BlueMSim
 #Region "Qualitätswertberechnung"
 
     'Qualitätswert aus PRB-Datei
-    'BUG 220: PRB geht nicht
+    'TODO: PRB geht nicht (#153)
     '***********************
     Private Function CalculateObjective_PRB(ByVal objective As Common.ObjectiveFunction) As Double
 

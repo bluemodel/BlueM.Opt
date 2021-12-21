@@ -370,8 +370,8 @@ Public Class Hauptdiagramm
         'Z-Achse:
         If (Me.ZielIndexZ <> -1) Then
             If (Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).hasIstWert) Then
-                'BUG 317: ColorLine auf Depth-Axis geht nicht!
-                MsgBox($"The current value on the Z-axis ({Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Bezeichnung}) can not be displayed (Bug 317)", MsgBoxStyle.Information)
+                'TODO: ColorLine auf Depth-Axis geht nicht! (#203)
+                MsgBox($"The current value on the Z-axis ({Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Bezeichnung}) can not be displayed (see #203)", MsgBoxStyle.Information)
                 'colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
                 'colorline1.Pen.Color = System.Drawing.Color.Red
                 'colorline1.AllowDrag = False
@@ -393,7 +393,7 @@ Public Class Hauptdiagramm
 
         'Sonderfall Sensiplot
         If (Me.mProblem.Method = BlueM.Opt.Common.METH_SENSIPLOT) Then
-            'BUG 327!
+            'TODO: #206
             Exit Sub
         End If
 

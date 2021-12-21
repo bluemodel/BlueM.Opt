@@ -737,7 +737,7 @@ Public MustInherit Class Sim
                 End Select
 
             Case "REIHE"
-                'BUG 112: TODO: Constraintberechnung bei einer Reihe!
+                'TODO: Constraintberechnung bei einer Reihe! (#45)
                 'Es wird die Summe der Grenzwertverletzungen verwendet
                 Dim summe As Double = 0
 

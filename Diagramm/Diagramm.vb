@@ -206,7 +206,7 @@ Public Class Diagramm
             serie.Pointer.Pen.Color = borderColor
         End If
 
-        'BUG 234: MarksTip funktioniert momentan nur in der XY-Ebene korrekt
+        'TODO: MarksTip funktioniert momentan nur in der XY-Ebene korrekt (#165)
         Call Me.add_MarksTips(serie)
         serie.Cursor = Windows.Forms.Cursors.Hand
 
