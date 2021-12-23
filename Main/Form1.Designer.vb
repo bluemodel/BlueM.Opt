@@ -72,6 +72,7 @@ Partial Class Form1
         Me.Hauptdiagramm1 = New BlueM.Opt.Diagramm.Hauptdiagramm()
         Me.EVO_Opt_Verlauf1 = New BlueM.Opt.EVO_Opt_Verlauf()
         Me.EVO_Einstellungen1 = New BlueM.Opt.EVO_Einstellungen()
+        Me.ReleaseNotesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         MenuStrip1 = New System.Windows.Forms.MenuStrip()
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem()
         MenuItem_Info = New System.Windows.Forms.ToolStripMenuItem()
@@ -107,12 +108,13 @@ Partial Class Form1
         '
         Me.MenuItem_DatensatzZurücksetzen.Enabled = False
         Me.MenuItem_DatensatzZurücksetzen.Name = "MenuItem_DatensatzZurücksetzen"
-        Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(180, 22)
+        Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(143, 22)
         Me.MenuItem_DatensatzZurücksetzen.Text = "Reset dataset"
         '
         'MenuItem_Info
         '
-        MenuItem_Info.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_Help, Me.ToolStripMenuItem_About})
+        MenuItem_Info.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        MenuItem_Info.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_Help, Me.ReleaseNotesToolStripMenuItem, Me.ToolStripMenuItem_About})
         MenuItem_Info.Name = "MenuItem_Info"
         MenuItem_Info.Size = New System.Drawing.Size(24, 20)
         MenuItem_Info.Text = "?"
@@ -120,13 +122,13 @@ Partial Class Form1
         'ToolStripMenuItem_Help
         '
         Me.ToolStripMenuItem_Help.Name = "ToolStripMenuItem_Help"
-        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(107, 22)
+        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem_Help.Text = "Help"
         '
         'ToolStripMenuItem_About
         '
         Me.ToolStripMenuItem_About.Name = "ToolStripMenuItem_About"
-        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(107, 22)
+        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem_About.Text = "About"
         '
         'ToolStripSeparator4
@@ -1652,6 +1654,12 @@ Partial Class Form1
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(244, 707)
         Me.EVO_Einstellungen1.TabIndex = 2
         '
+        'ReleaseNotesToolStripMenuItem
+        '
+        Me.ReleaseNotesToolStripMenuItem.Name = "ReleaseNotesToolStripMenuItem"
+        Me.ReleaseNotesToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ReleaseNotesToolStripMenuItem.Text = "Release notes"
+        '
         'Form1
         '
         Me.AcceptButton = Me.Button_Start
@@ -1720,4 +1728,5 @@ Partial Class Form1
     Private WithEvents ToolStripMenuItem_SettingsSave As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripButton_SelectedSolutions As System.Windows.Forms.ToolStripButton
+    Friend WithEvents ReleaseNotesToolStripMenuItem As ToolStripMenuItem
 End Class

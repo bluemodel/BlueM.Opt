@@ -8,6 +8,7 @@ NEW:
 * New objective function KGE (Kling-Gupta efficiency) for comparing series
 * New objective functions NSE (Nash-Sutcliffe efficiency) and lnNSE (logarithmic NSE) for comparing series
 * New objective functions MAE (mean absolute error) and MSE (mean squared error) for comparing series
+* Added a menu item for opening the release notes
 FIXED:
 * Fixed optimization settings sometimes not being saved to file correctly
 CHANGED:

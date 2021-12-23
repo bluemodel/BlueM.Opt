@@ -40,13 +40,9 @@
 
 Option Strict Off 'allows permissive type semantics. explicit narrowing conversions are not required 
 
-Imports System.IO
 Imports System.Xml
 Imports System.Xml.Serialization
 Imports BlueM.Opt.Common.Constants
-Imports BlueM
-
-
 
 ''' <summary>
 ''' Main Window
@@ -254,17 +250,38 @@ Partial Public Class Form1
         Me.ToolStripButton_Monitor.Checked = Me.Monitor1.Visible
     End Sub
 
+    ''' <summary>
+    ''' Handles Help menu item clicked
+    ''' Opens the help URL
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub Help(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_Help.Click
+        Call Process.Start(HelpURL)
+    End Sub
+
+    ''' <summary>
+    ''' Handles Release notes menu item clicked
+    ''' Opens the release notes
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub ReleaseNotesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReleaseNotesToolStripMenuItem.Click
+        Dim filepath As String
+        filepath = IO.Path.Combine(Application.StartupPath, "BLUEM.OPT_RELEASE-NOTES.txt")
+        Try
+            System.Diagnostics.Process.Start(filepath)
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical)
+        End Try
+
+    End Sub
+
     'About Dialog anzeigen
     '*********************
     Private Sub About(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_About.Click
         Dim about As New AboutBox()
         Call about.ShowDialog(Me)
-    End Sub
-
-    'Wiki aufrufen
-    '*************
-    Private Sub Help(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_Help.Click
-        Call Process.Start(HelpURL)
     End Sub
 
     'Einstellungen-Button hat selbst keine funktionalität -> nur DropDown
@@ -328,11 +345,11 @@ Partial Public Class Form1
     ''' <param name="filename">Pfad zur XML-Datei</param>
     Public Sub saveSettings(ByVal filename As String)
 
-        Dim writer As StreamWriter
+        Dim writer As IO.StreamWriter
         Dim serializer As XmlSerializer
 
         'Streamwriter öffnen
-        writer = New StreamWriter(filename)
+        writer = New IO.StreamWriter(filename)
 
         serializer = New XmlSerializer(GetType(Common.Settings), New XmlRootAttribute("Settings"))
         serializer.Serialize(writer, Me.mSettings)
@@ -352,7 +369,7 @@ Partial Public Class Form1
         AddHandler serializer.UnknownAttribute, AddressOf serializerUnknownAttribute
 
         'Filestream öffnen
-        Dim fs As New FileStream(filename, FileMode.Open)
+        Dim fs As New IO.FileStream(filename, IO.FileMode.Open)
 
         Try
             'Deserialisieren
@@ -630,8 +647,8 @@ Partial Public Class Form1
 
                             'nur existierende, zur Anwendung passende Datensätze anzeigen
                             pfad = My.Settings.MRUSimDatensaetze(i)
-                            If (File.Exists(pfad) _
-                                And Path.GetExtension(pfad).ToUpper() = Me.Sim1.DatensatzExtension) Then
+                            If (IO.File.Exists(pfad) _
+                                And IO.Path.GetExtension(pfad).ToUpper() = Me.Sim1.DatensatzExtension) Then
                                 Me.ComboBox_Datensatz.Items.Add(My.Settings.MRUSimDatensaetze(i))
                             End If
                         Next
@@ -1873,7 +1890,7 @@ Partial Public Class Form1
                     'Diagramm initialisieren
                     '-----------------------
                     Me.Hauptdiagramm1.Clear()
-                    Me.Hauptdiagramm1.DiagInitialise(Path.GetFileName(sourceFile), Achsen, Me.mProblem)
+                    Me.Hauptdiagramm1.DiagInitialise(IO.Path.GetFileName(sourceFile), Achsen, Me.mProblem)
 
                     'IstWerte in Diagramm einzeichnen
                     Call Me.Hauptdiagramm1.ZeichneIstWerte()
