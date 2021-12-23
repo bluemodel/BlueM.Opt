@@ -68,8 +68,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="IHWB.BlueM.DllAdapter, Version=0.9.7.33997, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="BlueM.DllAdapter, Version=0.9.7.23941, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>BlueM\BlueM.DllAdapter.dll</HintPath>
     </Reference>
     <Reference Include="IHWB.SWMM.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
@@ -139,13 +140,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BlueM\BlueM.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
-    <None Include="BlueM\IHWB.BlueM.DllAdapter.dll" />
     <None Include="TALSIM\sydrodomain.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -157,6 +152,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="BlueM\BlueM.Sim.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="BlueM\BlueM.DllAdapter.dll" />
+    <Content Include="BlueM\BLUEM.SIM_RELEASE-NOTES.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="BlueM\libifcoremd.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

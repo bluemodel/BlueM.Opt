@@ -16,6 +16,7 @@ CHANGED:
 * Changed objective function names in OBF file (old names still work)
 * Upgraded to TeeChart Pro version 4.2021.11.2
 * Updated BlueM.Wave to v1.11.0, now included as a subfolder
+* Updated BlueM.Sim to v0.9.8
 REMOVED:
 * Removed optimization methods CES and HYBRID #225
 * Removed objective function types SKos and Ecology #225

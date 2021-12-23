@@ -27,7 +27,7 @@
 '
 Imports System.IO
 Imports System.Threading
-Imports IHWB.BlueM.DllAdapter
+Imports BlueM.DllAdapter
 Imports BlueM
 Imports BlueM.Opt.Common
 
@@ -116,10 +116,10 @@ Public Class BlueMSim
 
         'Pfad zu BlueM.DLL bestimmen
         '---------------------------
-        dll_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "BlueM\BlueM.dll")
+        dll_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "BlueM\BlueM.Sim.dll")
 
         If (Not File.Exists(dll_path)) Then
-            Throw New Exception("BlueM.dll nicht gefunden!")
+            Throw New Exception("BlueM.Sim.dll nicht gefunden!")
         End If
 
     End Sub

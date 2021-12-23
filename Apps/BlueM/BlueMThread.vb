@@ -27,7 +27,7 @@
 '
 'Klasse beinhaltet alle Infomationen für einen Simulationslauf im Thread
 '***********************************************************************
-Imports IHWB.BlueM.DllAdapter
+Imports BlueM.DllAdapter
 
 Public Class BlueMSimThread
 

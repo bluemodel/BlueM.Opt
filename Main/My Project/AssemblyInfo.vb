@@ -12,7 +12,7 @@ Imports BlueM.Opt.Common.Constants
 <Assembly: AssemblyDescription("BlueM.Opt is part of the BlueM software package." & eol & eol _
                                & "BlueM.Opt is an optimization framework for optimization, autocalibration and sensitivity analysis of model parameters and the visualization thereof." & eol & eol _
                                & "Included simulation models:" & eol _
-                               & "* BlueM.Sim v0.9.7 (r793) (http://www.bluemodel.org)" & eol _
+                               & "* BlueM.Sim v0.9.8 (http://www.bluemodel.org)" & eol _
                                & "* SWMM v5.0.018 (http://www.epa.gov/ednnrmrl/models/swmm/)" & eol _
                                & "* Talsim-NG v3.1.6 (http://www.sydro.de/)")>
 <Assembly: AssemblyCompany("BlueM Dev Group")> 

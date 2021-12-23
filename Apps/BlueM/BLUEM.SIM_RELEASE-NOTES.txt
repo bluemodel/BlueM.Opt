@@ -1,0 +1,74 @@
+===============================================================
+BlueM.Sim Release Notes
+===============================================================
+
+Version 0.9.8
+-------------
+NEW:
+* Added debug wel file for FKA elements (including water quality parameters)
+FIXED:
+* Various fixes related to compilation and build output
+* Fixed error occurring with x64 builds on AMD CPUs
+CHANGED:
+* Updated to Intel Fortran Compiler Classic 2021.2.0
+
+NOTE: Due to a migration to a different issue tracking system, issue numbers have changed. Old numbers are denoted by BUG, new numbers by #
+
+Version 0.9.7 (r793)
+--------------------
+Initial Release under the BSD-2 License, see LICENSE.TXT for more information.
+
+NEW:
+* MBWQM - M. Bach Quality Model
+CHANGED:
+* Various bug fixes and enhancements
+
+Version 0.9.6 (r719)
+--------------------
+NEW:
+* OpenMI interface
+* SWQM4 - Simple water quality model Version 4
+* New extended log file output (option LLOGOUT in the ALL-File)
+IMPROVED: 
+* Calculation of flow over a submerged weir
+* Soil moisture calculation:
+  - All soil functions (infiltration, percolation, etc.) have been revised
+  - Interflow is now generated both in the infiltration layer as well as
+    in the root layer
+  - Calculation of rainfall interception has been revised
+* Release-Version rechnet schneller und ist multithread-fähig
+CHANGED: 
+* Bug 461: The error output file now has the file extension *.ERR
+  and the simulation time as part of the file name. Error files are now 
+  preserved permanently until deleted by the user.
+* Bug 468: The water level output for Transport elements 
+  is now calculated based on the average flow within the element 
+  (not the flow at the outlet, as was previously the case)
+
+Version 0.9.5 (r629)
+-------------
+* FIXED: Es wurde ein falscher Fehler ausgegeben
+* NEW: Umstellung auf Intel Fortran Compiler 11.0.103.103
+
+Version 0.9.4 (r623)
+-------------
+* NEW: Trennung von EZGs und FKAs; neue Eingabedatei *.FKA eingeführt
+* NEW: Angabe von Beta2 in EZG-Datei jetzt optional
+* FIXED: Bug 376: Psi-Beiwert wird mit aktuellem Verlustbeiwert berechnet
+* FIXED: Bug 371: Aufteilungsfaktoren Beta in EZG-Datei beziehen sich nur noch auf die unversiegelten Fläche
+
+Version 0.9.3
+-------------
+* Neue Schnittstelle Get_EZG_QBA
+
+Version 0.9.2 (r506)
+-------------
+* zu viele Veränderungen, um sie hier alle aufzuzählen
+
+Version 0.9.1 (r212)
+-------------
+* Umstellung von EXE auf DLL
+
+Version 0.9
+-----------
+* Anfang der Versionierung
