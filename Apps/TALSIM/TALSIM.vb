@@ -44,8 +44,7 @@ Public Class Talsim
 
     'Misc
     '----
-    Private useKWL As Boolean       'gibt an, ob die KTR.WEL-Datei benutzt wird
-    Private useTEMPWEL As Boolean   'gibt an, ob die TEMP.WEL-Datei benutzt wird
+    Private WELfiles As List(Of String) 'List of WEL files to use (e.g. "WEL", "KTR.WEL", "CHLO.WEL", etc.)
 
     '**** Multithreading ****
     Dim MyTalsimThreads() As TalsimThread
@@ -99,8 +98,7 @@ Public Class Talsim
 
         'Daten belegen
         '-------------
-        Me.useKWL = False
-        Me.useTEMPWEL = False
+        Me.WELfiles = New List(Of String)
 
         'Pfad zu talsimw64.exe bestimmen
         '-------------------------------
@@ -146,24 +144,21 @@ Public Class Talsim
         'TALSIM-spezifische Weiterverarbeitung von ZielReihen:
         Dim objective As Common.ObjectiveFunction
 
-        'Feststellen, ob irgendeine Zielfunktion die KTR.WEL-Datei oder die TEMP.WEL-Datei benutzt
+        'Feststellen, welche WEL-Dateien in Zielfunktionen genutzt werden
         For Each objective In Me.mProblem.List_ObjectiveFunctions
             If Not IsNothing(objective.Datei) Then
-                If objective.Datei.ToUpper() = "KTR.WEL" Then
-                    Me.useKWL = True
-                    'TEMP.WEL: Feststellen, ob irgendeine Zielfunktion die TEMP.WEL-Datei benutzt
-                ElseIf objective.Datei.ToUpper() = "TEMP.WEL" Then
-                    Me.useTEMPWEL = True
+                Dim welfile As String = objective.Datei.ToUpper()
+                If Not Me.WELfiles.Contains(welfile) Then
+                    Me.WELfiles.Add(welfile)
                 End If
             End If
         Next
 
-        'Prüfen, ob irgendwelche Constraints KTR.WEL oder TEMP.WEL benötigen
+        'Feststellen, welche WEL-Dateien in Constraints genutzt werden
         For Each constr As Constraintfunction In Me.mProblem.List_Constraintfunctions
-            If constr.Datei.ToUpper() = "KTR.WEL" Then
-                Me.useKWL = True
-            ElseIf constr.Datei.ToUpper() = "TEMP.WEL" Then
-                Me.useTEMPWEL = True
+            Dim welfile As String = constr.Datei.ToUpper()
+            If Not Me.WELfiles.Contains(welfile) Then
+                Me.WELfiles.Add(welfile)
             End If
         Next
 
@@ -430,15 +425,11 @@ Public Class Talsim
         'Benötigte SimReihen zusammenstellen
         'TODO: das braucht eigentlich nicht nach jeder Simulation nochmal neu getan zu werden
         Dim SimReihen As New Dictionary(Of String, List(Of String)) '{file: [series]}
-        SimReihen.Add("WEL", New List(Of String))
-        If Me.useKWL Then
-            SimReihen.Add("KTR.WEL", New List(Of String))
-        End If
-        If Me.useTEMPWEL Then
-            SimReihen.Add("TEMP.WEL", New List(Of String))
-        End If
+        For Each welfile As String In Me.WELfiles
+            SimReihen.Add(welfile, New List(Of String))
+        Next
         For Each objfunc As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-            If objfunc.GetObjType = ObjectiveFunction.ObjectiveType.Series Or _
+            If objfunc.GetObjType = ObjectiveFunction.ObjectiveType.Series Or
                 objfunc.GetObjType = ObjectiveFunction.ObjectiveType.ValueFromSeries Then
                 If Not SimReihen(objfunc.Datei.ToUpper()).Contains(objfunc.SimGr) Then
                     SimReihen(objfunc.Datei.ToUpper()).Add(objfunc.SimGr)
@@ -451,56 +442,24 @@ Public Class Talsim
             End If
         Next
 
-        'WEL-Datei einlesen
-        '------------------
-        Dim WELtmp As Wave.WEL = New Wave.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".WEL"))
+        'WEL-Dateien einlesen
+        '--------------------
+        For Each welfile As String In Me.WELfiles
 
-        'Benötigte Reihen für Import selektieren
-        For Each series As String In SimReihen("WEL")
-            WELtmp.selectSeries(series)
-        Next
-        'Datei einlesen
-        WELtmp.readFile()
-        'Zeitreihen übernehmen
-        For Each zre As Wave.TimeSeries In WELtmp.FileTimeSeries.Values
-            Me.SimErgebnis.Reihen.Add(zre.Title, zre)
-        Next
-
-        'ggf. KWL-Datei einlesen
-        '-----------------------
-        If (Me.useKWL) Then
-            Dim KWLpath As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".KTR.WEL")
-            Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath)
+            Dim WELtmp As Wave.WEL = New Wave.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & "." & welfile))
 
             'Benötigte Reihen für Import selektieren
-            For Each series As String In SimReihen("KTR.WEL")
-                KWLtmp.selectSeries(series)
+            For Each series As String In SimReihen(welfile)
+                WELtmp.selectSeries(series)
             Next
             'Datei einlesen
-            KWLtmp.readFile()
+            WELtmp.readFile()
             'Zeitreihen übernehmen
-            For Each zre As Wave.TimeSeries In KWLtmp.FileTimeSeries.Values
+            For Each zre As Wave.TimeSeries In WELtmp.FileTimeSeries.Values
                 Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
-        End If
+        Next
 
-        'ggf. TEMP.WEL-Datei einlesen
-        '----------------------------
-        If (Me.useTEMPWEL) Then
-            Dim TEMPWELpath As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".TEMP.WEL")
-            Dim tempwel As Wave.WEL = New Wave.WEL(TEMPWELpath)
-
-            'Benötigte Reihen für Import selektieren
-            For Each series As String In SimReihen("TEMP.WEL")
-                tempwel.selectSeries(series)
-            Next
-            'Datei einlesen
-            tempwel.readFile()
-            'Zeitreihen übernehmen
-            For Each zre As Wave.TimeSeries In tempwel.FileTimeSeries.Values
-                Me.SimErgebnis.Reihen.Add(zre.Title, zre)
-            Next
-        End If
     End Sub
 
 #End Region 'Evaluierung

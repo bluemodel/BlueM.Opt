@@ -1,6 +1,42 @@
 Talsim-NG simulation engine changelog
 *************************************
 
+Version 3.1.12
+--------------
+* Number of mixed-reactor for quality calculation has been changed. The retention of load and consequently concentration has improved and better follows the hydrological retention.
+* Transport elements with Translation follow now the incoming load according to the time shift of the translatio time 
+
+Version 3.1.11
+--------------
+* Added VariationOption SNOWSCALING, enabling update of initial snow conditions using variations
+
+Version 3.1.10
+--------------
+* Time series marked as inactive in the EXT file are no longer read (restored pre 3.1.7 behaviour)
+* If a system element references an inactive time series, this now causes the error 2827 #67
+* Re-added the "Active" column to version 1.5 of the EXT-file format #65
+
+Version 3.1.9
+-------------
+* Reservoir elements now display surface area as new time series
+
+Version 3.1.8
+-------------
+* Source/Sinks behave now with Supply loss (instead of Supply = adding water), Return flow fraction (instead of Behaviour)
+  As of 3.1.8 the calculation is now:
+  with version URB 2.0: inflow is reduced by supply loss, Demand consumed part of the inflow determined by the return flow fraction. 
+  with version URB 1.0: calculation is identical as before
+
+Version 3.1.7
+-------------
+* Fix constraints for reservoir releases sometimes not being respected when a release is also scaled by a control function #136
+* All time series in the EXT-file are now always considered active #67
+* If the EZG file references a non-existant time series ID, an error is now produced (before, the missing time series' values were assumed to be 0) #67
+* Removed the "Active" column from version 1.5 of the EXT-file format #65
+* Improved error handling
+* Removed superfluous warnings 203 and 3300 #66
+* Update to Intel® Fortran Compiler Classic 2021.4.0
+
 Version 3.1.6
 -------------
 * Switched to semantic versioning system (MAJOR.MINOR.PATCH)
