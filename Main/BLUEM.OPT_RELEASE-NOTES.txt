@@ -2,6 +2,12 @@
 BlueM.Opt Release Notes
 ===============================================================
 
+Version 1.9.2
+-------------
+FIXED:
+* Reference series used in objective functions or constraints are now checked for zero length after cutting to the evaluation period
+* Threshold series used in constraints are now checked for NaN values
+
 Version 1.9.1
 -------------
 CHANGED:

@@ -777,10 +777,13 @@ Public Class Problem
         Else
             'Referenzreihe auf Evaluierungszeitraum kürzen
             Call RefReihe.Cut(EvalStart, EvalEnde)
+            If RefReihe.Length = 0 Then
+                Throw New Exception($"The reference series '{dateipfad}' is empty after cutting to the evaluation period!")
+            End If
         End If
 
         'Check reference series for NaN values
-        If RefReihe.Nodes.Count > RefReihe.NodesClean.Count Then
+        If RefReihe.NaNCount > 0 Then
             Throw New Exception($"The reference series '{dateipfad}' contains NaN values, please remove all NaN values before use!")
         End If
 
@@ -895,6 +898,14 @@ Public Class Problem
                         Else
                             'Zielreihe auf Simulationszeitraum kürzen
                             Call .GrenzReihe.Cut(SimStart, SimEnde)
+                            If .GrenzReihe.Length = 0 Then
+                                Throw New Exception($"Constraints: The threshold series '{ .GrenzReiheDatei}' is empty after cutting to the simulation period!")
+                            End If
+                        End If
+
+                        'Check threshold series for NaN values
+                        If .GrenzReihe.NaNCount > 0 Then
+                            Throw New Exception($"Constraints: The threshold series '{ .GrenzReiheDatei}' contains NaN values, please remove all NaN values before use!")
                         End If
 
                         'Grenzwertreihe umbenennen
