@@ -808,7 +808,6 @@ Public Class Problem
         '*| Bezeichnung   | GrenzTyp | Datei | SimGröße  | Oben/Unten | WertTyp  | Grenzwert | Grenzgröße | Datei          |
         '*|---------------|----------|-------|-----------|------------|----------|-----------|------------|----------------|
 
-        Dim ext As String
         Dim i As Integer
         Dim Zeile As String
         Dim WerteArray() As String
