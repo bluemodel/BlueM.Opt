@@ -196,6 +196,12 @@ Public MustInherit Class ObjectiveFunction
             Throw New Exception($"The series '{SimReihe.Title}' and '{RefReihe.Title}' are not compatible! Different length/timestep? (see #151)")
         End If
 
+        'remove NaN values
+        If RefReihe.NaNCount > 0 Then
+            RefReihe = RefReihe.removeNaNValues()
+            BlueM.Wave.TimeSeries.Synchronize(SimReihe, RefReihe)
+        End If
+
         'Fallunterscheidung Zielfunktion
         Select Case Funktion.ToUpper()
 

@@ -784,7 +784,7 @@ Public Class Problem
 
         'Check reference series for NaN values
         If RefReihe.NaNCount > 0 Then
-            Throw New Exception($"The reference series '{dateipfad}' contains NaN values, please remove all NaN values before use!")
+            MsgBox($"The reference series '{dateipfad}' contains NaN values. These and the equivalent nodes in the simulation time series will be filtered before calculating the objective function values!", MsgBoxStyle.Exclamation)
         End If
 
         'Referenzreihe umbenennen
@@ -905,7 +905,7 @@ Public Class Problem
 
                         'Check threshold series for NaN values
                         If .GrenzReihe.NaNCount > 0 Then
-                            Throw New Exception($"Constraints: The threshold series '{ .GrenzReiheDatei}' contains NaN values, please remove all NaN values before use!")
+                            MsgBox($"The threshold series '{ .GrenzReiheDatei}' contains NaN values. These and the equivalent nodes in the simulation time series will be filtered before checking for contraint violations!", MsgBoxStyle.Exclamation)
                         End If
 
                         'Grenzwertreihe umbenennen

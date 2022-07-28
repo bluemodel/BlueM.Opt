@@ -737,18 +737,27 @@ Public MustInherit Class Sim
                 End Select
 
             Case "REIHE"
-                'TODO: Constraintberechnung bei einer Reihe! (#45)
                 'Es wird die Summe der Grenzwertverletzungen verwendet
+
+                Dim thresholdSeries As BlueM.Wave.TimeSeries
+                thresholdSeries = constr.GrenzReihe.Clone()
+
+                'remove NaN values
+                If constr.GrenzReihe.NaNCount > 0 Then
+                    thresholdSeries = thresholdSeries.removeNaNValues()
+                    BlueM.Wave.TimeSeries.Synchronize(SimReihe, thresholdSeries)
+                End If
+
                 Dim summe As Double = 0
 
                 For i = 0 To SimReihe.Length - 1
 
                     Select Case constr.GrenzPos.ToUpper()
                         Case "UPPER", "OBERGRENZE"
-                            summe += Math.Min(constr.GrenzReihe.Values(i) - SimReihe.Values(i), 0)
+                            summe += Math.Min(thresholdSeries.Values(i) - SimReihe.Values(i), 0)
 
                         Case "LOWER", "UNTERGRENZE"
-                            summe += Math.Min(SimReihe.Values(i) - constr.GrenzReihe.Values(i), 0)
+                            summe += Math.Min(SimReihe.Values(i) - thresholdSeries.Values(i), 0)
                         Case Else
                             Throw New Exception($"Unknown bound '{constr.GrenzPos}' for constraint {constr.Bezeichnung}!")
                     End Select
