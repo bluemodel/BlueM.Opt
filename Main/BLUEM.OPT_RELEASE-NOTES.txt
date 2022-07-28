@@ -7,6 +7,7 @@ Version 1.9.2
 FIXED:
 * Reference series used in objective functions or constraints are now checked for zero length after cutting to the evaluation period
 * Threshold series used in constraints are now checked for NaN values
+* Added Microsoft.ACE.OLEDB.12.0 as a fallback provider for connecting to the database if Microsoft.Jet.OLEDB.4.0 doesn't work
 
 Version 1.9.1
 -------------

@@ -399,17 +399,23 @@ Public Class OptResult
     'Mit Ergebnisdatenbank verbinden
     '*******************************
     Private Sub db_connect()
-        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & Me.db_path
-        db = New OleDb.OleDbConnection(ConnectionString)
-        db.Open()
+        Call db_connect(Me.db_path)
     End Sub
 
     'Mit einer benutzerdefinierten Ergebnisdatenbank verbinden
     '*********************************************************
     Private Sub db_connect(ByVal file As String)
-        Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & file
-        db = New OleDb.OleDbConnection(ConnectionString)
-        db.Open()
+        Try
+            'Try using Microsoft.Jet.OLEDB.4.0
+            Dim ConnectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & file
+            db = New OleDb.OleDbConnection(ConnectionString)
+            db.Open()
+        Catch ex As Exception
+            'fallback to Microsoft.ACE.OLEDB.12.0
+            Dim ConnectionString As String = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & file
+            db = New OleDb.OleDbConnection(ConnectionString)
+            db.Open()
+        End Try
     End Sub
 
     'Verbindung zu Ergebnisdatenbank schlieﬂen
