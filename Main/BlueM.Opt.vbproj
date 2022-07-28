@@ -331,6 +331,7 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>XCOPY $(SolutionDir)BlueM.Wave\bin\$(PlatformName)\$(ConfigurationName)\* $(TargetDir)BlueM.Wave /Y /S /I</PostBuildEvent>
+    <PostBuildEvent>XCOPY $(SolutionDir)BlueM.Wave\bin\$(PlatformName)\$(ConfigurationName)\* $(TargetDir)BlueM.Wave /Y /S /I
+XCOPY $(SolutionDir)BlueM.Opt\Apps\BlueM\$(PlatformName)\* $(TargetDir)BlueM /Y /S /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

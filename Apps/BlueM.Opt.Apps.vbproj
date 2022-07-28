@@ -68,9 +68,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BlueM.DllAdapter, Version=0.9.7.23941, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="BlueM.DllAdapter, Version=0.9.7.2489, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>BlueM\BlueM.DllAdapter.dll</HintPath>
+      <HintPath>BlueM\x86\BlueM.DllAdapter.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="IHWB.SWMM.DllAdapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
@@ -152,16 +153,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BlueM\BlueM.Sim.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Include="BlueM\BlueM.DllAdapter.dll" />
-    <Content Include="BlueM\BLUEM.SIM_RELEASE-NOTES.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlueM\libifcoremd.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="BlueM\x64\BlueM.DllAdapter.dll" />
+    <Content Include="BlueM\x64\BlueM.Sim.dll" />
+    <Content Include="BlueM\x64\BLUEM.SIM_RELEASE-NOTES.txt" />
+    <Content Include="BlueM\x64\libifcoremd.dll" />
+    <Content Include="BlueM\x86\BlueM.DllAdapter.dll" />
+    <Content Include="BlueM\x86\BlueM.Sim.dll" />
+    <Content Include="BlueM\x86\BLUEM.SIM_RELEASE-NOTES.txt" />
+    <Content Include="BlueM\x86\libifcoremd.dll" />
     <Content Include="SWMM\IHWB.SWMM.DllAdapter.dll" />
     <Content Include="SWMM\SWMM5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
