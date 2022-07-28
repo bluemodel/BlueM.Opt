@@ -8,6 +8,7 @@ NEW:
 * Reference and threshold series may now contain NaN values.
   These and the equivalent nodes in the simulation results are filtered before 
   calculating the objective function values or checking for constraint violations. #226
+* Reference and threshold series may now be of any file type readable by BlueM.Wave
 FIXED:
 * Reference and threshold series are now checked for zero length after cutting to the evaluation period
 * Added Microsoft.ACE.OLEDB.12.0 as a fallback provider for connecting to the database if Microsoft.Jet.OLEDB.4.0 doesn't work

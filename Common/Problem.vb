@@ -540,7 +540,7 @@ Public Class Problem
                             End If
 
                             'Referenzreihe einlesen
-                            .RefReihe = Me.Read_ZIE_RefReihe(IO.Path.Combine(Me.mWorkDir, .RefReiheDatei), .RefGr, .EvalStart, .EvalEnde)
+                            .RefReihe = Me.Read_OBF_RefSeries(IO.Path.Combine(Me.mWorkDir, .RefReiheDatei), .RefGr, .EvalStart, .EvalEnde)
 
                         End With
 
@@ -751,40 +751,40 @@ Public Class Problem
     End Sub
 
     ''' <summary>
-    ''' Referenzreihe aus Datei einlesen und zuschneiden
+    ''' Reads the reference series from file and cuts it to the evaluation period
     ''' </summary>
-    ''' <param name="dateipfad">Pfad zur Zeitreihendatei</param>
-    ''' <param name="refgroesse">Name der einzulesenden Reihe</param>
-    ''' <param name="EvalStart">Startpunkt der Evaluierung</param>
-    ''' <param name="EvalEnde">Endpunkt der Evaluierung</param>
+    ''' <param name="filePath">Path to the time series file</param>
+    ''' <param name="refName">Name of the series within the file (can be empty)</param>
+    ''' <param name="EvalStart">Start date of evaluation period</param>
+    ''' <param name="EvalEnde">End date of evaluation period</param>
     ''' <returns>Zeitreihe</returns>
-    Private Function Read_ZIE_RefReihe(ByVal dateipfad As String, ByVal refgroesse As String, ByVal EvalStart As DateTime, ByVal EvalEnde As DateTime) As Wave.TimeSeries
+    Private Function Read_OBF_RefSeries(ByVal filePath As String, ByVal refName As String, ByVal EvalStart As DateTime, ByVal EvalEnde As DateTime) As Wave.TimeSeries
 
         Dim RefReihe As Wave.TimeSeries
 
         'Referenzreihe aus Datei einlesen
-        Dim dateiobjekt As Wave.FileFormatBase = Wave.FileFactory.getFileInstance(dateipfad)
-        If refgroesse = "" Then
+        Dim dateiobjekt As Wave.FileFormatBase = Wave.FileFactory.getFileInstance(filePath)
+        If refName = "" Then
             RefReihe = dateiobjekt.getTimeSeries()
         Else
-            RefReihe = dateiobjekt.getTimeSeries(refgroesse)
+            RefReihe = dateiobjekt.getTimeSeries(refName)
         End If
 
         'Zeitraum der Referenzreihe überprüfen
         If (RefReihe.StartDate > EvalStart Or RefReihe.EndDate < EvalEnde) Then
             'Referenzreihe deckt Evaluierungszeitraum nicht ab
-            Throw New Exception($"The reference series '{dateipfad}' does not cover the evaluation period!")
-        Else
-            'Referenzreihe auf Evaluierungszeitraum kürzen
-            Call RefReihe.Cut(EvalStart, EvalEnde)
-            If RefReihe.Length = 0 Then
-                Throw New Exception($"The reference series '{dateipfad}' is empty after cutting to the evaluation period!")
-            End If
+            Throw New Exception($"The reference series '{filePath}' does not cover the evaluation period!")
+        End If
+
+        'Referenzreihe auf Evaluierungszeitraum kürzen
+        Call RefReihe.Cut(EvalStart, EvalEnde)
+        If RefReihe.Length = 0 Then
+            Throw New Exception($"The reference series '{filePath}' is empty after cutting to the evaluation period!")
         End If
 
         'Check reference series for NaN values
         If RefReihe.NaNCount > 0 Then
-            MsgBox($"The reference series '{dateipfad}' contains NaN values. These and the equivalent nodes in the simulation time series will be filtered before calculating the objective function values!", MsgBoxStyle.Exclamation)
+            MsgBox($"The reference series '{filePath}' contains NaN values. These and the equivalent nodes in the simulation time series will be filtered before calculating the objective function values!", MsgBoxStyle.Exclamation)
         End If
 
         'Referenzreihe umbenennen
@@ -862,7 +862,7 @@ Public Class Problem
                 With Me.List_Constraintfunctions(i)
                     If (Not {"VALUE", "SERIES", "WERT", "REIHE"}.Contains(.Typ.ToUpper())) Then Throw New Exception("Constraints: ThreshType must be either 'Value' or 'Series'!")
                     If (Not .Datei = "WEL") Then Throw New Exception("Constraints: Only 'WEL' file format is currently supported!")
-                    If (Not {"UPPER", "LOWER", "OBERGRENZE", "UNTERGRENZE"}.Contains(.GrenzPos.ToUpper())) Then Throw New Exception("Constraints: Bound must be wither 'Upper' or 'Lower'!")
+                    If (Not {"UPPER", "LOWER", "OBERGRENZE", "UNTERGRENZE"}.Contains(.GrenzPos.ToUpper())) Then Throw New Exception("Constraints: Bound must be either 'Upper' or 'Lower'!")
                 End With
             Next
 
@@ -874,18 +874,13 @@ Public Class Problem
                 With Me.List_Constraintfunctions(i)
                     If ({"SERIES", "REIHE"}.Contains(.Typ.ToUpper())) Then
 
-                        'Dateiendung der Grenzwertdatei bestimmen und Reihe einlesen
-                        ext = System.IO.Path.GetExtension(.GrenzReiheDatei)
-                        Select Case (ext.ToUpper)
-                            Case ".WEL"
-                                Dim WEL As New Wave.WEL(IO.Path.Combine(Me.mWorkDir, .GrenzReiheDatei))
-                                .GrenzReihe = WEL.getTimeSeries(.GrenzGr)
-                            Case ".ZRE"
-                                Dim ZRE As New Wave.ZRE(IO.Path.Combine(Me.mWorkDir, .GrenzReiheDatei))
-                                .GrenzReihe = ZRE.getTimeSeries(0)
-                            Case Else
-                                Throw New Exception($"Constraints: The file format of the threshold series '{ .GrenzReiheDatei}' is not supported!")
-                        End Select
+                        'Read threshold series from file
+                        Dim fileInstance As Wave.FileFormatBase = Wave.FileFactory.getFileInstance(IO.Path.Combine(Me.mWorkDir, .GrenzReiheDatei))
+                        If .GrenzGr = "" Then
+                            .GrenzReihe = fileInstance.getTimeSeries()
+                        Else
+                            .GrenzReihe = fileInstance.getTimeSeries(.GrenzGr)
+                        End If
 
                         'Zeitraum der Grenzwertreihe überprüfen
                         '--------------------------------------
