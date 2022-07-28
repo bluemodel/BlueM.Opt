@@ -5,11 +5,11 @@ BlueM.Opt Release Notes
 Version 1.9.2
 -------------
 NEW:
-* Reference and threshold series defined in objective functions or constraints may now contain NaN values.
+* Reference and threshold series may now contain NaN values.
   These and the equivalent nodes in the simulation results are filtered before 
   calculating the objective function values or checking for constraint violations. #226
 FIXED:
-* Reference series used in objective functions or constraints are now checked for zero length after cutting to the evaluation period
+* Reference and threshold series are now checked for zero length after cutting to the evaluation period
 * Added Microsoft.ACE.OLEDB.12.0 as a fallback provider for connecting to the database if Microsoft.Jet.OLEDB.4.0 doesn't work
 
 Version 1.9.1
