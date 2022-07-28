@@ -198,7 +198,10 @@ Partial Public Class Scatterplot
                 ind = Me.OptResult.getSolution(1)
                 min(i) = Math.Min(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Richtung, min(i))
                 max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Richtung, max(i))
-                'IstWerte
+            End If
+
+            'IstWerte
+            If Me.ShowIstWerte Then
                 If (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasIstWert) Then
                     min(i) = Math.Min(Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Richtung, min(i))
                     max(i) = Math.Max(Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).IstWert * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Richtung, max(i))
