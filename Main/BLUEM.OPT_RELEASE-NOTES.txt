@@ -2,6 +2,11 @@
 BlueM.Opt Release Notes
 ===============================================================
 
+Version 1.9.3
+-------------
+NEW:
+* Talsim-NG: added file extensions *.RFD, *.IRR and *.GRW for Talsim-NG datasets
+
 Version 1.9.2
 -------------
 NEW:
