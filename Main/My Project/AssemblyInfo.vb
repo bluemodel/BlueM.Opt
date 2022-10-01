@@ -14,7 +14,7 @@ Imports BlueM.Opt.Common.Constants
                                & "Included simulation models:" & eol _
                                & "* BlueM.Sim v0.9.8 (http://www.bluemodel.org)" & eol _
                                & "* SWMM v5.0.018 (http://www.epa.gov/ednnrmrl/models/swmm/)" & eol _
-                               & "* Talsim-NG v3.1.12 (http://www.sydro.de/)")>
+                               & "* Talsim-NG v3.1.12 (http://www.talsim.de/)")>
 <Assembly: AssemblyCompany("BlueM Dev Group")> 
 <Assembly: AssemblyProduct("BlueM.Opt")> 
 <Assembly: AssemblyCopyright("BSD-2 - Copyright © BlueM Dev Group")> 
