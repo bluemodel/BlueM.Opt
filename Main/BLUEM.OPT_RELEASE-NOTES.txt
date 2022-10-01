@@ -6,6 +6,8 @@ Version 1.10.0
 --------------
 NEW:
 * Added a new custom plot window for plotting an optimization parameter against an objective function
+CHANGED:
+* Upgraded to TeeChart Pro version 4.2022.9.26
 
 Version 1.9.3
 -------------
