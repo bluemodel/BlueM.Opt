@@ -37,6 +37,7 @@ Partial Class Form1
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_Help = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ReleaseNotesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_About = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button()
@@ -67,12 +68,12 @@ Partial Class Form1
         Me.ToolStripMenuItem_Tchart2CSV = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripButton_Monitor = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton_Scatterplot = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton_CustomPlot = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton_SelectedSolutions = New System.Windows.Forms.ToolStripButton()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.Hauptdiagramm1 = New BlueM.Opt.Diagramm.Hauptdiagramm()
         Me.EVO_Opt_Verlauf1 = New BlueM.Opt.EVO_Opt_Verlauf()
         Me.EVO_Einstellungen1 = New BlueM.Opt.EVO_Einstellungen()
-        Me.ReleaseNotesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         MenuStrip1 = New System.Windows.Forms.MenuStrip()
         MenuItem_Tools = New System.Windows.Forms.ToolStripMenuItem()
         MenuItem_Info = New System.Windows.Forms.ToolStripMenuItem()
@@ -122,13 +123,19 @@ Partial Class Form1
         'ToolStripMenuItem_Help
         '
         Me.ToolStripMenuItem_Help.Name = "ToolStripMenuItem_Help"
-        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(145, 22)
         Me.ToolStripMenuItem_Help.Text = "Help"
+        '
+        'ReleaseNotesToolStripMenuItem
+        '
+        Me.ReleaseNotesToolStripMenuItem.Name = "ReleaseNotesToolStripMenuItem"
+        Me.ReleaseNotesToolStripMenuItem.Size = New System.Drawing.Size(145, 22)
+        Me.ReleaseNotesToolStripMenuItem.Text = "Release notes"
         '
         'ToolStripMenuItem_About
         '
         Me.ToolStripMenuItem_About.Name = "ToolStripMenuItem_About"
-        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(145, 22)
         Me.ToolStripMenuItem_About.Text = "About"
         '
         'ToolStripSeparator4
@@ -277,7 +284,7 @@ Partial Class Form1
         '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_New, ToolStripSeparator7, Me.ToolStripSplitButton_Settings, ToolStripSeparator5, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripButton_Scatterplot, ToolStripSeparator8, Me.ToolStripButton_SelectedSolutions})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_New, ToolStripSeparator7, Me.ToolStripSplitButton_Settings, ToolStripSeparator5, Me.ToolStripSplitButton_ErgebnisDB, ToolStripSeparator4, Me.ToolStripSplitButton_Diagramm, ToolStripSeparator3, Me.ToolStripButton_Monitor, ToolStripSeparator6, Me.ToolStripButton_Scatterplot, Me.ToolStripButton_CustomPlot, ToolStripSeparator8, Me.ToolStripButton_SelectedSolutions})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(722, 25)
@@ -411,6 +418,16 @@ Partial Class Form1
         Me.ToolStripButton_Scatterplot.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_Scatterplot.Text = "Scatterplot"
         Me.ToolStripButton_Scatterplot.ToolTipText = "Display scatterplot matrix"
+        '
+        'ToolStripButton_CustomPlot
+        '
+        Me.ToolStripButton_CustomPlot.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton_CustomPlot.Image = CType(resources.GetObject("ToolStripButton_CustomPlot.Image"), System.Drawing.Image)
+        Me.ToolStripButton_CustomPlot.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton_CustomPlot.Name = "ToolStripButton_CustomPlot"
+        Me.ToolStripButton_CustomPlot.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton_CustomPlot.Text = "Display/update custom plot"
+        Me.ToolStripButton_CustomPlot.ToolTipText = "Display/update custom plot"
         '
         'ToolStripButton_SelectedSolutions
         '
@@ -1654,12 +1671,6 @@ Partial Class Form1
         Me.EVO_Einstellungen1.Size = New System.Drawing.Size(244, 707)
         Me.EVO_Einstellungen1.TabIndex = 2
         '
-        'ReleaseNotesToolStripMenuItem
-        '
-        Me.ReleaseNotesToolStripMenuItem.Name = "ReleaseNotesToolStripMenuItem"
-        Me.ReleaseNotesToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.ReleaseNotesToolStripMenuItem.Text = "Release notes"
-        '
         'Form1
         '
         Me.AcceptButton = Me.Button_Start
@@ -1729,4 +1740,5 @@ Partial Class Form1
     Private WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripButton_SelectedSolutions As System.Windows.Forms.ToolStripButton
     Friend WithEvents ReleaseNotesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripButton_CustomPlot As ToolStripButton
 End Class

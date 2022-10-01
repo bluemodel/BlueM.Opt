@@ -117,6 +117,7 @@ Partial Public Class Form1
     'Dialoge
     Private WithEvents solutionDialog As SolutionDialog
     Private WithEvents scatterplot1, scatterplot2 As BlueM.Opt.Diagramm.Scatterplot
+    Private WithEvents customPlot As BlueM.Opt.Diagramm.CustomPlot
 
     'Diagramme
     Private WithEvents Hauptdiagramm1 As BlueM.Opt.Diagramm.Hauptdiagramm
@@ -200,6 +201,7 @@ Partial Public Class Form1
         Me.ToolStripSplitButton_Diagramm.Enabled = False
         Me.ToolStripSplitButton_ErgebnisDB.Enabled = False
         Me.ToolStripButton_Scatterplot.Enabled = False
+        Me.ToolStripButton_CustomPlot.Enabled = False
         Me.ToolStripButton_SelectedSolutions.Enabled = False
         Me.ToolStripSplitButton_Settings.Enabled = False
         Me.ToolStripMenuItem_SettingsLoad.Enabled = True 'weil bei vorherigem Start deaktiviert
@@ -461,6 +463,7 @@ Partial Public Class Form1
             Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             Me.ToolStripButton_Scatterplot.Enabled = False
+            Me.ToolStripButton_CustomPlot.Enabled = False
             Me.ToolStripButton_SelectedSolutions.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
 
@@ -829,6 +832,7 @@ Partial Public Class Form1
             Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             Me.ToolStripButton_Scatterplot.Enabled = False
+            Me.ToolStripButton_CustomPlot.Enabled = False
             Me.ToolStripButton_SelectedSolutions.Enabled = False
 
             Select Case Me.mProblem.Method
@@ -1006,6 +1010,12 @@ Partial Public Class Form1
         Me.Monitor1.SelectTabLog()
         Me.Monitor1.Show()
 
+        'dispose of any previously existing customPlot instance
+        If Not IsNothing(Me.customPlot) Then
+            Me.customPlot.Dispose()
+            Me.customPlot = Nothing
+        End If
+
     End Sub
 
 #End Region 'Initialisierung der Anwendungen
@@ -1060,6 +1070,7 @@ Partial Public Class Form1
             If (Not IsNothing(Sim1)) Then
                 Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = True
                 Me.ToolStripButton_Scatterplot.Enabled = True
+                Me.ToolStripButton_CustomPlot.Enabled = True
                 Me.ToolStripButton_SelectedSolutions.Enabled = True
                 Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
             End If
@@ -1508,6 +1519,27 @@ Partial Public Class Form1
 
     End Sub
 
+    ''' <summary>
+    ''' Open the custom plot window
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub showCustomPlot(sender As Object, e As EventArgs) Handles ToolStripButton_CustomPlot.Click
+
+        If IsNothing(Me.customPlot) Then
+            Me.customPlot = New BlueM.Opt.Diagramm.CustomPlot(Me.mProblem, Sim1.OptResult)
+        Else
+            Me.customPlot.UpdateData(Sim1.OptResult)
+
+            If Not Me.customPlot.Visible Then
+                Me.customPlot.Visible = True
+            End If
+
+            Me.customPlot.BringToFront()
+        End If
+
+    End Sub
+
 #Region "Lösungsauswahl"
 
     ''' <summary>
@@ -1562,7 +1594,7 @@ Partial Public Class Form1
 
     'Eine Lösung auswählen
     '*********************
-    Private Sub selectSolution(ByVal ind As Common.Individuum) Handles scatterplot1.pointSelected, scatterplot2.pointSelected
+    Private Sub selectSolution(ByVal ind As Common.Individuum) Handles scatterplot1.pointSelected, scatterplot2.pointSelected, customPlot.pointSelected
 
         Dim isOK As Boolean
 
@@ -1592,6 +1624,11 @@ Partial Public Class Form1
             If (Not IsNothing(Me.scatterplot2)) Then
                 Call Me.scatterplot2.showSelectedSolution(ind)
             End If
+
+            'select solution in the custom plot
+            If (Not IsNothing(Me.customPlot)) Then
+                Call Me.customPlot.showSelectedSolution(ind)
+            End If
         End If
 
         'Lösungsdialog nach vorne bringen
@@ -1618,6 +1655,11 @@ Partial Public Class Form1
 
         If (Not IsNothing(Me.scatterplot2)) Then
             Call scatterplot2.clearSelection()
+        End If
+
+        'In the custom plot
+        If (Not IsNothing(Me.customPlot)) Then
+            Call customPlot.clearSelection()
         End If
 
         'Auswahl intern zurücksetzen
@@ -1659,6 +1701,12 @@ Partial Public Class Form1
                 Call Me.scatterplot2.showSelectedSolution(ind)
             Next
         End If
+
+        'Im CustomPlot neu zeichnen
+        Call Me.customPlot.clearSelection()
+        For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+            Call Me.customPlot.showSelectedSolution(ind)
+        Next
 
     End Sub
 
@@ -2018,6 +2066,7 @@ Partial Public Class Form1
 
                     'Ergebnis-Buttons
                     Me.ToolStripButton_Scatterplot.Enabled = True
+                    Me.ToolStripButton_CustomPlot.Enabled = True
                     Me.ToolStripButton_SelectedSolutions.Enabled = True
                     Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = True
 

@@ -87,6 +87,12 @@
     <Compile Include="Diagramm.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CustomPlot.Designer.vb">
+      <DependentUpon>CustomPlot.vb</DependentUpon>
+    </Compile>
+    <Compile Include="CustomPlot.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Hauptdiagramm.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -126,6 +132,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="CustomPlot.resx">
+      <DependentUpon>CustomPlot.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Monitor.resx">
       <DependentUpon>Monitor.vb</DependentUpon>
       <SubType>Designer</SubType>
