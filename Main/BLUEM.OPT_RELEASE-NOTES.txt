@@ -7,6 +7,7 @@ Version 1.10.0
 NEW:
 * Added a new custom plot window for plotting an optimization parameter against an objective function
 CHANGED:
+* Updated BlueM.Wave to v1.14.0
 * Upgraded to TeeChart Pro version 4.2022.9.26
 
 Version 1.9.3

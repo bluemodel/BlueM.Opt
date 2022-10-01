@@ -447,7 +447,7 @@ Public Class Talsim
         '--------------------
         For Each welfile As String In Me.WELfiles
 
-            Dim WELtmp As Wave.WEL = New Wave.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & "." & welfile))
+            Dim WELtmp As Wave.FileFormats.WEL = New Wave.FileFormats.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & "." & welfile))
 
             'Benötigte Reihen für Import selektieren
             For Each series As String In SimReihen(welfile)

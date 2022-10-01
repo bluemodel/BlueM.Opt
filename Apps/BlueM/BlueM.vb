@@ -375,7 +375,7 @@ Public Class BlueMSim
 
         'WEL-Datei einlesen
         '------------------
-        Dim WELtmp As Wave.WEL = New Wave.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".WEL"))
+        Dim WELtmp As Wave.Fileformats.WEL = New Wave.Fileformats.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".WEL"))
 
         'Benötigte Reihen für Import selektieren
         For Each series As String In SimReihen("WEL")
@@ -393,7 +393,7 @@ Public Class BlueMSim
         If (Me.useKWL) Then
 
             Dim KWLpath As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".KWL")
-            Dim KWLtmp As Wave.WEL = New Wave.WEL(KWLpath)
+            Dim KWLtmp As Wave.Fileformats.WEL = New Wave.Fileformats.WEL(KWLpath)
 
             'Benötigte Reihen für Import selektieren
             For Each series As String In SimReihen("KWL")

@@ -763,7 +763,7 @@ Public Class Problem
         Dim RefReihe As Wave.TimeSeries
 
         'Referenzreihe aus Datei einlesen
-        Dim dateiobjekt As Wave.FileFormatBase = Wave.FileFactory.getFileInstance(filePath)
+        Dim dateiobjekt As Wave.Fileformats.FileFormatBase = Wave.Fileformats.FileFactory.getFileInstance(filePath)
         If refName = "" Then
             RefReihe = dateiobjekt.getTimeSeries()
         Else
@@ -874,7 +874,7 @@ Public Class Problem
                     If ({"SERIES", "REIHE"}.Contains(.Typ.ToUpper())) Then
 
                         'Read threshold series from file
-                        Dim fileInstance As Wave.FileFormatBase = Wave.FileFactory.getFileInstance(IO.Path.Combine(Me.mWorkDir, .GrenzReiheDatei))
+                        Dim fileInstance As Wave.Fileformats.FileFormatBase = Wave.Fileformats.FileFactory.getFileInstance(IO.Path.Combine(Me.mWorkDir, .GrenzReiheDatei))
                         If .GrenzGr = "" Then
                             .GrenzReihe = fileInstance.getTimeSeries()
                         Else
