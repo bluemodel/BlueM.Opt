@@ -229,7 +229,7 @@ Public Class Hauptdiagramm
         If (Me.mProblem.NumPrimObjective = 1) Then
             'SingleObjective
             'xxxxxxxxxxxxxxx
-            serie = Me.getSeriesPoint("Start value", farbe)
+            serie = Me.getSeriesPoint("Start value", farbe, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
             Call serie.Add(1, ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.ID.ToString())
         Else
             'MultiObjective
@@ -237,14 +237,14 @@ Public Class Hauptdiagramm
             If (Me.mProblem.NumPrimObjective = 2) Then
                 '2D-Diagramm
                 '------------------------------------------------------------------------
-                serie = Me.getSeriesPoint("Start value", farbe)
+                serie = Me.getSeriesPoint("Start value", farbe, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
                 Call serie.Add(ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.PrimObjectives(1) * Me.mProblem.List_PrimObjectiveFunctions(1).Richtung, ind.ID.ToString())
 
             Else
                 '3D-Diagramm (Es werden die ersten drei Zielfunktionswerte eingezeichnet)
                 '------------------------------------------------------------------------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
-                serie3D = Me.getSeries3DPoint("Start value", farbe)
+                serie3D = Me.getSeries3DPoint("Start value", farbe, Steema.TeeChart.Styles.PointerStyles.Circle, 4)
                 Call serie3D.Add(ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Richtung, ind.PrimObjectives(1) * Me.mProblem.List_PrimObjectiveFunctions(1).Richtung, ind.PrimObjectives(2) * Me.mProblem.List_PrimObjectiveFunctions(2).Richtung, ind.ID.ToString())
             End If
         End If

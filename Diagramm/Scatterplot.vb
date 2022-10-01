@@ -382,7 +382,7 @@ Partial Public Class Scatterplot
                     'Startwert
                     '=========
                     If (Me.ShowStartValue) Then
-                        serie = .getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
                         ind = Me.OptResult.getSolution(1)
                         serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Richtung, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Richtung, ind.ID.ToString())
                     End If
@@ -565,7 +565,7 @@ Partial Public Class Scatterplot
                     'Startwerte der Parameter eintragen
                     '==================================
                     If (Me.ShowStartValue) Then
-                        serie = .getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                        serie = .getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
                         serie.Add(Me.mProblem.List_OptParameter(Me.Auswahl(i)).StartWert, Me.mProblem.List_OptParameter(Me.Auswahl(j)).StartWert, "Start value")
                     End If
 
