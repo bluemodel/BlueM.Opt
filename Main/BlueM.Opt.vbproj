@@ -252,15 +252,6 @@
   <ItemGroup>
     <EmbeddedResource Include="My Project\TeeChart.licenses" />
     <None Include="app.config" />
-    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings+Settings_General.datasource" />
-    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_DDS.datasource" />
-    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_HookeJeeves.datasource" />
-    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_MetaBlueM.Opt.datasource" />
-    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_PES+Settings_Pop.datasource" />
-    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_PES+Settings_Schrittweite.datasource" />
-    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_PES.datasource" />
-    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_Sensiplot.datasource" />
-    <None Include="My Project\DataSources\IHWB.BlueM.Opt.Common.Settings_TSP.datasource" />
     <None Include="My Project\Settings.settings">
       <CustomToolNamespace>My</CustomToolNamespace>
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -327,6 +318,7 @@
       <Version>4.2022.9.26</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PreBuildEvent>
