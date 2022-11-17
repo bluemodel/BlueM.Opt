@@ -1,0 +1,3 @@
+[submodule "BlueM.Wave"]
+	path = BlueM.Wave
+	url = https://github.com/bluemodel/BlueM.Wave.git
