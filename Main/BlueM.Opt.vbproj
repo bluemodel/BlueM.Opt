@@ -117,7 +117,7 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <ProjectReference Include="..\..\BlueM.Wave\Wave.vbproj">
+    <ProjectReference Include="..\..\BlueM.Wave\source\Wave.vbproj">
       <Project>{ce4132a2-2e2f-4f54-b66d-1baa928d499e}</Project>
       <Name>Wave</Name>
       <Private>False</Private>
@@ -331,7 +331,7 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>XCOPY $(SolutionDir)BlueM.Wave\bin\$(PlatformName)\$(ConfigurationName)\* $(TargetDir)BlueM.Wave /Y /S /I
+    <PostBuildEvent>XCOPY $(SolutionDir)BlueM.Wave\source\bin\$(PlatformName)\$(ConfigurationName)\* $(TargetDir)BlueM.Wave /Y /S /I
 XCOPY $(SolutionDir)BlueM.Opt\Apps\BlueM\$(PlatformName)\* $(TargetDir)BlueM /Y /S /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

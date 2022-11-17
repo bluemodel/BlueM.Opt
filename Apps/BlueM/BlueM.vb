@@ -384,7 +384,7 @@ Public Class BlueMSim
         'Datei einlesen
         WELtmp.readFile()
         'Zeitreihen übernehmen
-        For Each zre As Wave.TimeSeries In WELtmp.FileTimeSeries.Values
+        For Each zre As Wave.TimeSeries In WELtmp.TimeSeries.Values
             Me.SimErgebnis.Reihen.Add(zre.Title, zre)
         Next
 
@@ -402,7 +402,7 @@ Public Class BlueMSim
             'Datei einlesen
             KWLtmp.readFile()
             'Zeitreihen übernehmen
-            For Each zre As Wave.TimeSeries In KWLtmp.FileTimeSeries.Values
+            For Each zre As Wave.TimeSeries In KWLtmp.TimeSeries.Values
                 Me.SimErgebnis.Reihen.Add(zre.Title, zre)
             Next
 

@@ -1815,7 +1815,7 @@ Partial Public Class Form1
 
         'Wave anzeigen
         '-------------
-        Call Wave1.Show()
+        Dim app As New BlueM.Wave.App(Wave1)
 
         'Simulationsverzeichnis zurücksetzen
         Sim1.WorkDir_Current = WorkDir_Prev

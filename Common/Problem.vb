@@ -760,37 +760,37 @@ Public Class Problem
     ''' <returns>Zeitreihe</returns>
     Private Function Read_OBF_RefSeries(ByVal filePath As String, ByVal refName As String, ByVal EvalStart As DateTime, ByVal EvalEnde As DateTime) As Wave.TimeSeries
 
-        Dim RefReihe As Wave.TimeSeries
+        Dim refSeries As Wave.TimeSeries
 
         'Referenzreihe aus Datei einlesen
-        Dim dateiobjekt As Wave.Fileformats.FileFormatBase = Wave.Fileformats.FileFactory.getFileInstance(filePath)
+        Dim fileInstance As Wave.TimeSeriesFile = Wave.TimeSeriesFile.getInstance(filePath)
         If refName = "" Then
-            RefReihe = dateiobjekt.getTimeSeries()
+            refSeries = fileInstance.getTimeSeries()
         Else
-            RefReihe = dateiobjekt.getTimeSeries(refName)
+            refSeries = fileInstance.getTimeSeries(refName)
         End If
 
         'Zeitraum der Referenzreihe überprüfen
-        If (RefReihe.StartDate > EvalStart Or RefReihe.EndDate < EvalEnde) Then
+        If (refSeries.StartDate > EvalStart Or refSeries.EndDate < EvalEnde) Then
             'Referenzreihe deckt Evaluierungszeitraum nicht ab
             Throw New Exception($"The reference series '{filePath}' does not cover the evaluation period!")
         End If
 
         'Referenzreihe auf Evaluierungszeitraum kürzen
-        Call RefReihe.Cut(EvalStart, EvalEnde)
-        If RefReihe.Length = 0 Then
+        Call refSeries.Cut(EvalStart, EvalEnde)
+        If refSeries.Length = 0 Then
             Throw New Exception($"The reference series '{filePath}' is empty after cutting to the evaluation period!")
         End If
 
         'Check reference series for NaN values
-        If RefReihe.NaNCount > 0 Then
+        If refSeries.NaNCount > 0 Then
             MsgBox($"The reference series '{filePath}' contains NaN values. These and the equivalent nodes in the simulation time series will be filtered before calculating the objective function values!", MsgBoxStyle.Exclamation)
         End If
 
         'Referenzreihe umbenennen
-        RefReihe.Title += " (reference)"
+        refSeries.Title += " (reference)"
 
-        Return RefReihe
+        Return refSeries
 
     End Function
 
@@ -874,7 +874,7 @@ Public Class Problem
                     If ({"SERIES", "REIHE"}.Contains(.Typ.ToUpper())) Then
 
                         'Read threshold series from file
-                        Dim fileInstance As Wave.Fileformats.FileFormatBase = Wave.Fileformats.FileFactory.getFileInstance(IO.Path.Combine(Me.mWorkDir, .GrenzReiheDatei))
+                        Dim fileInstance As Wave.TimeSeriesFile = Wave.TimeSeriesFile.getInstance(IO.Path.Combine(Me.mWorkDir, .GrenzReiheDatei))
                         If .GrenzGr = "" Then
                             .GrenzReihe = fileInstance.getTimeSeries()
                         Else

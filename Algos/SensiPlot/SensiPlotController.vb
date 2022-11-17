@@ -259,7 +259,7 @@ Public Class SensiPlotController
             For Each zre As Wave.TimeSeries In SimReihen
                 Wave1.Import_Series(zre)
             Next
-            Call Wave1.Show()
+            Dim app As New BlueM.Wave.App(Wave1)
         End If
     End Sub
 
