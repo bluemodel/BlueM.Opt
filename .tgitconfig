@@ -1,0 +1,3 @@
+[bugtraq]
+	url = https://github.com/bluemodel/BlueM.Opt/issues/%BUGID%
+	logregex = "#(\\d+)"
