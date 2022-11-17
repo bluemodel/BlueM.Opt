@@ -6,6 +6,7 @@ Version 1.11.0
 --------------
 CHANGED:
 * Updated BlueM.Wave to v2.0.0
+* Updated Talsim-NG Engine to v3.1.15
 
 Version 1.10.0
 --------------

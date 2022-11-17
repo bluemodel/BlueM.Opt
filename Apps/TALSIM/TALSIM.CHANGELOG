@@ -1,10 +1,25 @@
 Talsim-NG simulation engine changelog
 *************************************
 
+Version 3.1.15
+--------------
+* Removed timeseries state from state files
+  The file format of state files has changed and is incompatible with previous versions!
+
+Version 3.1.14
+--------------
+* Fixed saving and reading states for water quality in transport reaches with calculation mode translation #112
+  The file format of state files has changed and is incompatible with previous versions!
+
+Version 3.1.13
+--------------
+* Fixed error when saving certain system states to state file #112
+
 Version 3.1.12
 --------------
-* Number of mixed-reactor for quality calculation has been changed. The retention of load and consequently concentration has improved and better follows the hydrological retention.
-* Transport elements with Translation follow now the incoming load according to the time shift of the translatio time 
+* Number of mixed-reactor for quality calculation has been changed. The retention of load and consequently concentration 
+  has improved and better follows the hydrological retention.
+* Transport elements with translation follow now the incoming load according to the time shift of the translation time 
 
 Version 3.1.11
 --------------
