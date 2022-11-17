@@ -266,9 +266,6 @@
       <DependentUpon>SolutionDialog.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <Content Include="LICENSE.TXT">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -324,6 +321,7 @@
     <PreBuildEvent>
     </PreBuildEvent>
     <PostBuildEvent>XCOPY $(SolutionDir)BlueM.Wave\source\bin\$(PlatformName)\$(ConfigurationName)\* $(TargetDir)BlueM.Wave /Y /S /I
-XCOPY $(SolutionDir)BlueM.Opt\Apps\BlueM\$(PlatformName)\* $(TargetDir)BlueM /Y /S /I</PostBuildEvent>
+XCOPY $(SolutionDir)BlueM.Opt\Apps\BlueM\$(PlatformName)\* $(TargetDir)BlueM /Y /S /I
+COPY /Y $(SolutionDir)LICENSE.TXT $(TargetDir)LICENSE.TXT</PostBuildEvent>
   </PropertyGroup>
 </Project>
