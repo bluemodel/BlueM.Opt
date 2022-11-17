@@ -47,6 +47,7 @@ Public Class Settings
     '-----------------------------
     Public Class Settings_General
         Private mUseMultithreading As Boolean
+        Private mNThreads As Integer
         Private mMultithreadingAllowed As Boolean
         Private mDrawOnlyCurrentGeneration As Boolean
 
@@ -82,6 +83,18 @@ Public Class Settings
         End Property
 
         ''' <summary>
+        ''' Number of threads to use for multithreading
+        ''' </summary>
+        Public Property NThreads() As Integer
+            Get
+                Return mNThreads
+            End Get
+            Set(ByVal value As Integer)
+                mNThreads = value
+            End Set
+        End Property
+
+        ''' <summary>
         ''' Nur die aktuelle Generation im Hauptdiagramm anzeigen
         ''' </summary>
         Public Property DrawOnlyCurrentGeneration() As Boolean
@@ -96,6 +109,7 @@ Public Class Settings
         Public Sub setStandard()
             Me.MultithreadingAllowed = True
             Me.UseMultithreading = True
+            Me.NThreads = Environment.ProcessorCount
             Me.DrawOnlyCurrentGeneration = False
         End Sub
     End Class

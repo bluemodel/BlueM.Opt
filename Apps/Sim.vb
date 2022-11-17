@@ -776,37 +776,18 @@ Public MustInherit Class Sim
 #Region "Multithreading"
 
     ''' <summary>
-    ''' Ermittelt basierend auf der Anzahl der physikalischen Prozessoren die Anzahl zu verwendender Threads
+    ''' Number of threads to use for simulation
     ''' </summary>
-    ''' <remarks>Wenn Multithreading ausgeschaltet ist, wird nur 1 Thread benutzt</remarks>
+    ''' <remarks>Returns 1 if multithreading is switched off</remarks>
     Protected ReadOnly Property n_Threads() As Integer
         Get
 
-            'Wenn Multithreading ausgeschaltet ist, nur 1 Thread benutzen
-            If (Not Me.mSettings.General.UseMultithreading) Then
+            If Not Me.mSettings.General.UseMultithreading Then
+                'Wenn Multithreading ausgeschaltet ist, nur 1 Thread benutzen
                 Return 1
-            End If
-
-            'Ansonsten Anzahl Threads ausrechnen:
-            '------------------------------------
-            Dim n_CPU As Integer
-            'Dim LogCPU As Integer = 0
-            'Dim PhysCPU As Integer = 0
-
-            'Gibt wahrscheinlich die Anzahl virtueller und physikalischer Prozessoren zurück
-            n_CPU = Environment.ProcessorCount
-            'LogCPU = Environment.ProcessorCount
-            'PhysCPU = Environment.ProcessorCount
-
-            If n_CPU = 1 Then
-                n_Threads = 4
             Else
-                n_Threads = n_CPU + 1
+                Return Me.mSettings.General.NThreads
             End If
-
-            'n_Threads = 3
-
-            Return n_Threads
 
         End Get
     End Property

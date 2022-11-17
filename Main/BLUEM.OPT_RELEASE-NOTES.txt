@@ -4,6 +4,9 @@ BlueM.Opt Release Notes
 
 Version 1.11.0
 --------------
+NEW:
+* The number of threads to use for multithreaded applications can now be set in the general settings, 
+  default is the machine's number of logical processors #229
 CHANGED:
 * Updated BlueM.Wave to v2.0.0
 * Updated Talsim-NG Engine to v3.1.15

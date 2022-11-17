@@ -56,6 +56,8 @@ Partial Class EVO_Einstellungen
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage_General = New System.Windows.Forms.TabPage()
         Me.GroupBox_Sim = New System.Windows.Forms.GroupBox()
+        Me.Label_NThreads = New System.Windows.Forms.Label()
+        Me.NumericUpDown_NThreads = New System.Windows.Forms.NumericUpDown()
         Me.CheckBox_useMultithreading = New System.Windows.Forms.CheckBox()
         Me.TabPage_PES = New System.Windows.Forms.TabPage()
         Me.PES_Label_OptModus = New System.Windows.Forms.Label()
@@ -187,6 +189,7 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.SuspendLayout()
         Me.TabPage_General.SuspendLayout()
         Me.GroupBox_Sim.SuspendLayout()
+        CType(Me.NumericUpDown_NThreads, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_PES.SuspendLayout()
         CType(Me.BindingSource_PES, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PES_Numeric_DnStart, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -518,10 +521,10 @@ Partial Class EVO_Einstellungen
         'GroupBox_Diagramm
         '
         GroupBox_Diagramm.Controls.Add(Me.CheckBox_drawOnlyCurrentGen)
-        GroupBox_Diagramm.Location = New System.Drawing.Point(6, 65)
+        GroupBox_Diagramm.Location = New System.Drawing.Point(6, 90)
         GroupBox_Diagramm.Name = "GroupBox_Diagramm"
         GroupBox_Diagramm.Size = New System.Drawing.Size(209, 62)
-        GroupBox_Diagramm.TabIndex = 4
+        GroupBox_Diagramm.TabIndex = 1
         GroupBox_Diagramm.TabStop = False
         GroupBox_Diagramm.Text = "Diagram"
         '
@@ -533,7 +536,7 @@ Partial Class EVO_Einstellungen
         Me.CheckBox_drawOnlyCurrentGen.Name = "CheckBox_drawOnlyCurrentGen"
         Me.CheckBox_drawOnlyCurrentGen.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.CheckBox_drawOnlyCurrentGen.Size = New System.Drawing.Size(197, 37)
-        Me.CheckBox_drawOnlyCurrentGen.TabIndex = 1
+        Me.CheckBox_drawOnlyCurrentGen.TabIndex = 0
         Me.CheckBox_drawOnlyCurrentGen.Text = "Only display the current generation:"
         Me.CheckBox_drawOnlyCurrentGen.UseVisualStyleBackColor = True
         '
@@ -558,7 +561,7 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Padding = New System.Drawing.Point(0, 0)
         Me.TabControl1.SelectedIndex = 0
         Me.TabControl1.Size = New System.Drawing.Size(229, 694)
-        Me.TabControl1.TabIndex = 1
+        Me.TabControl1.TabIndex = 0
         '
         'TabPage_General
         '
@@ -576,12 +579,34 @@ Partial Class EVO_Einstellungen
         'GroupBox_Sim
         '
         Me.GroupBox_Sim.Controls.Add(Me.CheckBox_useMultithreading)
+        Me.GroupBox_Sim.Controls.Add(Me.Label_NThreads)
+        Me.GroupBox_Sim.Controls.Add(Me.NumericUpDown_NThreads)
         Me.GroupBox_Sim.Location = New System.Drawing.Point(6, 6)
         Me.GroupBox_Sim.Name = "GroupBox_Sim"
-        Me.GroupBox_Sim.Size = New System.Drawing.Size(209, 53)
-        Me.GroupBox_Sim.TabIndex = 3
+        Me.GroupBox_Sim.Size = New System.Drawing.Size(209, 78)
+        Me.GroupBox_Sim.TabIndex = 0
         Me.GroupBox_Sim.TabStop = False
         Me.GroupBox_Sim.Text = "Simulations"
+        '
+        'Label_NThreads
+        '
+        Me.Label_NThreads.AutoSize = True
+        Me.Label_NThreads.Location = New System.Drawing.Point(7, 52)
+        Me.Label_NThreads.Name = "Label_NThreads"
+        Me.Label_NThreads.Size = New System.Drawing.Size(97, 13)
+        Me.Label_NThreads.TabIndex = 1
+        Me.Label_NThreads.Text = "Number of threads:"
+        '
+        'NumericUpDown_NThreads
+        '
+        Me.NumericUpDown_NThreads.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.NumericUpDown_NThreads.DataBindings.Add(New System.Windows.Forms.Binding("Value", Me.BindingSource_General, "NThreads", True))
+        Me.NumericUpDown_NThreads.Location = New System.Drawing.Point(146, 50)
+        Me.NumericUpDown_NThreads.Minimum = New Decimal(New Integer() {2, 0, 0, 0})
+        Me.NumericUpDown_NThreads.Name = "NumericUpDown_NThreads"
+        Me.NumericUpDown_NThreads.Size = New System.Drawing.Size(57, 20)
+        Me.NumericUpDown_NThreads.TabIndex = 2
+        Me.NumericUpDown_NThreads.Value = New Decimal(New Integer() {2, 0, 0, 0})
         '
         'CheckBox_useMultithreading
         '
@@ -1634,6 +1659,8 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage_General.ResumeLayout(False)
         Me.GroupBox_Sim.ResumeLayout(False)
+        Me.GroupBox_Sim.PerformLayout()
+        CType(Me.NumericUpDown_NThreads, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_PES.ResumeLayout(False)
         Me.TabPage_PES.PerformLayout()
         CType(Me.BindingSource_PES, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1800,4 +1827,6 @@ Partial Class EVO_Einstellungen
     Friend WithEvents BindingSource_TSP As System.Windows.Forms.BindingSource
     Friend WithEvents SensiPlot_CheckBox_SaveResults As CheckBox
     Private WithEvents PES_Combo_Strategie As ComboBox
+    Friend WithEvents Label_NThreads As Label
+    Friend WithEvents NumericUpDown_NThreads As NumericUpDown
 End Class

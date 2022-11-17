@@ -363,6 +363,21 @@ Public Class EVO_Einstellungen
         CType(sender, ComboBox).DataBindings(0).WriteValue()
     End Sub
 
+    ''' <summary>
+    ''' Enables/disables the inputs for the number of threads when the "use multithreading" option changes
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub CheckBox_useMultithreading_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox_useMultithreading.CheckedChanged
+        If CheckBox_useMultithreading.Checked Then
+            Label_NThreads.Enabled = True
+            NumericUpDown_NThreads.Enabled = True
+        Else
+            Label_NThreads.Enabled = False
+            NumericUpDown_NThreads.Enabled = False
+        End If
+    End Sub
+
 #End Region 'Events
 
 #End Region 'Methoden
