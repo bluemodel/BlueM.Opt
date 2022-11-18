@@ -247,6 +247,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="My Project\DataSources\BlueM.Opt.Common.Settings+Settings_General.datasource" />
+    <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_DDS.datasource" />
+    <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_HookeJeeves.datasource" />
+    <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_MetaEvo.datasource" />
+    <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_PES.datasource" />
+    <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_Sensiplot.datasource" />
+    <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_TSP.datasource" />
     <None Include="Resources\icon_excel.png" />
   </ItemGroup>
   <ItemGroup>
