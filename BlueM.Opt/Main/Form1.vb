@@ -726,68 +726,74 @@ Partial Public Class Form1
     ''' <param name="selectedDatensatz">Pfad zum Datensatz</param>
     Public Sub INI_Datensatz(ByVal selectedDatensatz As String)
 
-        'Zurücksetzen
-        '------------
+        Try
 
-        'Tooltip
-        Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
+            'Zurücksetzen
+            '------------
 
-        'Datensatz-Reset
-        Me.MenuItem_DatensatzZurücksetzen.Enabled = False
+            'Tooltip
+            Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
 
-        'gewählten Datensatz an Anwendung übergeben
-        '------------------------------------------
-        Select Case Me.Anwendung
+            'Datensatz-Reset
+            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
 
-            Case ANW_TESTPROBLEMS
+            'gewählten Datensatz an Anwendung übergeben
+            '------------------------------------------
+            Select Case Me.Anwendung
 
-                'Testproblem setzen
-                Testprobleme1.setTestproblem(selectedDatensatz)
+                Case ANW_TESTPROBLEMS
 
-                'Tooltip anzeigen
-                Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
+                    'Testproblem setzen
+                    Testprobleme1.setTestproblem(selectedDatensatz)
 
-            Case Else '(Alle Sim-Anwendungen)
+                    'Tooltip anzeigen
+                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
 
-                'Benutzereinstellungen aktualisieren
-                Try
-                    'place selected dataset at the end of the list
-                    If (My.Settings.MRUSimDatensaetze.Contains(selectedDatensatz)) Then
-                        My.Settings.MRUSimDatensaetze.Remove(selectedDatensatz)
-                    End If
-                    My.Settings.MRUSimDatensaetze.Add(selectedDatensatz)
-                    'save user settings
-                    Call My.Settings.Save()
-                Catch ex As Exception
-                    'TODO: log My.Settings.MRUSimDatensaetze error
-                End Try
+                Case Else '(Alle Sim-Anwendungen)
 
-                'Datensatz Combobox aktualisieren
-                Call Me.Datensatz_populateCombo()
+                    'Benutzereinstellungen aktualisieren
+                    Try
+                        'place selected dataset at the end of the list
+                        If (My.Settings.MRUSimDatensaetze.Contains(selectedDatensatz)) Then
+                            My.Settings.MRUSimDatensaetze.Remove(selectedDatensatz)
+                        End If
+                        My.Settings.MRUSimDatensaetze.Add(selectedDatensatz)
+                        'save user settings
+                        Call My.Settings.Save()
+                    Catch ex As Exception
+                        'TODO: log My.Settings.MRUSimDatensaetze error
+                    End Try
 
-                'Auswahl setzen (falls von ausserhalb)
-                Me.IsInitializing = True
-                Me.ComboBox_Datensatz.SelectedItem = selectedDatensatz
-                Me.IsInitializing = False
+                    'Datensatz Combobox aktualisieren
+                    Call Me.Datensatz_populateCombo()
 
-                'Datensatz setzen
-                Call Sim1.setDatensatz(selectedDatensatz)
+                    'Auswahl setzen (falls von ausserhalb)
+                    Me.IsInitializing = True
+                    Me.ComboBox_Datensatz.SelectedItem = selectedDatensatz
+                    Me.IsInitializing = False
 
-                'Tooltip anzeigen
-                Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, selectedDatensatz)
+                    'Datensatz setzen
+                    Call Sim1.setDatensatz(selectedDatensatz)
 
-        End Select
+                    'Tooltip anzeigen
+                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, selectedDatensatz)
 
-        'Methodenauswahl aktivieren und zurücksetzen
-        '-------------------------------------------
-        Me.Label_Methode.Enabled = True
-        Me.ComboBox_Methode.Enabled = True
-        Me.IsInitializing = True
-        Me.ComboBox_Methode.SelectedItem = ""
-        Me.IsInitializing = False
+            End Select
 
-        'Progress zurücksetzen
-        Call Me.mProgress.Initialize()
+            'Methodenauswahl aktivieren und zurücksetzen
+            '-------------------------------------------
+            Me.Label_Methode.Enabled = True
+            Me.ComboBox_Methode.Enabled = True
+            Me.IsInitializing = True
+            Me.ComboBox_Methode.SelectedItem = ""
+            Me.IsInitializing = False
+
+            'Progress zurücksetzen
+            Call Me.mProgress.Initialize()
+
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical)
+        End Try
 
     End Sub
 
