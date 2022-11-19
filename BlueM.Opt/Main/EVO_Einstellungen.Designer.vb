@@ -56,9 +56,9 @@ Partial Class EVO_Einstellungen
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage_General = New System.Windows.Forms.TabPage()
         Me.GroupBox_Sim = New System.Windows.Forms.GroupBox()
+        Me.CheckBox_useMultithreading = New System.Windows.Forms.CheckBox()
         Me.Label_NThreads = New System.Windows.Forms.Label()
         Me.NumericUpDown_NThreads = New System.Windows.Forms.NumericUpDown()
-        Me.CheckBox_useMultithreading = New System.Windows.Forms.CheckBox()
         Me.TabPage_PES = New System.Windows.Forms.TabPage()
         Me.PES_Label_OptModus = New System.Windows.Forms.Label()
         Me.BindingSource_PES = New System.Windows.Forms.BindingSource(Me.components)
@@ -588,6 +588,19 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Sim.TabStop = False
         Me.GroupBox_Sim.Text = "Simulations"
         '
+        'CheckBox_useMultithreading
+        '
+        Me.CheckBox_useMultithreading.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBox_useMultithreading.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_General, "UseMultithreading", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
+        Me.CheckBox_useMultithreading.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_General, "MultithreadingAllowed", True, System.Windows.Forms.DataSourceUpdateMode.Never))
+        Me.CheckBox_useMultithreading.Location = New System.Drawing.Point(6, 20)
+        Me.CheckBox_useMultithreading.Name = "CheckBox_useMultithreading"
+        Me.CheckBox_useMultithreading.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckBox_useMultithreading.Size = New System.Drawing.Size(197, 24)
+        Me.CheckBox_useMultithreading.TabIndex = 0
+        Me.CheckBox_useMultithreading.Text = "Use multithreading:"
+        Me.CheckBox_useMultithreading.UseVisualStyleBackColor = True
+        '
         'Label_NThreads
         '
         Me.Label_NThreads.AutoSize = True
@@ -607,19 +620,6 @@ Partial Class EVO_Einstellungen
         Me.NumericUpDown_NThreads.Size = New System.Drawing.Size(57, 20)
         Me.NumericUpDown_NThreads.TabIndex = 2
         Me.NumericUpDown_NThreads.Value = New Decimal(New Integer() {2, 0, 0, 0})
-        '
-        'CheckBox_useMultithreading
-        '
-        Me.CheckBox_useMultithreading.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBox_useMultithreading.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_General, "UseMultithreading", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
-        Me.CheckBox_useMultithreading.DataBindings.Add(New System.Windows.Forms.Binding("Enabled", Me.BindingSource_General, "MultithreadingAllowed", True, System.Windows.Forms.DataSourceUpdateMode.Never))
-        Me.CheckBox_useMultithreading.Location = New System.Drawing.Point(6, 20)
-        Me.CheckBox_useMultithreading.Name = "CheckBox_useMultithreading"
-        Me.CheckBox_useMultithreading.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CheckBox_useMultithreading.Size = New System.Drawing.Size(197, 24)
-        Me.CheckBox_useMultithreading.TabIndex = 0
-        Me.CheckBox_useMultithreading.Text = "Use multithreading:"
-        Me.CheckBox_useMultithreading.UseVisualStyleBackColor = True
         '
         'TabPage_PES
         '
