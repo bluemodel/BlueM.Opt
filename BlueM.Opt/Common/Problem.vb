@@ -763,12 +763,16 @@ Public Class Problem
         Dim refSeries As Wave.TimeSeries
 
         'Referenzreihe aus Datei einlesen
-        Dim fileInstance As Wave.TimeSeriesFile = Wave.TimeSeriesFile.getInstance(filePath)
-        If refName = "" Then
-            refSeries = fileInstance.getTimeSeries()
-        Else
-            refSeries = fileInstance.getTimeSeries(refName)
-        End If
+        Try
+            Dim fileInstance As Wave.TimeSeriesFile = Wave.TimeSeriesFile.getInstance(filePath)
+            If refName = "" Then
+                refSeries = fileInstance.getTimeSeries()
+            Else
+                refSeries = fileInstance.getTimeSeries(refName)
+            End If
+        Catch ex As Exception
+            Throw New Exception($"Unable to read reference series '{filePath}'!{eol}Error: {ex.Message}", ex)
+        End Try
 
         'Zeitraum der Referenzreihe überprüfen
         If (refSeries.StartDate > EvalStart Or refSeries.EndDate < EvalEnde) Then
