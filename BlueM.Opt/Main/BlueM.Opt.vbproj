@@ -329,6 +329,6 @@
     </PreBuildEvent>
     <PostBuildEvent>XCOPY $(SolutionDir)BlueM.Wave\source\bin\$(PlatformName)\$(ConfigurationName)\* $(TargetDir)BlueM.Wave /Y /S /I
 XCOPY $(SolutionDir)BlueM.Opt\Apps\BlueM\$(PlatformName)\* $(TargetDir)BlueM /Y /S /I
-COPY /Y $(SolutionDir)LICENSE.TXT $(TargetDir)LICENSE.TXT</PostBuildEvent>
+COPY /Y $(SolutionDir)COPYING $(TargetDir)COPYING</PostBuildEvent>
   </PropertyGroup>
 </Project>

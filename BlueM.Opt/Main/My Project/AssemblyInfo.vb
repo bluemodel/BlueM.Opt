@@ -16,8 +16,8 @@ Imports BlueM.Opt.Common.Constants
                                & "* SWMM v5.0.018 (http://www.epa.gov/ednnrmrl/models/swmm/)" & eol _
                                & "* Talsim-NG v3.1.15 (http://www.talsim.de/)")>
 <Assembly: AssemblyCompany("BlueM Dev Group")> 
-<Assembly: AssemblyProduct("BlueM.Opt")> 
-<Assembly: AssemblyCopyright("BSD-2 - Copyright © BlueM Dev Group")> 
+<Assembly: AssemblyProduct("BlueM.Opt")>
+<Assembly: AssemblyCopyright("Copyright © BlueM Dev Group")>
 <Assembly: AssemblyTrademark("")>
 <Assembly: AssemblyCulture("")>
 

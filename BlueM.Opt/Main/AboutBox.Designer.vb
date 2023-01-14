@@ -31,20 +31,20 @@ Partial Class AboutBox
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(AboutBox))
-        Me.LogoPictureBox = New System.Windows.Forms.PictureBox
-        Me.LabelProductName = New System.Windows.Forms.Label
-        Me.LabelVersion = New System.Windows.Forms.Label
-        Me.LabelCopyright = New System.Windows.Forms.Label
-        Me.LabelCompanyName = New System.Windows.Forms.Label
-        Me.TextBox_Description = New System.Windows.Forms.TextBox
-        Me.OKButton = New System.Windows.Forms.Button
-        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel
-        Me.TabControl1 = New System.Windows.Forms.TabControl
-        Me.TabPage_Description = New System.Windows.Forms.TabPage
-        Me.TabPage_License = New System.Windows.Forms.TabPage
-        Me.TextBox_License = New System.Windows.Forms.TextBox
-        Me.TabPage_Credits = New System.Windows.Forms.TabPage
-        Me.TextBox_Credits = New System.Windows.Forms.TextBox
+        Me.LogoPictureBox = New System.Windows.Forms.PictureBox()
+        Me.LabelProductName = New System.Windows.Forms.Label()
+        Me.LabelVersion = New System.Windows.Forms.Label()
+        Me.LabelCopyright = New System.Windows.Forms.Label()
+        Me.LabelCompanyName = New System.Windows.Forms.Label()
+        Me.TextBox_Description = New System.Windows.Forms.TextBox()
+        Me.OKButton = New System.Windows.Forms.Button()
+        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
+        Me.TabControl1 = New System.Windows.Forms.TabControl()
+        Me.TabPage_Description = New System.Windows.Forms.TabPage()
+        Me.TabPage_License = New System.Windows.Forms.TabPage()
+        Me.TextBox_License = New System.Windows.Forms.TextBox()
+        Me.TabPage_Credits = New System.Windows.Forms.TabPage()
+        Me.TextBox_Credits = New System.Windows.Forms.TextBox()
         CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl1.SuspendLayout()
         Me.TabPage_Description.SuspendLayout()
@@ -119,7 +119,7 @@ Partial Class AboutBox
         Me.TextBox_Description.Name = "TextBox_Description"
         Me.TextBox_Description.ReadOnly = True
         Me.TextBox_Description.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.TextBox_Description.Size = New System.Drawing.Size(326, 100)
+        Me.TextBox_Description.Size = New System.Drawing.Size(342, 100)
         Me.TextBox_Description.TabIndex = 0
         Me.TextBox_Description.TabStop = False
         Me.TextBox_Description.Text = resources.GetString("TextBox_Description.Text")
@@ -147,7 +147,7 @@ Partial Class AboutBox
         'TabControl1
         '
         Me.TabControl1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage_Description)
         Me.TabControl1.Controls.Add(Me.TabPage_License)
         Me.TabControl1.Controls.Add(Me.TabPage_Credits)
@@ -162,7 +162,7 @@ Partial Class AboutBox
         Me.TabPage_Description.Controls.Add(Me.TextBox_Description)
         Me.TabPage_Description.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_Description.Name = "TabPage_Description"
-        Me.TabPage_Description.Size = New System.Drawing.Size(326, 100)
+        Me.TabPage_Description.Size = New System.Drawing.Size(342, 100)
         Me.TabPage_Description.TabIndex = 0
         Me.TabPage_Description.Text = "Description"
         Me.TabPage_Description.UseVisualStyleBackColor = True
@@ -172,7 +172,7 @@ Partial Class AboutBox
         Me.TabPage_License.Controls.Add(Me.TextBox_License)
         Me.TabPage_License.Location = New System.Drawing.Point(4, 22)
         Me.TabPage_License.Name = "TabPage_License"
-        Me.TabPage_License.Size = New System.Drawing.Size(326, 100)
+        Me.TabPage_License.Size = New System.Drawing.Size(342, 100)
         Me.TabPage_License.TabIndex = 1
         Me.TabPage_License.Text = "License"
         Me.TabPage_License.UseVisualStyleBackColor = True
@@ -185,7 +185,7 @@ Partial Class AboutBox
         Me.TextBox_License.Name = "TextBox_License"
         Me.TextBox_License.ReadOnly = True
         Me.TextBox_License.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.TextBox_License.Size = New System.Drawing.Size(326, 100)
+        Me.TextBox_License.Size = New System.Drawing.Size(342, 100)
         Me.TextBox_License.TabIndex = 1
         Me.TextBox_License.Text = resources.GetString("TextBox_License.Text")
         '
