@@ -22,6 +22,7 @@ Public Class Settings_Sensiplot
     Public Enum SensiType As Integer
         evenDistribution = 1
         randomDistribution = 2
+        latinHypercube = 3
     End Enum
 
     Private _Selected_OptParameters As Collections.Generic.List(Of Integer)
@@ -68,8 +69,6 @@ Public Class Settings_Sensiplot
         Set(ByVal value As Boolean)
             If (value = True) Then
                 Me.Selected_Mode = SensiType.evenDistribution
-            Else
-                Me.Selected_Mode = SensiType.randomDistribution
             End If
         End Set
     End Property
@@ -82,8 +81,18 @@ Public Class Settings_Sensiplot
         Set(ByVal value As Boolean)
             If (value = True) Then
                 Me.Selected_Mode = SensiType.randomDistribution
-            Else
-                Me.Selected_Mode = SensiType.evenDistribution
+            End If
+        End Set
+    End Property
+
+    <XmlIgnore()>
+    Public Property ModeLatinHypercube() As Boolean
+        Get
+            Return (Me.Selected_Mode = SensiType.latinHypercube)
+        End Get
+        Set(ByVal value As Boolean)
+            If (value = True) Then
+                Me.Selected_Mode = SensiType.latinHypercube
             End If
         End Set
     End Property

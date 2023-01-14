@@ -16,7 +16,6 @@
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
 Imports BlueM.Opt.Common.Constants
-Imports BlueM
 
 Public Class SensiPlotController
     Implements BlueM.Opt.Algos.IController
@@ -64,7 +63,7 @@ Public Class SensiPlotController
         'geschrieben, und zwar mit den in der OPT-Datei angegebenen Startwerten
         '------------------------------------------------------------------------
 
-        Dim i, j, n, Anz_SensiPara, Anz_Sim As Integer
+        Dim i, n, NumParams, NumSteps, NumSims As Integer
         Dim isOK As Boolean
         Dim ind As Common.Individuum
         Dim serie As Steema.TeeChart.Styles.Points
@@ -79,27 +78,32 @@ Public Class SensiPlotController
         SimReihen = New Collection()
 
         'Parameter
-        Anz_SensiPara = Me.mySettings.SensiPlot.Selected_OptParameters.Count
+        NumParams = Me.mySettings.SensiPlot.Selected_OptParameters.Count
+
+        'Steps
+        NumSteps = Me.mySettings.SensiPlot.Num_Steps
 
         'Anzahl Simulationen
-        If (Anz_SensiPara = 1) Then
+        'TODO: update this!
+        If (NumParams = 1) Then
             '1 Parameter
-            Anz_Sim = Me.mySettings.SensiPlot.Num_Steps
+            NumSims = NumSteps
         Else
             '2 Parameter
-            Anz_Sim = Me.mySettings.SensiPlot.Num_Steps ^ 2
+            NumSims = NumSteps ^ 2
         End If
 
         'Progress initialisieren
-        Call Me.myProgress.Initialize(0, 0, 0, Anz_Sim)
+        Call Me.myProgress.Initialize(0, 0, 0, NumSims)
 
         'Bei 2 OptParametern 3D-Diagramm vorbereiten
-        If (Anz_SensiPara > 1) Then
+        If (NumParams > 1) Then
             'Oberfläche
+            'TODO: make irregular triangle for LatinHypercube
             surface = New Steema.TeeChart.Styles.Surface(Me.myHauptDiagramm.Chart)
             surface.IrregularGrid = True
-            surface.NumXValues = Me.mySettings.SensiPlot.Num_Steps
-            surface.NumZValues = Me.mySettings.SensiPlot.Num_Steps
+            surface.NumXValues = NumSteps
+            surface.NumZValues = NumSteps
             '3D-Punkte
             serie3D = Me.myHauptDiagramm.getSeries3DPoint("Sensiplot", "Orange")
             'Diagramm drehen (rechter Mausbutton)
@@ -112,130 +116,117 @@ Public Class SensiPlotController
             surface.Cursor = System.Windows.Forms.Cursors.Hand
         End If
 
+        'sample optparameters
+        Dim parameterCombinations As New List(Of Double())
+        Dim sampler As New ParameterSampler()
+        parameterCombinations = sampler.Sample(NumParams, NumSteps, Me.mySettings.SensiPlot.Selected_Mode)
+
         'Simulationsschleife
         '-------------------
-        Randomize()
+        For i = 0 To parameterCombinations.Count - 1
 
-        n = 0
+            'Stop?
+            If (Me.stopped) Then Exit Sub
 
-        'Äussere Schleife (2. OptParameter)
-        '----------------------------------
-        For i = 0 To ((Me.mySettings.SensiPlot.Num_Steps - 1) * (Anz_SensiPara - 1))
+            n = i + 1
+            Common.Log.AddMessage(Common.Log.levels.info, $"Sensiplot simulation {n}:")
 
-            '2. OptParameterwert variieren
-            If (Anz_SensiPara > 1) Then
-                Select Case Me.mySettings.SensiPlot.Selected_Mode
-                    Case Common.Settings_Sensiplot.SensiType.randomDistribution
-                        Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Xn = Rnd()
-                    Case Common.Settings_Sensiplot.SensiType.evenDistribution
-                        Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Xn = i / (Me.mySettings.SensiPlot.Num_Steps - 1)
-                End Select
+            Dim parameterCombination As Double() = parameterCombinations(i)
+
+            'OptParameterwerte setzen
+            For p As Integer = 0 To NumParams - 1
+                With Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(p))
+                    .Xn = parameterCombination(p)
+                    Common.Log.AddMessage(Common.Log.levels.info, $"* OptParameter { .Bezeichnung}: {Convert.ToString(.RWert, Common.Provider.FortranProvider)}")
+                End With
+            Next
+
+            'Verlaufsanzeige aktualisieren
+            Call Me.myProgress.NextNachf()
+
+            'Einhaltung von OptParameter-Beziehung überprüfen
+            isOK = True
+            If (NumParams > 1) Then
+                'Es muss nur der zweite Parameter auf eine Beziehung geprüft werden
+                If (Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Beziehung <> Relationship.none) Then
+                    'Beziehung bezieht sich immer auf den in der Liste vorherigen Parameter
+                    If (Me.mySettings.SensiPlot.Selected_OptParameters(0) = Me.mySettings.SensiPlot.Selected_OptParameters(1) - 1) Then
+
+                        isOK = False
+
+                        Dim ref As Double = Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(0)).RWert
+                        Dim wert As Double = Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).RWert
+
+                        Select Case Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Beziehung
+                            Case Relationship.smaller_than
+                                If (wert < ref) Then isOK = True
+                            Case Relationship.smaller_equal
+                                If (wert <= ref) Then isOK = True
+                            Case Relationship.larger_than
+                                If (wert > ref) Then isOK = True
+                            Case Relationship.larger_equal
+                                If (wert >= ref) Then isOK = True
+                        End Select
+
+                    End If
+                End If
             End If
 
-            'Innere Schleife (1. OptParameter)
-            '---------------------------------
-            For j = 0 To Me.mySettings.SensiPlot.Num_Steps - 1
+            'Evaluierung nur bei isOK
+            If (isOK) Then
 
-                'Stop?
-                If (Me.stopped) Then Exit Sub
+                'Individuum instanzieren
+                ind = New Common.Individuum_PES("SensiPlot", n)
 
-                '1. OptParameterwert variieren
-                Select Case Me.mySettings.SensiPlot.Selected_Mode
-                    Case Common.Settings_Sensiplot.SensiType.randomDistribution
-                        Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(0)).Xn = Rnd()
-                    Case Common.Settings_Sensiplot.SensiType.evenDistribution
-                        Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(0)).Xn = j / (Me.mySettings.SensiPlot.Num_Steps - 1)
-                End Select
+                'OptParameter ins Individuum kopieren
+                ind.OptParameter = Me.myProblem.List_OptParameter
 
-                n += 1
-
-                'Verlaufsanzeige aktualisieren
-                Call Me.myProgress.NextNachf()
-
-                'Einhaltung von OptParameter-Beziehung überprüfen
-                isOK = True
-                If (Anz_SensiPara > 1) Then
-                    'Es muss nur der zweite Parameter auf eine Beziehung geprüft werden
-                    If (Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Beziehung <> Relationship.none) Then
-                        'Beziehung bezieht sich immer auf den in der Liste vorherigen Parameter
-                        If (Me.mySettings.SensiPlot.Selected_OptParameters(0) = Me.mySettings.SensiPlot.Selected_OptParameters(1) - 1) Then
-
-                            isOK = False
-
-                            Dim ref As Double = Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(0)).RWert
-                            Dim wert As Double = Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).RWert
-
-                            Select Case Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Beziehung
-                                Case Relationship.smaller_than
-                                    If (wert < ref) Then isOK = True
-                                Case Relationship.smaller_equal
-                                    If (wert <= ref) Then isOK = True
-                                Case Relationship.larger_than
-                                    If (wert > ref) Then isOK = True
-                                Case Relationship.larger_equal
-                                    If (wert >= ref) Then isOK = True
-                            End Select
-
-                        End If
+                'WorkDir einrichten
+                If Me.mySettings.SensiPlot.Save_Results Then
+                    'Unterverzeichnis einrichten
+                    WorkDir = IO.Path.Combine(Sim1.WorkDir_Original, $"sensiplot_{n:0000}")
+                    If Not IO.Directory.Exists(WorkDir) Then
+                        IO.Directory.CreateDirectory(WorkDir)
                     End If
+                    Sim1.copyDateset(WorkDir)
+                    Sim1.WorkDir_Current = WorkDir
+                Else
+                    'Simulation in Originalverzeichnis ausführen
+                    Sim1.WorkDir_Current = Sim1.WorkDir_Original
                 End If
 
-                'Evaluierung nur bei isOK
+                'Individuum in Sim evaluieren
+                isOK = Sim1.Evaluate(ind)
+
+                'TODO: Verletzte Constraints bei SensiPlot kenntlich machen? (#173)
+
+                'Erfolgreich evaluiertes Individuum in Diagramm eintragen
                 If (isOK) Then
-
-                    'Individuum instanzieren
-                    ind = New Common.Individuum_PES("SensiPlot", n)
-
-                    'OptParameter ins Individuum kopieren
-                    ind.OptParameter = Me.myProblem.List_OptParameter
-
-                    'WorkDir einrichten
-                    If Me.mySettings.SensiPlot.Save_Results Then
-                        'Unterverzeichnis einrichten
-                        WorkDir = IO.Path.Combine(Sim1.WorkDir_Original, "sensiplot_" & n.ToString("0000"))
-                        If Not IO.Directory.Exists(WorkDir) Then
-                            IO.Directory.CreateDirectory(WorkDir)
-                        End If
-                        Sim1.copyDateset(WorkDir)
-                        Sim1.WorkDir_Current = WorkDir
+                    If (NumParams = 1) Then
+                        '1 Parameter
+                        serie = Me.myHauptDiagramm.getSeriesPoint("SensiPlot", "Orange")
+                        serie.Add(ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), n.ToString())
                     Else
-                        'Simulation in Originalverzeichnis ausführen
-                        Sim1.WorkDir_Current = Sim1.WorkDir_Original
+                        '> 1 Parameter, plot first two opt parameters
+                        surface.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
+                        serie3D.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
                     End If
 
-                    'Individuum in Sim evaluieren
-                    isOK = Sim1.Evaluate(ind)
-
-                    'TODO: Verletzte Constraints bei SensiPlot kenntlich machen? (#173)
-
-                    'Erfolgreich evaluiertes Individuum in Diagramm eintragen
-                    If (isOK) Then
-                        If (Anz_SensiPara = 1) Then
-                            '1 Parameter
-                            serie = Me.myHauptDiagramm.getSeriesPoint("SensiPlot", "Orange")
-                            serie.Add(ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), n.ToString())
-                        Else
-                            '2 Parameter
-                            surface.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
-                            serie3D.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
-                        End If
-
-                        'Simulationsergebnis in Wave laden
-                        If (Me.mySettings.SensiPlot.Show_Wave) Then
-                            'SimReihe auslesen
-                            SimReihe = Sim1.SimErgebnis.Reihen(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
-                            'Lösungs-ID an Titel anhängen
-                            SimReihe.Title &= $" (Solution {n})"
-                            'SimReihe zu Collection hinzufügen
-                            SimReihen.Add(SimReihe)
-                        End If
+                    'Simulationsergebnis in Wave laden
+                    If (Me.mySettings.SensiPlot.Show_Wave) Then
+                        'SimReihe auslesen
+                        SimReihe = Sim1.SimErgebnis.Reihen(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
+                        'Lösungs-ID an Titel anhängen
+                        SimReihe.Title &= $" (Solution {n})"
+                        'SimReihe zu Collection hinzufügen
+                        SimReihen.Add(SimReihe)
                     End If
-
                 End If
 
-                System.Windows.Forms.Application.DoEvents()
+            End If
 
-            Next
+            System.Windows.Forms.Application.DoEvents()
+
         Next
 
         'Wave Diagramm anzeigen:
