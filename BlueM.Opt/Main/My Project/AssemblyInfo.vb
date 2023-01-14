@@ -32,6 +32,6 @@ Imports BlueM.Opt.Common.Constants
 ' mit '*' verwenden. Siehe unten
 
 
-<Assembly: AssemblyVersion("1.11.2.*")>
+<Assembly: AssemblyVersion("2.0.0.*")>
 
 
