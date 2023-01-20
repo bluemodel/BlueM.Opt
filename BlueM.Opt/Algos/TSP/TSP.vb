@@ -17,20 +17,10 @@
 '
 Imports System.IO
 
+''' <summary>
+''' Traveling Salesman Problem
+''' </summary>
 Public Class TSP
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse TSP Traveling Salesman Problem                                 ****
-    '****                                                                       ****
-    '**** Autor: Christoph Hübner                                               ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** Februar 2007                                                          ****
-    '*******************************************************************************
-    '*******************************************************************************
 
     '******* Konvention *******
     'Cities:      1 2 3 4 5 6 7

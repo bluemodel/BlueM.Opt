@@ -22,19 +22,10 @@ Imports System.Threading
 Imports BlueM.Opt.Common.Constants
 Imports BlueM
 
-'*******************************************************************************
-'*******************************************************************************
-'**** Klasse Sim                                                            ****
-'****                                                                       ****
-'**** Basisklasse für Simulationsmodelle wie BlueM und SMUSI                ****
-'****                                                                       ****
-'**** Autoren: Christoph Huebner, Felix Froehlich                           ****
-'****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'*******************************************************************************
-'*******************************************************************************
-
+''' <summary>
+''' Klasse Sim
+''' Basisklasse für Simulationsmodelle wie BlueM und SMUSI
+''' </summary>
 Public MustInherit Class Sim
 
 #Region "Eigenschaften"

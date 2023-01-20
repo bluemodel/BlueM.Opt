@@ -15,22 +15,11 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-'*******************************************************************************
-'*******************************************************************************
-'**** Klasse Settings                                                       ****
-'**** zum Speichern aller EVO-Einstellungen aus dem Form                    ****
-'****                                                                       ****
-'**** Autoren: Christoph Hübner, Felix Froehlich, Dirk Muschalla            ****
-'****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'****                                                                       ****
-'**** November 2007                                                         ****
-'*******************************************************************************
-'*******************************************************************************
-
 Imports System.Xml.Serialization
-
+''' <summary>
+''' Klasse Settings
+''' zum Speichern aller EVO-Einstellungen aus dem Form
+''' </summary>
 Public Class Settings
 
     'Klasse für generelle Settings

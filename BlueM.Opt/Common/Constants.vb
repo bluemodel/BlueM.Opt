@@ -18,18 +18,10 @@
 Option Strict Off
 Option Explicit On
 
+''' <summary>
+''' Modul mit Konstanten
+''' </summary>
 Public Module Constants
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Modul mit Konstanten                                                  ****
-    '****                                                                       ****
-    '**** Autoren: Felix Fröhlich, Christoph Hübner, Dirk Muschalla                            ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '*******************************************************************************
-    '*******************************************************************************
 
     'URL zur Hilfe
     Public Const HelpURL As String = "http://wiki.bluemodel.org/index.php/BlueM.Opt"

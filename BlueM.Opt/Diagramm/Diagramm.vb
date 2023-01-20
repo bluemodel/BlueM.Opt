@@ -15,19 +15,6 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-'*******************************************************************************
-'*******************************************************************************
-'**** Klasse Diagramm                                                       ****
-'****                                                                       ****
-'**** Erweiterung der Klasse Steema.TeeChart.TChart                         ****
-'****                                                                       ****
-'**** Autoren: Felix Froehlich, Christoph Hübner                            ****
-'****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'*******************************************************************************
-'*******************************************************************************
-
 Imports System.Drawing
 
 ''' <summary>

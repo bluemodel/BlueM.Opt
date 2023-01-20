@@ -15,19 +15,6 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-'*******************************************************************************
-'*******************************************************************************
-'**** BlueM.Opt                                                             ****
-'****                                                                       ****
-'**** Christoph Huebner, Felix Froehlich, Dirk Muschalla, Dominik Kerber    ****
-'**** Frank Reuﬂner                                                         ****
-'****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'****                                                                       ****
-'*******************************************************************************
-'*******************************************************************************
-
 Option Strict Off 'allows permissive type semantics. explicit narrowing conversions are not required 
 
 Imports System.Xml

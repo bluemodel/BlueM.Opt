@@ -15,14 +15,6 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-'*******************************************************************************
-'*******************************************************************************
-'**** Klasse EVO_Einstellungen                                              ****
-'****                                                                       ****
-'**** Autoren: Christoph Hübner, Felix Froehlich, Dirk Muschalla            ****
-'*******************************************************************************
-'*******************************************************************************
-
 Imports BlueM.Opt.Common.Constants
 
 Public Class EVO_Einstellungen

@@ -17,22 +17,10 @@
 '
 Imports BlueM.Opt.Common
 
+''' <summary>
+''' Wird derzeit für das NDSorting verwendet um es für die verschiedenen Kerne anwenden zu können
+''' </summary>
 Public Class Functions
-
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse Functions                                                      ****
-    '****                                                                       ****
-    '**** Wird derzeit für das NDSorting verwendet um es für die verschiedenen  ****
-    '**** Kerne anwenden zu können                                              ****
-    '****                                                                       ****
-    '**** Autoren: Christoph Hübner, Felix Froehlich                            ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '*******************************************************************************
-    '*******************************************************************************
 
     'Die Statische Variablen werden im Konstruktor übergeben
     '*******************************************************

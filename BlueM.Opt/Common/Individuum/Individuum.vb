@@ -15,18 +15,10 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+''' <summary>
+''' Basisklasse Individuum für das Speichern eines Evaluierungssatzes
+''' </summary>
 Public MustInherit Class Individuum
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Basisklasse Individuum für das Speichern eines Evaluierungssatzes     ****
-    '****                                                                       ****
-    '**** Autoren: Christoph Hübner, Felix Fröhlich                             ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '*******************************************************************************
-    '*******************************************************************************
 
 #Region "Eigenschaften"
 

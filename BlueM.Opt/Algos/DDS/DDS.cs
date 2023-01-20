@@ -22,22 +22,23 @@ using System.Text;
 
 namespace modelEAU.DDS
 {
-//Dynamically dimensioned Search (DDS) version 1.1 algorithm by Bryan Tolson
-//C# version based on the Fortran version (original was coded in Matlab)
-//Fortran version was coded in Nov 2005 by Bryan Tolson
-//This version is a reengineered version coded in Nov 2008 by Dirk Muschalla
-
-//DDS is an n-dimensional continuous global optimization algorithm.  It is coded as a 
-//minimizer but built into the code is a hidden transformation to make it capable of 
-//solving a maximization problem.  In a maximization problem, the algorithm minimizes 
-//the negative of the objective function F (-1*F).  User specifies in inputs 
-//whether it is a max or a min problem.
-
-//REFERENCE FOR THIS ALGORITHM:  
-//Tolson, B. A., and C. A. Shoemaker (2007), Dynamically dimensioned search algorithm 
-//for computationally efficient watershed model calibration, Water Resour. Res., 43, 
-//W01413, doi:10.1029/2005WR004723.
-
+    /// <summary>
+    /// Dynamically dimensioned Search (DDS) version 1.1 algorithm by Bryan Tolson
+    /// C# version based on the Fortran version (original was coded in Matlab)
+    /// Fortran version was coded in Nov 2005 by Bryan Tolson
+    /// This version is a reengineered version coded in Nov 2008 by Dirk Muschalla
+    /// 
+    /// DDS is an n-dimensional continuous global optimization algorithm.  It is coded as a 
+    /// minimizer but built into the code is a hidden transformation to make it capable of 
+    /// solving a maximization problem.  In a maximization problem, the algorithm minimizes 
+    /// the negative of the objective function F (-1*F).  User specifies in inputs 
+    /// whether it is a max or a min problem.
+    /// 
+    /// REFERENCE FOR THIS ALGORITHM:  
+    /// Tolson, B. A., and C. A. Shoemaker (2007), Dynamically dimensioned search algorithm 
+    /// for computationally efficient watershed model calibration, Water Resour. Res., 43, 
+    /// W01413, doi:10.1029/2005WR004723.
+    /// </summary>
     public class DDS : modelEAU.DDS.IDDS
     {
         # region declarations

@@ -15,19 +15,6 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-'*******************************************************************************
-'*******************************************************************************
-'**** Klasse Scatterplot                                                    ****
-'****                                                                       ****
-'**** Stellt ein Optimierungsergebnis als Scatterplot-Matrix dar            ****
-'****                                                                       ****
-'**** Autor: Felix Froehlich                                                ****
-'****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'*******************************************************************************
-'*******************************************************************************
-
 Imports System.Windows.Forms
 Imports System.Drawing
 

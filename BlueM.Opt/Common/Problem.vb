@@ -15,21 +15,11 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-'*******************************************************************************
-'*******************************************************************************
-'**** Klasse Problem                                                        ****
-'****                                                                       ****
-'**** Autoren: Christoph Hübner, Felix Fröhlich                             ****
-'****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'*******************************************************************************
-'*******************************************************************************
-
 Imports System.IO
 Imports BlueM
 
 ''' <summary>
+''' Klasse Problem
 ''' Definiert das zu lösende Optimierungsproblem
 ''' </summary>
 Public Class Problem

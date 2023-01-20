@@ -21,19 +21,10 @@ Imports BlueM.DllAdapter
 Imports BlueM
 Imports BlueM.Opt.Common
 
-'*******************************************************************************
-'*******************************************************************************
-'**** Klasse BlueMSim                                                       ****
-'****                                                                       ****
-'**** Funktionen zur Kontrolle von BlueMSim                                 ****
-'****                                                                       ****
-'**** Autoren: Christoph Huebner, Felix Froehlich                           ****
-'****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'*******************************************************************************
-'*******************************************************************************
-
+''' <summary>
+''' Klasse BlueMSim
+''' Funktionen zur Kontrolle von BlueMSim
+''' </summary>
 Public Class BlueMSim
     Inherits Sim
 

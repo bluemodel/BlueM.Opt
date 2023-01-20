@@ -15,17 +15,6 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-'*******************************************************************************
-'*******************************************************************************
-'**** Klasse EVO_Opt_Verlauf                                                ****
-'****                                                                       ****
-'**** Autoren: Christoph Hübner, Felix Fröhlich, Dirk Muschalla             ****
-'****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'*******************************************************************************
-'*******************************************************************************
-
 ''' <summary>
 ''' Ein Benutzersteuerelement, dass den in einem Progress-Objekt 
 ''' abgebildeten Optimierungsverlauf in GUI-Form wiedergibt

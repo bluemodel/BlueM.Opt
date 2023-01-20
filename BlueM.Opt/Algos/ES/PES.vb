@@ -17,30 +17,16 @@
 '
 Imports BlueM.Opt.Common
 
+''' <summary>
+''' Klasse PES (Parametric Evolution Strategy)
+''' Modifizierte Evolutionsstrategie nach Rechenberg und Schwefel
+''' Klasse enthält alle Funktionen und Methoden zur Anwendung der Evolutionsstrategie
+''' Literatur:
+''' 1) Rechenberg, Ingo, Evolutionsstrategie '94, Fromman-Holzboog, 1994
+''' 2) Schwefel, Hans-Paul, Evolution and Optimum Seeking, Wiley, 1995
+''' 3) Deb, Kalyanmoy, Multi-Objective Optimization using Evolutionary Algorithms, Wiley, 2001
+''' </summary>
 Public Class PES
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse PES (Parametric Evolution Strategy)                            ****
-    '****                                                                       ****
-    '**** Modifizierte Evolutionsstrategie nach Rechenberg und Schwefel         ****
-    '**** Klasse enthält alle Funktionen und Methoden zur Anwendung             ****
-    '**** der Evolutionsstategie                                                ****
-    '****                                                                       ****
-    '**** Literatur:                                                            ****
-    '**** 1) Rechenberg, Ingo, Evolutionsstrategie '94, Fromman-Holzboog, 1994  ****
-    '**** 2) Schwefel, Hans-Paul, Evolution and Optimum Seeking, Wiley, 1995    ****
-    '**** 3) Deb, Kalyanmoy, Multi-Objective Optimization using Evolutionary    ****
-    '****    Algorithms, Wiley, 2001                                            ****
-    '****                                                                       ****
-    '**** Autoren: Dirk Muschalla, Christoph Hübner                             ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '****                                                                       ****
-    '**** Dezember 2003                                                         ****
-    '*******************************************************************************
-    '*******************************************************************************
 
     'Deklarationsteil Variablen und Strukturen
     '#########################################

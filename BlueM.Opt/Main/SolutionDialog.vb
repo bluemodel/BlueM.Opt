@@ -15,21 +15,11 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+''' <summary>
+''' Zeigt die ausgewählten Lösungen an
+''' </summary>
 Partial Public Class SolutionDialog
     Inherits System.Windows.Forms.Form
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse SolutionDialog                                                 ****
-    '****                                                                       ****
-    '**** Zeigt die ausgewählten Lösungen an                                    ****
-    '****                                                                       ****
-    '**** Autoren: Felix Froehlich                                              ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '*******************************************************************************
-    '*******************************************************************************
 
     'Das Problem
     Private mProblem As BlueM.Opt.Common.Problem

@@ -15,21 +15,11 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+''' <summary>
+''' Klasse OptParameter
+''' für das Speichern eines Optimierungsparameters und zugehöriger Informationen
+''' </summary>
 Public Class OptParameter
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse OptParameter                                                   ****
-    '**** für das Speichern eines Optimierungsparameters                        ****
-    '**** und zugehöriger Informationen                                         ****
-    '****                                                                       ****
-    '**** Autoren:                                                              ****
-    '**** Felix Froehlich                                                       ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '*******************************************************************************
-    '*******************************************************************************
 
 #Region "Eigenschaften"
 

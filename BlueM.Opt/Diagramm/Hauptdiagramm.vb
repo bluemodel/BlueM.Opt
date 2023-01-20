@@ -15,21 +15,11 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+''' <summary>
+''' Diagramm zeigt Lösungen (Individuen) im Lösungsraum an
+''' </summary>
 Public Class Hauptdiagramm
     Inherits Diagramm
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse Hauptdiagramm                                                  ****
-    '****                                                                       ****
-    '**** Diagramm zeigt Lösungen (Individuen) im Lösungsraum an                ****
-    '****                                                                       ****
-    '**** Autor: Felix Froehlich                                                ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '*******************************************************************************
-    '*******************************************************************************
 
     'lokale Referenz auf Settings
     Private mSettings As BlueM.Opt.Common.Settings

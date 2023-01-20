@@ -19,19 +19,10 @@ Imports System.IO
 Imports IHWB.SWMM.DLLAdapter
 Imports System.Threading
 
-'*******************************************************************************
-'*******************************************************************************
-'**** Klasse SWMM                                                           ****
-'****                                                                       ****
-'**** Funktionen zur Kontrolle von EPA SWMM5                                ****
-'****                                                                       ****
-'**** Autoren: Dirk Muschalla                                               ****
-'****                                                                       ****
-'**** modelEAU                                                              ****
-'**** Université Laval                                                      ****
-'*******************************************************************************
-'*******************************************************************************
-
+''' <summary>
+''' Klasse SWMM
+''' Funktionen zur Kontrolle von EPA SWMM5
+''' </summary>
 Public Class SWMM
     Inherits Sim
 

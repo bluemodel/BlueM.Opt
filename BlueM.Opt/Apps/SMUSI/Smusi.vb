@@ -18,19 +18,10 @@
 Imports System.IO
 Imports IHWB.SMUSI.DllAdapter
 
-'*******************************************************************************
-'*******************************************************************************
-'**** Klasse SMUSI                                                          ****
-'****                                                                       ****
-'**** Funktionen zur Kontrolle von SMUSI                                    ****
-'****                                                                       ****
-'**** Autoren: Christoph Huebner, Felix Froehlich, Dirk Muschalla           ****
-'****                                                                       ****
-'**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-'**** TU Darmstadt                                                          ****
-'*******************************************************************************
-'*******************************************************************************
-
+''' <summary>
+''' Klasse SMUSI
+''' Funktionen zur Kontrolle von SMUSI
+''' </summary>
 Public Class Smusi
     Inherits Sim
 

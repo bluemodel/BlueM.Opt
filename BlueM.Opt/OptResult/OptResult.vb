@@ -17,21 +17,11 @@
 '
 Imports System.Data.OleDb
 
+''' <summary>
+''' Speichert und verwaltet die Ergebnisse eines Optimierungslaufs,
+''' schreibt die Ergebnisse in eine Datenbank
+''' </summary>
 Public Class OptResult
-
-    '*******************************************************************************
-    '*******************************************************************************
-    '**** Klasse OptResult                                                      ****
-    '****                                                                       ****
-    '**** Speichert und verwaltet die Ergebnisse eines Optimierungslaufs,       ****
-    '**** schreibt die Ergebnisse in eine Datenbank                             ****
-    '****                                                                       ****
-    '**** Autoren: Felix Froehlich, Christoph Hübner                            ****
-    '****                                                                       ****
-    '**** Fachgebiet Ingenieurhydrologie und Wasserbewirtschaftung              ****
-    '**** TU Darmstadt                                                          ****
-    '*******************************************************************************
-    '*******************************************************************************
 
     'Allgemeine Einstellungen
     Private Datensatz As String
