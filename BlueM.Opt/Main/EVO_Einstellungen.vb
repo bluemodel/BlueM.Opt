@@ -332,11 +332,15 @@ Public Class EVO_Einstellungen
     End Sub
 
     ''' <summary>
-    ''' Ensure that combobox changes are saved to the data binding immediately
+    ''' Ensure that control value changes are saved to the data binding immediately
+    ''' TODO: Why is this even necessary? And if it is, what is the point of binding?
+    '''       It seems to be only necessary for comboboxes and for when the NumericUpDown_NThreads is changed by typing a number into it
+    '''       Other NumericUpDowns seem to work as expected...
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
-    Private Sub ComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles _
+    Private Sub ControlValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles _
+        NumericUpDown_NThreads.ValueChanged,
         PES_Combo_OptEltern.SelectedIndexChanged,
         PES_Combo_DnMutation.SelectedIndexChanged,
         PES_Combo_Strategie.SelectedIndexChanged,
@@ -350,7 +354,7 @@ Public Class EVO_Einstellungen
         TSP_ComboBox_Reproductionoperator.SelectedIndexChanged,
         TSP_ComboBox_Mutationoperator.SelectedIndexChanged
 
-        CType(sender, ComboBox).DataBindings(0).WriteValue()
+        CType(sender, Control).DataBindings(0).WriteValue()
     End Sub
 
     ''' <summary>
