@@ -169,21 +169,26 @@ Public Class Talsim
         '------------------
         Dim Datei As String = IO.Path.Combine(Me.WorkDir_Original, Me.Datensatz & ".ALL")
 
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-
         'read all settings
-        Do
-            line = StrRead.ReadLine.ToString().Trim()
+        Try
+            Using FiStr As New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
+                Using StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+                    Do
+                        line = StrRead.ReadLine.ToString().Trim()
 
-            If line.Length = 0 Then Continue Do
+                        If line.Length = 0 Then Continue Do
 
-            If line.Contains("=") And Not (line.StartsWith("*") Or line.StartsWith("#") Or line.StartsWith("[")) Then
-                kvp = line.Split("=")
-                settings.Add(kvp(0).ToUpper(), kvp(1).ToUpper())
-            End If
+                        If line.Contains("=") And Not (line.StartsWith("*") Or line.StartsWith("#") Or line.StartsWith("[")) Then
+                            kvp = line.Split("=")
+                            settings.Add(kvp(0).ToUpper(), kvp(1).ToUpper())
+                        End If
 
-        Loop Until StrRead.Peek() = -1
+                    Loop Until StrRead.Peek() = -1
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw New Exception($"Error while reading file {Datei}: {ex.Message}")
+        End Try
 
         'check settings
         'WEL output

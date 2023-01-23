@@ -2,6 +2,11 @@
 BlueM.Opt Release Notes
 ===============================================================
 
+Version 2.0.1
+-------------
+FIXED:
+* Improved error handling when reading TALSIM simulation parameters
+
 Version 2.0.0
 -------------
 CHANGED:
