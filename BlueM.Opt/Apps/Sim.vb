@@ -196,7 +196,7 @@ Public MustInherit Class Sim
             Me.WorkDir_Current = Path.GetDirectoryName(pfad)
             Me.WorkDir_Original = Path.GetDirectoryName(pfad)
         Else
-            Throw New Exception($"Der Datensatz '{pfad}' existiert nicht!")
+            Throw New Exception($"Dataset '{pfad}' not found!")
         End If
 
         'Simulationsdaten einlesen

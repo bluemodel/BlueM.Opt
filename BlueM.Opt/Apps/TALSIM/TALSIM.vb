@@ -196,7 +196,7 @@ Public Class Talsim
             Throw New Exception("Key ""WEL"" not found in .ALL file!")
         End If
         If Not settings("WEL") = "J" Then
-            Throw New Exception("Die Ganglinienausgabe ist in der .ALL Datei nicht eingeschaltet! Es muss 'WEL=J' eingestellt sein!")
+            Throw New Exception($"Result output in WEL format is not switched on in {Datei}! Please set to 'WEL=J'!")
         End If
 
         'Simstart and Simend
