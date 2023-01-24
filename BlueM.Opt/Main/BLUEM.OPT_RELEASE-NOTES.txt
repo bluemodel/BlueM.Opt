@@ -6,6 +6,7 @@ Version 2.0.1
 -------------
 FIXED:
 * Improved error handling when reading TALSIM simulation parameters
+* Fixed error occurring when the selected solutions are changed and the custom plot window has not been opened yet
 
 Version 2.0.0
 -------------

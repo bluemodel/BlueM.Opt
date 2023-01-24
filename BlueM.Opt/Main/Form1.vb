@@ -1642,7 +1642,7 @@ Partial Public Class Form1
 
         'In the custom plot
         If (Not IsNothing(Me.customPlot)) Then
-            Call customPlot.clearSelection()
+            Call Me.customPlot.clearSelection()
         End If
 
         'Auswahl intern zurücksetzen
@@ -1686,10 +1686,12 @@ Partial Public Class Form1
         End If
 
         'Im CustomPlot neu zeichnen
-        Call Me.customPlot.clearSelection()
-        For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
-            Call Me.customPlot.showSelectedSolution(ind)
-        Next
+        If (Not IsNothing(Me.customPlot)) Then
+            Call Me.customPlot.clearSelection()
+            For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+                Call Me.customPlot.showSelectedSolution(ind)
+            Next
+        End If
 
     End Sub
 
