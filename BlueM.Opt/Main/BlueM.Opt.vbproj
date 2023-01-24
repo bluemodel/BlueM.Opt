@@ -296,7 +296,6 @@
     <None Include="Resources\chart_curve_edit.png" />
     <None Include="Resources\database_connect.png" />
     <None Include="Resources\database_go.png" />
-    <None Include="Resources\database_save.png" />
     <None Include="Resources\icon_teechart.png" />
     <None Include="Resources\scatterplot.ico" />
   </ItemGroup>

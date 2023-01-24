@@ -566,18 +566,6 @@ Public Class OptResult
 
     End Function
 
-    'Ergebnisdatenbank abspeichern (kopieren)
-    '****************************************
-    Public Sub db_save(ByVal targetFile As String)
-
-        'Datei kopieren
-        My.Computer.FileSystem.CopyFile(Me.db_path, targetFile, True)
-
-        'Neuen Dateipfad speichern
-        Me.db_path = targetFile
-
-    End Sub
-
     ''' <summary>
     ''' Optimierungsergebnis aus einer DB einlesen
     ''' </summary>

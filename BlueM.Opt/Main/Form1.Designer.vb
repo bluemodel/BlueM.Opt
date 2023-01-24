@@ -35,6 +35,7 @@ Partial Class Form1
         Dim ToolStripSeparator8 As System.Windows.Forms.ToolStripSeparator
         Dim ToolStripSeparator7 As System.Windows.Forms.ToolStripSeparator
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
+        Dim Margins1 As Steema.TeeChart.Margins = New Steema.TeeChart.Margins()
         Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_Help = New System.Windows.Forms.ToolStripMenuItem()
         Me.ReleaseNotesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -58,7 +59,6 @@ Partial Class Form1
         Me.ToolStripMenuItem_SettingsSave = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_SettingsLoad = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSplitButton_ErgebnisDB = New System.Windows.Forms.ToolStripSplitButton()
-        Me.ToolStripMenuItem_ErgebnisDBSave = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_ErgebnisDBLoad = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_ErgebnisDBCompare = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSplitButton_Diagramm = New System.Windows.Forms.ToolStripSplitButton()
@@ -326,7 +326,7 @@ Partial Class Form1
         '
         'ToolStripSplitButton_ErgebnisDB
         '
-        Me.ToolStripSplitButton_ErgebnisDB.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_ErgebnisDBSave, Me.ToolStripMenuItem_ErgebnisDBLoad, Me.ToolStripMenuItem_ErgebnisDBCompare})
+        Me.ToolStripSplitButton_ErgebnisDB.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_ErgebnisDBLoad, Me.ToolStripMenuItem_ErgebnisDBCompare})
         Me.ToolStripSplitButton_ErgebnisDB.Image = Global.BlueM.Opt.My.Resources.Resources.database
         Me.ToolStripSplitButton_ErgebnisDB.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripSplitButton_ErgebnisDB.Name = "ToolStripSplitButton_ErgebnisDB"
@@ -334,19 +334,11 @@ Partial Class Form1
         Me.ToolStripSplitButton_ErgebnisDB.Text = "Result"
         Me.ToolStripSplitButton_ErgebnisDB.ToolTipText = "Optimization result"
         '
-        'ToolStripMenuItem_ErgebnisDBSave
-        '
-        Me.ToolStripMenuItem_ErgebnisDBSave.Image = Global.BlueM.Opt.My.Resources.Resources.database_save
-        Me.ToolStripMenuItem_ErgebnisDBSave.Name = "ToolStripMenuItem_ErgebnisDBSave"
-        Me.ToolStripMenuItem_ErgebnisDBSave.Size = New System.Drawing.Size(169, 22)
-        Me.ToolStripMenuItem_ErgebnisDBSave.Text = "Save result DB..."
-        Me.ToolStripMenuItem_ErgebnisDBSave.ToolTipText = "Ergebnisdatenbank speichern..."
-        '
         'ToolStripMenuItem_ErgebnisDBLoad
         '
         Me.ToolStripMenuItem_ErgebnisDBLoad.Image = Global.BlueM.Opt.My.Resources.Resources.database_connect
         Me.ToolStripMenuItem_ErgebnisDBLoad.Name = "ToolStripMenuItem_ErgebnisDBLoad"
-        Me.ToolStripMenuItem_ErgebnisDBLoad.Size = New System.Drawing.Size(169, 22)
+        Me.ToolStripMenuItem_ErgebnisDBLoad.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem_ErgebnisDBLoad.Text = "Load result DB..."
         Me.ToolStripMenuItem_ErgebnisDBLoad.ToolTipText = "Optimierungsergebnis aus bestehender DB laden"
         '
@@ -354,7 +346,7 @@ Partial Class Form1
         '
         Me.ToolStripMenuItem_ErgebnisDBCompare.Image = Global.BlueM.Opt.My.Resources.Resources.database_go
         Me.ToolStripMenuItem_ErgebnisDBCompare.Name = "ToolStripMenuItem_ErgebnisDBCompare"
-        Me.ToolStripMenuItem_ErgebnisDBCompare.Size = New System.Drawing.Size(169, 22)
+        Me.ToolStripMenuItem_ErgebnisDBCompare.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem_ErgebnisDBCompare.Text = "Compare results..."
         Me.ToolStripMenuItem_ErgebnisDBCompare.ToolTipText = "mit einem anderen Optimierungsergebnis vergleichen"
         '
@@ -571,6 +563,7 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.Bottom.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.Bottom.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Title.Shadow.Brush.Visible = True
+        Me.Hauptdiagramm1.Axes.Bottom.UseMaxPixelPos = True
         '
         '
         '
@@ -683,6 +676,7 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.Depth.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.Depth.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Title.Shadow.Brush.Visible = True
+        Me.Hauptdiagramm1.Axes.Depth.UseMaxPixelPos = True
         '
         '
         '
@@ -795,6 +789,7 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Shadow.Brush.Visible = True
+        Me.Hauptdiagramm1.Axes.DepthTop.UseMaxPixelPos = True
         '
         '
         '
@@ -907,6 +902,7 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.Left.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.Left.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Title.Shadow.Brush.Visible = True
+        Me.Hauptdiagramm1.Axes.Left.UseMaxPixelPos = True
         '
         '
         '
@@ -1019,6 +1015,7 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.Right.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.Right.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Title.Shadow.Brush.Visible = True
+        Me.Hauptdiagramm1.Axes.Right.UseMaxPixelPos = True
         '
         '
         '
@@ -1131,6 +1128,7 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.Top.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.Top.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Title.Shadow.Brush.Visible = True
+        Me.Hauptdiagramm1.Axes.Top.UseMaxPixelPos = True
         '
         '
         '
@@ -1396,6 +1394,14 @@ Partial Class Form1
         Me.Hauptdiagramm1.Panel.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Panel.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Panel.Shadow.Brush.Visible = True
+        '
+        '
+        '
+        Margins1.Bottom = 100
+        Margins1.Left = 100
+        Margins1.Right = 100
+        Margins1.Top = 100
+        Me.Hauptdiagramm1.Printer.Margins = Margins1
         Me.Hauptdiagramm1.Size = New System.Drawing.Size(477, 627)
         '
         '
@@ -1725,7 +1731,6 @@ Partial Class Form1
     Private WithEvents ToolStripMenuItem_TChart2PNG As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_Tchart2CSV As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripSplitButton_ErgebnisDB As System.Windows.Forms.ToolStripSplitButton
-    Private WithEvents ToolStripMenuItem_ErgebnisDBSave As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_ErgebnisDBLoad As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_ErgebnisDBCompare As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_TChartEdit As System.Windows.Forms.ToolStripMenuItem

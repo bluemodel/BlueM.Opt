@@ -437,7 +437,6 @@ Partial Public Class Form1
             Me.ComboBox_Methode.Enabled = False
 
             'Toolbar-Buttons
-            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             Me.ToolStripButton_Scatterplot.Enabled = False
             Me.ToolStripButton_CustomPlot.Enabled = False
@@ -812,7 +811,6 @@ Partial Public Class Form1
             Me.Button_Start.Enabled = False
 
             'Toolbar-Buttons deaktivieren
-            Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             Me.ToolStripButton_Scatterplot.Enabled = False
             Me.ToolStripButton_CustomPlot.Enabled = False
@@ -1051,7 +1049,6 @@ Partial Public Class Form1
             'Ergebnis-Buttons
             Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
             If (Not IsNothing(Sim1)) Then
-                Me.ToolStripMenuItem_ErgebnisDBSave.Enabled = True
                 Me.ToolStripButton_Scatterplot.Enabled = True
                 Me.ToolStripButton_CustomPlot.Enabled = True
                 Me.ToolStripButton_SelectedSolutions.Enabled = True
@@ -1820,29 +1817,6 @@ Partial Public Class Form1
     '***************************************************************
     Private Sub Button_ErgebnisDB_ButtonClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripSplitButton_ErgebnisDB.ButtonClick
         Call Me.ToolStripSplitButton_ErgebnisDB.ShowDropDown()
-    End Sub
-
-    'Ergebnisdatenbank speichern
-    '***************************
-    Private Sub ErgebnisDB_Save(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_ErgebnisDBSave.Click
-
-        Dim diagresult As DialogResult
-
-        'Datei-speichern Dialog anzeigen
-        Me.SaveFileDialog1.Filter = "Access databases (*.mdb)|*.mdb"
-        Me.SaveFileDialog1.DefaultExt = "mdb"
-        Me.SaveFileDialog1.Title = "Save result DB as..."
-        Me.SaveFileDialog1.FileName = Sim1.Datensatz & "_Opt.mdb"
-        Me.SaveFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-        diagresult = Me.SaveFileDialog1.ShowDialog()
-
-        If (diagresult = Windows.Forms.DialogResult.OK) Then
-
-            'Ergebnisdatenbank speichern
-            Call Sim1.OptResult.db_save(Me.SaveFileDialog1.FileName)
-
-        End If
-
     End Sub
 
     'Optimierungsergebnis aus einer Datenbank einlesen
