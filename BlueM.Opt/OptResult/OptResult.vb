@@ -73,7 +73,7 @@ Public Class OptResult
 
         If (createNewMdb) Then
             'DB initialiseren
-            Call Me.db_init()
+            Call Me.db_init(prob.WorkDir, prob.Datensatz)
         End If
 
     End Sub
@@ -283,15 +283,19 @@ Public Class OptResult
     'Methoden für die Ergebnisdatenbank
     '##################################
 
-    'Datenbank vorbereiten
-    '*********************
-    Private Sub db_init()
+    ''' <summary>
+    ''' Initialize the result database by copying the template and then initiating db_prepare()
+    ''' </summary>
+    ''' <param name="workdir">Directory to save the database in</param>
+    ''' <param name="datasetname">Dataset name to use for the filename</param>
+    Private Sub db_init(workdir As String, datasetname As String)
 
-        'Ergebnisdatenbank in temporärem Verzeichnis anlegen
-        '---------------------------------------------------
+        'Ergebnisdatenbank anlegen
+        '-------------------------
 
         'Datenbankpfad
-        Me.db_path = IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "EVO.mdb")
+        Dim dateformat As String = "yyyyMMddHHmm"
+        Me.db_path = IO.Path.Combine(workdir, $"{datasetname}.BlueM.Opt.{DateTime.Now.ToString(dateformat)}.mdb")
 
         'Pfad zur Vorlage
         Dim db_source_path As String = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "EVO.mdb")

@@ -2,8 +2,10 @@
 BlueM.Opt Release Notes
 ===============================================================
 
-Version 2.0.1
+Version 2.1.0
 -------------
+CHANGED:
+* The result database is now always automatically saved in the directory of the dataset 
 FIXED:
 * Improved error handling when reading TALSIM simulation parameters
 * Fixed error occurring when the selected solutions are changed and the custom plot window has not been opened yet
