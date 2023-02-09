@@ -301,18 +301,30 @@ Public MustInherit Class ObjectiveFunction
             Case "LNNSE"
                 'Logarithmic Nash-Sutcliffe efficiency
                 '-------------------------------------
-                Dim obs_avg, zaehler, nenner, Qobs, Qsim, minValue As Double
-                obs_avg = RefReihe.Average
-                minValue = obs_avg / 100.0 ' define a minimum value, to prevent Math.Log(0) = -Infinity
-                zaehler = 0.0
-                nenner = 0.0
-                For i = 0 To SimReihe.Length - 1
-                    Qobs = Math.Max(minValue, RefReihe.Values(i))
-                    Qsim = Math.Max(minValue, SimReihe.Values(i))
-                    zaehler += (Math.Log(Qobs) - Math.Log(Qsim)) ^ 2
-                    nenner += (Math.Log(Qobs) - Math.Log(obs_avg)) ^ 2
+                Dim epsilon, avg_ln_obs As Double
+                ' negligible constant to prevent Math.Log(0) = -Infinity
+                ' Pushpalatha et al. (2012) DOI:10.1016/j.jhydrol.2011.11.055
+                epsilon = RefReihe.Average / 100.0
+
+                ' transform all values by adding epsilon and then logarithmisizing
+                Dim values_ref As New List(Of Double)
+                Dim values_sim As New List(Of Double)
+                For i = 0 To RefReihe.length - 1
+                    values_ref.Add(Math.Log(RefReihe.Values(i) + epsilon))
+                    values_sim.Add(Math.Log(SimReihe.Values(i) + epsilon))
                 Next
-                QWert = 1 - zaehler / nenner
+
+                avg_ln_obs = values_ref.Sum() / values_ref.Count
+
+                Dim sum_ln_diff_squared As Double = 0.0
+                Dim sum_ln_diff_avg_squared As Double = 0.0
+
+                For i = 0 To values_ref.Count - 1
+                    sum_ln_diff_squared += (values_ref(i) - values_sim(i)) ^ 2
+                    sum_ln_diff_avg_squared += (values_ref(i) - avg_ln_obs) ^ 2
+                Next
+
+                QWert = 1 - sum_ln_diff_squared / sum_ln_diff_avg_squared
 
             Case "DET", "KORR"
                 'Coefficient of determination r^2 (linear regression)
