@@ -229,11 +229,6 @@ Public MustInherit Class Sim
             Me.Akt.OptPara(i) = Me.mProblem.List_OptParameter(i).StartWert
         Next
 
-        'Ergebnisspeicher initialisieren
-        If (Me.StoreIndividuals) Then
-            Me.OptResult = New BlueM.Opt.OptResult.OptResult(Me.Datensatz, Me.mProblem)
-        End If
-
     End Sub
 
     ''' <summary>
@@ -251,6 +246,16 @@ Public MustInherit Class Sim
     ''' Simulationsparameter einlesen
     ''' </summary>
     Protected MustOverride Sub Read_SimParameter()
+
+    ''' <summary>
+    ''' Prepares the OptResult instance by initializing the database
+    ''' </summary>
+    Public Sub PrepareOptResult()
+        'Ergebnisspeicher initialisieren
+        If (Me.StoreIndividuals) Then
+            Me.OptResult = New BlueM.Opt.OptResult.OptResult(Me.Datensatz, Me.mProblem)
+        End If
+    End Sub
 
 #End Region 'Initialisierung
 

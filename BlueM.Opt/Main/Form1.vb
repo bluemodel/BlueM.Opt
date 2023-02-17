@@ -1032,7 +1032,6 @@ Partial Public Class Form1
     Private Sub StarteDurchlauf(ByRef AllOptTime As Stopwatch)
 
         Try
-
             'Stoppuhr
             Dim isOK, blnSimWeiter As Boolean
             AllOptTime.Start()
@@ -1079,6 +1078,9 @@ Partial Public Class Form1
 
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM
                     'Sim-Anwendungen
+
+                    'Prepare OptResult (database)
+                    Call Me.Sim1.PrepareOptResult()
 
                     'Simulationen vorbereiten
                     Call Me.Sim1.prepareSimulation()

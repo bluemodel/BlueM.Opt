@@ -2,6 +2,11 @@
 BlueM.Opt Release Notes
 ===============================================================
 
+Version 2.2.1
+-------------
+FIXED:
+* A result database is now only created once the optimization actually starts #232
+
 Version 2.2.0
 -------------
 FIXED:
