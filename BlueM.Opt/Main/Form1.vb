@@ -279,7 +279,6 @@ Partial Public Class Form1
 
         'Dialog einrichten
         OpenFileDialog1.Filter = "XML files (*.xml)|*.xml"
-        OpenFileDialog1.FileName = "Settings.xml"
         OpenFileDialog1.Title = "Select settings file"
         If (Not IsNothing(Sim1)) Then
             OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
@@ -290,108 +289,42 @@ Partial Public Class Form1
         'Dialog anzeigen
         If (OpenFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
 
-            'Settings aus Datei laden
-            Call Me.loadSettings(OpenFileDialog1.FileName)
+            Try
+                'Settings aus Datei laden
+                Call Me.loadSettings(OpenFileDialog1.FileName)
+
+            Catch ex As Exception
+                MsgBox("Error while reading settings:" & ex.Message, MsgBoxStyle.Exclamation)
+            End Try
 
         End If
 
-    End Sub
-
-    'EVO_Einstellungen speichern
-    '***************************
-    Private Sub Einstellungen_Save(ByVal sender As Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem_SettingsSave.Click
-
-        'Dialog einrichten
-        SaveFileDialog1.Filter = "XML files (*.xml)|*.xml"
-        SaveFileDialog1.FileName = "Settings.xml"
-        SaveFileDialog1.DefaultExt = "xml"
-        SaveFileDialog1.Title = "Save settings file"
-        If (Not IsNothing(Sim1)) Then
-            SaveFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-        Else
-            SaveFileDialog1.InitialDirectory = CurDir()
-        End If
-
-        'Dialog anzeigen
-        If (SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
-            Call Me.saveSettings(SaveFileDialog1.FileName)
-        End If
     End Sub
 
 #End Region 'UI
 
 #Region "Settings-IO"
 
-    ''' <summary>
-    ''' Speichern der Settings in einer XML-Datei
-    ''' </summary>
-    ''' <param name="filename">Pfad zur XML-Datei</param>
-    Public Sub saveSettings(ByVal filename As String)
-
-        Dim writer As IO.StreamWriter
-        Dim serializer As XmlSerializer
-
-        'Streamwriter öffnen
-        writer = New IO.StreamWriter(filename)
-
-        serializer = New XmlSerializer(GetType(Common.Settings), New XmlRootAttribute("Settings"))
-        serializer.Serialize(writer, Me.mSettings)
-
-        writer.Close()
-
-    End Sub
-
     'Laden der Settings aus einer XML-Datei
     '**************************************
     Public Sub loadSettings(ByVal filename As String)
 
-        Dim serializer As New XmlSerializer(GetType(Common.Settings))
-        Dim settings As Common.Settings
+        'read settings from file
+        Dim settings As Common.Settings = Common.Settings.Load(filename)
 
-        AddHandler serializer.UnknownElement, AddressOf serializerUnknownElement
-        AddHandler serializer.UnknownAttribute, AddressOf serializerUnknownAttribute
+        'Checks: PES OptMode has to be identical
+        If settings.PES.OptModus <> Me.mSettings.PES.OptModus Then
+            Throw New Exception("The loaded settings use a different optimization mode (single-/multiobjective) and are not compatible!")
+        End If
 
-        'Filestream öffnen
-        Dim fs As New IO.FileStream(filename, IO.FileMode.Open)
+        'Geladene Settings überall neu setzen
+        Me.mSettings = settings
+        Me.EVO_Einstellungen1.setSettings(Me.mSettings)
+        Me.Hauptdiagramm1.setSettings(Me.mSettings)
+        If (Not IsNothing(Me.Sim1)) Then
+            Me.Sim1.setSettings(Me.mSettings)
+        End If
 
-        Try
-            'Deserialisieren
-            'TODO: XmlDeserializationEvents ms-help://MS.VSCC.v90/MS.MSDNQTR.v90.en/fxref_system.xml/html/e0657840-5678-bf57-6e7a-1bd93b2b27d1.htm
-            settings = CType(serializer.Deserialize(fs), Common.Settings)
-
-            'Checks: PES OptMode has to be identical
-            If settings.PES.OptModus <> Me.mSettings.PES.OptModus Then
-                Throw New Exception("The loaded settings use a different optimization mode (single-/multiobjective) and are not compatible!")
-            End If
-
-            'Geladene Settings überall neu setzen
-            Me.mSettings = settings
-            Me.EVO_Einstellungen1.setSettings(Me.mSettings)
-            Me.Hauptdiagramm1.setSettings(Me.mSettings)
-            If (Not IsNothing(Me.Sim1)) Then
-                Me.Sim1.setSettings(Me.mSettings)
-            End If
-
-        Catch e As Exception
-            MsgBox("Error while reading settings!" & eol & e.Message, MsgBoxStyle.Exclamation)
-
-        Finally
-            fs.Close()
-
-        End Try
-
-    End Sub
-
-    'Fehlerbehandlung Serialisierung
-    '*******************************
-    Private Sub serializerUnknownElement(ByVal sender As Object, ByVal e As XmlElementEventArgs)
-        MsgBox("Error while reading settings:" & eol _
-            & $"The element '{e.Element.Name}' is unknown!", MsgBoxStyle.Exclamation)
-    End Sub
-
-    Private Sub serializerUnknownAttribute(ByVal sender As Object, ByVal e As XmlAttributeEventArgs)
-        MsgBox("Error while reading settings:" & eol _
-            & $"The attribute '{e.Attr.Name}' is unknown!", MsgBoxStyle.Exclamation)
     End Sub
 
 #End Region 'Settings-IO
@@ -1042,6 +975,7 @@ Partial Public Class Form1
             AllOptTime.Start()
             Dim starttime As DateTime = DateTime.Now
 
+            'set log file
             Dim logfilename As String = IO.Path.Combine(Me.mProblem.WorkDir, $"{Me.mProblem.Datensatz}.BlueM.Opt.{starttime:yyyyMMddHHmm}.log")
             BlueM.Opt.Common.Log.SetLogFile(logfilename)
 
@@ -1069,10 +1003,9 @@ Partial Public Class Form1
             'Anwendungs-Groupbox deaktivieren
             Me.GroupBox_Anwendung.Enabled = False
 
-            'Settings in temp-Verzeichnis speichern
-            Dim dir As String
-            dir = My.Computer.FileSystem.SpecialDirectories.Temp
-            Me.saveSettings(IO.Path.Combine(dir, "Settings.xml"))
+            'Save settings to file
+            Dim settingsFile As String = IO.Path.Combine(Me.mProblem.WorkDir, $"{Me.mProblem.Datensatz}.BlueM.Opt.{starttime:yyyyMMddHHmm}.settings.xml")
+            Me.mSettings.Save(settingsFile)
 
             'Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()

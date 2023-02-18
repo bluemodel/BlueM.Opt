@@ -7,9 +7,10 @@ Version 2.3.0
 NEW:
 * Log messages now have levels (DEBUG, INFO, WARNING, ERROR)
 * The log is now always saved to a file in the directory of the dataset
+* The settings are now always saved to a file in the directory of the dataset
 FIXED:
 * A result database is now only created once the optimization actually starts #232
-* Path to dataset is now part of error message when simulation of start values fails
+* The path to the dataset is now part of the error message when simulation of start values fails
 
 Version 2.2.0
 -------------

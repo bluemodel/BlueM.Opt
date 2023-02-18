@@ -56,7 +56,6 @@ Partial Class Form1
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton_New = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSplitButton_Settings = New System.Windows.Forms.ToolStripSplitButton()
-        Me.ToolStripMenuItem_SettingsSave = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_SettingsLoad = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSplitButton_ErgebnisDB = New System.Windows.Forms.ToolStripSplitButton()
         Me.ToolStripMenuItem_ErgebnisDBLoad = New System.Windows.Forms.ToolStripMenuItem()
@@ -303,25 +302,18 @@ Partial Class Form1
         '
         'ToolStripSplitButton_Settings
         '
-        Me.ToolStripSplitButton_Settings.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_SettingsSave, Me.ToolStripMenuItem_SettingsLoad})
+        Me.ToolStripSplitButton_Settings.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_SettingsLoad})
         Me.ToolStripSplitButton_Settings.Image = Global.BlueM.Opt.My.Resources.Resources.wrench
         Me.ToolStripSplitButton_Settings.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripSplitButton_Settings.Name = "ToolStripSplitButton_Settings"
         Me.ToolStripSplitButton_Settings.Size = New System.Drawing.Size(81, 22)
         Me.ToolStripSplitButton_Settings.Text = "Settings"
         '
-        'ToolStripMenuItem_SettingsSave
-        '
-        Me.ToolStripMenuItem_SettingsSave.Image = Global.BlueM.Opt.My.Resources.Resources.page_white_put
-        Me.ToolStripMenuItem_SettingsSave.Name = "ToolStripMenuItem_SettingsSave"
-        Me.ToolStripMenuItem_SettingsSave.Size = New System.Drawing.Size(153, 22)
-        Me.ToolStripMenuItem_SettingsSave.Text = "Save settings..."
-        '
         'ToolStripMenuItem_SettingsLoad
         '
         Me.ToolStripMenuItem_SettingsLoad.Image = Global.BlueM.Opt.My.Resources.Resources.page_white_get
         Me.ToolStripMenuItem_SettingsLoad.Name = "ToolStripMenuItem_SettingsLoad"
-        Me.ToolStripMenuItem_SettingsLoad.Size = New System.Drawing.Size(153, 22)
+        Me.ToolStripMenuItem_SettingsLoad.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem_SettingsLoad.Text = "Load settings..."
         '
         'ToolStripSplitButton_ErgebnisDB
@@ -338,7 +330,7 @@ Partial Class Form1
         '
         Me.ToolStripMenuItem_ErgebnisDBLoad.Image = Global.BlueM.Opt.My.Resources.Resources.database_connect
         Me.ToolStripMenuItem_ErgebnisDBLoad.Name = "ToolStripMenuItem_ErgebnisDBLoad"
-        Me.ToolStripMenuItem_ErgebnisDBLoad.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem_ErgebnisDBLoad.Size = New System.Drawing.Size(169, 22)
         Me.ToolStripMenuItem_ErgebnisDBLoad.Text = "Load result DB..."
         Me.ToolStripMenuItem_ErgebnisDBLoad.ToolTipText = "Optimierungsergebnis aus bestehender DB laden"
         '
@@ -346,7 +338,7 @@ Partial Class Form1
         '
         Me.ToolStripMenuItem_ErgebnisDBCompare.Image = Global.BlueM.Opt.My.Resources.Resources.database_go
         Me.ToolStripMenuItem_ErgebnisDBCompare.Name = "ToolStripMenuItem_ErgebnisDBCompare"
-        Me.ToolStripMenuItem_ErgebnisDBCompare.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem_ErgebnisDBCompare.Size = New System.Drawing.Size(169, 22)
         Me.ToolStripMenuItem_ErgebnisDBCompare.Text = "Compare results..."
         Me.ToolStripMenuItem_ErgebnisDBCompare.ToolTipText = "mit einem anderen Optimierungsergebnis vergleichen"
         '
@@ -1741,7 +1733,6 @@ Partial Class Form1
     Private WithEvents Button_Stop As System.Windows.Forms.Button
     Private WithEvents ToolStripButton_New As System.Windows.Forms.ToolStripButton
     Private WithEvents ToolStripButton_Monitor As System.Windows.Forms.ToolStripButton
-    Private WithEvents ToolStripMenuItem_SettingsSave As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripButton_SelectedSolutions As System.Windows.Forms.ToolStripButton
     Friend WithEvents ReleaseNotesToolStripMenuItem As ToolStripMenuItem

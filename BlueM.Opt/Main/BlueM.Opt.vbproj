@@ -288,7 +288,6 @@
     <None Include="Resources\table_lightning.png" />
     <None Include="Resources\table_delete.png" />
     <None Include="Resources\table.png" />
-    <None Include="Resources\page_white_put.png" />
     <None Include="Resources\page_white_get.png" />
     <None Include="Resources\wrench.png" />
     <None Include="Resources\monitor.png" />

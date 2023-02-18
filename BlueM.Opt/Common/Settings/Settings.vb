@@ -106,4 +106,59 @@ Public Class Settings
         Me.General.setStandard()
     End Sub
 
+    ''' <summary>
+    ''' Saves the current settings to an XML file
+    ''' </summary>
+    ''' <param name="path">path to file</param>
+    Public Sub Save(ByVal path As String)
+
+        Dim writer As IO.StreamWriter
+        Dim serializer As XmlSerializer
+
+        'Streamwriter öffnen
+        writer = New IO.StreamWriter(path)
+
+        serializer = New XmlSerializer(GetType(Settings), New XmlRootAttribute("Settings"))
+        serializer.Serialize(writer, Me)
+
+        writer.Close()
+
+    End Sub
+
+    ''' <summary>
+    ''' Loads settings from an XML file
+    ''' </summary>
+    ''' <param name="path">path to file</param>
+    ''' <returns></returns>
+    Public Shared Function Load(path As String) As Settings
+
+        Dim serializer As New XmlSerializer(GetType(Common.Settings))
+        Dim settings As Settings
+
+        AddHandler serializer.UnknownElement, AddressOf serializerUnknownElement
+        AddHandler serializer.UnknownAttribute, AddressOf serializerUnknownAttribute
+
+        'Filestream öffnen
+        Dim fs As New IO.FileStream(path, IO.FileMode.Open)
+
+        'Deserialisieren
+        'TODO: XmlDeserializationEvents ms-help://MS.VSCC.v90/MS.MSDNQTR.v90.en/fxref_system.xml/html/e0657840-5678-bf57-6e7a-1bd93b2b27d1.htm
+        settings = CType(serializer.Deserialize(fs), Common.Settings)
+
+        fs.Close()
+
+        Return settings
+
+    End Function
+
+    'Fehlerbehandlung Serialisierung
+    '*******************************
+    Private Shared Sub serializerUnknownElement(ByVal sender As Object, ByVal e As XmlElementEventArgs)
+        Throw New Exception($"The element '{e.Element.Name}' is unknown!")
+    End Sub
+
+    Private Shared Sub serializerUnknownAttribute(ByVal sender As Object, ByVal e As XmlAttributeEventArgs)
+        Throw New Exception($"The attribute '{e.Attr.Name}' is unknown!")
+    End Sub
+
 End Class
