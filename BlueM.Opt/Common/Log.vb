@@ -27,15 +27,46 @@ Public Module Log
     Public Event LogMessageAdded(msg As String)
 
     Private _Log As String
+    Private _File As String
+
+    ''' <summary>
+    ''' Sets the path to the log file to write to
+    ''' </summary>
+    ''' <param name="path"></param>
+    Public Sub SetLogFile(path As String)
+        _File = path
+        'write any already existing messages to file
+        If Not IsNothing(_Log) Then
+            IO.File.WriteAllText(_File, _Log)
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Clears the log and resets any file association
+    ''' </summary>
+    Public Sub Reset()
+        _Log = Nothing
+        _File = Nothing
+    End Sub
 
     ''' <summary>
     ''' Adds a new message to the log
     ''' </summary>
     ''' <param name="msg"></param>
     Public Sub AddMessage(msg As String)
+
+        'format message
         msg = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss") & ": " & msg & BlueM.Opt.Common.Constants.eol
+
+        'store
         _Log &= msg
-        'IO.File.AppendAllText("BlueM.Opt.log", msg)
+
+        'append to file
+        If Not IsNothing(_File) Then
+            IO.File.AppendAllText(_File, msg)
+        End If
+
+        'raise event
         RaiseEvent LogMessageAdded(msg)
     End Sub
 

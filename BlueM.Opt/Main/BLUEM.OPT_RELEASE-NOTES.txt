@@ -4,11 +4,11 @@ BlueM.Opt Release Notes
 
 Version 2.3.0
 -------------
+NEW:
+* The log is now always saved to a file in the directory of the dataset
 FIXED:
 * A result database is now only created once the optimization actually starts #232
 * Path to dataset is now part of error message when simulation of start values fails
-CHANGED:
-* Refactored logging
 
 Version 2.2.0
 -------------

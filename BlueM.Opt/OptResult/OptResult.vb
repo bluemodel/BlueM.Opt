@@ -54,9 +54,14 @@ Public Class OptResult
     ''' </summary>
     Public holdsOptparameters As Boolean
 
-    'Konstruktor
-    '***********
-    Public Sub New(ByVal Datensatzname As String, ByRef prob As Common.Problem, Optional ByVal createNewMdb As Boolean = True)
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
+    ''' <param name="Datensatzname"></param>
+    ''' <param name="prob"></param>
+    ''' <param name="createNewMdb"></param>
+    ''' <param name="starttime">optional start time to use for the database filename</param>
+    Public Sub New(ByVal Datensatzname As String, ByRef prob As Common.Problem, Optional ByVal createNewMdb As Boolean = True, Optional starttime As DateTime = Nothing)
 
         'Standardm‰ﬂig mit Optparametern
         Me.holdsOptparameters = True
@@ -72,8 +77,11 @@ Public Class OptResult
         ReDim Me.SekPops(-1)
 
         If (createNewMdb) Then
+            If IsNothing(starttime) Then
+                starttime = DateTime.Now
+            End If
             'DB initialiseren
-            Call Me.db_init(prob.WorkDir, prob.Datensatz)
+            Call Me.db_init(prob.WorkDir, prob.Datensatz, starttime)
         End If
 
     End Sub
@@ -288,14 +296,14 @@ Public Class OptResult
     ''' </summary>
     ''' <param name="workdir">Directory to save the database in</param>
     ''' <param name="datasetname">Dataset name to use for the filename</param>
-    Private Sub db_init(workdir As String, datasetname As String)
+    ''' <param name="starttime">Start time to use for the filename</param>
+    Private Sub db_init(workdir As String, datasetname As String, starttime As DateTime)
 
         'Ergebnisdatenbank anlegen
         '-------------------------
 
         'Datenbankpfad
-        Dim dateformat As String = "yyyyMMddHHmm"
-        Dim filename As String = $"{datasetname}.BlueM.Opt.{DateTime.Now.ToString(dateformat)}.mdb"
+        Dim filename As String = $"{datasetname}.BlueM.Opt.{starttime:yyyyMMddHHmm}.mdb"
         Me.db_path = IO.Path.Combine(workdir, filename)
 
         'Pfad zur Vorlage

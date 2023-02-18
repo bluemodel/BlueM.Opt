@@ -250,10 +250,11 @@ Public MustInherit Class Sim
     ''' <summary>
     ''' Prepares the OptResult instance by initializing the database
     ''' </summary>
-    Public Sub PrepareOptResult()
+    ''' <param name="starttime">start time to use for the database filename</param>
+    Public Sub PrepareOptResult(starttime As DateTime)
         'Ergebnisspeicher initialisieren
         If (Me.StoreIndividuals) Then
-            Me.OptResult = New BlueM.Opt.OptResult.OptResult(Me.Datensatz, Me.mProblem)
+            Me.OptResult = New BlueM.Opt.OptResult.OptResult(Me.Datensatz, Me.mProblem, True, starttime)
         End If
     End Sub
 

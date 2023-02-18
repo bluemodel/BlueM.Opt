@@ -137,6 +137,9 @@ Partial Public Class Form1
 
         Me.IsInitializing = True
 
+        'clear the log
+        BlueM.Opt.Common.Log.Reset()
+
         'Anwendungs-Groupbox aktivieren
         Me.GroupBox_Anwendung.Enabled = True
 
@@ -1033,9 +1036,14 @@ Partial Public Class Form1
     Private Sub StarteDurchlauf(ByRef AllOptTime As Stopwatch)
 
         Try
-            'Stoppuhr
             Dim isOK, blnSimWeiter As Boolean
+
+            'Stoppuhr
             AllOptTime.Start()
+            Dim starttime As DateTime = DateTime.Now
+
+            Dim logfilename As String = IO.Path.Combine(Me.mProblem.WorkDir, $"{Me.mProblem.Datensatz}.BlueM.Opt.{starttime:yyyyMMddHHmm}.log")
+            BlueM.Opt.Common.Log.SetLogFile(logfilename)
 
             'Optimierung starten
             '-------------------
@@ -1081,7 +1089,7 @@ Partial Public Class Form1
                     'Sim-Anwendungen
 
                     'Prepare OptResult (database)
-                    Call Me.Sim1.PrepareOptResult()
+                    Call Me.Sim1.PrepareOptResult(starttime)
 
                     'Simulationen vorbereiten
                     Call Me.Sim1.prepareSimulation()
@@ -1121,6 +1129,7 @@ Partial Public Class Form1
         Catch ex As Exception
 
             'Globale Fehlerbehandlung für Optimierungslauf:
+            BlueM.Opt.Common.Log.AddMessage(ex.Message)
             MsgBox(ex.Message, MsgBoxStyle.Critical, "Error")
 
         Finally
