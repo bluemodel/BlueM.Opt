@@ -470,6 +470,9 @@ Partial Public Class Form1
             'Progress zurücksetzen
             Call Me.mProgress.Initialize()
 
+            'log
+            Common.Log.AddMessage(Common.Log.levels.info, $"Set application to {Me.Anwendung}")
+
         Catch ex As Exception
 
             MsgBox("Error while initializing the application:" & eol & ex.Message, MsgBoxStyle.Critical)
@@ -704,6 +707,9 @@ Partial Public Class Form1
             'Progress zurücksetzen
             Call Me.mProgress.Initialize()
 
+            'log
+            Common.Log.AddMessage(Common.Log.levels.info, $"Set dataset to {selectedDatensatz}")
+
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical)
         End Try
@@ -920,11 +926,12 @@ Partial Public Class Form1
 
         'Problembeschreibung in Log schreiben
         '------------------------------------
+        Common.Log.AddMessage(Common.Log.levels.info, $"Set method to {Me.mProblem.Method}")
         Dim msg As String
-        msg = eol & "Optimization problem loaded:" & eol
-        msg &= "----------------------------" & eol
+        msg = "Optimization problem loaded:" & eol
         msg &= Me.mProblem.Description()
         Common.Log.AddMessage(Common.Log.levels.info, msg)
+
         Me.Monitor1.SelectTabLog()
         Me.Monitor1.Show()
 
@@ -959,9 +966,12 @@ Partial Public Class Form1
         'Stoppuhr
         Dim AllOptTime As New Stopwatch
 
+        Common.Log.AddMessage(Common.Log.levels.info, "Starting optimization...")
+
         Call StarteDurchlauf(AllOptTime)
 
         MsgBox("Optimization ended!", MsgBoxStyle.Information, "BlueM.Opt")
+
         Common.Log.AddMessage(Common.Log.levels.info, $"The optimization took {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
 
     End Sub
