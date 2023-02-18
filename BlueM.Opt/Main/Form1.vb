@@ -975,10 +975,6 @@ Partial Public Class Form1
             AllOptTime.Start()
             Dim starttime As DateTime = DateTime.Now
 
-            'set log file
-            Dim logfilename As String = IO.Path.Combine(Me.mProblem.WorkDir, $"{Me.mProblem.Datensatz}.BlueM.Opt.{starttime:yyyyMMddHHmm}.log")
-            BlueM.Opt.Common.Log.SetLogFile(logfilename)
-
             'Optimierung starten
             '-------------------
             Me.isRun = True
@@ -1003,10 +999,6 @@ Partial Public Class Form1
             'Anwendungs-Groupbox deaktivieren
             Me.GroupBox_Anwendung.Enabled = False
 
-            'Save settings to file
-            Dim settingsFile As String = IO.Path.Combine(Me.mProblem.WorkDir, $"{Me.mProblem.Datensatz}.BlueM.Opt.{starttime:yyyyMMddHHmm}.settings.xml")
-            Me.mSettings.Save(settingsFile)
-
             'Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()
 
@@ -1020,6 +1012,14 @@ Partial Public Class Form1
 
                 Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM
                     'Sim-Anwendungen
+
+                    'Save settings to file
+                    Dim settingsFile As String = IO.Path.Combine(Me.mProblem.WorkDir, $"{Me.mProblem.Datensatz}.BlueM.Opt.{starttime:yyyyMMddHHmm}.settings.xml")
+                    Me.mSettings.Save(settingsFile)
+
+                    'Set log file
+                    Dim logfilename As String = IO.Path.Combine(Me.mProblem.WorkDir, $"{Me.mProblem.Datensatz}.BlueM.Opt.{starttime:yyyyMMddHHmm}.log")
+                    BlueM.Opt.Common.Log.SetLogFile(logfilename)
 
                     'Prepare OptResult (database)
                     Call Me.Sim1.PrepareOptResult(starttime)
