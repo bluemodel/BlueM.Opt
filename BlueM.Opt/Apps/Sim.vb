@@ -290,7 +290,7 @@ Public MustInherit Class Sim
         Try
             Call Me.SIM_Ergebnis_auswerten(ind, storeInDB)
         Catch e As Exception
-            BlueM.Opt.Common.Log.AddMessage("ERROR: Failed to evaluate simulation: " & eol & e.Message)
+            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.error, "Failed to evaluate simulation: " & eol & e.Message)
             Return False
         End Try
 
@@ -375,7 +375,7 @@ Public MustInherit Class Sim
                         isOK(n_ind_Ready) = True
 
                     Catch e As Exception
-                        BlueM.Opt.Common.Log.AddMessage("ERROR: Failed to evaluate simulation: " & eol & e.Message)
+                        BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.error, "Failed to evaluate simulation: " & eol & e.Message)
                         isOK(n_ind_Ready) = False
                         SIM_Eval_is_OK = False
                     End Try

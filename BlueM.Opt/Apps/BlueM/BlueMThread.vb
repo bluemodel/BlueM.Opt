@@ -67,7 +67,7 @@ Public Class BlueMSimThread
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            BlueM.Opt.Common.Log.AddMessage(ex.Message)
+            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.error, ex.Message)
 
             'Simulation abschliessen
             Call bluem_dll.Finish()

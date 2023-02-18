@@ -30,6 +30,16 @@ Public Module Log
     Private _File As String
 
     ''' <summary>
+    ''' Log levels
+    ''' </summary>
+    Public Enum levels As Short
+        debug
+        info
+        warning
+        [error]
+    End Enum
+
+    ''' <summary>
     ''' Sets the path to the log file to write to
     ''' </summary>
     ''' <param name="path"></param>
@@ -53,10 +63,10 @@ Public Module Log
     ''' Adds a new message to the log
     ''' </summary>
     ''' <param name="msg"></param>
-    Public Sub AddMessage(msg As String)
+    Public Sub AddMessage(level As levels, msg As String)
 
         'format message
-        msg = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss") & ": " & msg & BlueM.Opt.Common.Constants.eol
+        msg = $"{DateTime.Now:dd.MM.yyyy HH:mm:ss} {level.ToString.ToUpper()}: {msg}{eol}"
 
         'store
         _Log &= msg

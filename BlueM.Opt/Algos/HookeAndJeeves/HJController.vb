@@ -183,7 +183,7 @@ Public Class HJController
                 durchlauf += 1
 
                 'Monitor
-                BlueM.Opt.Common.Log.AddMessage("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+                BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
 
                 'Individuum instanzieren
                 ind = New Common.Individuum_PES("HJ", durchlauf)
@@ -220,7 +220,7 @@ Public Class HJController
                     durchlauf += 1
 
                     'Monitor
-                    BlueM.Opt.Common.Log.AddMessage("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
 
                     'Individuum instanzieren
                     ind = New Common.Individuum_PES("HJ", durchlauf)
@@ -264,9 +264,9 @@ Public Class HJController
             Tastschritte_aktuell = 0
 
             'Monitor
-            BlueM.Opt.Common.Log.AddMessage("Tastschritte gesamt: " & Tastschritte_gesamt.ToString())
-            BlueM.Opt.Common.Log.AddMessage("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
-            BlueM.Opt.Common.Log.AddMessage("Tastschritte mittel: " & Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString())
+            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Tastschritte gesamt: " & Tastschritte_gesamt.ToString())
+            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Tastschritte mittel: " & Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString())
 
             'Extrapolationsschritt
             If (QNBest(0) < QBest(0)) Then
@@ -283,7 +283,7 @@ Public Class HJController
                 Extrapolationsschritte += 1
 
                 'Monitor
-                BlueM.Opt.Common.Log.AddMessage("Extrapolationsschritte: " & Extrapolationsschritte.ToString())
+                BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Extrapolationsschritte: " & Extrapolationsschritte.ToString())
 
                 k += 1
                 aktuellePara = HookJeeves.getLetzteParameter
@@ -293,7 +293,7 @@ Public Class HJController
                         Rueckschritte += 1
 
                         'Monitor
-                        BlueM.Opt.Common.Log.AddMessage("Rückschritte: " & Rueckschritte.ToString())
+                        BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Rückschritte: " & Rueckschritte.ToString())
 
                         k += -1
                         HookJeeves.Schrittweitenhalbierung()
@@ -313,7 +313,7 @@ Public Class HJController
                     HookJeeves.Rueckschritt()
 
                     'Monitor
-                    BlueM.Opt.Common.Log.AddMessage("Rückschritte: " & Rueckschritte.ToString())
+                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Rückschritte: " & Rueckschritte.ToString())
 
                     HookJeeves.Schrittweitenhalbierung()
                     aktuellePara = HookJeeves.getLetzteParameter()
