@@ -80,7 +80,7 @@ namespace BlueM.Opt.Algos.MetaEvo
         {
             Random rand = new Random();
             int difference2genpool = 0;
-            this.monitor1.LogAppend("Algo Manager: Input: Generated and Simulated Individuums: \r\n" + this.generationinfo(ref new_generation_input));
+            BlueM.Opt.Common.Log.AddMessage("Algo Manager: Input: Generated and Simulated Individuums: \r\n" + this.generationinfo(ref new_generation_input));
 
             if (settings.MetaEvo.OpMode == "Local Optimizer")
             {
@@ -107,7 +107,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                     localcounter2 = 0;
                     localcounter = difference2genpool;
                 }
-                this.monitor1.LogAppend("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+                BlueM.Opt.Common.Log.AddMessage("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
             }
 
             else if ((settings.MetaEvo.OpMode == "Both") || (settings.MetaEvo.OpMode == "Global Optimizer"))
@@ -144,7 +144,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 //4.3.Sortieren
                 //quicksort(ref wastepool, kriterium, 0, wastepool.Length - 1); //Nötig??
                 quicksort(ref genpool, kriterium, 0, genpool.Length - 1);
-                this.monitor1.LogAppend("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+                BlueM.Opt.Common.Log.AddMessage("Algo Manager: Result: New Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
 
                 //5.Solutionvolume berechnen (Reihenfolge im IF wichtig, da immer das solutionvolume berechnet werden soll)
                 if ((solutionvolume.calculate(ref genpool)) && (settings.MetaEvo.OpMode == "Both"))
@@ -157,7 +157,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 this.updateMonitor();
             }
 
-            this.monitor1.LogAppend("Algo Manager: Solutionvolume: Last Volume: " + solutionvolume.get_complete_infos());
+            BlueM.Opt.Common.Log.AddMessage("Algo Manager: Solutionvolume: Last Volume: " + solutionvolume.get_complete_infos());
         }
 
         //Erzeugt mit Hilfe von Algos die neuen Individuen
@@ -188,7 +188,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             {
                 this.genpool[i] = genpool_input[i].Clone_MetaEvo();
             }
-            this.monitor1.LogAppend("Algo Manager: Genpool: \r\n" + this.generationinfo(ref this.genpool));
+            BlueM.Opt.Common.Log.AddMessage("Algo Manager: Genpool: \r\n" + this.generationinfo(ref this.genpool));
         }
 
         //Wiederbelebte Feasible-Individuen wieder auf false setzen
@@ -270,7 +270,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                                 if (dominator > -1)
                                 {
                                     genpool_input[k].set_status("false#dominated#" + genpool_input[dominator].ID);
-                                    this.monitor1.LogAppend("Algo Manager: Domination: Individuum " + genpool_input[k].ID + " is dominated (by Individuum " + genpool_input[dominator].ID + ")");
+                                    BlueM.Opt.Common.Log.AddMessage("Algo Manager: Domination: Individuum " + genpool_input[k].ID + " is dominated (by Individuum " + genpool_input[dominator].ID + ")");
                                     dominator = -1;
                                 }
                             }
@@ -317,17 +317,17 @@ namespace BlueM.Opt.Algos.MetaEvo
                                 {
                                     case -1:
                                         input2[pointer_newgen].set_status("false#dominated#" + genpool_input[pointer_genpool].ID);
-                                        this.monitor1.LogAppend("Algo Manager: Domination: Individuum " + input2[pointer_newgen].ID + " is dominated (by Individuum " + genpool_input[pointer_genpool].ID + ")");
+                                        BlueM.Opt.Common.Log.AddMessage("Algo Manager: Domination: Individuum " + input2[pointer_newgen].ID + " is dominated (by Individuum " + genpool_input[pointer_genpool].ID + ")");
                                         break;
 
                                     case 1:
                                         genpool_input[pointer_genpool].set_status("false#dominated#" + input2[pointer_newgen].ID);
-                                        this.monitor1.LogAppend("Algo Manager: Domination: Individuum " + genpool_input[pointer_genpool].ID + " is dominated (by Individuum " + input2[pointer_newgen].ID + ")");
+                                        BlueM.Opt.Common.Log.AddMessage("Algo Manager: Domination: Individuum " + genpool_input[pointer_genpool].ID + " is dominated (by Individuum " + input2[pointer_newgen].ID + ")");
                                         break;
 
                                     case 0:
                                         genpool_input[pointer_genpool].set_status("false#equal#" + input2[pointer_newgen].ID);
-                                        this.monitor1.LogAppend("Algo Manager: Domination: Individuum " + genpool_input[pointer_genpool].ID + " equals Individuum " + input2[pointer_newgen].ID);
+                                        BlueM.Opt.Common.Log.AddMessage("Algo Manager: Domination: Individuum " + genpool_input[pointer_genpool].ID + " equals Individuum " + input2[pointer_newgen].ID);
                                         break;
 
                                     case 10:
@@ -351,7 +351,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             double[] densities = new double[genpool_input.Length + killindividuums];
             int pointer = 0;
 
-            this.monitor1.LogAppend("Algo Manager: Number of new Individuums has a difference to Genpool-size: +" + killindividuums_input + " -> Crowding Selection");
+            BlueM.Opt.Common.Log.AddMessage("Algo Manager: Number of new Individuums has a difference to Genpool-size: +" + killindividuums_input + " -> Crowding Selection");
 
             //Arbeits-Array erstellen (genau so gross dass alle "true"-Individuen Platz finden)
             BlueM.Opt.Common.Individuum_MetaEvo[] work = new BlueM.Opt.Common.Individuum_MetaEvo[genpool_input.Length + killindividuums];
@@ -385,10 +385,10 @@ namespace BlueM.Opt.Algos.MetaEvo
                     if (densities[i] > densities[pointer]) pointer = i;
                     //tmp = tmp + " ["+i+"]:" + densities[i]+ " ";
                 }
-                //this.monitor1.LogAppend("Algo Manager: Crowding: Densities: " + tmp);
+                //BlueM.Opt.Common.Log.AddMessage("Algo Manager: Crowding: Densities: " + tmp);
 
                 densities[pointer] = 0;
-                this.monitor1.LogAppend("Algo Manager: Crowding: Individuum " + work[pointer].ID + " is not used anymore");
+                BlueM.Opt.Common.Log.AddMessage("Algo Manager: Crowding: Individuum " + work[pointer].ID + " is not used anymore");
                 work[pointer].set_status("false#crowding#0");
 
                 killindividuums--;
@@ -405,7 +405,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             int pointer = 0;
             double distance = -1;
 
-            this.monitor1.LogAppend("Algo Manager: Number of new Individuums has a difference to Genpool-size: " + numberawake_input + " -> Revive");
+            BlueM.Opt.Common.Log.AddMessage("Algo Manager: Number of new Individuums has a difference to Genpool-size: " + numberawake_input + " -> Revive");
 
             //Arbeits-Array erstellen 
             BlueM.Opt.Common.Individuum_MetaEvo[] work = new BlueM.Opt.Common.Individuum_MetaEvo[genpool_input.Length + input2.Length];
@@ -472,7 +472,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                     if ((distances[i, 2] > distances[pointer_highest_ranking, 2]) && (work[pointer_highest_ranking].get_status_reason() != "constraints")) pointer_highest_ranking = i;
                 }
                 distances[pointer_highest_ranking, 2] = -1;
-                this.monitor1.LogAppend("Algo Manager: Diversity: Individuum " + work[pointer_highest_ranking].ID + " is used again");
+                BlueM.Opt.Common.Log.AddMessage("Algo Manager: Diversity: Individuum " + work[pointer_highest_ranking].ID + " is used again");
                 work[pointer_highest_ranking].set_status("true");
 
                 numberawake_input++;
@@ -599,7 +599,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 algos.algofeedbackarray[i].number_individuals_for_nextGen = 0;
             }
 
-            this.monitor1.LogAppend("Algo Manager: nemGen_composition: Initiativ-sum: " + initiativensumme);
+            BlueM.Opt.Common.Log.AddMessage("Algo Manager: nemGen_composition: Initiativ-sum: " + initiativensumme);
 
             //5. number_individuals_for_nextGen neu setzen
             initproind = initiativensumme / new_generation_input.Length;
@@ -622,13 +622,13 @@ namespace BlueM.Opt.Algos.MetaEvo
             {
                 log[algos.algofeedbackarray.Length] = log[algos.algofeedbackarray.Length] + log[i] + " Initiative: " + algos.algofeedbackarray[i].initiative + " = " + algos.algofeedbackarray[i].number_individuals_for_nextGen + " Individuums for next generation\r\n";    
             }
-            this.monitor1.LogAppend("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log[algos.algofeedbackarray.Length]);
+            BlueM.Opt.Common.Log.AddMessage("Algo Manager: nemGen_composition: Individuuum-Composition for next Generation:\r\n" + log[algos.algofeedbackarray.Length]);
 
 
             //7. Initiative bei Bedarf erhöhen (Falls zur Berechnung zu klein)
             if (initiativensumme < 1.00)
             {
-                this.monitor1.LogAppend("Algo Manager: nemGen_composition: Initiative will be increased to the sum of 1(was too low for good calculation)");
+                BlueM.Opt.Common.Log.AddMessage("Algo Manager: nemGen_composition: Initiative will be increased to the sum of 1(was too low for good calculation)");
                 double tmp = 1 / initiativensumme;
                 for (int i = 0; i < algos.algofeedbackarray.Length; i++)
                 {
@@ -667,7 +667,7 @@ namespace BlueM.Opt.Algos.MetaEvo
 
             if (settings.MetaEvo.NumberResults < genpool.Length)
             {
-                this.monitor1.LogAppend("Algo Manager: Reducing Genpool to " + settings.MetaEvo.NumberResults + " Individuums");
+                BlueM.Opt.Common.Log.AddMessage("Algo Manager: Reducing Genpool to " + settings.MetaEvo.NumberResults + " Individuums");
                 //Nur noch NumberResults Individuen überleben
                 crowding_selection((genpool.Length - settings.MetaEvo.NumberResults), ref genpool, ref new_generation_input);
                 //Lokaler Algo darf nur NumberResults Prozesse Starten
@@ -679,7 +679,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 copy_some_to(ref new_generation_input, ref new_generation_input2);
                 genpool = genpool2;
                 new_generation_input = new_generation_input2;
-                this.monitor1.LogAppend("Algo Manager: Genpool for local Optimization: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+                BlueM.Opt.Common.Log.AddMessage("Algo Manager: Genpool for local Optimization: \r\n" + this.generationinfo(ref genpool) + "\r\n");
 
             }
 
@@ -701,14 +701,14 @@ namespace BlueM.Opt.Algos.MetaEvo
         {
             if (settings.MetaEvo.NumberResults < genpool.Length)
             {
-                this.monitor1.LogAppend("Algo Manager: Reducing Genpool to " + settings.MetaEvo.NumberResults + " Individuums");
+                BlueM.Opt.Common.Log.AddMessage("Algo Manager: Reducing Genpool to " + settings.MetaEvo.NumberResults + " Individuums");
                 //Nur noch NumberResults Individuen überleben
                 crowding_selection((genpool.Length - settings.MetaEvo.NumberResults), ref genpool, ref new_generation_input);
                 //Neuen Genpool und Generation wegen Lösungsreduzierung
                 BlueM.Opt.Common.Individuum_MetaEvo[] genpool2 = new BlueM.Opt.Common.Individuum_MetaEvo[settings.MetaEvo.NumberResults];
                 copy_true_to(ref genpool, ref genpool2);
                 genpool = genpool2;
-                this.monitor1.LogAppend("Algo Manager: Final Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
+                BlueM.Opt.Common.Log.AddMessage("Algo Manager: Final Genpool: \r\n" + this.generationinfo(ref genpool) + "\r\n");
             }
         }
 

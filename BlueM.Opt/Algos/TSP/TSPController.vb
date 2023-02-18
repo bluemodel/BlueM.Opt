@@ -28,7 +28,6 @@ Public Class TSPController
     End Property
 
     Private myHauptDiagramm As BlueM.Opt.Diagramm.Hauptdiagramm
-    Private myMonitor As BlueM.Opt.Diagramm.Monitor
     Private myProblem As BlueM.Opt.Common.Problem
     Private mySettings As BlueM.Opt.Common.Settings
     Private myProgress As BlueM.Opt.Common.Progress
@@ -49,7 +48,6 @@ Public Class TSPController
         Me.mySettings = inputSettings
         Me.myProgress = inputProgress
         Me.myHauptDiagramm = inputHptDiagramm
-        Me.myMonitor = BlueM.Opt.Diagramm.Monitor.getInstance()
 
         Stopp = False
     End Sub
@@ -82,20 +80,16 @@ Public Class TSPController
         'Progress
         Me.myProgress.Initialize(0, 0, Me.mySettings.TSP.N_Gen, Me.mySettings.TSP.N_Children)
 
-        'Monitor Stuff
-        With Me.myMonitor
-            .SelectTabLog()
-            .Show()
-            .LogAppend("Cities: " & Me.mySettings.TSP.N_Cities)
-            .LogAppend("Combinations: " & TSP1.n_Comb(Me.mySettings.TSP.N_Cities))
-            .LogAppend("Parents: " & Me.mySettings.TSP.N_Parents)
-            .LogAppend("Children: " & Me.mySettings.TSP.N_Children)
-            .LogAppend("Generations: " & Me.mySettings.TSP.N_Gen)
-            .LogAppend("Evaluations: " & Me.mySettings.TSP.N_Children * Me.mySettings.TSP.N_Gen)
-            If Me.mySettings.TSP.Problem = Common.EnProblem.circle Then
-                .LogAppend("Quality Aim: " & Conversion.Int(TSP1.circumference))
-            End If
-        End With
+        'Log
+        BlueM.Opt.Common.Log.AddMessage("Cities: " & Me.mySettings.TSP.N_Cities)
+        BlueM.Opt.Common.Log.AddMessage("Combinations: " & TSP1.n_Comb(Me.mySettings.TSP.N_Cities))
+        BlueM.Opt.Common.Log.AddMessage("Parents: " & Me.mySettings.TSP.N_Parents)
+        BlueM.Opt.Common.Log.AddMessage("Children: " & Me.mySettings.TSP.N_Children)
+        BlueM.Opt.Common.Log.AddMessage("Generations: " & Me.mySettings.TSP.N_Gen)
+        BlueM.Opt.Common.Log.AddMessage("Evaluations: " & Me.mySettings.TSP.N_Children * Me.mySettings.TSP.N_Gen)
+        If Me.mySettings.TSP.Problem = Common.EnProblem.circle Then
+            BlueM.Opt.Common.Log.AddMessage("Quality Aim: " & Conversion.Int(TSP1.circumference))
+        End If
 
         Select Case TSP1.Mode
 
@@ -114,7 +108,7 @@ Public Class TSPController
 
                     For M = 1 To 4
                         Me.mySettings.TSP.MutOperator = M
-                        Me.myMonitor.LogAppend($"ReprodOperator: {Me.mySettings.TSP.ReprodOperator}; MutationOperator: {Me.mySettings.TSP.MutOperator}")
+                        BlueM.Opt.Common.Log.AddMessage($"ReprodOperator: {Me.mySettings.TSP.ReprodOperator}; MutationOperator: {Me.mySettings.TSP.MutOperator}")
 
                         'n Wiederholungen
                         For i = 1 To TSP1.nTests
@@ -140,8 +134,8 @@ Public Class TSPController
                 Next
                 Time.Stop()
 
-                Me.myMonitor.LogAppend($"Number of calculations: {j}")
-                Me.myMonitor.LogAppend($"Time elapsed: {Time.Elapsed.Hours}h {Time.Elapsed.Minutes}m {Time.Elapsed.Seconds}s {Time.Elapsed.Milliseconds}ms")
+                BlueM.Opt.Common.Log.AddMessage($"Number of calculations: {j}")
+                BlueM.Opt.Common.Log.AddMessage($"Time elapsed: {Time.Elapsed.Hours}h {Time.Elapsed.Minutes}m {Time.Elapsed.Seconds}s {Time.Elapsed.Milliseconds}ms")
 
         End Select
     End Sub
@@ -207,7 +201,7 @@ Public Class TSPController
                 jepp += increm
                 Me.myProgress.iGen() = gen
                 If Batch_Mode = False Then
-                    Me.myMonitor.LogAppend($"Gen.: {gen}; Length: {Conversion.Int(TSP1.ParentList(0).Penalty)}; Factor: {Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven)}")
+                    BlueM.Opt.Common.Log.AddMessage($"Gen.: {gen}; Length: {Conversion.Int(TSP1.ParentList(0).Penalty)}; Factor: {Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven)}")
                     'png Export
                     If TSP1.pngExport = True And Conversion.Int(TSP1.ParentList(0).Penalty) < PenaltyTMP Then
                         Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
@@ -242,7 +236,7 @@ Public Class TSPController
                 If Batch_Mode = False Then
                     Call Zeichnen_TSP(TSP1.ParentList(0).Image)
                     Me.myHauptDiagramm.Update()
-                    Me.myMonitor.LogAppend($"Gen.: {gen}; Length: {Conversion.Int(TSP1.ParentList(0).Penalty)}; Factor: {Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven)}")
+                    BlueM.Opt.Common.Log.AddMessage($"Gen.: {gen}; Length: {Conversion.Int(TSP1.ParentList(0).Penalty)}; Factor: {Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven)}")
                     'png Export
                     If TSP1.pngExport = True Then
                         Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
@@ -262,7 +256,7 @@ Public Class TSPController
 
         Next gen
 
-        Me.myMonitor.LogAppend("Final Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
+        BlueM.Opt.Common.Log.AddMessage("Final Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
 
     End Sub
 

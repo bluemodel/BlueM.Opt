@@ -108,7 +108,7 @@ Public Class TalsimThread
                 'start
                 proc = Process.Start(startInfo)
                 'DEBUG: write to log
-                'BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Thread {Me.Thread_ID}: {startInfo.FileName} {startInfo.Arguments}")
+                'BlueM.Opt.Common.Log.AddMessage($"Thread {Me.Thread_ID}: {startInfo.FileName} {startInfo.Arguments}")
                 'wait until finished
                 Do
                     isFinished = proc.WaitForExit(100)
@@ -143,13 +143,13 @@ Public Class TalsimThread
                 End If
 
                 'Log error message
-                BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend(errmsg)
+                BlueM.Opt.Common.Log.AddMessage(errmsg)
 
                 If i_attempt < n_attempts Then
-                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, trying again...")
+                    BlueM.Opt.Common.Log.AddMessage($"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, trying again...")
                     System.Threading.Thread.Sleep(100)
                 Else
-                    BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, parameter set will be discarded!")
+                    BlueM.Opt.Common.Log.AddMessage($"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, parameter set will be discarded!")
                 End If
 
             Next
@@ -157,7 +157,7 @@ Public Class TalsimThread
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend(ex.Message)
+            BlueM.Opt.Common.Log.AddMessage(ex.Message)
 
             'Simulation nicht erfolgreich
             Me.SimIsOK = False

@@ -87,6 +87,7 @@
     </Compile>
     <Compile Include="Individuum\Individuum_MetaEvo.vb" />
     <Compile Include="Individuum\Individuum_PES.vb" />
+    <Compile Include="Log.vb" />
     <Compile Include="Modellparameter.vb" />
     <Compile Include="ObjectiveFunctions\ObjectiveFunction_Aggregate.vb" />
     <Compile Include="ObjectiveFunctions\ObjectiveFunction_Series.vb" />

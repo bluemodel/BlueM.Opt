@@ -2,11 +2,13 @@
 BlueM.Opt Release Notes
 ===============================================================
 
-Version 2.2.1
+Version 2.3.0
 -------------
 FIXED:
 * A result database is now only created once the optimization actually starts #232
-* Output path to dataset in error message when simulation of start values fails
+* Path to dataset is now part of error message when simulation of start values fails
+CHANGED:
+* Refactored logging
 
 Version 2.2.0
 -------------

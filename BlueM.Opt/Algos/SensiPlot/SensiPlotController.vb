@@ -33,7 +33,6 @@ Public Class SensiPlotController
     Private myProblem As BlueM.Opt.Common.Problem
     Private mySettings As BlueM.Opt.Common.Settings
     Private myProgress As BlueM.Opt.Common.Progress
-    Private myMonitor As BlueM.Opt.Diagramm.Monitor
     Private myHauptDiagramm As BlueM.Opt.Diagramm.Hauptdiagramm
 
     Private myAppType As BlueM.Opt.Common.ApplicationTypes
@@ -46,8 +45,6 @@ Public Class SensiPlotController
         Me.mySettings = inputSettings
         Me.myProgress = inputProgress
         Me.myHauptDiagramm = inputHptDiagramm
-
-        Me.myMonitor = BlueM.Opt.Diagramm.Monitor.getInstance()
     End Sub
 
     Public Sub InitApp(ByRef inputSim As Apps.Sim) Implements IController.InitApp

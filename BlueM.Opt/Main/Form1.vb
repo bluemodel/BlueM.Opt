@@ -102,7 +102,6 @@ Partial Public Class Form1
 
 #End Region 'Eigenschaften
 
-
 #Region "Methoden"
 
 #Region "UI"
@@ -117,6 +116,8 @@ Partial Public Class Form1
         Me.Monitor1 = BlueM.Opt.Diagramm.Monitor.getInstance()
         'Monitor zentrieren
         Me.Monitor1.Location = New Drawing.Point(Me.Location.X + Me.Width / 2 - Me.Monitor1.Width / 2, Me.Location.Y + Me.Height / 2 - Me.Monitor1.Height / 2)
+        'Add handler for log messages
+        AddHandler BlueM.Opt.Common.Log.LogMessageAdded, AddressOf Monitor1.LogAppend
 
         'Formular initialisieren
         Call Me.INI()
@@ -987,7 +988,7 @@ Partial Public Class Form1
         msg = eol & "Optimization problem loaded:" & eol
         msg &= "----------------------------" & eol
         msg &= Me.mProblem.Description()
-        Me.Monitor1.LogAppend(msg)
+        BlueM.Opt.Common.Log.AddMessage(msg)
         Me.Monitor1.SelectTabLog()
         Me.Monitor1.Show()
 
@@ -1025,7 +1026,7 @@ Partial Public Class Form1
         Call StarteDurchlauf(AllOptTime)
 
         MsgBox("Optimization ended!", MsgBoxStyle.Information, "BlueM.Opt")
-        Me.Monitor1.LogAppend($"The optimization took {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
+        BlueM.Opt.Common.Log.AddMessage($"The optimization took {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
 
     End Sub
 

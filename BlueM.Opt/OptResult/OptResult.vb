@@ -295,7 +295,8 @@ Public Class OptResult
 
         'Datenbankpfad
         Dim dateformat As String = "yyyyMMddHHmm"
-        Me.db_path = IO.Path.Combine(workdir, $"{datasetname}.BlueM.Opt.{DateTime.Now.ToString(dateformat)}.mdb")
+        Dim filename As String = $"{datasetname}.BlueM.Opt.{DateTime.Now.ToString(dateformat)}.mdb"
+        Me.db_path = IO.Path.Combine(workdir, filename)
 
         'Pfad zur Vorlage
         Dim db_source_path As String = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "EVO.mdb")
@@ -316,6 +317,8 @@ Public Class OptResult
             Case Else
                 Throw New NotImplementedException($"Method '{Me.mProblem.Method}' not implemented in OptResult.db_init()!")
         End Select
+
+        BlueM.Opt.Common.Log.AddMessage($"Initialized result database {filename}")
 
     End Sub
 

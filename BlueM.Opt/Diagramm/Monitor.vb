@@ -39,19 +39,6 @@ Partial Public Class Monitor
     ''' </summary>
     Public WithEvents Diag As Diagramm
 
-#Region "Properties"
-
-    ''' <summary>
-    ''' Der Log-Text
-    ''' </summary>
-    Public ReadOnly Property LogText() As String
-        Get
-            Return Me.TextBox_Log.Text
-        End Get
-    End Property
-
-#End Region 'Properties
-
 #Region "Methoden"
 
 #Region "Public Methoden"
@@ -87,7 +74,7 @@ Partial Public Class Monitor
     ''' </summary>
     ''' <param name="text">der Text</param>
     Public Sub LogAppend(ByVal text As String)
-        Call Me.LogAppendText(DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss") & ": " & text & BlueM.Opt.Common.Constants.eol)
+        Call Me.LogAppendText(text)
         System.Windows.Forms.Application.DoEvents()
     End Sub
 
@@ -97,7 +84,6 @@ Partial Public Class Monitor
     Public Sub Reset()
         Call Me.InitMonitorDiagramm()
         Call Me.TextBox_Log.Clear()
-        Me.starttime = DateTime.Now
     End Sub
 
     ''' <summary>
@@ -112,49 +98,6 @@ Partial Public Class Monitor
     ''' </summary>
     Public Sub SelectTabLog()
         Me.TabControl1.SelectedTab = Me.TabPage_Log
-    End Sub
-
-    ''' <summary>
-    ''' Ruft den Speichern-Dialog um den Log-Inhalt als Textdatei abzuspeichern
-    ''' </summary>
-    Public Sub savelog()
-
-        Dim sw As StreamWriter
-        Dim jetzt = DateTime.Now
-
-        Dim SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
-        'Dialog(einrichten)
-        SaveFileDialog1.Filter = "Text-Dateien (*.txt)|*.txt"
-        SaveFileDialog1.FileName = "ApplicationLog_" + jetzt.Year.ToString + _
-            jetzt.Month.ToString + jetzt.Day.ToString + "_" + jetzt.Hour.ToString + _
-            jetzt.Minute.ToString + jetzt.Second.ToString + ".txt"
-        SaveFileDialog1.DefaultExt = "txt"
-        SaveFileDialog1.Title = "Log speichern"
-        SaveFileDialog1.InitialDirectory = CurDir()
-
-        'Dialog anzeigen
-        If (SaveFileDialog1.ShowDialog() = Windows.Forms.DialogResult.OK) Then
-            sw = File.CreateText(SaveFileDialog1.FileName)
-            sw.Write(Me.TextBox_Log.Text)
-            sw.Flush()
-            sw.Close()
-        End If
-
-    End Sub
-
-
-    Public Sub savelog(ByRef Path As String)
-
-        Dim sw As StreamWriter
-        Dim jetzt = DateTime.Now
-
-        sw = File.CreateText(Path & "ApplicationLog_" + jetzt.Year.ToString + _
-            jetzt.Month.ToString + jetzt.Day.ToString + "_" + jetzt.Hour.ToString + _
-            jetzt.Minute.ToString + jetzt.Second.ToString + ".txt")
-        sw.Write(Me.TextBox_Log.Text)
-        sw.Flush()
-        sw.Close()
-
     End Sub
 
 #End Region 'Public Methoden

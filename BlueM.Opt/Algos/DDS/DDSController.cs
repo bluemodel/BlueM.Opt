@@ -38,7 +38,6 @@ namespace modelEAU.DDS
         private BlueM.Opt.Common.Problem mProblem;
         private BlueM.Opt.Common.Settings mSettings;
         private BlueM.Opt.Common.Progress mProgress;
-        private BlueM.Opt.Diagramm.Monitor mMonitor; //z.Zt. nicht benutzt
         private BlueM.Opt.Diagramm.Hauptdiagramm Hauptdiagramm1;
         private BlueM.Opt.Apps.Sim Sim1;
         private BlueM.Opt.Apps.Testprobleme Testproblem;
@@ -61,8 +60,6 @@ namespace modelEAU.DDS
             this.mSettings = inputSettings;
             this.mProgress = inputProgress;
             this.Hauptdiagramm1 = inputHauptdiagramm;
-
-            this.mMonitor = BlueM.Opt.Diagramm.Monitor.getInstance();
         }
 
         /// <summary>

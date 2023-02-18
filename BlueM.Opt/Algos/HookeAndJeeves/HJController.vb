@@ -35,7 +35,6 @@ Public Class HJController
     Private myProblem As BlueM.Opt.Common.Problem
     Private mySettings As BlueM.Opt.Common.Settings
     Private myProgress As BlueM.Opt.Common.Progress 'TODO: Verlaufsanzeige für H&J
-    Private myMonitor As BlueM.Opt.Diagramm.Monitor
     Private myHauptDiagramm As BlueM.Opt.Diagramm.Hauptdiagramm
 
     Private myAppType As BlueM.Opt.Common.ApplicationTypes
@@ -53,9 +52,9 @@ Public Class HJController
     ''' <param name="inputSettings"></param>
     ''' <param name="inputProgress"></param>
     ''' <param name="inputHptDiagramm"></param>
-    Public Sub Init(ByRef inputProblem As Common.Problem, _
-                    ByRef inputSettings As Common.Settings, _
-                    ByRef inputProgress As Common.Progress, _
+    Public Sub Init(ByRef inputProblem As Common.Problem,
+                    ByRef inputSettings As Common.Settings,
+                    ByRef inputProgress As Common.Progress,
                     ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
 
         Me.myProblem = inputProblem
@@ -63,7 +62,6 @@ Public Class HJController
         Me.myProgress = inputProgress
         Me.myHauptDiagramm = inputHptDiagramm
 
-        Me.myMonitor = BlueM.Opt.Diagramm.Monitor.getInstance()
     End Sub
 
     ''' <summary>
@@ -109,10 +107,6 @@ Public Class HJController
         Dim HookJeeves As New HookeAndJeeves(Me.myProblem.NumOptParams, Me.mySettings.HookeJeeves.DnStart, Me.mySettings.HookeJeeves.DnFinish)
 
         Me.stopped = False
-
-        'Monitor anzeigen
-        Call Me.myMonitor.SelectTabLog()
-        Call Me.myMonitor.Show()
 
         'Los gehts
         ReDim QNBest(Me.myProblem.NumPrimObjective - 1)
@@ -189,7 +183,7 @@ Public Class HJController
                 durchlauf += 1
 
                 'Monitor
-                Call Me.myMonitor.LogAppend("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+                BlueM.Opt.Common.Log.AddMessage("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
 
                 'Individuum instanzieren
                 ind = New Common.Individuum_PES("HJ", durchlauf)
@@ -226,7 +220,7 @@ Public Class HJController
                     durchlauf += 1
 
                     'Monitor
-                    Call Me.myMonitor.LogAppend("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+                    BlueM.Opt.Common.Log.AddMessage("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
 
                     'Individuum instanzieren
                     ind = New Common.Individuum_PES("HJ", durchlauf)
@@ -270,9 +264,9 @@ Public Class HJController
             Tastschritte_aktuell = 0
 
             'Monitor
-            Call Me.myMonitor.LogAppend("Tastschritte gesamt: " & Tastschritte_gesamt.ToString())
-            Call Me.myMonitor.LogAppend("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
-            Call Me.myMonitor.LogAppend("Tastschritte mittel: " & Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString())
+            BlueM.Opt.Common.Log.AddMessage("Tastschritte gesamt: " & Tastschritte_gesamt.ToString())
+            BlueM.Opt.Common.Log.AddMessage("Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+            BlueM.Opt.Common.Log.AddMessage("Tastschritte mittel: " & Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString())
 
             'Extrapolationsschritt
             If (QNBest(0) < QBest(0)) Then
@@ -289,7 +283,7 @@ Public Class HJController
                 Extrapolationsschritte += 1
 
                 'Monitor
-                Call Me.myMonitor.LogAppend("Extrapolationsschritte: " & Extrapolationsschritte.ToString())
+                BlueM.Opt.Common.Log.AddMessage("Extrapolationsschritte: " & Extrapolationsschritte.ToString())
 
                 k += 1
                 aktuellePara = HookJeeves.getLetzteParameter
@@ -299,7 +293,7 @@ Public Class HJController
                         Rueckschritte += 1
 
                         'Monitor
-                        Call Me.myMonitor.LogAppend("Rückschritte: " & Rueckschritte.ToString())
+                        BlueM.Opt.Common.Log.AddMessage("Rückschritte: " & Rueckschritte.ToString())
 
                         k += -1
                         HookJeeves.Schrittweitenhalbierung()
@@ -319,7 +313,7 @@ Public Class HJController
                     HookJeeves.Rueckschritt()
 
                     'Monitor
-                    Call Me.myMonitor.LogAppend("Rückschritte: " & Rueckschritte.ToString())
+                    BlueM.Opt.Common.Log.AddMessage("Rückschritte: " & Rueckschritte.ToString())
 
                     HookJeeves.Schrittweitenhalbierung()
                     aktuellePara = HookJeeves.getLetzteParameter()

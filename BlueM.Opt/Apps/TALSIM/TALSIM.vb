@@ -333,7 +333,7 @@ Public Class Talsim
             'start
             proc = Process.Start(startInfo)
             'DEBUG: write to log
-            'BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend(startInfo.FileName & " " & startInfo.Arguments)
+            'BlueM.Opt.Common.Log.AddMessage(startInfo.FileName & " " & startInfo.Arguments)
             'wait until finished
             Do
                 isFinished = proc.WaitForExit(100)
@@ -369,7 +369,7 @@ Public Class Talsim
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend(ex.Message)
+            BlueM.Opt.Common.Log.AddMessage(ex.Message)
 
             'Simulation nicht erfolgreich
             simOK = False

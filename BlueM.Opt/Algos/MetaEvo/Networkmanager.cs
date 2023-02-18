@@ -47,14 +47,12 @@ namespace BlueM.Opt.Algos.MetaEvo
             number_constraints = individuum_input.Constraints.Length;
             number_objectives = individuum_input.Objectives.Length;
 
-            monitor1 = BlueM.Opt.Diagramm.Monitor.getInstance();
-
             myCommand = new MySqlCommand();
 
             //Server
             if (settings_input.MetaEvo.Role == "Network Server")
             {
-                this.monitor1.LogAppend("Network Manager: Started in 'Network Server' Mode");
+                BlueM.Opt.Common.Log.AddMessage("Network Manager: Started in 'Network Server' Mode");
                 mycon = new MySqlConnection("datasource=" + settings_input.MetaEvo.MySQL_Host + ";username=" + settings_input.MetaEvo.MySQL_User + ";password=" + settings_input.MetaEvo.MySQL_Password + ";database=information_schema");
                 myCommand.Connection = mycon;
 
@@ -67,7 +65,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             // Client
             else
             {
-                this.monitor1.LogAppend("Network Manager: Started in 'Network Client' Mode");
+                BlueM.Opt.Common.Log.AddMessage("Network Manager: Started in 'Network Client' Mode");
                 mycon = new MySqlConnection("datasource=" + settings_input.MetaEvo.MySQL_Host + ";username=" + settings_input.MetaEvo.MySQL_User + ";password=" + settings_input.MetaEvo.MySQL_Password + ";database=" + settings_input.MetaEvo.MySQL_Database);
                 myCommand.Connection = mycon;
                 if (this.DB_check_connection())
@@ -88,7 +86,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             {
                 mycon.Open();
                 mycon.Close();
-                this.monitor1.LogAppend("Network Manager: DB-Connection Successfully");
+                BlueM.Opt.Common.Log.AddMessage("Network Manager: DB-Connection Successfully");
             }
             catch (MySqlException ex)
             {
@@ -192,7 +190,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             myCommand.ExecuteNonQuery();
             myCommand.Connection.Close();
 
-            this.monitor1.LogAppend("Network Manager: DB-Construction Successfully");
+            BlueM.Opt.Common.Log.AddMessage("Network Manager: DB-Construction Successfully");
         }
 
         //(ok)sich als Client in DB eintragen
@@ -240,7 +238,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             }
             if (affectedrows == 0)
             {
-                this.monitor1.LogAppend("Network Manager: Server-restart detected, creating new entry...");
+                BlueM.Opt.Common.Log.AddMessage("Network Manager: Server-restart detected, creating new entry...");
                 DB_client_entry(ref prob_input);
             }
         }
@@ -695,13 +693,13 @@ namespace BlueM.Opt.Algos.MetaEvo
             //Falls kein Aktiver Client vorhanden ist, 3 Sekunden warten und dann nochmal aufrufen
             if (network1.number_clients == 0)
             {
-                this.monitor1.LogAppend("Scheduling: No Client found registered in DB - wait...");
+                BlueM.Opt.Common.Log.AddMessage("Scheduling: No Client found registered in DB - wait...");
                 System.Threading.Thread.Sleep(3000);
                 scheduling_new(ref generation_input);
             }
             else
             {
-                 this.monitor1.LogAppend("Networkmanager: New Scheduling");
+                 BlueM.Opt.Common.Log.AddMessage("Networkmanager: New Scheduling");
 
                 //Scheduling berechnen
                 //Für jedes Individuum
@@ -729,7 +727,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 //Ausgabe der Zuteilung
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
-                     //this.monitor1.LogAppend("Networkmanager: New Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
+                     //BlueM.Opt.Common.Log.AddMessage("Networkmanager: New Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
                 }
             }
         }
@@ -746,7 +744,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             //Falls kein Aktiver Client vorhanden ist, 3 Sekunden warten und dann scheduling_new aufrufen
             if (network1.number_clients == 0)
             {
-                this.monitor1.LogAppend("Scheduling (new): No Client found registered in DB - waiting...");
+                BlueM.Opt.Common.Log.AddMessage("Scheduling (new): No Client found registered in DB - waiting...");
                 System.Threading.Thread.Sleep(3000);
                 scheduling_new(ref generation_input);
             }
@@ -754,7 +752,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             //An den Daten der Clients hat sich etwas geändert (Neues Individuum, Speed-av hat sich um mehr als 5% geändert oder speed-low ist um 20% überschritten)
             else if (scheduling_error)   
             {
-                this.monitor1.LogAppend("Networkmanager: Adapting Scheduling...");
+                BlueM.Opt.Common.Log.AddMessage("Networkmanager: Adapting Scheduling...");
 
                 //tmp-array für schlussendlich die Sollwerte der Clients
                 //  Client: [Client][0:vergangene Rechenzeit beim aktuellen Individuum + Rechenzeit für neue Individuen, (-1 = Error)
@@ -886,7 +884,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 //Ausgabe der neuen Zuteilung
                 for (int i = 0; i < network1.Clients.Length; i++)
                 {
-                    //this.monitor1.LogAppend("Networkmanager: Adapted Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
+                    //BlueM.Opt.Common.Log.AddMessage("Networkmanager: Adapted Scheduling: Client '" + network1.Clients[i].ipName + "' " + network1.Clients[i].numberindividuums + " Individuums");
                 }
             }
         }
@@ -905,12 +903,12 @@ namespace BlueM.Opt.Algos.MetaEvo
             this.scheduling_new(ref generation_input);
 
             //In die Datenbank schreiben
-            this.monitor1.LogAppend("Networkmanager: Write Individuums to DB");
+            BlueM.Opt.Common.Log.AddMessage("Networkmanager: Write Individuums to DB");
             this.DB_ClearIndividuumsTable();
             number_tosimulate = this.Individuums_WriteToDB(ref generation_input);
 
             //Warten bis erste Ergebnisse vorliegen müssten
-            this.monitor1.LogAppend("Networkmanager: Waiting for first Results...");
+            BlueM.Opt.Common.Log.AddMessage("Networkmanager: Waiting for first Results...");
 
             //Prüfen ob alle Individuen fertig berechnet sind
             while (individuums_ready_now < number_tosimulate)
@@ -934,7 +932,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                         }
                     }
 
-                    this.monitor1.LogAppend("Networkmanager: " + Math.Round((double)individuums_ready_now / ((double)number_tosimulate), 2) * 100 + "%");
+                    BlueM.Opt.Common.Log.AddMessage("Networkmanager: " + Math.Round((double)individuums_ready_now / ((double)number_tosimulate), 2) * 100 + "%");
 
                     individuums_ready = individuums_ready_now;
                 }

@@ -289,7 +289,7 @@ Public MustInherit Class Sim
         Try
             Call Me.SIM_Ergebnis_auswerten(ind, storeInDB)
         Catch e As Exception
-            BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("ERROR: Failed to evaluate simulation: " & eol & e.Message)
+            BlueM.Opt.Common.Log.AddMessage("ERROR: Failed to evaluate simulation: " & eol & e.Message)
             Return False
         End Try
 
@@ -374,7 +374,7 @@ Public MustInherit Class Sim
                         isOK(n_ind_Ready) = True
 
                     Catch e As Exception
-                        BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend("ERROR: Failed to evaluate simulation: " & eol & e.Message)
+                        BlueM.Opt.Common.Log.AddMessage("ERROR: Failed to evaluate simulation: " & eol & e.Message)
                         isOK(n_ind_Ready) = False
                         SIM_Eval_is_OK = False
                     End Try
@@ -437,7 +437,7 @@ Public MustInherit Class Sim
         End If
 
         OptTimePara.Stop()
-        'BlueM.Opt.Diagramm.Monitor.getInstance().LogAppend($"Die Evaluierung der Generation dauerte:   {OptTimePara.Elapsed.Hours}h  {OptTimePara.Elapsed.Minutes}m  {OptTimePara.Elapsed.Seconds}s {OptTimePara.Elapsed}ms")
+        'BlueM.Opt.Common.Log.AddMessage($"Die Evaluierung der Generation dauerte:   {OptTimePara.Elapsed.Hours}h  {OptTimePara.Elapsed.Minutes}m  {OptTimePara.Elapsed.Seconds}s {OptTimePara.Elapsed}ms")
 
         Return isOK
 
