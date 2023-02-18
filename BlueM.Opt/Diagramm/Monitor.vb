@@ -29,8 +29,6 @@ Partial Public Class Monitor
     ' the text property on a TextBox control.
     Delegate Sub LogAppendTextCallback(ByVal [text] As String)
 
-    Private starttime As DateTime
-
     Public Event MonitorClosed()
     Public Event MonitorOpened()
 
