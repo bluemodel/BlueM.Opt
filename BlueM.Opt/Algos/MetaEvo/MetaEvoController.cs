@@ -108,7 +108,7 @@ namespace BlueM.Opt.Algos.MetaEvo
 
             individuumnumber = 2;
 
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Task: " + prob.Datensatz);
+            Common.Log.AddMessage(Common.Log.levels.info, "Controller: Task: " + prob.Datensatz);
 
             //Progress Initialisieren
             progress1.Initialize(1, 1, (short)settings.MetaEvo.NumberGenerations, (short)(settings.MetaEvo.ChildrenPerParent * settings.MetaEvo.PopulationSize));
@@ -116,7 +116,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             switch (this.role)
             {
                 case "Single PC":
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: MetaEvo started in 'Single PC'-Mode");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: MetaEvo started in 'Single PC'-Mode");
                     //### Vorbereitung ###
                     //Initialisieren des Individuum-Arrays
                     if (settings.MetaEvo.OpMode == "Local Optimizer")
@@ -142,7 +142,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                     break;
 
                 case "Network Server":
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: MetaEvo started in 'Network Server'-Mode");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: MetaEvo started in 'Network Server'-Mode");
                     //### Vorbereitung ###
                     //Initialisieren des Individuum-Arrays
                     generation = new BlueM.Opt.Common.Individuum_MetaEvo[this.settings.MetaEvo.PopulationSize];
@@ -167,7 +167,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                     break;
 
                 case "Network Client":
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: MetaEvo started in 'Network Client'-Mode");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: MetaEvo started in 'Network Client'-Mode");
                     //### Vorbereitung ###
                     individuumForClient = new BlueM.Opt.Common.Individuum_MetaEvo("MetaEvo", 0, this.prob.List_OptParameter.Length);
                     //Individuum-Speicher des Clients ausschalten
@@ -204,7 +204,7 @@ namespace BlueM.Opt.Algos.MetaEvo
         {
             double[] random;
             Random randomizer = new Random();
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Construct random Genpool");
+            Common.Log.AddMessage(Common.Log.levels.info, "Controller: Construct random Genpool");
 
             //Für jedes Individuum durchgehen
             for (int k = 0; k < this.settings.MetaEvo.PopulationSize; k++)
@@ -236,7 +236,7 @@ namespace BlueM.Opt.Algos.MetaEvo
 
             while (mePC.status != "finished")
             {
-                BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Status: " + mePC.status);
+                Common.Log.AddMessage(Common.Log.levels.info, "Controller: Status: " + mePC.status);
 
                 if (this.stopped) return false;
 
@@ -247,11 +247,11 @@ namespace BlueM.Opt.Algos.MetaEvo
                     set_random_parents(ref generation);
 
                     //Genpool simulieren
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Genpool: Simulating Individuums...");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: Genpool: Simulating Individuums...");
                     for (int i = 0; i < generation.Length; i++)
                     {
                         evaluate(ref generation[i], i);
-                        BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)");
+                        Common.Log.AddMessage(Common.Log.levels.info, "Controller: Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)");
                         System.Windows.Forms.Application.DoEvents();
                     }
 
@@ -267,7 +267,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 #region Zustand: generate Individuums
                 else if (mePC.status == "generate Individuums")
                 {
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: ### Building new Individuums for Generation " + settings.MetaEvo.CurrentGeneration + " ###");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: ### Building new Individuums for Generation " + settings.MetaEvo.CurrentGeneration + " ###");
                     algomanager.new_individuals_build(ref generation);
                     mePC.status = "simulate Individuums";
                 }
@@ -276,14 +276,14 @@ namespace BlueM.Opt.Algos.MetaEvo
                 #region Zustand: simulate Individuums
                 else if (mePC.status == "simulate Individuums")
                 {
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Individuums for Generation " + settings.MetaEvo.CurrentGeneration + ": Simulating Individuums...");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: Individuums for Generation " + settings.MetaEvo.CurrentGeneration + ": Simulating Individuums...");
                     progress1.iNachf = 0;
                     for (int i = 0; i < generation.Length; i++)
                     {
                         //Simulieren und zeichnen
                         if (generation[i].get_toSimulate())
                         {
-                            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name);
+                            Common.Log.AddMessage(Common.Log.levels.info, "Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name);
                             evaluate(ref generation[i], i);
                             System.Windows.Forms.Application.DoEvents();
 
@@ -353,7 +353,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             }
 
             progress1.iGen = progress1.NGen;
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Calculation Finished");
+            Common.Log.AddMessage(Common.Log.levels.info, "Controller: Calculation Finished");
             return true;
         }
         #endregion
@@ -367,7 +367,7 @@ namespace BlueM.Opt.Algos.MetaEvo
 
             while (mePC.status != "finished")
             {
-                BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Status: " + mePC.status);
+                Common.Log.AddMessage(Common.Log.levels.info, "Controller: Status: " + mePC.status);
 
                 if (this.stopped) return false;
 
@@ -378,7 +378,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                     set_random_parents(ref generation);
 
                     //Genpool simulieren
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Genpool: Simulating Individuums...");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: Genpool: Simulating Individuums...");
                     evaluate_multi_4single(ref generation);
 
                     //Genpool speichern
@@ -393,7 +393,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 #region Zustand: generate Individuums
                 else if (mePC.status == "generate Individuums")
                 {
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: ### Building new Individuums for Generation " + settings.MetaEvo.CurrentGeneration + " ###");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: ### Building new Individuums for Generation " + settings.MetaEvo.CurrentGeneration + " ###");
                     algomanager.new_individuals_build(ref generation);
                     mePC.status = "simulate Individuums";
                 }
@@ -402,7 +402,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 #region Zustand: simulate Individuums
                 else if (mePC.status == "simulate Individuums")
                 {
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Individuums for Generation " + settings.MetaEvo.CurrentGeneration + ": Simulating Individuums...");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: Individuums for Generation " + settings.MetaEvo.CurrentGeneration + ": Simulating Individuums...");
                     progress1.iNachf = 0;
                     //Simulieren
 
@@ -412,7 +412,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                         {
                             if (generation[i].get_toSimulate())
                             {
-                                BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name);
+                                Common.Log.AddMessage(Common.Log.levels.info, "Controller: Simulating Individuum " + generation[i].ID + " (" + Math.Round(((double)(i + 1) / (double)generation.Length), 2) * 100 + "%)...   " + algomanager.algos.algofeedbackarray[generation[i].get_generator()].name);
                                 evaluate_multi_4single(ref generation);
                                 System.Windows.Forms.Application.DoEvents();
 
@@ -505,7 +505,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             }
 
             progress1.iGen = progress1.NGen;
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Calculation Finished");
+            Common.Log.AddMessage(Common.Log.levels.info, "Controller: Calculation Finished");
             return true;
         }
 
@@ -555,7 +555,7 @@ namespace BlueM.Opt.Algos.MetaEvo
         /// <remarks>Es werden nur Individuen mit Status "true" verwendet!</remarks>
         public void evaluate_multi_4single_Event(ref BlueM.Opt.Common.Individuum ind, int zahl)
         {
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Simulating Individuum " + ind.ID + "   (" + Math.Round(((double)(progress1.iNachf + 1) / (double)generation.Length), 2) * 100 + "%)...");
+            Common.Log.AddMessage(Common.Log.levels.info, "Controller: Simulating Individuum " + ind.ID + "   (" + Math.Round(((double)(progress1.iNachf + 1) / (double)generation.Length), 2) * 100 + "%)...");
             System.Windows.Forms.Application.DoEvents();
 
             progress1.NextNachf();
@@ -579,7 +579,7 @@ namespace BlueM.Opt.Algos.MetaEvo
 
             while (meServer.status != "finished")
             {
-                BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Status: " + meServer.status);
+                Common.Log.AddMessage(Common.Log.levels.info, "Controller: Status: " + meServer.status);
 
                 if (this.stopped) return false;
 
@@ -590,7 +590,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                     set_random_parents(ref generation);
 
                     //Von den Clients ausrechnen lassen
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Calculate Genpool by Clients");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: Calculate Genpool by Clients");
                     MessageBox.Show("Wait for Clients to register for calculation. Press ok to start", "MetaEvo - Networkmanager");
                     if (networkmanager.calculate_by_clients(ref generation, ref hauptdiagramm1, ref progress1, ref this.stopped))
                     {
@@ -610,7 +610,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 else if (meServer.status == "generate Individuums")
                 {
                     //Neue Individuen
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: ### Building new Individuums for Generation " + settings.MetaEvo.CurrentGeneration + " ###");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: ### Building new Individuums for Generation " + settings.MetaEvo.CurrentGeneration + " ###");
                     algomanager.new_individuals_build(ref generation);
 
                     //Neuen Serverstatus setzen
@@ -701,7 +701,7 @@ namespace BlueM.Opt.Algos.MetaEvo
             }
 
             progress1.iGen = progress1.NGen;
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Calculation Finished");
+            Common.Log.AddMessage(Common.Log.levels.info, "Controller: Calculation Finished");
             return true;
         }
         #endregion;
@@ -736,7 +736,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                     networkmanager.Individuum_UpdateInDB(ref individuumForClient, "status", "calculate");
 
                     //Simulieren
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Individuum " + individuumForClient.ID + " simulating...");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: Individuum " + individuumForClient.ID + " simulating...");
                     evaluate(ref individuumForClient, individuumForClient.ID);
                     System.Windows.Forms.Application.DoEvents();
 
@@ -748,7 +748,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                     if (meClient.numberindividuums == 1) meClient.speed_av = Berechnungsdauer;
                     else meClient.speed_av += Math.Round((Berechnungsdauer - meClient.speed_av) / 10, 0);
                     if (Berechnungsdauer > meClient.speed_low) meClient.speed_low = Berechnungsdauer;
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to " + meClient.speed_low + " Milliseconds");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to " + meClient.speed_low + " Milliseconds");
 
                     //Client ind DB Updaten
                     meClient.set_AlsoInDB("", meClient.speed_av, meClient.speed_low);
@@ -760,7 +760,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                     //Status zuweisen
                     meClient.set_AlsoInDB("ready", -1, -1);
 
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: No Individuum found in DB (for this Client) - waiting...");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: No Individuum found in DB (for this Client) - waiting...");
                     System.Threading.Thread.Sleep(3000);
                     //Prüfen ob Client-Entry noch besteht bzw. neu eintragen
                     networkmanager.DB_client_entry_update(ref prob);
@@ -770,7 +770,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 serverstatus = networkmanager.Network_ReadServer();
             }
             progress1.iGen = progress1.NGen;
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Calculation Finished");
+            Common.Log.AddMessage(Common.Log.levels.info, "Controller: Calculation Finished");
             return true;
         }
         #endregion
@@ -810,7 +810,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                         networkmanager.Individuum_UpdateInDB(ref generation[i], "status", "calculate");
                         generation_tmp[i] = (BlueM.Opt.Common.Individuum)generation[i];
                     }
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Read " + (int)clienttmp[0] + " Individuums from DB, starting Simulation...");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: Read " + (int)clienttmp[0] + " Individuums from DB, starting Simulation...");
 
                     //Status zuweisen
                     meClient.set_AlsoInDB("calculating", -1, -1);
@@ -840,7 +840,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                     //Status zuweisen
                     meClient.set_AlsoInDB("ready", -1, -1);
 
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: No Individuum found in DB (for this Client) - waiting...");
+                    Common.Log.AddMessage(Common.Log.levels.info, "Controller: No Individuum found in DB (for this Client) - waiting...");
                     System.Threading.Thread.Sleep(3000);
                     //Prüfen ob Client-Entry noch besteht bzw. neu eintragen
                     networkmanager.DB_client_entry_update(ref prob);
@@ -850,13 +850,13 @@ namespace BlueM.Opt.Algos.MetaEvo
                 serverstatus = networkmanager.Network_ReadServer();
             }
             progress1.iGen = progress1.NGen;
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Calculation Finished");
+            Common.Log.AddMessage(Common.Log.levels.info, "Controller: Calculation Finished");
             return true;
         }
 
         private void evaluate_multi_4client_Event(ref BlueM.Opt.Common.Individuum ind, int zahl)
         {
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Individuum " + ind.ID + " simulated");
+            Common.Log.AddMessage(Common.Log.levels.info, "Controller: Individuum " + ind.ID + " simulated");
             //Im der DB updaten
             for (int i = 0; i < generation.Length; i++)
             {
@@ -884,7 +884,7 @@ namespace BlueM.Opt.Algos.MetaEvo
                 clienttmp[2] = Math.Round((DateTime.Now.Subtract(Berechnungsstart)).TotalMilliseconds, 0);
                 meClient.speed_av += Math.Round(((clienttmp[2] / clienttmp[1]) - meClient.speed_av) / (5 + Math.Abs(5 - clienttmp[1])), 0);
                 if (clienttmp[2] > meClient.speed_low) meClient.speed_low = clienttmp[2];
-                BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, "Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to " + meClient.speed_low + " Milliseconds");
+                Common.Log.AddMessage(Common.Log.levels.info, "Controller: Average Speed is set to " + meClient.speed_av + " Milliseconds, Lowest Speed is set to " + meClient.speed_low + " Milliseconds");
             }
         }
         #endregion;

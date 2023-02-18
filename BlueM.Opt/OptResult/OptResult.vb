@@ -326,7 +326,7 @@ Public Class OptResult
                 Throw New NotImplementedException($"Method '{Me.mProblem.Method}' not implemented in OptResult.db_init()!")
         End Select
 
-        BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, $"Initialized result database {filename}")
+        Common.Log.AddMessage(Common.Log.levels.info, $"Initialized result database {filename}")
 
     End Sub
 

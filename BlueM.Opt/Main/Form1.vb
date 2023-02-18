@@ -991,7 +991,7 @@ Partial Public Class Form1
         msg = eol & "Optimization problem loaded:" & eol
         msg &= "----------------------------" & eol
         msg &= Me.mProblem.Description()
-        BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, msg)
+        Common.Log.AddMessage(Common.Log.levels.info, msg)
         Me.Monitor1.SelectTabLog()
         Me.Monitor1.Show()
 
@@ -1029,7 +1029,7 @@ Partial Public Class Form1
         Call StarteDurchlauf(AllOptTime)
 
         MsgBox("Optimization ended!", MsgBoxStyle.Information, "BlueM.Opt")
-        BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.info, $"The optimization took {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
+        Common.Log.AddMessage(Common.Log.levels.info, $"The optimization took {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
 
     End Sub
 
@@ -1129,7 +1129,7 @@ Partial Public Class Form1
         Catch ex As Exception
 
             'Globale Fehlerbehandlung für Optimierungslauf:
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.error, ex.Message)
+            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
             MsgBox(ex.Message, MsgBoxStyle.Critical, "Error")
 
         Finally

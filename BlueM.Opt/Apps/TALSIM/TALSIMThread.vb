@@ -144,13 +144,13 @@ Public Class TalsimThread
                 End If
 
                 'Log error message
-                BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.error, errmsg)
+                Common.Log.AddMessage(Common.Log.levels.error, errmsg)
 
                 If i_attempt < n_attempts Then
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.error, $"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, trying again...")
+                    Common.Log.AddMessage(Common.Log.levels.error, $"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, trying again...")
                     System.Threading.Thread.Sleep(100)
                 Else
-                    BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.error, $"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, parameter set will be discarded!")
+                    Common.Log.AddMessage(Common.Log.levels.error, $"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, parameter set will be discarded!")
                 End If
 
             Next
@@ -158,7 +158,7 @@ Public Class TalsimThread
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            BlueM.Opt.Common.Log.AddMessage(BlueM.Opt.Common.Log.levels.error, ex.Message)
+            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
 
             'Simulation nicht erfolgreich
             Me.SimIsOK = False
