@@ -57,7 +57,7 @@ Public Class Talsim
                                         "VER", "RUE", "BEK", "BOA", "BOD", "LNZ", "EFL",
                                         "DIF", "FKA", "SCE", "QAB", "UPD", "OPF", "KAL",
                                         "HYO", "TEM", "ZIE", "QUA", "PRO", "GRW", "IRR",
-                                        "RFD"})
+                                        "RFD", "ABZ"})
 
             Return exts
 
