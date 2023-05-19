@@ -23,18 +23,19 @@ Public Class Testprobleme
     '#############
 
     'Testprobleme:
-    Private Const TP_SinusFunktion As String = "Sine function"
+    Private Const TP_Ackley As String = "Ackley function"
     Private Const TP_BealeProblem As String = "Beale problem"
-    Private Const TP_Schwefel24Problem As String = "Schwefel 2.4 problem"
+    Private Const TP_Box As String = "Box"
+    Private Const TP_CONSTR As String = "CONSTR"
     Private Const TP_Deb1 As String = "Deb 1"
+    Private Const TP_DependentParameters As String = "Dependent parameters"
+    Private Const TP_FloodMitigation As String = "Flood Mitigation"
+    Private Const TP_Schwefel24Problem As String = "Schwefel 2.4 problem"
+    Private Const TP_SinusFunktion As String = "Sine function"
     Private Const TP_ZitzlerDebT1 As String = "Zitzler/Deb T1"
     Private Const TP_ZitzlerDebT2 As String = "Zitzler/Deb T2"
     Private Const TP_ZitzlerDebT3 As String = "Zitzler/Deb T3"
     Private Const TP_ZitzlerDebT4 As String = "Zitzler/Deb T4"
-    Private Const TP_CONSTR As String = "CONSTR"
-    Private Const TP_Box As String = "Box"
-    Private Const TP_DependentParameters As String = "Dependent parameters"
-    Private Const TP_FloodMitigation As String = "Flood Mitigation"
 
     Private mSelectedTestproblem As String
     Private mTestProblemDescription As String
@@ -50,26 +51,25 @@ Public Class Testprobleme
     '##########
 
     'Liste von Testproblemen
-    Public ReadOnly Property Testprobleme() As String()
+    Public ReadOnly Property Testprobleme As List(Of String)
         Get
-            Dim array() As String
+            Dim list As New List(Of String) From {
+                TP_Ackley,
+                TP_BealeProblem,
+                TP_Box,
+                TP_CONSTR,
+                TP_Deb1,
+                TP_DependentParameters,
+                TP_FloodMitigation,
+                TP_Schwefel24Problem,
+                TP_SinusFunktion,
+                TP_ZitzlerDebT1,
+                TP_ZitzlerDebT2,
+                TP_ZitzlerDebT3,
+                TP_ZitzlerDebT4
+            }
 
-            ReDim array(11)
-
-            array(0) = TP_SinusFunktion
-            array(1) = TP_BealeProblem
-            array(2) = TP_Schwefel24Problem
-            array(3) = TP_Deb1
-            array(4) = TP_ZitzlerDebT1
-            array(5) = TP_ZitzlerDebT2
-            array(6) = TP_ZitzlerDebT3
-            array(7) = TP_ZitzlerDebT4
-            array(8) = TP_CONSTR
-            array(9) = TP_Box
-            array(10) = TP_DependentParameters
-            array(11) = TP_FloodMitigation
-
-            Return array
+            Return list
 
         End Get
     End Property
@@ -261,6 +261,31 @@ Public Class Testprobleme
                     Me.mOptPara(i).Max = 2592000
                 Next
 
+            Case TP_Ackley
+                Me.mTestProblemDescription = "A non-convex function used as a performance test problem for optimization algorithms proposed by Ackley 1987."
+                Me.mAnzParameter = 2
+                Me.mAnzZiele = 1
+                Me.mAnzConstraints = 0
+                ReDim Me.mOptPara(Me.mAnzParameter - 1)
+                For i = 0 To Me.mAnzParameter - 1
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
+                Next
+                Randomize()
+                With Me.mOptPara(0)
+                    .Min = -5
+                    .Max = 5
+                    .Bezeichnung = "X"
+                    'set random starting value
+                    .Xn = Rnd()
+                End With
+                With Me.mOptPara(1)
+                    .Min = -5
+                    .Max = 5
+                    .Bezeichnung = "Y"
+                    'set random starting value
+                    .Xn = Rnd()
+                End With
+
         End Select
 
         'Das Problem mit Pseudo-Werten füllen
@@ -304,6 +329,9 @@ Public Class Testprobleme
 
             Case TP_DependentParameters
                 Call Me.DiagInitialise_AbhParameter(Diag)
+
+            Case TP_Ackley
+                Call Me.DiagInitialise_Ackley(Diag)
 
             Case Else
                 Call Me.DiagInitialise_MultiTestProb(Diag)
@@ -806,6 +834,91 @@ Public Class Testprobleme
 
     End Sub
 
+    'Diagramm für Ackley function initialisieren (3D)
+    '************************************************
+    Private Sub DiagInitialise_Ackley(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
+
+        Dim n As Integer
+        Dim x, y As Double
+        Dim ArrayX() As Double
+        Dim ArrayY() As Double
+        Dim ArrayZ() As Double
+        Dim achsen As Collection
+        Dim achse As BlueM.Opt.Diagramm.Diagramm.Achse
+
+        Dim paramMin As Double = -5.0
+        Dim paramMax As Double = 5.0
+
+        'Achsen
+        '------
+        achsen = New Collection()
+
+        'Bottom axis
+        achse.Title = "X"
+        achse.Automatic = False
+        achse.Minimum = paramMin
+        achse.Maximum = paramMax
+        achse.Increment = 1
+        Call achsen.Add(achse)
+
+        'Left axis
+        achse.Title = "Z"
+        achse.Automatic = False
+        achse.Minimum = 0
+        achse.Maximum = 15
+        achse.Increment = 1
+        Call achsen.Add(achse)
+
+        'Depth bottom axis
+        achse.Title = "Y"
+        achse.Automatic = False
+        achse.Minimum = paramMin
+        achse.Maximum = paramMax
+        achse.Increment = 1
+        Call achsen.Add(achse)
+
+        'Diagramm initialisieren
+        Call Diag.DiagInitialise(TP_Ackley, achsen, Me.mProblem)
+
+        'Serien
+        '------
+        Dim surface As Steema.TeeChart.Styles.Surface
+
+        'Ackley function surface
+        Dim resolution As Double = 0.2
+        Dim length As Integer = (paramMax - paramMin) / resolution
+        ReDim ArrayX(length ^ 2 - 1)
+        ReDim ArrayY(length ^ 2 - 1)
+        ReDim ArrayZ(length ^ 2 - 1)
+
+        n = 0
+        For x = paramMin To paramMax Step resolution
+            For y = paramMin To paramMax Step resolution
+                ArrayX(n) = x
+                ArrayY(n) = y
+                'Formula taken from https://en.wikipedia.org/wiki/Ackley_function
+                ArrayZ(n) = -20.0 * Math.Exp(-0.2 * Math.Sqrt(0.5 * (x ^ 2 + y ^ 2))) _
+                    - Math.Exp(0.5 * (Math.Cos(2 * Math.PI * x) + Math.Cos(2 * Math.PI * y))) _
+                    + Math.E + 20
+                n += 1
+            Next
+        Next
+
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
+        surface.Title = "Ackley function"
+        surface.IrregularGrid = True
+        surface.NumXValues = length
+        surface.NumZValues = length
+        surface.Add(ArrayX, ArrayZ, ArrayY)
+        surface.UseColorRange = False
+        surface.UsePalette = True
+        surface.PaletteStyle = Steema.TeeChart.Styles.PaletteStyles.Rainbow
+        surface.Brush.Solid = True
+        surface.Brush.Transparency = 70
+        surface.Pen.Visible = False
+
+    End Sub
+
 
     'Diagramm für Abhängige Parameter initialisieren
     '***********************************************
@@ -902,8 +1015,8 @@ Public Class Testprobleme
 
         Dim i As Integer
         Dim Unterteilung_X As Double
-        Dim x1, x2 As Double
-        Dim X() As Double
+        Dim x, x1, x2, y As Double
+        Dim x_arr() As Double
         Dim f1, f2 As Double
         Dim g1, g2 As Double
         Dim globalAnzPar As Integer = Me.mProblem.NumOptParams
@@ -963,13 +1076,13 @@ Public Class Testprobleme
 
                 'Qualitätswert berechnen
                 '-----------------------
-                ReDim X(globalAnzPar - 1)
+                ReDim x_arr(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
-                    X(i) = -10 + ind.OptParameter(i).Xn * 20
+                    x_arr(i) = -10 + ind.OptParameter(i).Xn * 20
                 Next i
                 ind.Objectives(0) = 0
                 For i = 0 To globalAnzPar - 1
-                    ind.Objectives(0) += ((X(0) - X(i) ^ 2) ^ 2 + (X(i) - 1) ^ 2)
+                    ind.Objectives(0) += ((x_arr(0) - x_arr(i) ^ 2) ^ 2 + (x_arr(i) - 1) ^ 2)
                 Next i
 
                 'Zeichnen
@@ -1148,9 +1261,9 @@ Public Class Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 'Getting the new Parameters
-                ReDim X(7)
-                For i = 0 To X.GetUpperBound(0)
-                    X(i) = ind.OptParameter(i).RWert
+                ReDim x_arr(7)
+                For i = 0 To x_arr.GetUpperBound(0)
+                    x_arr(i) = ind.OptParameter(i).RWert
                 Next
 
                 'Calculating the Objective Function
@@ -1165,25 +1278,25 @@ Public Class Testprobleme
                 f2 = 0
 
                 'Objective Function 1 and 2
-                f1 = -((p(0) - X(4)) - (X(0) - X(1)))
-                f2 = -(0.09651 * (((8.0E-22 * Math.Pow(X(0), 3)) - (0.00000000000008 * Math.Pow(X(0), 2)) + (0.000003 * X(0)) + 6.2034) * X(4)))
+                f1 = -((p(0) - x_arr(4)) - (x_arr(0) - x_arr(1)))
+                f2 = -(0.09651 * (((8.0E-22 * Math.Pow(x_arr(0), 3)) - (0.00000000000008 * Math.Pow(x_arr(0), 2)) + (0.000003 * x_arr(0)) + 6.2034) * x_arr(4)))
 
-                f1 = f1 - ((p(1) - X(5)) - (X(1) - X(2)))
-                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(1), 3)) - (0.00000000000008 * Math.Pow(X(1), 2)) + (0.000003 * X(1)) + 6.2034) * X(5)))
+                f1 = f1 - ((p(1) - x_arr(5)) - (x_arr(1) - x_arr(2)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(x_arr(1), 3)) - (0.00000000000008 * Math.Pow(x_arr(1), 2)) + (0.000003 * x_arr(1)) + 6.2034) * x_arr(5)))
 
-                f1 = f1 - ((p(2) - X(6)) - (X(2) - X(3)))
-                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(2), 3)) - (0.00000000000008 * Math.Pow(X(2), 2)) + (0.000003 * X(2)) + 6.2034) * X(6)))
+                f1 = f1 - ((p(2) - x_arr(6)) - (x_arr(2) - x_arr(3)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(x_arr(2), 3)) - (0.00000000000008 * Math.Pow(x_arr(2), 2)) + (0.000003 * x_arr(2)) + 6.2034) * x_arr(6)))
 
-                f1 = f1 - ((p(3) - X(7)) - (X(3) - X(4)))
-                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(X(3), 3)) - (0.00000000000008 * Math.Pow(X(3), 2)) + (0.000003 * X(3)) + 6.2034) * X(7)))
+                f1 = f1 - ((p(3) - x_arr(7)) - (x_arr(3) - x_arr(4)))
+                f2 = f2 - (0.09651 * (((8.0E-22 * Math.Pow(x_arr(3), 3)) - (0.00000000000008 * Math.Pow(x_arr(3), 2)) + (0.000003 * x_arr(3)) + 6.2034) * x_arr(7)))
 
                 'Constraints
                 '-----------
                 Dim contrain(3) As Double
-                contrain(0) = (X(0) - Storage - p(0) + X(4))
-                contrain(1) = (X(1) - X(0) - p(1) + X(5))
-                contrain(2) = (X(2) - X(1) - p(2) + X(6))
-                contrain(3) = (X(3) - X(2) - p(3) + X(7))
+                contrain(0) = (x_arr(0) - Storage - p(0) + x_arr(4))
+                contrain(1) = (x_arr(1) - x_arr(0) - p(1) + x_arr(5))
+                contrain(2) = (x_arr(2) - x_arr(1) - p(2) + x_arr(6))
+                contrain(3) = (x_arr(3) - x_arr(2) - p(3) + x_arr(7))
 
                 'Give Back the Penalties and Constraints
                 ind.Objectives(0) = f1
@@ -1202,6 +1315,22 @@ Public Class Testprobleme
                     serie = Diag.getSeriesPoint("Population (invalid)", "Gray")
                 End If
                 serie.Add(ind.Objectives(0), ind.Objectives(1))
+
+            Case TP_Ackley
+                'Qualitätswert berechnen
+                '-----------------------
+                x = ind.OptParameter(0).RWert
+                y = ind.OptParameter(1).RWert
+                'Formula taken from https://en.wikipedia.org/wiki/Ackley_function
+                ind.Objectives(0) = -20.0 * Math.Exp(-0.2 * Math.Sqrt(0.5 * (x ^ 2 + y ^ 2))) _
+                    - Math.Exp(0.5 * (Math.Cos(2 * Math.PI * x) + Math.Cos(2 * Math.PI * y))) _
+                    + Math.E + 20
+
+                'Zeichnen
+                '--------
+                Dim serie3D As Steema.TeeChart.Styles.Points3D
+                serie3D = Diag.getSeries3DPoint("Population", "Orange")
+                serie3D.Add(x, ind.Objectives(0), y)
 
         End Select
     End Sub

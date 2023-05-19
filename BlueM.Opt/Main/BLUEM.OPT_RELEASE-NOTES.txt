@@ -6,6 +6,7 @@ Version 2.4.0
 -------------
 NEW:
 * Talsim: added the file extension "ABZ" as part of the dataset
+* Test problems: added a new test problem of the Ackley function
 CHANGED:
 * Updated Talsim-NG Engine to v3.2.12
 

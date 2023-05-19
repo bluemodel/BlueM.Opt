@@ -549,7 +549,7 @@ Partial Public Class Form1
             Case ANW_TESTPROBLEMS
 
                 'Mit Testproblemen füllen
-                Me.ComboBox_Datensatz.Items.AddRange(Testprobleme1.Testprobleme)
+                Me.ComboBox_Datensatz.Items.AddRange(Testprobleme1.Testprobleme.ToArray())
 
             Case ANW_TSP
 
