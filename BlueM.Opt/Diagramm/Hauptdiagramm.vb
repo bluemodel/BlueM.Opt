@@ -367,46 +367,58 @@ Public Class Hauptdiagramm
 
 #Region "Lösungsauswahl"
 
-    'ausgewählte Lösung anzeigen
-    '***************************
-    Public Sub ZeichneAusgewählteLösung(ByVal ind As BlueM.Opt.Common.Individuum)
+    ''' <summary>
+    ''' Draw a selected solution in the diagram
+    ''' </summary>
+    ''' <param name="ind">the solution to draw</param>
+    Public Sub DrawSelectedSolution(ind As Common.Individuum)
 
-        'Sonderfall Sensiplot
-        If (Me.mProblem.Method = BlueM.Opt.Common.METH_SENSIPLOT) Then
-            'TODO: #206
-            Exit Sub
-        End If
+        Dim x, y, z As Double
 
-        '2D oder 3D?
-        If (Not Me.is3D) Then
-
-            '2D-Diagramm
-            '-----------
+        If Not Me.is3D Then
+            '2D diagram
             Dim serie As Steema.TeeChart.Styles.Series
             serie = Me.getSeriesPoint("Selected solutions", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
             serie.Marks.Visible = True
             serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie.Marks.Transparency = 50
             serie.Marks.ArrowLength = 10
-            If (Me.ZielIndexX = -1) Then
-                'X-Achse ist Simulations-ID (Single-Objective)
-                serie.Add(ind.ID, ind.Objectives(Me.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Richtung, ind.ID.ToString())
+            If Me.mProblem.Method = Common.METH_SENSIPLOT Then
+                'x axis is optparameter, y axis is objective function
+                x = ind.OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).RWert
+                y = ind.Objectives(Me.mSettings.SensiPlot.Selected_Objective) * Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Richtung
             Else
-                'X- und Y-Achsen sind beides Zielwerte
-                serie.Add(ind.Objectives(Me.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).Richtung, ind.Objectives(Me.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Richtung, ind.ID.ToString())
+                If Me.mProblem.Modus = Common.Constants.EVO_MODE.Single_Objective Then
+                    'x axis is simulation ID (single objective)
+                    x = ind.ID
+                    y = ind.Objectives(Me.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Richtung
+                Else
+                    'x and y axes are both objective functions
+                    x = ind.Objectives(Me.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).Richtung
+                    y = ind.Objectives(Me.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Richtung
+                End If
             End If
-
+            serie.Add(x, y, ind.ID.ToString())
         Else
-            '3D-Diagramm
-            '-----------
+            '3D diagram
             Dim serie3D As Steema.TeeChart.Styles.Points3D
             serie3D = Me.getSeries3DPoint("Selected solutions", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-            serie3D.Add(ind.Objectives(Me.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).Richtung, ind.Objectives(Me.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Richtung, ind.Objectives(Me.ZielIndexZ) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Richtung, ind.ID.ToString())
             serie3D.Marks.Visible = True
             serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie3D.Marks.Transparency = 50
             serie3D.Marks.ArrowLength = 10
-
+            If Me.mProblem.Method = Common.METH_SENSIPLOT Then
+                'x and z axis are optparameters, y axis is objective function
+                x = ind.OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).RWert
+                z = ind.OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(1)).RWert
+                y = ind.Objectives(Me.mSettings.SensiPlot.Selected_Objective) * Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Richtung
+            Else
+                'x, y and z axes are all objective functions
+                x = ind.Objectives(Me.ZielIndexX) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).Richtung
+                y = ind.Objectives(Me.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Richtung
+                z = ind.Objectives(Me.ZielIndexZ) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Richtung
+            End If
+            serie3D.Add(x, y, z, ind.ID.ToString())
         End If
 
     End Sub

@@ -1270,57 +1270,47 @@ Partial Public Class Form1
 
                             'Achsen:
                             '-------
-                            'X-Achse = QWert
+                            'X-Achse = OptParameter
+                            Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
+                            Achse.Automatic = False
+                            Achse.Minimum = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Min
+                            Achse.Maximum = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Max
+                            Achsen.Add(Achse)
+                            'Y-Achse = QWert
                             Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung
                             Achse.Automatic = True
-                            Achse.Maximum = 0
                             Achsen.Add(Achse)
-                            'Y-Achse = OptParameter
-                            Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
-                            Achse.Automatic = True
-                            Achse.Maximum = 0
-                            Achsen.Add(Achse)
-
-                            'Achsenzuordnung (#206)
-                            For i = 0 To Me.mProblem.NumObjectives - 1
-                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
-                                    Me.Hauptdiagramm1.ZielIndexX = i
-                                    Exit For 'Abbruch
-                                End If
-                            Next
-                            Me.Hauptdiagramm1.ZielIndexY = -1
+                            'Achsenzuordnung
+                            Me.Hauptdiagramm1.ZielIndexX = -1
+                            Me.Hauptdiagramm1.ZielIndexY = Me.mSettings.SensiPlot.Selected_Objective
                             Me.Hauptdiagramm1.ZielIndexZ = -1
 
                         Else
-                            '2 OptParameter:
-                            '---------------
+                            '>= 2 OptParameter:
+                            '------------------
 
                             'Achsen:
                             '-------
                             'X-Achse = OptParameter1
                             Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Bezeichnung
-                            Achse.Automatic = True
-                            Achse.Maximum = 0
+                            Achse.Automatic = False
+                            Achse.Minimum = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Min
+                            Achse.Maximum = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).Max
                             Achsen.Add(Achse)
                             'Y-Achse = Objective
                             Achse.Title = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung
                             Achse.Automatic = True
-                            Achse.Maximum = 0
                             Achsen.Add(Achse)
                             'Z-Achse = OptParameter2
                             Achse.Title = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(1)).Bezeichnung
-                            Achse.Automatic = True
-                            Achse.Maximum = 0
+                            Achse.Automatic = False
+                            Achse.Minimum = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(1)).Min
+                            Achse.Maximum = Me.mProblem.List_OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(1)).Max
                             Achsen.Add(Achse)
 
-                            'Achsenzuordnung (#206)
+                            'Achsenzuordnung
                             Me.Hauptdiagramm1.ZielIndexX = -1
-                            For i = 0 To Me.mProblem.NumObjectives - 1
-                                If (Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung = Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Bezeichnung) Then
-                                    Me.Hauptdiagramm1.ZielIndexY = i
-                                    Exit For 'Abbruch
-                                End If
-                            Next
+                            Me.Hauptdiagramm1.ZielIndexY = Me.mSettings.SensiPlot.Selected_Objective
                             Me.Hauptdiagramm1.ZielIndexZ = -1
 
                         End If
@@ -1550,7 +1540,7 @@ Partial Public Class Form1
             Call Me.solutionDialog.addSolution(ind)
 
             'Lösung im Hauptdiagramm anzeigen
-            Call Me.Hauptdiagramm1.ZeichneAusgewählteLösung(ind)
+            Call Me.Hauptdiagramm1.DrawSelectedSolution(ind)
 
             'Lösung in den Scatterplots anzeigen
             If (Not IsNothing(Me.scatterplot1)) Then
@@ -1619,7 +1609,7 @@ Partial Public Class Form1
         'Im Hauptdiagramm neu zeichnen
         Call Me.Hauptdiagramm1.LöscheAusgewählteLösungen()
         For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
-            Call Me.Hauptdiagramm1.ZeichneAusgewählteLösung(ind)
+            Call Me.Hauptdiagramm1.DrawSelectedSolution(ind)
         Next
 
         'In den Scatterplot-Matrizen neu zeichnen

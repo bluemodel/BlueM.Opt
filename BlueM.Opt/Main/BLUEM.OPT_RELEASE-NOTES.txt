@@ -12,6 +12,7 @@ NEW:
 FIXED:
 * SensiPlot: fix direction of objective functions not being considered when plotting results
 * SensiPlot: make scatterplot and custom plot windows usable for SensiPlot
+* SensiPlot: fix not being able to select or show selected solutions in the main diagram #206
 CHANGED:
 * Updated Talsim-NG Engine to v3.2.12
 

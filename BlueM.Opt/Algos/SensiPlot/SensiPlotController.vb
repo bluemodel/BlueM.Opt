@@ -64,6 +64,7 @@ Public Class SensiPlotController
         '------------------------------------------------------------------------
 
         Dim i, n, NumParams, NumSteps As Integer
+        Dim x, y, z As Double
         Dim isOK As Boolean
         Dim ind As Common.Individuum
         Dim serie As Steema.TeeChart.Styles.Points
@@ -127,9 +128,9 @@ Public Class SensiPlotController
             Dim parameterCombination As Double() = parameterCombinations(i)
 
             'OptParameterwerte setzen
-            For p As Integer = 0 To NumParams - 1
-                With Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(p))
-                    .Xn = parameterCombination(p)
+            For j = 0 To NumParams - 1
+                With Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(j))
+                    .Xn = parameterCombination(j)
                     Common.Log.AddMessage(Common.Log.levels.info, $"* OptParameter { .Bezeichnung}: {Convert.ToString(.RWert, Common.Provider.FortranProvider)}")
                 End With
             Next
@@ -139,7 +140,7 @@ Public Class SensiPlotController
 
             'Einhaltung von OptParameter-Beziehung überprüfen
             isOK = True
-            If (NumParams > 1) Then
+            If NumParams > 1 Then
                 'Es muss nur der zweite Parameter auf eine Beziehung geprüft werden
                 If (Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Beziehung <> Relationship.none) Then
                     'Beziehung bezieht sich immer auf den in der Liste vorherigen Parameter
@@ -177,7 +178,7 @@ Public Class SensiPlotController
                 'WorkDir einrichten
                 If Me.mySettings.SensiPlot.Save_Results Then
                     'Unterverzeichnis einrichten
-                    WorkDir = IO.Path.Combine(Sim1.WorkDir_Original, $"sensiplot_{n:0000}")
+                    WorkDir = IO.Path.Combine(Sim1.WorkDir_Original, $"sensiplot_{ind.ID:0000}")
                     If Not IO.Directory.Exists(WorkDir) Then
                         IO.Directory.CreateDirectory(WorkDir)
                     End If
@@ -196,15 +197,20 @@ Public Class SensiPlotController
                 'Erfolgreich evaluiertes Individuum in Diagramm eintragen
                 If (isOK) Then
                     If (NumParams = 1) Then
-                        '1 Parameter
+                        '1 Parameter, x is opt parameter, y is objective function
                         serie = Me.myHauptDiagramm.getSeriesPoint("SensiPlot", "Orange")
-                        serie.Add(ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung, ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), n.ToString())
+                        x = ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0))
+                        y = ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung
+                        serie.Add(x, y, ind.ID.ToString())
                     Else
-                        '> 1 parameters, plot first two opt parameters
-                        serie3D.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung, ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
-                        'if 2 parameters, add a 2D surface
+                        '> 1 parameters, x and z are first two opt parameters, y is objective function
+                        x = ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0))
+                        z = ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1))
+                        y = ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung
+                        serie3D.Add(x, y, z, ind.ID.ToString())
+                        'if exactly 2 parameters, add a 2D surface
                         If NumParams = 2 Then
-                            surface.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung, ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
+                            surface.Add(x, y, z, ind.ID.ToString())
                         End If
                     End If
 
@@ -213,7 +219,7 @@ Public Class SensiPlotController
                         'SimReihe auslesen
                         SimReihe = Sim1.SimErgebnis.Reihen(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
                         'Lösungs-ID an Titel anhängen
-                        SimReihe.Title &= $" (Solution {n})"
+                        SimReihe.Title &= $" (Solution {ind.ID})"
                         'SimReihe zu Collection hinzufügen
                         SimReihen.Add(SimReihe)
                     End If
