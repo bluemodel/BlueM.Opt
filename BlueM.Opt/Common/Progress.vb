@@ -129,7 +129,7 @@ Public Class Progress
         End Get
         Set(ByVal value As Integer)
             'MaxWert abfangen
-            value = Math.Min(value, Me.NNachf - 1)
+            value = Math.Min(value, Me.NNachf)
             m_iNachf = value
             RaiseEvent iNachfChanged()
         End Set
