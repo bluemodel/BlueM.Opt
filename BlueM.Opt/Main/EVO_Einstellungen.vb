@@ -282,7 +282,8 @@ Public Class EVO_Einstellungen
         SensiPlot_ListBox_OptParameter.SelectedIndexChanged,
         SensiPlot_ListBox_Objectives.SelectedIndexChanged,
         SensiPlot_RadioButton_ModeEvenDistribution.CheckedChanged,
-        SensiPlot_RadioButton_ModeRandom.CheckedChanged
+        SensiPlot_RadioButton_ModeRandom.CheckedChanged,
+        SensiPlot_RadioButton_ModeLatinHypercube.CheckedChanged
 
         If (Me.isInitializing) Then Exit Sub
 
@@ -350,6 +351,25 @@ Public Class EVO_Einstellungen
             Label_NThreads.Enabled = False
             NumericUpDown_NThreads.Enabled = False
         End If
+    End Sub
+
+    ''' <summary>
+    ''' Updates the display of the total number of required simulations for SensiPlot
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub SensiPlot_NumericUpDown_NumSteps_ValueChanged(sender As Object, e As EventArgs) Handles _
+        SensiPlot_NumericUpDown_NumSteps.ValueChanged,
+        SensiPlot_RadioButton_ModeEvenDistribution.CheckedChanged,
+        SensiPlot_ListBox_OptParameter.SelectedIndexChanged
+
+        Dim NumSims As Integer
+        If SensiPlot_RadioButton_ModeEvenDistribution.Checked Then
+            NumSims = SensiPlot_NumericUpDown_NumSteps.Value ^ SensiPlot_ListBox_OptParameter.SelectedIndices.Count
+        Else
+            NumSims = SensiPlot_NumericUpDown_NumSteps.Value
+        End If
+        SensiPlot_Label_NumSims.Text = $"({NumSims} simulations)"
     End Sub
 
 #End Region 'Events
