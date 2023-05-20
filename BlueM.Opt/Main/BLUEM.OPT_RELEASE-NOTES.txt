@@ -11,6 +11,7 @@ NEW:
 * SensiPlot: number of optimization parameters that can be varied at the same time is now infinite
 FIXED:
 * SensiPlot: fix direction of objective functions not being considered when plotting results
+* SensiPlot: make scatterplot and custom plot windows usable for SensiPlot
 CHANGED:
 * Updated Talsim-NG Engine to v3.2.12
 

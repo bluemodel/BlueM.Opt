@@ -96,6 +96,12 @@ Public Class ScatterplotDialog
             Me.CheckBox_showRef.Enabled = False
         End If
 
+        'Deactive SekPop only option for SensiPlot
+        If Me.mProblem.Method = Common.METH_SENSIPLOT Then
+            Me.CheckBox_SekPopOnly.Checked = False
+            Me.CheckBox_SekPopOnly.Enabled = False
+        End If
+
         'Default-Auswahl setzen
         Me.RadioButton_SolutionSpace.Checked = True
 

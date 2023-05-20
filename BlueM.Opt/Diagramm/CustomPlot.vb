@@ -97,9 +97,11 @@ Public Class CustomPlot
         End With
 
         'instantiate series
-        Me._series_StartValue = Me.Diag.getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+        If Me._problem.Method <> Common.METH_SENSIPLOT Then
+            Me._series_StartValue = Me.Diag.getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
+            Me._series_SekPop = Me.Diag.getSeriesPoint("Secondary population", "Green")
+        End If
         Me._series_Population = Me.Diag.getSeriesPoint("Population", "Orange")
-        Me._series_SekPop = Me.Diag.getSeriesPoint("Secondary population", "Green")
         Me._series_Selected = Me.Diag.getSeriesPoint("Selected solutions", "Red")
 
         'format marks for selected solutions series
@@ -164,10 +166,12 @@ Public Class CustomPlot
 
         Dim ind As Common.Individuum
 
-        'plot start value
-        _series_StartValue.Clear()
-        ind = _optresult.getSolution(1)
-        _series_StartValue.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Richtung, ind.ID.ToString)
+        If Me._problem.Method <> Common.METH_SENSIPLOT Then
+            'plot start value
+            _series_StartValue.Clear()
+            ind = _optresult.getSolution(1)
+            _series_StartValue.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Richtung, ind.ID.ToString)
+        End If
 
         'plot population
         _series_Population.Clear()
@@ -175,11 +179,13 @@ Public Class CustomPlot
             _series_Population.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Richtung, ind.ID.ToString)
         Next
 
-        'plot secondary population
-        _series_SekPop.Clear()
-        For Each ind In Me._optresult.getSekPop
-            _series_SekPop.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Richtung, ind.ID.ToString)
-        Next
+        If Me._problem.Method <> Common.METH_SENSIPLOT Then
+            'plot secondary population
+            _series_SekPop.Clear()
+            For Each ind In Me._optresult.getSekPop
+                _series_SekPop.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Richtung, ind.ID.ToString)
+            Next
+        End If
 
         'plot selected solutions
         _series_Selected.Clear()
