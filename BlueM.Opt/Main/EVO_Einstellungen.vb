@@ -288,28 +288,11 @@ Public Class EVO_Einstellungen
 
         Dim i As Integer
 
-        'Entweder 1 oder 2 OptParameter
-        If (Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count = 0 _
-            Or Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count > 2) Then
-            MsgBox("Bitte zwischen 1 und 2 OptParameter auswählen!", MsgBoxStyle.Exclamation, "SensiPlot")
-            'Auswahl zurücksetzen
-            Me.isInitializing = True
-            For i = 0 To Me.SensiPlot_ListBox_OptParameter.Items.Count - 1
-                Call Me.SensiPlot_ListBox_OptParameter.SetSelected(i, False)
-            Next
-            Me.isInitializing = False
-            'Ersten OptParameter auswählen
-            Me.SensiPlot_ListBox_OptParameter.SetSelected(0, True)
+        'Mindestens 1 OptParameter
+        If (Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count = 0) Then
+            MsgBox("Please select at least one optimization parameter!", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
-
-        ''bei 2 OptParametern geht nur diskret!
-        'If (Me.SensiPlot_ListBox_OptParameter.SelectedIndices.Count = 2 And
-        '    Me.SensiPlot_RadioButton_ModeRandom.Checked) Then
-        '    MsgBox("Bei mehr als einem OptParameter muss 'Diskret' als Modus ausgewählt sein!", MsgBoxStyle.Exclamation, "SensiPlot")
-        '    Me.SensiPlot_RadioButton_ModeEvenDistribution.Checked = True
-        '    Exit Sub
-        'End If
 
         Me.SensiPlot_RadioButton_ModeEvenDistribution.DataBindings("Checked").WriteValue()
         Me.SensiPlot_RadioButton_ModeRandom.DataBindings("Checked").WriteValue()

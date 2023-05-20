@@ -128,6 +128,7 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_Label_NumSteps = New System.Windows.Forms.Label()
         Me.SensiPlot_NumericUpDown_NumSteps = New System.Windows.Forms.NumericUpDown()
         Me.SensiPlot_GroupBox_Modus = New System.Windows.Forms.GroupBox()
+        Me.SensiPlot_RadioButton_ModeLatinHypercube = New System.Windows.Forms.RadioButton()
         Me.SensiPlot_RadioButton_ModeEvenDistribution = New System.Windows.Forms.RadioButton()
         Me.SensiPlot_RadioButton_ModeRandom = New System.Windows.Forms.RadioButton()
         Me.SensiPlot_Label_Objectives = New System.Windows.Forms.Label()
@@ -152,7 +153,6 @@ Partial Class EVO_Einstellungen
         Me.TSP_Label_n_cities = New System.Windows.Forms.Label()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox()
-        Me.SensiPlot_RadioButton_ModeLatinHypercube = New System.Windows.Forms.RadioButton()
         Label_OptModus = New System.Windows.Forms.Label()
         LabelStrategie = New System.Windows.Forms.Label()
         LabelStartwerte = New System.Windows.Forms.Label()
@@ -1349,7 +1349,7 @@ Partial Class EVO_Einstellungen
         '
         Me.SensiPlot_CheckBox_SaveResults.AutoSize = True
         Me.SensiPlot_CheckBox_SaveResults.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "Save_Results", True))
-        Me.SensiPlot_CheckBox_SaveResults.Location = New System.Drawing.Point(6, 534)
+        Me.SensiPlot_CheckBox_SaveResults.Location = New System.Drawing.Point(6, 491)
         Me.SensiPlot_CheckBox_SaveResults.Name = "SensiPlot_CheckBox_SaveResults"
         Me.SensiPlot_CheckBox_SaveResults.Size = New System.Drawing.Size(141, 17)
         Me.SensiPlot_CheckBox_SaveResults.TabIndex = 16
@@ -1365,7 +1365,7 @@ Partial Class EVO_Einstellungen
         '
         Me.SensiPlot_CheckBox_wave.AutoSize = True
         Me.SensiPlot_CheckBox_wave.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "Show_Wave", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
-        Me.SensiPlot_CheckBox_wave.Location = New System.Drawing.Point(6, 511)
+        Me.SensiPlot_CheckBox_wave.Location = New System.Drawing.Point(6, 468)
         Me.SensiPlot_CheckBox_wave.Name = "SensiPlot_CheckBox_wave"
         Me.SensiPlot_CheckBox_wave.Size = New System.Drawing.Size(129, 17)
         Me.SensiPlot_CheckBox_wave.TabIndex = 15
@@ -1377,7 +1377,7 @@ Partial Class EVO_Einstellungen
         'SensiPlot_Label_NumSteps
         '
         Me.SensiPlot_Label_NumSteps.AutoSize = True
-        Me.SensiPlot_Label_NumSteps.Location = New System.Drawing.Point(3, 487)
+        Me.SensiPlot_Label_NumSteps.Location = New System.Drawing.Point(3, 444)
         Me.SensiPlot_Label_NumSteps.Name = "SensiPlot_Label_NumSteps"
         Me.SensiPlot_Label_NumSteps.Size = New System.Drawing.Size(67, 13)
         Me.SensiPlot_Label_NumSteps.TabIndex = 14
@@ -1386,7 +1386,7 @@ Partial Class EVO_Einstellungen
         'SensiPlot_NumericUpDown_NumSteps
         '
         Me.SensiPlot_NumericUpDown_NumSteps.DataBindings.Add(New System.Windows.Forms.Binding("Value", Me.BindingSource_Sensiplot, "Num_Steps", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
-        Me.SensiPlot_NumericUpDown_NumSteps.Location = New System.Drawing.Point(94, 485)
+        Me.SensiPlot_NumericUpDown_NumSteps.Location = New System.Drawing.Point(94, 442)
         Me.SensiPlot_NumericUpDown_NumSteps.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
         Me.SensiPlot_NumericUpDown_NumSteps.Minimum = New Decimal(New Integer() {2, 0, 0, 0})
         Me.SensiPlot_NumericUpDown_NumSteps.Name = "SensiPlot_NumericUpDown_NumSteps"
@@ -1400,12 +1400,23 @@ Partial Class EVO_Einstellungen
         Me.SensiPlot_GroupBox_Modus.Controls.Add(Me.SensiPlot_RadioButton_ModeLatinHypercube)
         Me.SensiPlot_GroupBox_Modus.Controls.Add(Me.SensiPlot_RadioButton_ModeEvenDistribution)
         Me.SensiPlot_GroupBox_Modus.Controls.Add(Me.SensiPlot_RadioButton_ModeRandom)
-        Me.SensiPlot_GroupBox_Modus.Location = New System.Drawing.Point(6, 380)
+        Me.SensiPlot_GroupBox_Modus.Location = New System.Drawing.Point(3, 344)
         Me.SensiPlot_GroupBox_Modus.Name = "SensiPlot_GroupBox_Modus"
         Me.SensiPlot_GroupBox_Modus.Size = New System.Drawing.Size(209, 92)
         Me.SensiPlot_GroupBox_Modus.TabIndex = 12
         Me.SensiPlot_GroupBox_Modus.TabStop = False
         Me.SensiPlot_GroupBox_Modus.Text = "Mode"
+        '
+        'SensiPlot_RadioButton_ModeLatinHypercube
+        '
+        Me.SensiPlot_RadioButton_ModeLatinHypercube.AutoSize = True
+        Me.SensiPlot_RadioButton_ModeLatinHypercube.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "ModeLatinHypercube", True))
+        Me.SensiPlot_RadioButton_ModeLatinHypercube.Location = New System.Drawing.Point(9, 65)
+        Me.SensiPlot_RadioButton_ModeLatinHypercube.Name = "SensiPlot_RadioButton_ModeLatinHypercube"
+        Me.SensiPlot_RadioButton_ModeLatinHypercube.Size = New System.Drawing.Size(147, 17)
+        Me.SensiPlot_RadioButton_ModeLatinHypercube.TabIndex = 11
+        Me.SensiPlot_RadioButton_ModeLatinHypercube.Text = "Latin Hypercube sampling"
+        Me.SensiPlot_RadioButton_ModeLatinHypercube.UseVisualStyleBackColor = True
         '
         'SensiPlot_RadioButton_ModeEvenDistribution
         '
@@ -1434,16 +1445,16 @@ Partial Class EVO_Einstellungen
         'SensiPlot_Label_Objectives
         '
         Me.SensiPlot_Label_Objectives.AutoSize = True
-        Me.SensiPlot_Label_Objectives.Location = New System.Drawing.Point(3, 195)
+        Me.SensiPlot_Label_Objectives.Location = New System.Drawing.Point(3, 175)
         Me.SensiPlot_Label_Objectives.Name = "SensiPlot_Label_Objectives"
-        Me.SensiPlot_Label_Objectives.Size = New System.Drawing.Size(147, 13)
+        Me.SensiPlot_Label_Objectives.Size = New System.Drawing.Size(177, 13)
         Me.SensiPlot_Label_Objectives.TabIndex = 6
-        Me.SensiPlot_Label_Objectives.Text = "Objective functions (select 1):"
+        Me.SensiPlot_Label_Objectives.Text = "Objective function (for main display):"
         '
         'SensiPlot_ListBox_Objectives
         '
         Me.SensiPlot_ListBox_Objectives.FormattingEnabled = True
-        Me.SensiPlot_ListBox_Objectives.Location = New System.Drawing.Point(6, 214)
+        Me.SensiPlot_ListBox_Objectives.Location = New System.Drawing.Point(3, 191)
         Me.SensiPlot_ListBox_Objectives.Name = "SensiPlot_ListBox_Objectives"
         Me.SensiPlot_ListBox_Objectives.Size = New System.Drawing.Size(209, 147)
         Me.SensiPlot_ListBox_Objectives.TabIndex = 5
@@ -1451,18 +1462,18 @@ Partial Class EVO_Einstellungen
         'SensiPlot_Label_OptParameter
         '
         Me.SensiPlot_Label_OptParameter.AutoSize = True
-        Me.SensiPlot_Label_OptParameter.Location = New System.Drawing.Point(3, 0)
+        Me.SensiPlot_Label_OptParameter.Location = New System.Drawing.Point(2, 9)
         Me.SensiPlot_Label_OptParameter.Name = "SensiPlot_Label_OptParameter"
-        Me.SensiPlot_Label_OptParameter.Size = New System.Drawing.Size(195, 13)
+        Me.SensiPlot_Label_OptParameter.Size = New System.Drawing.Size(122, 13)
         Me.SensiPlot_Label_OptParameter.TabIndex = 4
-        Me.SensiPlot_Label_OptParameter.Text = "Optimization parameters (select up to 2):"
+        Me.SensiPlot_Label_OptParameter.Text = "Optimization parameters:"
         '
         'SensiPlot_ListBox_OptParameter
         '
-        Me.SensiPlot_ListBox_OptParameter.Location = New System.Drawing.Point(6, 22)
+        Me.SensiPlot_ListBox_OptParameter.Location = New System.Drawing.Point(3, 25)
         Me.SensiPlot_ListBox_OptParameter.Name = "SensiPlot_ListBox_OptParameter"
         Me.SensiPlot_ListBox_OptParameter.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.SensiPlot_ListBox_OptParameter.Size = New System.Drawing.Size(209, 160)
+        Me.SensiPlot_ListBox_OptParameter.Size = New System.Drawing.Size(209, 147)
         Me.SensiPlot_ListBox_OptParameter.TabIndex = 3
         '
         'TabPage_TSP
@@ -1649,18 +1660,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabIndex = 0
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Settings:"
-        '
-        'SensiPlot_RadioButton_ModeLatinHypercube
-        '
-        Me.SensiPlot_RadioButton_ModeLatinHypercube.AutoSize = True
-        Me.SensiPlot_RadioButton_ModeLatinHypercube.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "ModeLatinHypercube", True))
-        Me.SensiPlot_RadioButton_ModeLatinHypercube.Location = New System.Drawing.Point(9, 65)
-        Me.SensiPlot_RadioButton_ModeLatinHypercube.Name = "SensiPlot_RadioButton_ModeLatinHypercube"
-        Me.SensiPlot_RadioButton_ModeLatinHypercube.Size = New System.Drawing.Size(147, 17)
-        Me.SensiPlot_RadioButton_ModeLatinHypercube.TabIndex = 11
-        Me.SensiPlot_RadioButton_ModeLatinHypercube.TabStop = True
-        Me.SensiPlot_RadioButton_ModeLatinHypercube.Text = "Latin Hypercube sampling"
-        Me.SensiPlot_RadioButton_ModeLatinHypercube.UseVisualStyleBackColor = True
         '
         'EVO_Einstellungen
         '
