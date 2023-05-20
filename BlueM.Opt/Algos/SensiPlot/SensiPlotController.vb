@@ -205,11 +205,11 @@ Public Class SensiPlotController
                     If (NumParams = 1) Then
                         '1 Parameter
                         serie = Me.myHauptDiagramm.getSeriesPoint("SensiPlot", "Orange")
-                        serie.Add(ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), n.ToString())
+                        serie.Add(ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung, ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), n.ToString())
                     Else
                         '> 1 Parameter, plot first two opt parameters
-                        surface.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
-                        serie3D.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective), ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
+                        surface.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung, ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
+                        serie3D.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung, ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
                     End If
 
                     'Simulationsergebnis in Wave laden

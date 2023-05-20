@@ -8,6 +8,8 @@ NEW:
 * Talsim: added the file extension "ABZ" as part of the dataset
 * Test problems: added a new test problem of the Ackley function
 * SensiPlot: added Latin Hypercube Sampling as a method for parameter sampling #228
+FIXED:
+* SensiPlot: fix direction of objective functions not being considered when plotting results
 CHANGED:
 * Updated Talsim-NG Engine to v3.2.12
 
