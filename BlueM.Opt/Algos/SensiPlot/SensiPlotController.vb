@@ -63,7 +63,7 @@ Public Class SensiPlotController
         'geschrieben, und zwar mit den in der OPT-Datei angegebenen Startwerten
         '------------------------------------------------------------------------
 
-        Dim i, n, NumParams, NumSteps, NumSims As Integer
+        Dim i, n, NumParams, NumSteps As Integer
         Dim isOK As Boolean
         Dim ind As Common.Individuum
         Dim serie As Steema.TeeChart.Styles.Points
@@ -83,27 +83,8 @@ Public Class SensiPlotController
         'Steps
         NumSteps = Me.mySettings.SensiPlot.Num_Steps
 
-        'Anzahl Simulationen
-        'TODO: update this!
-        If (NumParams = 1) Then
-            '1 Parameter
-            NumSims = NumSteps
-        Else
-            '2 Parameter
-            NumSims = NumSteps ^ 2
-        End If
-
-        'Progress initialisieren
-        Call Me.myProgress.Initialize(0, 0, 0, NumSims)
-
         'Bei 2 OptParametern 3D-Diagramm vorbereiten
-        If (NumParams > 1) Then
-            'Oberfläche
-            'TODO: make irregular triangle for LatinHypercube
-            surface = New Steema.TeeChart.Styles.Surface(Me.myHauptDiagramm.Chart)
-            surface.IrregularGrid = True
-            surface.NumXValues = NumSteps
-            surface.NumZValues = NumSteps
+        If NumParams > 1 Then
             '3D-Punkte
             serie3D = Me.myHauptDiagramm.getSeries3DPoint("Sensiplot", "Orange")
             'Diagramm drehen (rechter Mausbutton)
@@ -112,14 +93,26 @@ Public Class SensiPlotController
             Me.myHauptDiagramm.Tools.Add(rotate1)
             'MarksTips
             Me.myHauptDiagramm.add_MarksTips(serie3D, Steema.TeeChart.Styles.MarksStyles.Label)
-            surface.Title = "SensiPlot"
-            surface.Cursor = System.Windows.Forms.Cursors.Hand
+
+            If NumParams = 2 Then
+                'Add a 2D surface
+                'TODO: make irregular triangle TriSurface for LatinHypercube, but always requires at least 4 points
+                surface = New Steema.TeeChart.Styles.Surface(Me.myHauptDiagramm.Chart)
+                surface.IrregularGrid = True
+                surface.NumXValues = NumSteps
+                surface.NumZValues = NumSteps
+                surface.Title = "SensiPlot"
+                surface.Cursor = System.Windows.Forms.Cursors.Hand
+            End If
         End If
 
         'sample optparameters
         Dim parameterCombinations As New List(Of Double())
         Dim sampler As New ParameterSampler()
         parameterCombinations = sampler.Sample(NumParams, NumSteps, Me.mySettings.SensiPlot.Selected_Mode)
+
+        'Progress initialisieren
+        Call Me.myProgress.Initialize(0, 0, 0, parameterCombinations.Count)
 
         'Simulationsschleife
         '-------------------
@@ -207,9 +200,12 @@ Public Class SensiPlotController
                         serie = Me.myHauptDiagramm.getSeriesPoint("SensiPlot", "Orange")
                         serie.Add(ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung, ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), n.ToString())
                     Else
-                        '> 1 Parameter, plot first two opt parameters
-                        surface.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung, ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
+                        '> 1 parameters, plot first two opt parameters
                         serie3D.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung, ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
+                        'if 2 parameters, add a 2D surface
+                        If NumParams = 2 Then
+                            surface.Add(ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0)), ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung, ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1)), n.ToString())
+                        End If
                     End If
 
                     'Simulationsergebnis in Wave laden
