@@ -200,6 +200,22 @@ Partial Public Class Form1
             Me.solutionDialog = Nothing
         End If
 
+        'Scatterplot
+        If Not IsNothing(Me.scatterplot1) Then
+            Me.scatterplot1.Close()
+            Me.scatterplot1 = Nothing
+        End If
+        If Not IsNothing(Me.scatterplot2) Then
+            Me.scatterplot2.Close()
+            Me.scatterplot2 = Nothing
+        End If
+
+        'CustomPlot
+        If Not IsNothing(Me.customPlot) Then
+            Me.customPlot.Close()
+            Me.customPlot = Nothing
+        End If
+
         Me.IsInitializing = False
 
     End Sub
