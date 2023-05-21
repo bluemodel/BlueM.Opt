@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30104.148
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlueM.Opt.Algos", "BlueM.Opt.Algos", "{44D440EE-4641-44A1-B177-2DD0FDD6FB75}"
 EndProject
@@ -31,6 +31,10 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TSP", "BlueM.Opt\Algos\TSP\TSP.vbproj", "{6FCD5583-4A2A-4298-8A48-D46FAEFC5D7C}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Wave", "BlueM.Wave\source\Wave.vbproj", "{CE4132A2-2E2F-4F54-B66D-1BAA928D499E}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SensiPlot_ParameterSampling", "BlueM.Opt\Tests\SensiPlot_ParameterSampling\SensiPlot_ParameterSampling.vbproj", "{2BC34399-890A-4C37-85A4-3F8D633835B9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlueM.Opt.Tests", "BlueM.Opt.Tests", "{2846C8D3-E679-4D5C-95B4-4CF3E4BF7122}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -152,6 +156,12 @@ Global
 		{CE4132A2-2E2F-4F54-B66D-1BAA928D499E}.Release|x64.Build.0 = Release|x64
 		{CE4132A2-2E2F-4F54-B66D-1BAA928D499E}.Release|x86.ActiveCfg = Release|x86
 		{CE4132A2-2E2F-4F54-B66D-1BAA928D499E}.Release|x86.Build.0 = Release|x86
+		{2BC34399-890A-4C37-85A4-3F8D633835B9}.Debug|x64.ActiveCfg = Debug|x64
+		{2BC34399-890A-4C37-85A4-3F8D633835B9}.Debug|x64.Build.0 = Debug|x64
+		{2BC34399-890A-4C37-85A4-3F8D633835B9}.Debug|x86.ActiveCfg = Debug|x86
+		{2BC34399-890A-4C37-85A4-3F8D633835B9}.Debug|x86.Build.0 = Debug|x86
+		{2BC34399-890A-4C37-85A4-3F8D633835B9}.Release|x64.ActiveCfg = Release|x64
+		{2BC34399-890A-4C37-85A4-3F8D633835B9}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -164,6 +174,7 @@ Global
 		{85403900-E545-4122-B1A0-8C30AE0D0F3C} = {44D440EE-4641-44A1-B177-2DD0FDD6FB75}
 		{A9272445-616D-4B4F-ACFF-DE6F5591AF63} = {44D440EE-4641-44A1-B177-2DD0FDD6FB75}
 		{6FCD5583-4A2A-4298-8A48-D46FAEFC5D7C} = {44D440EE-4641-44A1-B177-2DD0FDD6FB75}
+		{2BC34399-890A-4C37-85A4-3F8D633835B9} = {2846C8D3-E679-4D5C-95B4-4CF3E4BF7122}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4558EFAB-BB97-40C0-BF67-4380356C931B}
