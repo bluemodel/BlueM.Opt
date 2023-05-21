@@ -1675,6 +1675,10 @@ Partial Public Class Form1
                 Continue For
             End If
 
+            If Me.mProblem.Method = METH_SENSIPLOT & Me.mSettings.SensiPlot.Save_Results Then
+                'TODO: reuse existing simulation results in folder $"sensiplot_{ind.ID:0000}"!
+            End If
+
             'WorkDir einrichten
             WorkDir = IO.Path.Combine(Sim1.WorkDir_Original, "solution_" & ind.ID.ToString("0000"))
             If Not IO.Directory.Exists(WorkDir) Then
