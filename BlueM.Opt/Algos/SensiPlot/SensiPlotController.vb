@@ -102,6 +102,12 @@ Public Class SensiPlotController
                 surface.IrregularGrid = True
                 surface.NumXValues = NumSteps
                 surface.NumZValues = NumSteps
+                surface.UseColorRange = False
+                surface.UsePalette = True
+                surface.PaletteStyle = Steema.TeeChart.Styles.PaletteStyles.Rainbow
+                surface.Brush.Solid = True
+                surface.Brush.Transparency = 70
+                surface.Pen.Visible = False
                 surface.Title = "SensiPlot"
                 surface.Cursor = System.Windows.Forms.Cursors.Hand
             End If
