@@ -15,8 +15,6 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Option Strict Off 'allows permissive type semantics. explicit narrowing conversions are not required 
-
 Imports BlueM.Opt.Common.Constants
 Imports System.Windows.Forms
 Imports System.ComponentModel
