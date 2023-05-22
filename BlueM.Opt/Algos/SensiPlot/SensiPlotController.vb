@@ -144,36 +144,38 @@ Public Class SensiPlotController
             'Verlaufsanzeige aktualisieren
             Call Me.myProgress.NextNachf()
 
-            'Einhaltung von OptParameter-Beziehung überprüfen
-            isOK = True
-            If NumParams > 1 Then
-                'Es muss nur der zweite Parameter auf eine Beziehung geprüft werden
-                If (Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Beziehung <> Relationship.none) Then
-                    'Beziehung bezieht sich immer auf den in der Liste vorherigen Parameter
-                    If (Me.mySettings.SensiPlot.Selected_OptParameters(0) = Me.mySettings.SensiPlot.Selected_OptParameters(1) - 1) Then
+            'Check whether parameter relationships are satisfied
+            Dim allRelationshipsSatisfied As Boolean = True
+            For j = 1 To Me.myProblem.List_OptParameter.Length - 1 'start checking from the second parameter
 
-                        isOK = False
+                If Me.myProblem.List_OptParameter(j).Beziehung <> Relationship.none Then
+                    Dim relationshipSatisfied As Boolean = False
+                    Dim ref As Double = Me.myProblem.List_OptParameter(j - 1).RWert
+                    Dim wert As Double = Me.myProblem.List_OptParameter(j).RWert
 
-                        Dim ref As Double = Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(0)).RWert
-                        Dim wert As Double = Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).RWert
+                    Select Case Me.myProblem.List_OptParameter(j).Beziehung
+                        Case Relationship.smaller_than
+                            If (wert < ref) Then relationshipSatisfied = True
+                        Case Relationship.smaller_equal
+                            If (wert <= ref) Then relationshipSatisfied = True
+                        Case Relationship.larger_than
+                            If (wert > ref) Then relationshipSatisfied = True
+                        Case Relationship.larger_equal
+                            If (wert >= ref) Then relationshipSatisfied = True
+                    End Select
 
-                        Select Case Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(1)).Beziehung
-                            Case Relationship.smaller_than
-                                If (wert < ref) Then isOK = True
-                            Case Relationship.smaller_equal
-                                If (wert <= ref) Then isOK = True
-                            Case Relationship.larger_than
-                                If (wert > ref) Then isOK = True
-                            Case Relationship.larger_equal
-                                If (wert >= ref) Then isOK = True
-                        End Select
-
+                    If Not relationshipSatisfied Then
+                        allRelationshipsSatisfied = False
+                        Common.Log.AddMessage(Common.Log.levels.warning, $"Relationship for optimization parameter {Me.myProblem.List_OptParameter(j).Bezeichnung} is not satisfied!")
                     End If
                 End If
-            End If
+            Next
 
-            'Evaluierung nur bei isOK
-            If (isOK) Then
+            If Not allRelationshipsSatisfied Then
+                'Skip evaluation
+                Common.Log.AddMessage(Common.Log.levels.warning, $"Skipping evaluation of parameter combination {n} because of parameter relationship violations!")
+            Else
+                'Evaluate parameter combination
 
                 'Individuum instanzieren
                 ind = New Common.Individuum_PES("SensiPlot", n)
