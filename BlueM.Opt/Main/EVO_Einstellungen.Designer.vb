@@ -122,7 +122,7 @@ Partial Class EVO_Einstellungen
         Me.DDS_Numeric_maxiter = New System.Windows.Forms.NumericUpDown()
         Me.DDS_Numeric_r_val = New System.Windows.Forms.NumericUpDown()
         Me.TabPage_SensiPlot = New System.Windows.Forms.TabPage()
-        Me.SensiPlot_Label_NumSims = New System.Windows.Forms.Label()
+        Me.SensiPlot_Label_NumCombinations = New System.Windows.Forms.Label()
         Me.SensiPlot_CheckBox_SaveResults = New System.Windows.Forms.CheckBox()
         Me.BindingSource_Sensiplot = New System.Windows.Forms.BindingSource(Me.components)
         Me.SensiPlot_CheckBox_wave = New System.Windows.Forms.CheckBox()
@@ -1329,7 +1329,7 @@ Partial Class EVO_Einstellungen
         'TabPage_SensiPlot
         '
         Me.TabPage_SensiPlot.AutoScroll = True
-        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_Label_NumSims)
+        Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_Label_NumCombinations)
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_CheckBox_SaveResults)
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_CheckBox_wave)
         Me.TabPage_SensiPlot.Controls.Add(Me.SensiPlot_Label_NumSteps)
@@ -1347,21 +1347,21 @@ Partial Class EVO_Einstellungen
         Me.TabPage_SensiPlot.Text = "SensiPlot"
         Me.TabPage_SensiPlot.UseVisualStyleBackColor = True
         '
-        'SensiPlot_Label_NumSims
+        'SensiPlot_Label_NumCombinations
         '
-        Me.SensiPlot_Label_NumSims.AutoSize = True
-        Me.SensiPlot_Label_NumSims.ForeColor = System.Drawing.SystemColors.ControlDarkDark
-        Me.SensiPlot_Label_NumSims.Location = New System.Drawing.Point(126, 444)
-        Me.SensiPlot_Label_NumSims.Name = "SensiPlot_Label_NumSims"
-        Me.SensiPlot_Label_NumSims.Size = New System.Drawing.Size(74, 13)
-        Me.SensiPlot_Label_NumSims.TabIndex = 17
-        Me.SensiPlot_Label_NumSims.Text = "(X simulations)"
+        Me.SensiPlot_Label_NumCombinations.AutoSize = True
+        Me.SensiPlot_Label_NumCombinations.ForeColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.SensiPlot_Label_NumCombinations.Location = New System.Drawing.Point(3, 465)
+        Me.SensiPlot_Label_NumCombinations.Name = "SensiPlot_Label_NumCombinations"
+        Me.SensiPlot_Label_NumCombinations.Size = New System.Drawing.Size(129, 13)
+        Me.SensiPlot_Label_NumCombinations.TabIndex = 17
+        Me.SensiPlot_Label_NumCombinations.Text = "X parameter combinations"
         '
         'SensiPlot_CheckBox_SaveResults
         '
         Me.SensiPlot_CheckBox_SaveResults.AutoSize = True
         Me.SensiPlot_CheckBox_SaveResults.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "Save_Results", True))
-        Me.SensiPlot_CheckBox_SaveResults.Location = New System.Drawing.Point(6, 491)
+        Me.SensiPlot_CheckBox_SaveResults.Location = New System.Drawing.Point(6, 507)
         Me.SensiPlot_CheckBox_SaveResults.Name = "SensiPlot_CheckBox_SaveResults"
         Me.SensiPlot_CheckBox_SaveResults.Size = New System.Drawing.Size(141, 17)
         Me.SensiPlot_CheckBox_SaveResults.TabIndex = 16
@@ -1377,7 +1377,7 @@ Partial Class EVO_Einstellungen
         '
         Me.SensiPlot_CheckBox_wave.AutoSize = True
         Me.SensiPlot_CheckBox_wave.DataBindings.Add(New System.Windows.Forms.Binding("Checked", Me.BindingSource_Sensiplot, "Show_Wave", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
-        Me.SensiPlot_CheckBox_wave.Location = New System.Drawing.Point(6, 468)
+        Me.SensiPlot_CheckBox_wave.Location = New System.Drawing.Point(6, 484)
         Me.SensiPlot_CheckBox_wave.Name = "SensiPlot_CheckBox_wave"
         Me.SensiPlot_CheckBox_wave.Size = New System.Drawing.Size(148, 17)
         Me.SensiPlot_CheckBox_wave.TabIndex = 15
@@ -1854,5 +1854,5 @@ Partial Class EVO_Einstellungen
     Private WithEvents SensiPlot_RadioButton_ModeEvenDistribution As RadioButton
     Private WithEvents SensiPlot_RadioButton_ModeRandom As RadioButton
     Private WithEvents SensiPlot_RadioButton_ModeLatinHypercube As RadioButton
-    Friend WithEvents SensiPlot_Label_NumSims As Label
+    Friend WithEvents SensiPlot_Label_NumCombinations As Label
 End Class

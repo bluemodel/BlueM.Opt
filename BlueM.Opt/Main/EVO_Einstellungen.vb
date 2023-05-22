@@ -363,13 +363,19 @@ Public Class EVO_Einstellungen
         SensiPlot_RadioButton_ModeEvenDistribution.CheckedChanged,
         SensiPlot_ListBox_OptParameter.SelectedIndexChanged
 
-        Dim NumSims As Integer
-        If SensiPlot_RadioButton_ModeEvenDistribution.Checked Then
-            NumSims = SensiPlot_NumericUpDown_NumSteps.Value ^ SensiPlot_ListBox_OptParameter.SelectedIndices.Count
-        Else
-            NumSims = SensiPlot_NumericUpDown_NumSteps.Value
-        End If
-        SensiPlot_Label_NumSims.Text = $"({NumSims} simulations)"
+        Try
+            Dim NumCombinations As Integer
+            If SensiPlot_RadioButton_ModeEvenDistribution.Checked Then
+                NumCombinations = SensiPlot_NumericUpDown_NumSteps.Value ^ SensiPlot_ListBox_OptParameter.SelectedIndices.Count
+            Else
+                NumCombinations = SensiPlot_NumericUpDown_NumSteps.Value
+            End If
+            SensiPlot_Label_NumCombinations.Text = $"{NumCombinations} parameter combinations"
+        Catch ex As OverflowException
+            MsgBox($"The current settings result in too many parameter combinations!{eol}Setting no. of steps to 2.")
+            SensiPlot_NumericUpDown_NumSteps.Value = 2
+        End Try
+
     End Sub
 
 #End Region 'Events
