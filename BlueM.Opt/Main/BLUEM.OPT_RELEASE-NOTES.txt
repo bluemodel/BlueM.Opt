@@ -10,6 +10,7 @@ NEW:
 * SensiPlot: added Latin Hypercube Sampling as a method for parameter sampling #228
 * SensiPlot: number of optimization parameters that can be varied at the same time is now infinite
 FIXED:
+* Fix error when trying to load result database #232
 * SensiPlot: fix direction of objective functions not being considered when plotting results
 * SensiPlot: make scatterplot and custom plot windows usable for SensiPlot
 * SensiPlot: fix not being able to select or show selected solutions in the main diagram #206

@@ -582,12 +582,11 @@ Public Class OptResult
     ''' </summary>
     ''' <param name="sourceFile">Pfad zur mdb-Datei</param>
     ''' <param name="loadOptParameters">Ob auch die OptParameter-Werte eingelesen werden sollen</param>
-    ''' <returns>True if successful</returns>
     ''' <remarks>
     ''' Das Optimierungsproblem (d.h. ObjectiveFunctions, OptParameter, Constraints), 
     ''' ebenso wie die Methode, müssen mit der DB übereinstimmen!
     ''' </remarks>
-    Public Function db_load(ByVal sourceFile As String, Optional ByVal loadOptParameters As Boolean = True) As Boolean
+    Public Sub db_load(ByVal sourceFile As String, Optional ByVal loadOptParameters As Boolean = True)
 
         'Optparameter gewünscht?
         Me.holdsOptparameters = loadOptParameters
@@ -607,14 +606,11 @@ Public Class OptResult
             'Sekundärpopulationen laden
             Call Me.db_loadSekPops()
 
-            Return True
-
         Catch ex As Exception
-            MsgBox("Failed to load optimization result!" & Common.eol & ex.Message, MsgBoxStyle.Critical)
-            Return False
+            Throw New Exception("Failed to load optimization result!" & Common.eol & ex.Message)
         End Try
 
-    End Function
+    End Sub
 
     'Alle Lösungen aus der DB als PES-Individuen einlesen
     '****************************************************

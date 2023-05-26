@@ -18,6 +18,7 @@
 Imports System.Xml
 Imports System.Xml.Serialization
 Imports BlueM.Opt.Common.Constants
+Imports DHI.Generic.MikeZero.DFS
 
 ''' <summary>
 ''' Main Window
@@ -1788,35 +1789,35 @@ Partial Public Class Form1
 
         Dim diagresult As DialogResult
         Dim sourceFile As String
-        Dim isOK As Boolean
 
-        'Datei-öffnen Dialog anzeigen
-        Me.OpenFileDialog1.Filter = "Access databases (*.mdb)|*.mdb"
-        Me.OpenFileDialog1.Title = "Select result DB"
-        Me.OpenFileDialog1.FileName = ""
-        Me.OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-        diagresult = Me.OpenFileDialog1.ShowDialog()
+        Try
 
-        If (diagresult = Windows.Forms.DialogResult.OK) Then
-
-            sourceFile = Me.OpenFileDialog1.FileName
-
-            'MDBImportDialog
-            '---------------
-            Dim importDialog As New BlueM.Opt.OptResult.MDBImportDialog(Me.mProblem)
-
-            diagresult = importDialog.ShowDialog()
+            'Datei-öffnen Dialog anzeigen
+            Me.OpenFileDialog1.Filter = "Access databases (*.mdb)|*.mdb"
+            Me.OpenFileDialog1.Title = "Select result DB"
+            Me.OpenFileDialog1.FileName = ""
+            Me.OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
+            diagresult = Me.OpenFileDialog1.ShowDialog()
 
             If (diagresult = Windows.Forms.DialogResult.OK) Then
 
-                'Cursor Wait
-                Cursor = Cursors.WaitCursor
+                sourceFile = Me.OpenFileDialog1.FileName
 
-                'Daten einlesen
-                '==============
-                isOK = Sim1.OptResult.db_load(sourceFile)
+                'MDBImportDialog
+                '---------------
+                Dim importDialog As New BlueM.Opt.OptResult.MDBImportDialog(Me.mProblem)
 
-                If (isOK) Then
+                diagresult = importDialog.ShowDialog()
+
+                If (diagresult = Windows.Forms.DialogResult.OK) Then
+
+                    'Cursor Wait
+                    Cursor = Cursors.WaitCursor
+
+                    'Daten einlesen
+                    '==============
+                    Sim1.OptResult = New OptResult.OptResult(sourceFile, Me.mProblem, createNewMdb:=False)
+                    Sim1.OptResult.db_load(sourceFile)
 
                     'Hauptdiagramm
                     '=============
@@ -1995,17 +1996,22 @@ Partial Public Class Form1
                     'Start-Button deaktivieren
                     Me.Button_Start.Enabled = False
 
+                    'Simulationen vorbereiten (weil möglicherweise vorher noch nicht geschehen!)
+                    Call Me.Sim1.prepareSimulation()
+
                 End If
-
-                'Simulationen vorbereiten (weil möglicherweise vorher noch nicht geschehen!)
-                Call Me.Sim1.prepareSimulation()
-
-                'Cursor Default
-                Cursor = Cursors.Default
 
             End If
 
-        End If
+        Catch ex As Exception
+            MsgBox("Error while loading result database:" & eol & ex.Message, MsgBoxStyle.Critical)
+
+        Finally
+
+            'Cursor Default
+            Cursor = Cursors.Default
+
+        End Try
 
     End Sub
 
@@ -2015,38 +2021,38 @@ Partial Public Class Form1
 
         Dim diagresult As DialogResult
         Dim sourceFile As String
-        Dim loadOptparameters, isOK As Boolean
+        Dim loadOptparameters As Boolean
 
-        'Datei-öffnen Dialog anzeigen
-        Me.OpenFileDialog1.Filter = "Access-Database (*.mdb)|*.mdb"
-        Me.OpenFileDialog1.Title = "Result comparison: select optimization result"
-        Me.OpenFileDialog1.FileName = ""
-        Me.OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
-        diagresult = Me.OpenFileDialog1.ShowDialog()
+        Try
 
-        If (diagresult = Windows.Forms.DialogResult.OK) Then
+            'Datei-öffnen Dialog anzeigen
+            Me.OpenFileDialog1.Filter = "Access-Database (*.mdb)|*.mdb"
+            Me.OpenFileDialog1.Title = "Result comparison: select optimization result"
+            Me.OpenFileDialog1.FileName = ""
+            Me.OpenFileDialog1.InitialDirectory = Sim1.WorkDir_Original
+            diagresult = Me.OpenFileDialog1.ShowDialog()
 
-            sourceFile = Me.OpenFileDialog1.FileName
+            If (diagresult = Windows.Forms.DialogResult.OK) Then
 
-            'Abfrage
-            diagresult = MsgBox("Should the optimization parameters of the comparison result be loaded as well?" & eol _
+                sourceFile = Me.OpenFileDialog1.FileName
+
+                'Abfrage
+                diagresult = MsgBox("Should the optimization parameters of the comparison result be loaded as well?" & eol _
                                 & "(This requires that the optimization parameter definition of both results are identical!)", MsgBoxStyle.YesNo)
 
-            If (diagresult = Windows.Forms.DialogResult.Yes) Then
-                loadOptparameters = True
-            Else
-                loadOptparameters = False
-            End If
+                If (diagresult = Windows.Forms.DialogResult.Yes) Then
+                    loadOptparameters = True
+                Else
+                    loadOptparameters = False
+                End If
 
-            'Cursor Wait
-            Cursor = Cursors.WaitCursor
+                'Cursor Wait
+                Cursor = Cursors.WaitCursor
 
-            'Daten einlesen
-            '==============
-            Sim1.OptResultRef = New BlueM.Opt.OptResult.OptResult(Me.Sim1.Datensatz, Me.mProblem, False)
-            isOK = Sim1.OptResultRef.db_load(sourceFile, loadOptparameters)
-
-            If (isOK) Then
+                'Daten einlesen
+                '==============
+                Sim1.OptResultRef = New BlueM.Opt.OptResult.OptResult(Me.Sim1.Datensatz, Me.mProblem, createNewMdb:=False)
+                Sim1.OptResultRef.db_load(sourceFile, loadOptparameters)
 
                 'In Diagramm anzeigen
                 '====================
@@ -2104,8 +2110,8 @@ Partial Public Class Form1
 
                     'Anzeige in Messagebox
                     MsgBox("Hypervolume difference to comparison result:" & eol _
-                            & indicatorDiff.ToString() & eol _
-                            & "(Value was copied to the clipboard)", MsgBoxStyle.Information, "Hypervolume")
+                        & indicatorDiff.ToString() & eol _
+                        & "(Value was copied to the clipboard)", MsgBoxStyle.Information, "Hypervolume")
 
                 End If
 
@@ -2125,11 +2131,15 @@ Partial Public Class Form1
 
             End If
 
+        Catch ex As Exception
+            MsgBox("Error while loading reference result database:" & eol & ex.Message, MsgBoxStyle.Critical)
+
+        Finally
+
             'Cursor Default
             Cursor = Cursors.Default
 
-        End If
-
+        End Try
     End Sub
 
 #End Region 'Ergebnisdatenbank
