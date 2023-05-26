@@ -16,7 +16,7 @@ FIXED:
 * SensiPlot: better handling of parameter relationship checks
 CHANGED:
 * Updated BlueM.Wave to v2.3.0
-* Updated Talsim-NG Engine to v3.2.12
+* Updated Talsim-NG Engine to v3.2.17
 
 Version 2.3.0
 -------------

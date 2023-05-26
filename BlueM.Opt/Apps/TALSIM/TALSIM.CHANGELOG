@@ -1,6 +1,46 @@
 Talsim-NG simulation engine changelog
 *************************************
 
+Version 3.2.17
+--------------
+NEW
+* Reading/writing states was enhanced. 
+  WRITE states: Writing multiple dates is possible and files obtain the date stamp as part of the filename.
+  READ/WRITE states: new parameter SimEndOffset determines the offset in timesteps to the simulation end. A value of 1 means Simulation End minus 1 timestep is written. 
+NEW
+* Initial storage volume for reservoirs was changed to DBLE precision instead of SNGL.
+  !!!!! ATTENTION !!!!! This reauires to use either the latest sydrodomain.ini or to change SNGL to DBLE in the parameter combination section. 
+  
+CHANGED (internal)
+* Parameters for automated Updates are now performed by using double precision instead of single precision. 
+  This preserves the precision of large numbers, for example initial storage content of huge lakes
+
+Version 3.2.16
+--------------
+FIXED:
+* Errors in the water balance for sub-basins were caused occurd when using a HRU flow network.
+  The reason was that variables interflow and baseflow were transformed for output before they were used to calcuate the error per time step. The order of calculation was changed.
+* Under certain circumstances, the reverse calculation from bottom to top for soil layers was stopped even when backwater conditions occured. 
+  The saturation and backwater conditions are now used to enable/disable the recalculation of a soil layer. 
+
+Version 3.2.15
+--------------
+CHANGED:
+* Fortran checks the expected file size of results. If this exceeds 2GB, binary output "WBL" instead of ASCII output "EWEL" will be written. 
+
+Version 3.2.14
+--------------
+FIXED:
+* Fortran has a bug when reading a float from a character with a simple format specification (F). 
+  This format was used when reading land use (*.lnz) and files *.ext). Numbers without a decimal delimiter is interpreted by Fortran as zero!
+  Example: 732 becomes 0.00732. 
+  The read statement was changed so that 732 or 732. is the same. 
+
+Version 3.2.13
+--------------
+CHANGED:
+* When the max. number of iteration of the non-linear equation solver is exceeded, a simple water balance equation is used instead
+
 Version 3.2.12
 --------------
 CHANGED:
