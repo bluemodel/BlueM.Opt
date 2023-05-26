@@ -1689,7 +1689,7 @@ Partial Public Class Form1
                 Continue For
             End If
 
-            If Me.mProblem.Method = METH_SENSIPLOT & Me.mSettings.SensiPlot.Save_Results Then
+            If Me.mProblem.Method = METH_SENSIPLOT AndAlso Me.mSettings.SensiPlot.Save_Results Then
                 'TODO: reuse existing simulation results in folder $"sensiplot_{ind.ID:0000}"!
             End If
 
