@@ -97,11 +97,11 @@ Public Class CustomPlot
         End With
 
         'instantiate series
+        Me._series_Population = Me.Diag.getSeriesPoint("Population", "Orange")
         If Me._problem.Method <> Common.METH_SENSIPLOT Then
             Me._series_StartValue = Me.Diag.getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
             Me._series_SekPop = Me.Diag.getSeriesPoint("Secondary population", "Green")
         End If
-        Me._series_Population = Me.Diag.getSeriesPoint("Population", "Orange")
         Me._series_Selected = Me.Diag.getSeriesPoint("Selected solutions", "Red")
 
         'format marks for selected solutions series
