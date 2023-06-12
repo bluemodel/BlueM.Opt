@@ -2,6 +2,11 @@
 BlueM.Opt Release Notes
 ===============================================================
 
+Version 2.4.1
+-------------
+CHANGED:
+* Updated BlueM.Wave to v2.4.0
+
 Version 2.4.0
 -------------
 NEW:
