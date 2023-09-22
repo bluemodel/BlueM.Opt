@@ -1399,13 +1399,13 @@ Partial Class EVO_Einstellungen
         '
         Me.SensiPlot_NumericUpDown_NumSteps.DataBindings.Add(New System.Windows.Forms.Binding("Value", Me.BindingSource_Sensiplot, "Num_Steps", True, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged))
         Me.SensiPlot_NumericUpDown_NumSteps.Location = New System.Drawing.Point(76, 442)
-        Me.SensiPlot_NumericUpDown_NumSteps.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.SensiPlot_NumericUpDown_NumSteps.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
         Me.SensiPlot_NumericUpDown_NumSteps.Minimum = New Decimal(New Integer() {2, 0, 0, 0})
         Me.SensiPlot_NumericUpDown_NumSteps.Name = "SensiPlot_NumericUpDown_NumSteps"
-        Me.SensiPlot_NumericUpDown_NumSteps.Size = New System.Drawing.Size(44, 20)
+        Me.SensiPlot_NumericUpDown_NumSteps.Size = New System.Drawing.Size(71, 20)
         Me.SensiPlot_NumericUpDown_NumSteps.TabIndex = 13
         Me.SensiPlot_NumericUpDown_NumSteps.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.SensiPlot_NumericUpDown_NumSteps.Value = New Decimal(New Integer() {11, 0, 0, 0})
+        Me.SensiPlot_NumericUpDown_NumSteps.Value = New Decimal(New Integer() {10, 0, 0, 0})
         '
         'SensiPlot_GroupBox_Modus
         '
