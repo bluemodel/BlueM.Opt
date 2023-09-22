@@ -15,6 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports System.IO
+Imports System.Net.Sockets
 ''' <summary>
 ''' The log
 ''' </summary>
@@ -26,6 +28,7 @@ Public Module Log
     ''' <param name="msg"></param>
     Public Event LogMessageAdded(msg As String)
 
+    Private locker As New Object()
     Private _Log As String
     Private _File As String
 
@@ -73,7 +76,16 @@ Public Module Log
 
         'append to file
         If Not IsNothing(_File) Then
-            IO.File.AppendAllText(_File, msg)
+            Try
+                'use a lock to ensure only one thread writes to the file at a time
+                SyncLock locker
+                    Using writer As New StreamWriter(_File, True)
+                        writer.WriteLine(msg)
+                    End Using
+                End SyncLock
+            Catch ex As Exception
+                Console.WriteLine($"Error writing to file: {ex.Message}")
+            End Try
         End If
 
         'raise event
