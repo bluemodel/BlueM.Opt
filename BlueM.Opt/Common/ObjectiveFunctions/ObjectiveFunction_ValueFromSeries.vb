@@ -30,73 +30,72 @@ Public Class ObjectiveFunction_ValueFromSeries
     End Property
 
     ''' <summary>
-    ''' Start des Evaluierungszeitraums
+    ''' Start of the evaluation period
     ''' </summary>
     Public EvalStart As DateTime
 
     ''' <summary>
-    ''' Ende des Evaluierungszeitraums
+    ''' End of the evaluation period
     ''' </summary>
-    Public EvalEnde As DateTime
+    Public EvalEnd As DateTime
 
     ''' <summary>
-    ''' Der zu vergleichende Referenzwert
+    ''' Reference value
     ''' </summary>
-    ''' <remarks>siehe Wiki</remarks>
-    Public RefWert As Double
+    Public RefValue As Double
 
     ''' <summary>
-    ''' Gibt an wie der Wert, der mit dem Referenzwert verglichen werden soll, aus dem Simulationsergebnis berechnet werden soll.
+    ''' Function with which to calculate the simulation value from the simulation time series
     ''' </summary>
-    Public WertFunktion As String
+    Public ValueFunction As String
 
     ''' <summary>
     ''' Calculate ObjectiveFunction value 
     ''' </summary>
-    ''' <param name="SimErgebnis">collection of simulation results</param>
+    ''' <param name="SimResult">simulation result</param>
     ''' <returns>objective function value</returns>
-    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimResults) As Double
+    Public Overrides Function calculateObjective(ByVal SimResult As SimResults) As Double
 
-        Dim SimWert As Double
-        Dim SimReihe As Wave.TimeSeries
-        Dim QWert As Double
+        Dim SimValue As Double
+        Dim SimSeries As Wave.TimeSeries
+        Dim objectiveValue As Double
 
         'Check
-        If Not SimErgebnis.Series.ContainsKey(Me.SimResultName) Then
+        If Not SimResult.Series.ContainsKey(Me.SimResultName) Then
             Throw New Exception($"Unable to find '{Me.SimResultName}' in simulation result! Please check the dataset.")
         End If
 
         'SimReihe aus SimErgebnis rausholen
-        SimReihe = SimErgebnis.Series(Me.SimResultName).Clone()
+        SimSeries = SimResult.Series(Me.SimResultName).Clone()
 
         'SimReihe auf Evaluierungszeitraum kürzen
-        Call SimReihe.Cut(Me.EvalStart, Me.EvalEnde)
+        Call SimSeries.Cut(Me.EvalStart, Me.EvalEnd)
 
         'Calculate SimValue from SimSeries
-        Select Case Me.WertFunktion.ToUpper()
+        Select Case Me.ValueFunction.ToUpper()
             Case "MAX", "MAXWERT"
-                SimWert = SimReihe.Maximum
+                SimValue = SimSeries.Maximum
             Case "MIN", "MINWERT"
-                SimWert = SimReihe.Minimum
+                SimValue = SimSeries.Minimum
             Case "AVG", "AVERAGE"
-                SimWert = SimReihe.Average
+                SimValue = SimSeries.Average
             Case "START", "ANFWERT"
-                SimWert = SimReihe.Values.First
+                SimValue = SimSeries.Values.First
             Case "END", "ENDWERT"
-                SimWert = SimReihe.Values.Last
+                SimValue = SimSeries.Values.Last
             Case "SUM", "SUMME"
-                SimWert = SimReihe.Sum
+                SimValue = SimSeries.Sum
             Case Else
-                Throw New Exception($"Unknown value type '{Me.WertFunktion}' for objective function {Me.Description}!")
+                Throw New Exception($"Unknown value type '{Me.ValueFunction}' for objective function {Me.Description}!")
         End Select
 
         'Wertevergleich durchführen
-        QWert = ObjectiveFunction.compareValues(SimWert, Me.RefWert, Me.Function)
+        objectiveValue = ObjectiveFunction.compareValues(SimValue, Me.RefValue, Me.Function)
 
         'Zielrichtung berücksichtigen
-        QWert *= Me.Direction
+        objectiveValue *= Me.Direction
 
-        Return QWert
+        Return objectiveValue
 
     End Function
 

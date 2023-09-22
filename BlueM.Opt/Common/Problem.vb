@@ -593,17 +593,17 @@ Public Class Problem
                                 .EvalStart = SimStart
                             End If
                             If WerteArray(10).Trim() <> "" Then
-                                .EvalEnde = WerteArray(10).Trim()
+                                .EvalEnd = WerteArray(10).Trim()
                                 'Check
-                                If .EvalEnde > SimEnde Then
-                                    Throw New Exception($"The end of the evaluation period of the objective function '{ .Description}' ({ .EvalEnde}) is later than the simulation end ({SimEnde})!")
+                                If .EvalEnd > SimEnde Then
+                                    Throw New Exception($"The end of the evaluation period of the objective function '{ .Description}' ({ .EvalEnd}) is later than the simulation end ({SimEnde})!")
                                 End If
                             Else
-                                .EvalEnde = SimEnde
+                                .EvalEnd = SimEnde
                             End If
-                            .WertFunktion = WerteArray(11).Trim()
+                            .ValueFunction = WerteArray(11).Trim()
                             If (WerteArray(12).Trim() <> "") Then
-                                .RefWert = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
+                                .RefValue = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
                             End If
                             If (WerteArray(13).Trim() <> "") Then
                                 .hasCurrentValue = True
