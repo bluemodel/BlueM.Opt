@@ -1057,7 +1057,7 @@ Partial Public Class Form1
                     If (Me.mProblem.Method <> METH_SENSIPLOT) Then
                         isOK = Me.evaluateStartwerte()
                         If Not isOK Then
-                            Throw New Exception($"Simulation of start values failed! Please check the dataset in {Me.Sim1.WorkDir_Current}!")
+                            Throw New Exception($"Evaluation of start values failed! Please check the dataset in {Me.Sim1.WorkDir_Current} and the log!")
                         End If
                     End If
 
