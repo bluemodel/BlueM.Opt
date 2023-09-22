@@ -1,6 +1,63 @@
 Talsim-NG simulation engine changelog
 *************************************
 
+Version 3.2.26
+--------------
+CHANGED:
+* Time series error value handling #231:
+  * NaN values in BIN files are now also recognized as error values
+  * New error number 2830 for time series error handling mode 4 (cancel on error)
+  * Default error handling mode is now 4 (cancel on error)
+
+Version 3.2.25
+--------------
+FIXED:
+* Fixed unit of transport element volume output to be consistent with header (Tsd.m3) #88
+* Fixed crash when a reservoir has no releases, this now outputs error number 2245 #163
+
+Version 3.2.24
+--------------
+FIXED:
+* Fixed crash when a dataset contains more than 4 internal dependencies for a reservoir,
+  this now causes error 2244 #215
+CHANGED:
+* If binary result output is switched on, a warning is no longer emitted #223
+
+Version 3.2.23
+--------------
+CHANGED:
+* Binary result files (WBL) are no longer written automatically based on result file size estimates.
+  Binary results can now be switched on/off by setting BIN=true/false in the ALL file #223
+* All welinfo result files now use 0-based series indices #217
+FIXED:
+* Fixed crash when using annual patterns in combination with a simulation timestep > 1 day #192
+* Fixed an issue with using a time series for the demand of a consumer #218
+* Inactive time series in the EXT file no longer cause error 2803 when they cannot be found #214
+
+Version 3.2.22
+--------------
+NEW:
+* New result output group "SNOW" containing the following results:
+  * Water flow from snow (SNA) [mm]
+  * Snow water equivalent (SNE) [mm]
+  * Calculation mode waterflow from snow (STA) [0/1], is 1 if value from external time series was used
+* New optional setting "Debug=1" in the run file to show debug messages in the log #205
+FIXED:
+* Fixed using external time series for water flow from snow #203
+* Fixed the setting HardOnOff for internal dependencies of reservoir releases #198
+* Fixed output of water balance in BLZ file: #190
+  * Fixed error in the calculation of the "Error" column values
+  * Changed column names to more comprehensive names:
+    * "Prec-eff" -> "Runoff"
+    * "Excess Soil" -> "Excess Water"
+* Fixed error 2827 being output unnecessarily #67
+* More specific error messages when reading state files
+CHANGED:
+* Attempting to use external time series for snow water equivalent now produces an error (was never properly implemented)
+* Result output for snow height (SCH) [mm] is now assigned to the group "SNOW" (was previously assigned to "PRECIP")
+* Internal calculation of inflow from upstream HRUs to downstream HRUs was accelerated through direct access of pointers creating upstream/downstream relationships
+* Retention coefficients for HRUs now provided only if HRUs exist (minor change in EZG_START)
+
 Version 3.2.21
 --------------
 FIXED:
