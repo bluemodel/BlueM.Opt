@@ -346,7 +346,7 @@ Public Class OptResult
         'Spalten festlegen:
         fieldnames = New List(Of String)
         For Each objfun As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-            fieldnames.Add($"[{objfun.Bezeichnung}] DOUBLE")
+            fieldnames.Add($"[{objfun.Description}] DOUBLE")
         Next
         'Tabelle anpassen
         command.CommandText = "ALTER TABLE QWerte ADD COLUMN " & String.Join(", ", fieldnames) & ";"
@@ -441,7 +441,7 @@ Public Class OptResult
         fieldnames = New List(Of String)
         fieldvalues = New List(Of String)
         For i = 0 To Me.mProblem.NumObjectives - 1
-            fieldnames.Add($"[{Me.mProblem.List_ObjectiveFunctions(i).Bezeichnung}]")
+            fieldnames.Add($"[{Me.mProblem.List_ObjectiveFunctions(i).Description}]")
             fieldvalues.Add(ind.Objectives(i).ToString(Common.Provider.FortranProvider))
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID, " & String.Join(", ", fieldnames) & $") VALUES ({ind.ID}, " & String.Join(", ", fieldvalues) & ");"
@@ -496,7 +496,7 @@ Public Class OptResult
             'zugehörige Sim_ID bestimmen
             bedingung = ""
             For j = 0 To Me.mProblem.NumPrimObjective - 1
-                bedingung &= $" AND QWerte.[{Me.mProblem.List_PrimObjectiveFunctions(j).Bezeichnung}] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
+                bedingung &= $" AND QWerte.[{Me.mProblem.List_PrimObjectiveFunctions(j).Description}] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
             Next
             command.CommandText = $"SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1{bedingung});"
             Sim_ID = command.ExecuteScalar()
@@ -673,7 +673,7 @@ Public Class OptResult
                 'Features
                 '--------
                 For j = 0 To Me.mProblem.NumObjectives - 1
-                    .Objectives(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_ObjectiveFunctions(j).Bezeichnung)
+                    .Objectives(j) = ds.Tables(0).Rows(i).Item(Me.mProblem.List_ObjectiveFunctions(j).Description)
                 Next
 
             End With

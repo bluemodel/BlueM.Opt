@@ -109,7 +109,7 @@ namespace modelEAU.DDS
             Current_Parameter = new double[this.mProblem.NumOptParams];
             DDS = new modelEAU.DDS.DDS();
 
-            if (this.mProblem.List_ObjectiveFunctions[0].Richtung == BlueM.Opt.Common.Constants.EVO_DIRECTION.Maximization)
+            if (this.mProblem.List_ObjectiveFunctions[0].Direction == BlueM.Opt.Common.Constants.EVO_DIRECTION.Maximization)
             {
                 DDS.to_max = -1.0;
             }

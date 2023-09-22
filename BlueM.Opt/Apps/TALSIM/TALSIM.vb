@@ -138,8 +138,8 @@ Public Class Talsim
 
         'Feststellen, welche WEL/WBL-Dateien in Zielfunktionen genutzt werden
         For Each objective In Me.mProblem.List_ObjectiveFunctions
-            If Not IsNothing(objective.Datei) Then
-                Dim fileExtension As String = objective.Datei.ToUpper()
+            If Not IsNothing(objective.FileExtension) Then
+                Dim fileExtension As String = objective.FileExtension.ToUpper()
                 If Not Me.resultFiles.Contains(fileExtension) Then
                     Me.resultFiles.Add(fileExtension)
                 End If
@@ -428,8 +428,8 @@ Public Class Talsim
         For Each objfunc As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             If objfunc.GetObjType = ObjectiveFunction.ObjectiveType.Series Or
                 objfunc.GetObjType = ObjectiveFunction.ObjectiveType.ValueFromSeries Then
-                If Not seriesMap(objfunc.Datei.ToUpper()).Contains(objfunc.SimGr) Then
-                    seriesMap(objfunc.Datei.ToUpper()).Add(objfunc.SimGr)
+                If Not seriesMap(objfunc.FileExtension.ToUpper()).Contains(objfunc.SimResult) Then
+                    seriesMap(objfunc.FileExtension.ToUpper()).Add(objfunc.SimResult)
                 End If
             End If
         Next

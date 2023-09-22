@@ -217,7 +217,7 @@ Public Class Problem
             Dim msg As String
             msg = $"Objective Functions ({Me.NumPrimObjective} primary, {Me.NumSecObjectives} secondary):" & eol
             For Each obj As ObjectiveFunction In Me.List_ObjectiveFunctions
-                msg &= "* " & obj.Bezeichnung & eol
+                msg &= "* " & obj.Description & eol
             Next
             msg &= $"Optimization parameters ({Me.NumOptParams}):" & eol
             For Each optparam As OptParameter In Me.List_OptParameter
@@ -501,7 +501,7 @@ Public Class Problem
                                 .EvalEnde = WerteArray(10).Trim()
                                 'Check
                                 If .EvalEnde > SimEnde Then
-                                    Throw New Exception($"The end of the evaluation period of the objective function '{ .Bezeichnung}' ({ .EvalEnde}) is later than the simulation end ({SimEnde})!")
+                                    Throw New Exception($"The end of the evaluation period of the objective function '{ .Description}' ({ .EvalEnde}) is later than the simulation end ({SimEnde})!")
                                 End If
                             Else
                                 .EvalEnde = SimEnde
@@ -509,14 +509,14 @@ Public Class Problem
                             .RefGr = WerteArray(11).Trim()
                             .RefReiheDatei = WerteArray(12).Trim()
                             If (WerteArray(13).Trim() <> "") Then
-                                .hasIstWert = True
-                                .IstWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
+                                .hasCurrentValue = True
+                                .CurrentValue = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
                                 'Reverse the sign for objective functions that should be maximized (#198)
-                                If .Richtung = EVO_DIRECTION.Maximization Then
-                                    .IstWert = .IstWert * -1
+                                If .Direction = EVO_DIRECTION.Maximization Then
+                                    .CurrentValue = .CurrentValue * -1
                                 End If
                             Else
-                                .hasIstWert = False
+                                .hasCurrentValue = False
                             End If
 
                             'Referenzreihe einlesen
@@ -553,14 +553,14 @@ Public Class Problem
                                 .RefWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
                             End If
                             If (WerteArray(12).Trim() <> "") Then
-                                .hasIstWert = True
-                                .IstWert = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
+                                .hasCurrentValue = True
+                                .CurrentValue = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
                                 'Reverse the sign for objective functions that should be maximized (#198)
-                                If .Richtung = EVO_DIRECTION.Maximization Then
-                                    .IstWert = .IstWert * -1
+                                If .Direction = EVO_DIRECTION.Maximization Then
+                                    .CurrentValue = .CurrentValue * -1
                                 End If
                             Else
-                                .hasIstWert = False
+                                .hasCurrentValue = False
                             End If
                         End With
 
@@ -596,7 +596,7 @@ Public Class Problem
                                 .EvalEnde = WerteArray(10).Trim()
                                 'Check
                                 If .EvalEnde > SimEnde Then
-                                    Throw New Exception($"The end of the evaluation period of the objective function '{ .Bezeichnung}' ({ .EvalEnde}) is later than the simulation end ({SimEnde})!")
+                                    Throw New Exception($"The end of the evaluation period of the objective function '{ .Description}' ({ .EvalEnde}) is later than the simulation end ({SimEnde})!")
                                 End If
                             Else
                                 .EvalEnde = SimEnde
@@ -606,14 +606,14 @@ Public Class Problem
                                 .RefWert = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
                             End If
                             If (WerteArray(13).Trim() <> "") Then
-                                .hasIstWert = True
-                                .IstWert = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
+                                .hasCurrentValue = True
+                                .CurrentValue = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
                                 'Reverse the sign for objective functions that should be maximized (#198)
-                                If .Richtung = EVO_DIRECTION.Maximization Then
-                                    .IstWert = .IstWert * -1
+                                If .Direction = EVO_DIRECTION.Maximization Then
+                                    .CurrentValue = .CurrentValue * -1
                                 End If
                             Else
-                                .hasIstWert = False
+                                .hasCurrentValue = False
                             End If
                         End With
 
@@ -642,22 +642,22 @@ Public Class Problem
                             Else
                                 .isPrimObjective = False
                             End If
-                            .Bezeichnung = WerteArray(2).Trim()
-                            .Gruppe = WerteArray(3).Trim()
+                            .Description = WerteArray(2).Trim()
+                            .Group = WerteArray(3).Trim()
                             If (WerteArray(4).Trim() = "+") Then
-                                .Richtung = Common.EVO_DIRECTION.Maximization
+                                .Direction = Common.EVO_DIRECTION.Maximization
                             Else
-                                .Richtung = Common.EVO_DIRECTION.Minimization
+                                .Direction = Common.EVO_DIRECTION.Minimization
                             End If
                             If (WerteArray(5).Trim() <> "") Then
-                                .hasIstWert = True
-                                .IstWert = Convert.ToDouble(WerteArray(5).Trim(), Common.Provider.FortranProvider)
+                                .hasCurrentValue = True
+                                .CurrentValue = Convert.ToDouble(WerteArray(5).Trim(), Common.Provider.FortranProvider)
                                 'Reverse the sign for objective functions that should be maximized (#198)
-                                If .Richtung = EVO_DIRECTION.Maximization Then
-                                    .IstWert = .IstWert * -1
+                                If .Direction = EVO_DIRECTION.Maximization Then
+                                    .CurrentValue = .CurrentValue * -1
                                 End If
                             Else
-                                .hasIstWert = False
+                                .hasCurrentValue = False
                             End If
 
                         End With
@@ -708,24 +708,24 @@ Public Class Problem
             Else
                 .isPrimObjective = False
             End If
-            .Bezeichnung = WerteArray(2).Trim()
-            .Gruppe = WerteArray(3).Trim()
+            .Description = WerteArray(2).Trim()
+            .Group = WerteArray(3).Trim()
             If (WerteArray(4).Trim() = "+") Then
-                .Richtung = Common.EVO_DIRECTION.Maximization
+                .Direction = Common.EVO_DIRECTION.Maximization
             Else
-                .Richtung = Common.EVO_DIRECTION.Minimization
+                .Direction = Common.EVO_DIRECTION.Minimization
             End If
 
             If (WerteArray(5).Trim() = "+") Then
-                .OpFact = 1
+                .Factor = 1
             ElseIf (WerteArray(5).Trim() = "-") Then
-                .OpFact = -1
+                .Factor = -1
             ElseIf Not (WerteArray(5).Trim() = "") Then
-                .OpFact = Convert.ToDouble(WerteArray(5).Trim())
+                .Factor = Convert.ToDouble(WerteArray(5).Trim())
             End If
-            .Datei = WerteArray(6).Trim()
-            .SimGr = WerteArray(7).Trim()
-            .Funktion = WerteArray(8).Trim()
+            .FileExtension = WerteArray(6).Trim()
+            .SimResult = WerteArray(7).Trim()
+            .Function = WerteArray(8).Trim()
         End With
 
     End Sub

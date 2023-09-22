@@ -78,15 +78,15 @@ Partial Public Class SolutionDialog
             column = New DataGridViewTextBoxColumn()
             If (feature.isPrimObjective) Then
                 cellstyle.BackColor = Color.LightGreen
-                column.HeaderText = feature.Bezeichnung & " (*)"
+                column.HeaderText = feature.Description & " (*)"
                 column.HeaderCell.ToolTipText = "Primary objective function"
             Else
                 cellstyle.BackColor = Color.LightBlue
-                column.HeaderText = feature.Bezeichnung
+                column.HeaderText = feature.Description
                 column.HeaderCell.ToolTipText = "Secondary objective function"
             End If
             column.ReadOnly = True
-            column.Name = feature.Bezeichnung
+            column.Name = feature.Description
             column.DefaultCellStyle = cellstyle.Clone()
             Me.DataGridView1.Columns.Add(column)
         Next
@@ -147,7 +147,7 @@ Partial Public Class SolutionDialog
 
         'Ziele
         For Each featurevalue As Double In ind.Objectives
-            cellvalues(i) = featurevalue * Me.mProblem.List_ObjectiveFunctions(i - 1).Richtung
+            cellvalues(i) = featurevalue * Me.mProblem.List_ObjectiveFunctions(i - 1).Direction
             i += 1
         Next
 

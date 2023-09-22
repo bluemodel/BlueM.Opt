@@ -507,17 +507,17 @@ Public MustInherit Class Sim
                 With Me.mProblem.List_ObjectiveFunctions(k)
 
                     If (Not .isGroupLeader _
-                        And .Gruppe = aggroziel.Gruppe) Then
+                        And .Group = aggroziel.Group) Then
 
                         'gefundenes Gruppenmitglied hinzuaddieren
-                        ind.Objectives(j) += ind.Objectives(k) * .OpFact
+                        ind.Objectives(j) += ind.Objectives(k) * .Factor
                     End If
 
                 End With
             Next
 
             'Zielrichtung berücksichtigen
-            ind.Objectives(j) *= aggroziel.Richtung
+            ind.Objectives(j) *= aggroziel.Direction
         Next
 
         'Constraints berechnen

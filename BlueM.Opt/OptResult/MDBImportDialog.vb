@@ -36,7 +36,7 @@ Public Class MDBImportDialog
         'Listboxen füllen
         Dim bezeichnung As String
         For Each feature As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-            bezeichnung = feature.Bezeichnung
+            bezeichnung = feature.Description
             'Penalty-Funktionen mit Sternchen markieren
             If (feature.isPrimObjective) Then bezeichnung &= " (*)"
             Me.ListBox_ZieleX.Items.Add(bezeichnung)

@@ -131,11 +131,11 @@ Public Class CustomPlot
         Dim objective As Common.ObjectiveFunction = Me.ComboBox_ObjectiveFunctions.SelectedItem
 
         'set chart title
-        Me.Diag.Chart.Header.Text = $"{param.Bezeichnung} vs. {objective.Bezeichnung}"
+        Me.Diag.Chart.Header.Text = $"{param.Bezeichnung} vs. {objective.Description}"
 
         'set axis titles
         Me.Diag.Chart.Axes.Bottom.Title.Text = param.Bezeichnung
-        Me.Diag.Chart.Axes.Left.Title.Text = objective.Bezeichnung
+        Me.Diag.Chart.Axes.Left.Title.Text = objective.Description
 
         'set x axis min max
         Me.Diag.Chart.Axes.Bottom.Automatic = False
@@ -170,20 +170,20 @@ Public Class CustomPlot
             'plot start value
             _series_StartValue.Clear()
             ind = _optresult.getSolution(1)
-            _series_StartValue.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Richtung, ind.ID.ToString)
+            _series_StartValue.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Direction, ind.ID.ToString)
         End If
 
         'plot population
         _series_Population.Clear()
         For Each ind In Me._optresult.Solutions
-            _series_Population.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Richtung, ind.ID.ToString)
+            _series_Population.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Direction, ind.ID.ToString)
         Next
 
         If Me._problem.Method <> Common.METH_SENSIPLOT Then
             'plot secondary population
             _series_SekPop.Clear()
             For Each ind In Me._optresult.getSekPop
-                _series_SekPop.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Richtung, ind.ID.ToString)
+                _series_SekPop.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Direction, ind.ID.ToString)
             Next
         End If
 
@@ -207,7 +207,7 @@ Public Class CustomPlot
     ''' </summary>
     ''' <param name="ind">the selected individual</param>
     Public Sub showSelectedSolution(ind As Common.Individuum)
-        Me._series_Selected.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Richtung, ind.ID.ToString)
+        Me._series_Selected.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Direction, ind.ID.ToString)
     End Sub
 
     ''' <summary>

@@ -62,12 +62,12 @@ Public Class ObjectiveFunction_ValueFromSeries
         Dim QWert As Double
 
         'Check
-        If Not SimErgebnis.Series.ContainsKey(Me.SimGr) Then
-            Throw New Exception($"Unable to find '{Me.SimGr}' in simulation result! Please check the dataset.")
+        If Not SimErgebnis.Series.ContainsKey(Me.SimResult) Then
+            Throw New Exception($"Unable to find '{Me.SimResult}' in simulation result! Please check the dataset.")
         End If
 
         'SimReihe aus SimErgebnis rausholen
-        SimReihe = SimErgebnis.Series(Me.SimGr).Clone()
+        SimReihe = SimErgebnis.Series(Me.SimResult).Clone()
 
         'SimReihe auf Evaluierungszeitraum kürzen
         Call SimReihe.Cut(Me.EvalStart, Me.EvalEnde)
@@ -87,14 +87,14 @@ Public Class ObjectiveFunction_ValueFromSeries
             Case "SUM", "SUMME"
                 SimWert = SimReihe.Sum
             Case Else
-                Throw New Exception($"Unknown value type '{Me.WertFunktion}' for objective function {Me.Bezeichnung}!")
+                Throw New Exception($"Unknown value type '{Me.WertFunktion}' for objective function {Me.Description}!")
         End Select
 
         'Wertevergleich durchführen
-        QWert = ObjectiveFunction.compareValues(SimWert, Me.RefWert, Me.Funktion)
+        QWert = ObjectiveFunction.compareValues(SimWert, Me.RefWert, Me.Function)
 
         'Zielrichtung berücksichtigen
-        QWert *= Me.Richtung
+        QWert *= Me.Direction
 
         Return QWert
 

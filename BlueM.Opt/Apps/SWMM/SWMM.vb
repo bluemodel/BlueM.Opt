@@ -329,7 +329,7 @@ Public Class SWMM
                 Case Common.ObjectiveFunction.ObjectiveType.Value
                     'TODO: Umbauen, so dass Datei nicht jedes mal geoeffnet werden muss
                     '.RPT-Datei oeffnen
-                    DateiPfad = IO.Path.Combine(WorkDir_Current, Datensatz & "." & obj.Datei)
+                    DateiPfad = IO.Path.Combine(WorkDir_Current, Datensatz & "." & obj.FileExtension)
                     Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
                     Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
                     Dim KeyWord_Block As String, KeyWord_SimGr As String
@@ -408,7 +408,7 @@ Public Class SWMM
                     'Datei durchgehen und nach Schluesselwort suchen
                     blnValueAdded = False
                     Do
-                        KeyWord_SimGr = "  " & objValue.SimGr
+                        KeyWord_SimGr = "  " & objValue.SimResult
                         Zeile = StrRead.ReadLine.ToString
                         If (Zeile.StartsWith(KeyWord_Block)) Then
                             Zeile = StrRead.ReadLine.ToString    'Es folgt immer eine Zeile mit Sternen
@@ -417,7 +417,7 @@ Public Class SWMM
                                 Zeile = StrRead.ReadLine.ToString
                                 If (Zeile.StartsWith(KeyWord_SimGr)) Then
                                     tmpValue = Convert.ToDouble(Zeile.Split(" ", options:=StringSplitOptions.RemoveEmptyEntries)(NoSpalte - 1), Common.Provider.FortranProvider)
-                                    Me.SimResult.Values.Add(obj.Bezeichnung, tmpValue)
+                                    Me.SimResult.Values.Add(obj.Description, tmpValue)
                                     blnValueAdded = True
                                     Exit Do
                                     'Falls keine Nodes überstaut sind bei Node Flooding Summary muss geährleistet werden,
@@ -434,7 +434,7 @@ Public Class SWMM
                                     'Wenn die SimGr nicht im Block auftaucht muss tmpvalue = 0 gesetzt werden
                                 ElseIf Zeile.TrimStart.StartsWith("**********************") Then    'nächster Block beginnt
                                     tmpValue = 0.0
-                                    Me.SimResult.Values.Add(obj.Bezeichnung, tmpValue)
+                                    Me.SimResult.Values.Add(obj.Description, tmpValue)
                                     blnValueAdded = True
                                     Exit Do
                                 End If

@@ -56,13 +56,13 @@ Public Class Objectivefunction_Value
         Dim QWert As Double
 
         'SimWert aus SimErgebnis rausholen
-        SimWert = SimErgebnis.Values(Me.Bezeichnung)
+        SimWert = SimErgebnis.Values(Me.Description)
 
         'Wertevergleich ausführen
-        QWert = ObjectiveFunction.compareValues(SimWert, Me.RefWert, Me.Funktion)
+        QWert = ObjectiveFunction.compareValues(SimWert, Me.RefWert, Me.Function)
 
         'Zielrichtung berücksichtigen
-        QWert *= Me.Richtung
+        QWert *= Me.Direction
 
         Return QWert
 

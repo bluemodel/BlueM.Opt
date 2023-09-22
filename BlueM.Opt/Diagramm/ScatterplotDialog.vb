@@ -133,7 +133,7 @@ Public Class ScatterplotDialog
             Case Common.SPACE.SolutionSpace
                 'Solution Space
                 For Each feature As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-                    bezeichnung = feature.Bezeichnung
+                    bezeichnung = feature.Description
                     'Penalty-Functions mit Sternchen markieren
                     If (feature.isPrimObjective) Then bezeichnung &= " (*)"
                     Me.CheckedListBox_Auswahl.Items.Add(bezeichnung)

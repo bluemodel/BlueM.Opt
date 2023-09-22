@@ -208,13 +208,13 @@ Public Class SensiPlotController
                         '1 Parameter, x is opt parameter, y is objective function
                         serie = Me.myHauptDiagramm.getSeriesPoint("SensiPlot", "Orange")
                         x = ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0))
-                        y = ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung
+                        y = ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Direction
                         serie.Add(x, y, ind.ID.ToString())
                     Else
                         '> 1 parameters, x and z are first two opt parameters, y is objective function
                         x = ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(0))
                         z = ind.OptParameter_RWerte(Me.mySettings.SensiPlot.Selected_OptParameters(1))
-                        y = ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Richtung
+                        y = ind.Objectives(Me.mySettings.SensiPlot.Selected_Objective) * Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).Direction
                         serie3D.Add(x, y, z, ind.ID.ToString())
                         'if exactly 2 parameters, add a 2D surface
                         If NumParams = 2 Then
@@ -225,7 +225,7 @@ Public Class SensiPlotController
                     'Simulationsergebnis in Wave laden
                     If (Me.mySettings.SensiPlot.Show_Wave) Then
                         'SimReihe auslesen
-                        SimReihe = Sim1.SimResult.Series(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
+                        SimReihe = Sim1.SimResult.Series(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimResult)
                         'Lösungs-ID an Titel anhängen
                         SimReihe.Title &= $" (Solution {ind.ID})"
                         'SimReihe zu Collection hinzufügen
