@@ -50,13 +50,13 @@ Public Class Objectivefunction_Value
     ''' </summary>
     ''' <param name="SimErgebnis">collection of simulation results</param>
     ''' <returns>objective function value</returns>
-    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
+    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimResults) As Double
 
         Dim SimWert As Double
         Dim QWert As Double
 
         'SimWert aus SimErgebnis rausholen
-        SimWert = SimErgebnis.Werte(Me.Bezeichnung)
+        SimWert = SimErgebnis.Values(Me.Bezeichnung)
 
         'Wertevergleich ausführen
         QWert = ObjectiveFunction.compareValues(SimWert, Me.RefWert, Me.Funktion)

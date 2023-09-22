@@ -417,7 +417,7 @@ Public Class Talsim
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
         'Altes Simulationsergebnis löschen
-        Me.SimErgebnis.Clear()
+        Me.SimResult.Clear()
 
         'Collect required result files and series
         'TODO: das braucht eigentlich nicht nach jeder Simulation nochmal neu getan zu werden
@@ -452,7 +452,7 @@ Public Class Talsim
             fileInstance.readFile()
             'add time series to SimResults
             For Each ts As Wave.TimeSeries In fileInstance.TimeSeries.Values
-                Me.SimErgebnis.Reihen.Add(ts.Title, ts)
+                Me.SimResult.Series.Add(ts.Title, ts)
             Next
         Next
 

@@ -313,7 +313,7 @@ Public Class SWMM
         Dim Zeile As String
 
         'Altes Simulationsergebnis löschen
-        Me.SimErgebnis.Clear()
+        Me.SimResult.Clear()
 
         'Ablauf
         'Durchgehen aller ObjectiveFunctions - Objekte
@@ -417,7 +417,7 @@ Public Class SWMM
                                 Zeile = StrRead.ReadLine.ToString
                                 If (Zeile.StartsWith(KeyWord_SimGr)) Then
                                     tmpValue = Convert.ToDouble(Zeile.Split(" ", options:=StringSplitOptions.RemoveEmptyEntries)(NoSpalte - 1), Common.Provider.FortranProvider)
-                                    Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                                    Me.SimResult.Values.Add(obj.Bezeichnung, tmpValue)
                                     blnValueAdded = True
                                     Exit Do
                                     'Falls keine Nodes überstaut sind bei Node Flooding Summary muss geährleistet werden,
@@ -434,7 +434,7 @@ Public Class SWMM
                                     'Wenn die SimGr nicht im Block auftaucht muss tmpvalue = 0 gesetzt werden
                                 ElseIf Zeile.TrimStart.StartsWith("**********************") Then    'nächster Block beginnt
                                     tmpValue = 0.0
-                                    Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                                    Me.SimResult.Values.Add(obj.Bezeichnung, tmpValue)
                                     blnValueAdded = True
                                     Exit Do
                                 End If

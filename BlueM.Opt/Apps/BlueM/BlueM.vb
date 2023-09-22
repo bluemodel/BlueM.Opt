@@ -331,7 +331,7 @@ Public Class BlueMSim
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
         'Altes Simulationsergebnis löschen
-        Me.SimErgebnis.Clear()
+        Me.SimResult.Clear()
 
         'Benötigte SimReihen zusammenstellen
         'TODO: das braucht eigentlich nicht nach jeder Simulation nochmal neu getan zu werden
@@ -366,7 +366,7 @@ Public Class BlueMSim
         WELtmp.readFile()
         'Zeitreihen übernehmen
         For Each zre As Wave.TimeSeries In WELtmp.TimeSeries.Values
-            Me.SimErgebnis.Reihen.Add(zre.Title, zre)
+            Me.SimResult.Series.Add(zre.Title, zre)
         Next
 
         'ggf. KWL-Datei einlesen
@@ -384,7 +384,7 @@ Public Class BlueMSim
             KWLtmp.readFile()
             'Zeitreihen übernehmen
             For Each zre As Wave.TimeSeries In KWLtmp.TimeSeries.Values
-                Me.SimErgebnis.Reihen.Add(zre.Title, zre)
+                Me.SimResult.Series.Add(zre.Title, zre)
             Next
 
         End If

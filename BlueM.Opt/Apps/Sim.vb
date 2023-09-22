@@ -60,9 +60,9 @@ Public MustInherit Class Sim
     Public SimDT As TimeSpan                             'Zeitschrittweite der Simulation
 
     ''' <summary>
-    ''' Das Simulationsergebnis
+    ''' The simulation result
     ''' </summary>
-    Public SimErgebnis As BlueM.Opt.Common.ObjectiveFunction.SimErgebnis_Structure
+    Public SimResult As BlueM.Opt.Common.ObjectiveFunction.SimResults
 
     'Das Problem
     '-----------
@@ -160,7 +160,7 @@ Public MustInherit Class Sim
     Public Sub New()
 
         'Simulationsergebnis instanzieren
-        Me.SimErgebnis.Clear()
+        Me.SimResult.Clear()
 
         'Standardmässig OptResult verwenden
         Me.mStoreIndividuals = True
@@ -487,7 +487,7 @@ Public MustInherit Class Sim
                     aggregateIndices.Add(i)
                 Else
                     'andere Ziele auswerten
-                    ind.Objectives(i) = .calculateObjective(Me.SimErgebnis)
+                    ind.Objectives(i) = .calculateObjective(Me.SimResult)
                 End If
 
             End With
@@ -688,7 +688,7 @@ Public MustInherit Class Sim
 
         'Simulationsergebnis auslesen
         Dim SimReihe As Wave.TimeSeries
-        SimReihe = Me.SimErgebnis.Reihen(constr.SimGr)
+        SimReihe = Me.SimResult.Series(constr.SimGr)
 
         'Fallunterscheidung GrenzTyp (Wert/Reihe)
         Select Case constr.Typ.ToUpper()

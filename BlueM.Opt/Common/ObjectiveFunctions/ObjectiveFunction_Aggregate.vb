@@ -27,7 +27,7 @@ Public Class ObjectiveFunction_Aggregate
         End Get
     End Property
 
-    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
+    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimResults) As Double
 
         'Aggregierte Ziele müssen von ausserhalb berechnet werden
         Throw New Exception("don't go here!")

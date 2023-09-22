@@ -55,19 +55,19 @@ Public Class ObjectiveFunction_ValueFromSeries
     ''' </summary>
     ''' <param name="SimErgebnis">collection of simulation results</param>
     ''' <returns>objective function value</returns>
-    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
+    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimResults) As Double
 
         Dim SimWert As Double
         Dim SimReihe As Wave.TimeSeries
         Dim QWert As Double
 
         'Check
-        If Not SimErgebnis.Reihen.ContainsKey(Me.SimGr) Then
+        If Not SimErgebnis.Series.ContainsKey(Me.SimGr) Then
             Throw New Exception($"Unable to find '{Me.SimGr}' in simulation result! Please check the dataset.")
         End If
 
         'SimReihe aus SimErgebnis rausholen
-        SimReihe = SimErgebnis.Reihen(Me.SimGr).Clone()
+        SimReihe = SimErgebnis.Series(Me.SimGr).Clone()
 
         'SimReihe auf Evaluierungszeitraum kürzen
         Call SimReihe.Cut(Me.EvalStart, Me.EvalEnde)

@@ -23,23 +23,23 @@ Imports BlueM
 Public MustInherit Class ObjectiveFunction
 
     ''' <summary>
-    ''' Struktur für Simulationsergebnisse
+    ''' Structure for holding simulation results
     ''' </summary>
-    Public Structure SimErgebnis_Structure
+    Public Structure SimResults
         ''' <summary>
-        ''' Ergebniswerte (Key ist ObjectiveFunction Name)
+        ''' Result values (key is ObjectiveFunction name)
         ''' </summary>
-        Public Werte As Dictionary(Of String, Double)
+        Public Values As Dictionary(Of String, Double)
         ''' <summary>
-        ''' Ergebnisreihen (Key ist ObjectiveFunction Name)
+        ''' Result time series (key is ObjectiveFunction name)
         ''' </summary>
-        Public Reihen As Dictionary(Of String, Wave.TimeSeries)
+        Public Series As Dictionary(Of String, Wave.TimeSeries)
         ''' <summary>
-        ''' Löscht alle vorhandenen Ergebnisse
+        ''' CLears all results
         ''' </summary>
         Public Sub Clear()
-            Me.Werte = New Dictionary(Of String, Double)
-            Me.Reihen = New Dictionary(Of String, Wave.TimeSeries)
+            Me.Values = New Dictionary(Of String, Double)
+            Me.Series = New Dictionary(Of String, Wave.TimeSeries)
         End Sub
     End Structure
 
@@ -132,7 +132,7 @@ Public MustInherit Class ObjectiveFunction
     ''' </summary>
     ''' <param name="SimErgebnis">collection of simulation results</param>
     ''' <returns>objective function value</returns>
-    Public MustOverride Function calculateObjective(ByVal SimErgebnis As SimErgebnis_Structure) As Double
+    Public MustOverride Function calculateObjective(ByVal SimErgebnis As SimResults) As Double
 
     ''' <summary>
     ''' compare two values using a function

@@ -225,7 +225,7 @@ Public Class SensiPlotController
                     'Simulationsergebnis in Wave laden
                     If (Me.mySettings.SensiPlot.Show_Wave) Then
                         'SimReihe auslesen
-                        SimReihe = Sim1.SimErgebnis.Reihen(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
+                        SimReihe = Sim1.SimResult.Series(Me.myProblem.List_ObjectiveFunctions(Me.mySettings.SensiPlot.Selected_Objective).SimGr)
                         'Lösungs-ID an Titel anhängen
                         SimReihe.Title &= $" (Solution {ind.ID})"
                         'SimReihe zu Collection hinzufügen
