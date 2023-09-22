@@ -343,7 +343,7 @@ Public Class SWMM
                     Select Case objValue.Block
                         Case "NodeFlooding"
                             KeyWord_Block = "  Node Flooding Summary"
-                            Select Case objValue.Spalte
+                            Select Case objValue.Column
                                 Case "HoursFlooded"
                                     NoSpalte = 2
                                 Case "FloodVolume"
@@ -353,7 +353,7 @@ Public Class SWMM
                             End Select
                         Case "StorageVolume"
                             KeyWord_Block = "  Storage Volume Summary"
-                            Select Case objValue.Spalte
+                            Select Case objValue.Column
                                 Case "AvgVolume"
                                     NoSpalte = 2
                                 Case "AvgPctFull"
@@ -369,7 +369,7 @@ Public Class SWMM
                             End Select
                         Case "OutfallLoad"
                             KeyWord_Block = "  Outfall Loading Summary"
-                            Select Case objValue.Spalte
+                            Select Case objValue.Column
                                 Case "MaxFlow"
                                     NoSpalte = 4
                                 Case "FlowVolume"
@@ -395,7 +395,7 @@ Public Class SWMM
                             KeyWord_Block = "  Conduit Surcharge Summary"
                         Case "Pumping"
                             KeyWord_Block = "  Pumping Summary"
-                            Select Case objValue.Spalte
+                            Select Case objValue.Column
                                 Case "OnlineTime"
                                     NoSpalte = 2
                                 Case "TotalEnergy"

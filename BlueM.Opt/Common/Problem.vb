@@ -548,9 +548,9 @@ Public Class Problem
                         'Restliche Spalten einlesen
                         With Objective_Value
                             .Block = WerteArray(9).Trim()
-                            .Spalte = WerteArray(10).Trim()
+                            .Column = WerteArray(10).Trim()
                             If (WerteArray(11).Trim() <> "") Then
-                                .RefWert = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
+                                .RefValue = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
                             End If
                             If (WerteArray(12).Trim() <> "") Then
                                 .hasCurrentValue = True

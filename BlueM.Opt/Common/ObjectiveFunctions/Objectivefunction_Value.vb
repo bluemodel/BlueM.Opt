@@ -28,43 +28,40 @@ Public Class Objectivefunction_Value
     End Property
 
     ''' <summary>
-    ''' Der zu vergleichende Referenzwert
+    ''' Reference value
     ''' </summary>
-    ''' <remarks>siehe Wiki</remarks>
-    Public RefWert As Double
+    Public RefValue As Double
 
     ''' <summary>
-    ''' Gibt den Block an, in der die Zielfunktionswerte stehen
+    ''' Section (block) in which the target variable is located
     ''' </summary>
-    ''' <remarks>Erlaubte Werte abhängig von Application: siehe Wiki</remarks>
     Public Block As String
 
     ''' <summary>
-    ''' Gibt die Spalte im Block an, in dem díe Zielfunktionswerte stehen
+    ''' Target variable (column) within the block
     ''' </summary>
-    ''' <remarks>Erlaubte Werte abhängig von Application: siehe Wiki</remarks>
-    Public Spalte As String
+    Public Column As String
 
     ''' <summary>
     ''' Calculate ObjectiveFunction value
     ''' </summary>
-    ''' <param name="SimErgebnis">collection of simulation results</param>
+    ''' <param name="SimResult">simulation result</param>
     ''' <returns>objective function value</returns>
-    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimResults) As Double
+    Public Overrides Function calculateObjective(ByVal SimResult As SimResults) As Double
 
-        Dim SimWert As Double
-        Dim QWert As Double
+        Dim SimValue As Double
+        Dim objectiveValue As Double
 
         'SimWert aus SimErgebnis rausholen
-        SimWert = SimErgebnis.Values(Me.Description)
+        SimValue = SimResult.Values(Me.Description)
 
         'Wertevergleich ausführen
-        QWert = ObjectiveFunction.compareValues(SimWert, Me.RefWert, Me.Function)
+        objectiveValue = ObjectiveFunction.compareValues(SimValue, Me.RefValue, Me.Function)
 
         'Zielrichtung berücksichtigen
-        QWert *= Me.Direction
+        objectiveValue *= Me.Direction
 
-        Return QWert
+        Return objectiveValue
 
     End Function
 
