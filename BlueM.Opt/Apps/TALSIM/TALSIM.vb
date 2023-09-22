@@ -32,9 +32,10 @@ Public Class Talsim
 
     Private exe_path As String
 
-    'Misc
-    '----
-    Private WELfiles As List(Of String) 'List of WEL files to use (e.g. "WEL", "KTR.WEL", "CHLO.WEL", etc.)
+    ''' <summary>
+    ''' List of result file extensions to use (e.g. "WEL", "KTR.WEL", "CHLO.WEL", "WBL", etc.)
+    ''' </summary>
+    Private resultFiles As List(Of String)
 
     '**** Multithreading ****
     Dim MyTalsimThreads() As TalsimThread
@@ -89,7 +90,7 @@ Public Class Talsim
 
         'Daten belegen
         '-------------
-        Me.WELfiles = New List(Of String)
+        Me.resultFiles = New List(Of String)
 
         'Pfad zu talsimw64.exe bestimmen
         '-------------------------------
@@ -135,21 +136,21 @@ Public Class Talsim
         'TALSIM-spezifische Weiterverarbeitung von ZielReihen:
         Dim objective As Common.ObjectiveFunction
 
-        'Feststellen, welche WEL-Dateien in Zielfunktionen genutzt werden
+        'Feststellen, welche WEL/WBL-Dateien in Zielfunktionen genutzt werden
         For Each objective In Me.mProblem.List_ObjectiveFunctions
             If Not IsNothing(objective.Datei) Then
-                Dim welfile As String = objective.Datei.ToUpper()
-                If Not Me.WELfiles.Contains(welfile) Then
-                    Me.WELfiles.Add(welfile)
+                Dim fileExtension As String = objective.Datei.ToUpper()
+                If Not Me.resultFiles.Contains(fileExtension) Then
+                    Me.resultFiles.Add(fileExtension)
                 End If
             End If
         Next
 
-        'Feststellen, welche WEL-Dateien in Constraints genutzt werden
+        'Feststellen, welche WEL/WBL-Dateien in Constraints genutzt werden
         For Each constr As Constraintfunction In Me.mProblem.List_Constraintfunctions
-            Dim welfile As String = constr.Datei.ToUpper()
-            If Not Me.WELfiles.Contains(welfile) Then
-                Me.WELfiles.Add(welfile)
+            Dim fileExtension As String = constr.Datei.ToUpper()
+            If Not Me.resultFiles.Contains(fileExtension) Then
+                Me.resultFiles.Add(fileExtension)
             End If
         Next
 
@@ -418,41 +419,40 @@ Public Class Talsim
         'Altes Simulationsergebnis löschen
         Me.SimErgebnis.Clear()
 
-        'Benötigte SimReihen zusammenstellen
+        'Collect required result files and series
         'TODO: das braucht eigentlich nicht nach jeder Simulation nochmal neu getan zu werden
-        Dim SimReihen As New Dictionary(Of String, List(Of String)) '{file: [series]}
-        For Each welfile As String In Me.WELfiles
-            SimReihen.Add(welfile, New List(Of String))
+        Dim seriesMap As New Dictionary(Of String, List(Of String)) '{file: [series]}
+        For Each fileExtension As String In Me.resultFiles
+            seriesMap.Add(fileExtension, New List(Of String))
         Next
         For Each objfunc As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             If objfunc.GetObjType = ObjectiveFunction.ObjectiveType.Series Or
                 objfunc.GetObjType = ObjectiveFunction.ObjectiveType.ValueFromSeries Then
-                If Not SimReihen(objfunc.Datei.ToUpper()).Contains(objfunc.SimGr) Then
-                    SimReihen(objfunc.Datei.ToUpper()).Add(objfunc.SimGr)
+                If Not seriesMap(objfunc.Datei.ToUpper()).Contains(objfunc.SimGr) Then
+                    seriesMap(objfunc.Datei.ToUpper()).Add(objfunc.SimGr)
                 End If
             End If
         Next
         For Each constr As Constraintfunction In Me.mProblem.List_Constraintfunctions
-            If Not SimReihen(constr.Datei.ToUpper()).Contains(constr.SimGr) Then
-                SimReihen(constr.Datei.ToUpper()).Add(constr.SimGr)
+            If Not seriesMap(constr.Datei.ToUpper()).Contains(constr.SimGr) Then
+                seriesMap(constr.Datei.ToUpper()).Add(constr.SimGr)
             End If
         Next
 
-        'WEL-Dateien einlesen
-        '--------------------
-        For Each welfile As String In Me.WELfiles
+        'Read result series from file
+        For Each fileExtension As String In Me.resultFiles
 
-            Dim WELtmp As Wave.FileFormats.WEL = New Wave.FileFormats.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & "." & welfile))
-
-            'Benötigte Reihen für Import selektieren
-            For Each series As String In SimReihen(welfile)
-                WELtmp.selectSeries(series)
+            'get a file instance
+            Dim fileInstance As Wave.TimeSeriesFile = Wave.TimeSeriesFile.getInstance(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & "." & fileExtension))
+            'select required series for import
+            For Each series As String In seriesMap(fileExtension)
+                fileInstance.selectSeries(series)
             Next
-            'Datei einlesen
-            WELtmp.readFile()
-            'Zeitreihen übernehmen
-            For Each zre As Wave.TimeSeries In WELtmp.TimeSeries.Values
-                Me.SimErgebnis.Reihen.Add(zre.Title, zre)
+            'read the file
+            fileInstance.readFile()
+            'add time series to SimResults
+            For Each ts As Wave.TimeSeries In fileInstance.TimeSeries.Values
+                Me.SimErgebnis.Reihen.Add(ts.Title, ts)
             Next
         Next
 

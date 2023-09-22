@@ -4,8 +4,10 @@ BlueM.Opt Release Notes
 
 Version 2.4.1
 -------------
+NEW:
+* Added support for Talsim result files in WBL format #236
 FIXED:
-* Fix crash when multiple threads try to write to the log file at the same time
+* Fixed crash when multiple threads try to write to the log file at the same time
 CHANGED:
 * Updated BlueM.Wave to v2.4.5
 * Updated Talsim-NG Engine to v3.2.26
