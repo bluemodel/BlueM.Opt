@@ -8,6 +8,7 @@ NEW:
 * Added support for Talsim result files in WBL format #236
 FIXED:
 * Fixed crash when multiple threads try to write to the log file at the same time
+* SensiPlot: allow loading results from a result database #38
 CHANGED:
 * SensiPlot: increased max. number of allowed steps to 10000 #235
 * Updated BlueM.Wave to v2.4.5

@@ -785,6 +785,9 @@ Partial Public Class Form1
                     'Monitor deaktivieren
                     Me.ToolStripButton_Monitor.Checked = False
 
+                    'Ergebnis-Buttons
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+
                     'TODO: Progress initialisieren
 
 

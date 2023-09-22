@@ -597,14 +597,17 @@ Public Class OptResult
             Me.db_path = sourceFile
 
             Select Case Me.mProblem.Method
-                Case Common.METH_PES, Common.METH_HOOKEJEEVES, Common.METH_SENSIPLOT, Common.METH_METAEVO
-                    Call db_getIndividuen_PES()
+                Case Common.METH_PES, Common.METH_HOOKEJEEVES, Common.METH_METAEVO
+                    'Individuen laden
+                    Call Me.db_getIndividuen_PES()
+                    'Sekundärpopulationen laden
+                    Call Me.db_loadSekPops()
+                Case Common.METH_SENSIPLOT
+                    'Nur Individuen laden
+                    Call Me.db_getIndividuen_PES()
                 Case Else
                     Throw New NotImplementedException($"Method '{Me.mProblem.Method}' not implemented in OptResult.db_load()!")
             End Select
-
-            'Sekundärpopulationen laden
-            Call Me.db_loadSekPops()
 
         Catch ex As Exception
             Throw New Exception("Failed to load optimization result!" & Common.eol & ex.Message)
