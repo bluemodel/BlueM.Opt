@@ -83,7 +83,7 @@ Public MustInherit Class ObjectiveFunction
     ''' <summary>
     ''' Name of the simulation result from which to calculate the objective function value
     ''' </summary>
-    Public SimResult As String
+    Public SimResultName As String
 
     ''' <summary>
     ''' Name of the function with which to calculate the objective function value

@@ -343,8 +343,8 @@ Public Class BlueMSim
         For Each objfunc As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             If objfunc.GetObjType = ObjectiveFunction.ObjectiveType.Series Or
                 objfunc.GetObjType = ObjectiveFunction.ObjectiveType.ValueFromSeries Then
-                If Not SimReihen(objfunc.FileExtension.ToUpper()).Contains(objfunc.SimResult) Then
-                    SimReihen(objfunc.FileExtension.ToUpper()).Add(objfunc.SimResult)
+                If Not SimReihen(objfunc.FileExtension.ToUpper()).Contains(objfunc.SimResultName) Then
+                    SimReihen(objfunc.FileExtension.ToUpper()).Add(objfunc.SimResultName)
                 End If
             End If
         Next

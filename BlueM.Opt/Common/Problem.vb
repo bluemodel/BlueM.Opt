@@ -506,8 +506,8 @@ Public Class Problem
                             Else
                                 .EvalEnde = SimEnde
                             End If
-                            .RefGr = WerteArray(11).Trim()
-                            .RefReiheDatei = WerteArray(12).Trim()
+                            .RefName = WerteArray(11).Trim()
+                            .RefSeriesFile = WerteArray(12).Trim()
                             If (WerteArray(13).Trim() <> "") Then
                                 .hasCurrentValue = True
                                 .CurrentValue = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
@@ -520,7 +520,7 @@ Public Class Problem
                             End If
 
                             'Referenzreihe einlesen
-                            .RefReihe = Me.Read_OBF_RefSeries(IO.Path.Combine(Me.mWorkDir, .RefReiheDatei), .RefGr, .EvalStart, .EvalEnde)
+                            .RefSeries = Me.Read_OBF_RefSeries(IO.Path.Combine(Me.mWorkDir, .RefSeriesFile), .RefName, .EvalStart, .EvalEnde)
 
                         End With
 
@@ -724,7 +724,7 @@ Public Class Problem
                 .Factor = Convert.ToDouble(WerteArray(5).Trim())
             End If
             .FileExtension = WerteArray(6).Trim()
-            .SimResult = WerteArray(7).Trim()
+            .SimResultName = WerteArray(7).Trim()
             .Function = WerteArray(8).Trim()
         End With
 

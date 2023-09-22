@@ -1733,10 +1733,10 @@ Partial Public Class Form1
                                 'TODO: Dieselbe Referenzreihe könnte aber mehrfach mit jeweils 
                                 '      unterschiedlichen Evaluierungszeiträumen definiert sein.
                                 '      Dann sollte sie auch mehrfach gezeichnet werden.
-                                If (Not RefSeries.Contains(.RefReiheDatei & .RefGr)) Then
-                                    RefSeries.Add(.RefGr, .RefReiheDatei & .RefGr)
+                                If (Not RefSeries.Contains(.RefSeriesFile & .RefName)) Then
+                                    RefSeries.Add(.RefName, .RefSeriesFile & .RefName)
                                     'Referenzreihe in Wave laden
-                                    Wave1.Import_Series(.RefReihe)
+                                    Wave1.Import_Series(.RefSeries)
                                 End If
                             End With
                         End If
@@ -1744,9 +1744,9 @@ Partial Public Class Form1
                         'Simulationsergebnis in Wave laden
                         '---------------------------------
                         'Simulationsreihen nur jeweils ein Mal zeichnen
-                        If (Not SimSeries.Contains(.SimResult)) Then
-                            Call SimSeries.Add(.SimResult, .SimResult)
-                            zre = Sim1.SimResult.Series(.SimResult).Clone()
+                        If (Not SimSeries.Contains(.SimResultName)) Then
+                            Call SimSeries.Add(.SimResultName, .SimResultName)
+                            zre = Sim1.SimResult.Series(.SimResultName).Clone()
                             'Lösungsnummer an Titel anhängen
                             zre.Title &= $" (Solution {ind.ID})"
                             'Simreihe in Wave laden

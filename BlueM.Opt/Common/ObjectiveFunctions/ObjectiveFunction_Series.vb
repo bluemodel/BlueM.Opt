@@ -30,59 +30,59 @@ Public Class ObjectiveFunction_Series
     End Property
 
     ''' <summary>
-    ''' Der Dateiname der Referenzreihe
+    ''' Path to the file containing the reference series
     ''' </summary>
-    ''' <remarks>Pfadangabe relativ zum Datensatz</remarks>
-    Public RefReiheDatei As String
+    ''' <remarks>can be relative to the dataset</remarks>
+    Public RefSeriesFile As String
 
     ''' <summary>
-    ''' Zu verwendender Spaltenname falls Referenzreihe eine .WEL Datei ist
+    ''' The name of the reference time series. Only necessary if RefSeriesFile contains multiple series
     ''' </summary>
-    Public RefGr As String
+    Public RefName As String
 
     ''' <summary>
-    ''' Die Referenzreihe
+    ''' Reference time series
     ''' </summary>
-    Public RefReihe As Wave.TimeSeries
+    Public RefSeries As Wave.TimeSeries
 
     ''' <summary>
-    ''' Start des Evaluierungszeitraums
+    ''' Start of the evaluation period
     ''' </summary>
     Public EvalStart As DateTime
 
     ''' <summary>
-    ''' Ende des Evaluierungszeitraums
+    ''' End of the evaluation period
     ''' </summary>
     Public EvalEnde As DateTime
 
     ''' <summary>
     ''' Calculate the ObjectiveFunction value
     ''' </summary>
-    ''' <param name="SimErgebnis">collection of simulation results</param>
+    ''' <param name="SimResult">simulation result</param>
     ''' <returns>objective function value</returns>
-    Public Overrides Function calculateObjective(ByVal SimErgebnis As SimResults) As Double
+    Public Overrides Function calculateObjective(ByVal SimResult As SimResults) As Double
 
-        Dim QWert As Double
-        Dim SimReihe As Wave.TimeSeries
+        Dim objectiveValue As Double
+        Dim SimSeries As Wave.TimeSeries
 
         'Check
-        If Not SimErgebnis.Series.ContainsKey(Me.SimResult) Then
-            Throw New Exception($"Unable to find SimResult '{Me.SimResult}' in simulation result! Please check the dataset.")
+        If Not SimResult.Series.ContainsKey(Me.SimResultName) Then
+            Throw New Exception($"Unable to find SimResult '{Me.SimResultName}' in simulation result! Please check the dataset.")
         End If
 
         'SimReihe aus SimErgebnis rausholen
-        SimReihe = SimErgebnis.Series(Me.SimResult).Clone()
+        SimSeries = SimResult.Series(Me.SimResultName).Clone()
 
         'Simulationszeitreihe auf Evaluierungszeitraum zuschneiden
-        Call SimReihe.Cut(Me.EvalStart, Me.EvalEnde)
+        Call SimSeries.Cut(Me.EvalStart, Me.EvalEnde)
 
         'Reihenvergleich durchführen
-        QWert = ObjectiveFunction.compareSeries(SimReihe, Me.RefReihe, Me.Function)
+        objectiveValue = ObjectiveFunction.compareSeries(SimSeries, Me.RefSeries, Me.Function)
 
         'Zielrichtung berücksichtigen
-        QWert *= Me.Direction
+        objectiveValue *= Me.Direction
 
-        Return QWert
+        Return objectiveValue
 
     End Function
 

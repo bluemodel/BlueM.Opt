@@ -408,7 +408,7 @@ Public Class SWMM
                     'Datei durchgehen und nach Schluesselwort suchen
                     blnValueAdded = False
                     Do
-                        KeyWord_SimGr = "  " & objValue.SimResult
+                        KeyWord_SimGr = "  " & objValue.SimResultName
                         Zeile = StrRead.ReadLine.ToString
                         If (Zeile.StartsWith(KeyWord_Block)) Then
                             Zeile = StrRead.ReadLine.ToString    'Es folgt immer eine Zeile mit Sternen

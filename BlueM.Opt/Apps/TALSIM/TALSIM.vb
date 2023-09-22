@@ -428,8 +428,8 @@ Public Class Talsim
         For Each objfunc As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             If objfunc.GetObjType = ObjectiveFunction.ObjectiveType.Series Or
                 objfunc.GetObjType = ObjectiveFunction.ObjectiveType.ValueFromSeries Then
-                If Not seriesMap(objfunc.FileExtension.ToUpper()).Contains(objfunc.SimResult) Then
-                    seriesMap(objfunc.FileExtension.ToUpper()).Add(objfunc.SimResult)
+                If Not seriesMap(objfunc.FileExtension.ToUpper()).Contains(objfunc.SimResultName) Then
+                    seriesMap(objfunc.FileExtension.ToUpper()).Add(objfunc.SimResultName)
                 End If
             End If
         Next
