@@ -350,8 +350,8 @@ Public MustInherit Class ObjectiveFunction
                 objectiveValue = covar ^ 2 / (var_x * var_y)
 
             Case "KGE"
-                'Kling-Gupta efficiency
-                'https://permetrics.readthedocs.io/pages/regression/KGE.html
+                'Modified Kling-Gupta Efficiency, Kling et al. 2012 https://doi.org/10.1016/j.jhydrol.2012.01.011
+                'Formula: https://thibhlln.github.io/hydroeval/functions/hydroeval.kgeprime.html
                 Dim corr, covar, avg_sim, avg_obs, std_sim, std_obs As Double
                 Dim n As Integer = SimSeries.Length
 
