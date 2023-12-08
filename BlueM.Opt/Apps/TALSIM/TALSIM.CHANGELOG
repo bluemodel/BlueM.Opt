@@ -1,6 +1,27 @@
 Talsim-NG simulation engine changelog
 *************************************
 
+Version 3.2.29
+--------------
+FIXED:
+* Fixed system states not being calculated properly in the first timestep #252
+* Fixed system state refresh interval of type years not working #250
+* Fixed system state refresh interval not being respected when not aligned with simulation start date #250
+
+Version 3.2.28
+--------------
+CHANGED:
+* Scenario simulation:
+  * if a hydrograph is moved outside the simulation window due to offsets to the master, the last values of remains valid for the entire simulation
+
+Version 3.2.27
+--------------
+FIXED:
+* Scenario simulation:
+  * offset of flood peak moves correctly with offset of master flood hydrograph
+CHANGED:
+* Parameter tAFak in SCE file no longer needs to consider time unit conversion
+
 Version 3.2.26
 --------------
 CHANGED:
