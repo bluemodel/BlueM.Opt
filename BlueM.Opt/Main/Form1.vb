@@ -1527,8 +1527,10 @@ Partial Public Class Form1
 
                 'Lösung auswählen
                 Call Me.selectSolution(ind)
-            Catch
-                MsgBox("Solution is not selectable!", MsgBoxStyle.Information)
+
+            Catch ex As Exception
+                Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
+                MsgBox($"Solution is not selectable!{Common.Constants.eol}{ex.Message}", MsgBoxStyle.Information)
             End Try
 
         End If

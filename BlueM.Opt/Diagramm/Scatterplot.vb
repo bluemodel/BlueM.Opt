@@ -630,7 +630,8 @@ Partial Public Class Scatterplot
             End If
 
         Catch ex As Exception
-            MsgBox("Solution is not selectable!", MsgBoxStyle.Information)
+            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
+            MsgBox($"Solution is not selectable!{Common.Constants.eol}{ex.Message}", MsgBoxStyle.Information)
         End Try
 
     End Sub

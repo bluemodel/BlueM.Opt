@@ -6,6 +6,7 @@ Development
 -------------
 FIXED:
 * Added number of days to total optimization time output in log
+* Added log messages and more information to message box in case of errors when selecting a solution
 
 Version 2.4.2
 -------------
