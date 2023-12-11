@@ -990,7 +990,7 @@ Partial Public Class Form1
 
         MsgBox("Optimization ended!", MsgBoxStyle.Information, "BlueM.Opt")
 
-        Common.Log.AddMessage(Common.Log.levels.info, $"The optimization took {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
+        Common.Log.AddMessage(Common.Log.levels.info, $"The optimization took {AllOptTime.Elapsed.Days}d {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
 
     End Sub
 
