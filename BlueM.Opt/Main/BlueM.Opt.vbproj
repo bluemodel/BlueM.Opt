@@ -257,6 +257,7 @@
     <None Include="Resources\icon_excel.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\magnifier.png" />
     <EmbeddedResource Include="My Project\TeeChart.licenses" />
     <None Include="app.config" />
     <None Include="My Project\Settings.settings">

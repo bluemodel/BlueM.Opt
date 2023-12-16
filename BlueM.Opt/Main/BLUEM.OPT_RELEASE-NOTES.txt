@@ -4,6 +4,8 @@ BlueM.Opt Release Notes
 
 Development
 -------------
+NEW:
+* Added the possibility to select a solution by ID #237
 FIXED:
 * Added number of days to total optimization time output in log
 * Added log messages and more information to message box in case of errors when selecting a solution

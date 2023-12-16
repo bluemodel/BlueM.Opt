@@ -45,6 +45,7 @@ Partial Public Class SolutionDialog
     Public Event SelectedSolutionsSimulationRequested(ByVal checkedSolutions() As Integer)
     Public Event SelectedSolutionsChanged(ByVal selectedSolutions() As Integer)
     Public Event SelectedSolutionsCleared()
+    Public Event SelectedSolutionsIDRequested(id As Integer)
 
 
     ''' <summary>
@@ -230,6 +231,37 @@ Partial Public Class SolutionDialog
         'Cursor
         Cursor = Cursors.Default
 
+    End Sub
+
+    ''' <summary>
+    ''' Handles key presses in the ID textbox
+    ''' If Enter is pressed, mocks a SelectById button click
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub ToolStripTextBox_ID_KeyDown(sender As Object, e As KeyEventArgs) Handles ToolStripTextBox_ID.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            Call Me.ToolStripButton_SelectById_Click(sender, e)
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Handles SelectById button clicked
+    ''' Attempts to convert the ID textbox content to an integer 
+    ''' and if successful raises the SelectedSolutionsIDRequested event
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub ToolStripButton_SelectById_Click(sender As Object, e As EventArgs) Handles ToolStripButton_SelectByID.Click
+        Dim id As Integer
+        Dim isNumeric As Boolean = Integer.TryParse(Me.ToolStripTextBox_ID.Text, id)
+        If Not isNumeric Then
+            MsgBox("Entered ID is not a valid number!", MsgBoxStyle.Critical)
+            Me.ToolStripTextBox_ID.SelectAll()
+            Me.ToolStripTextBox_ID.Focus()
+            Exit Sub
+        End If
+        RaiseEvent SelectedSolutionsIDRequested(id)
     End Sub
 
     'Form resize

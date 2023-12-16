@@ -1537,9 +1537,25 @@ Partial Public Class Form1
 
     End Sub
 
-    'Eine Lösung auswählen
-    '*********************
-    Private Sub selectSolution(ByVal ind As Common.Individuum) Handles scatterplot1.pointSelected, scatterplot2.pointSelected, customPlot.pointSelected
+    ''' <summary>
+    ''' Selects a solution by ID
+    ''' </summary>
+    ''' <param name="id">the solution ID to select</param>
+    Private Overloads Sub selectSolution(id As Integer) Handles solutionDialog.SelectedSolutionsIDRequested
+        Dim ind As Common.Individuum
+        Try
+            ind = Sim1.OptResult.getSolution(id)
+            Call Me.selectSolution(ind)
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Selects a solution
+    ''' </summary>
+    ''' <param name="ind">the individual to select</param>
+    Private Overloads Sub selectSolution(ByVal ind As Common.Individuum) Handles scatterplot1.pointSelected, scatterplot2.pointSelected, customPlot.pointSelected
 
         Dim isOK As Boolean
 
