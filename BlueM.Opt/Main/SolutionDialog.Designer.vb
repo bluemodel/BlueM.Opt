@@ -53,7 +53,7 @@ Partial Class SolutionDialog
         Me.DataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders
         Me.DataGridView1.ShowEditingIcon = False
         Me.DataGridView1.ShowRowErrors = False
-        Me.DataGridView1.Size = New System.Drawing.Size(601, 282)
+        Me.DataGridView1.Size = New System.Drawing.Size(604, 282)
         Me.DataGridView1.TabIndex = 0
         '
         'Selection
@@ -68,7 +68,7 @@ Partial Class SolutionDialog
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton_Wave, Me.ToolStripSeparator1, Me.ToolStripButton_unselect, Me.ToolStripButton_Clear, Me.ToolStripSeparator2, Me.ToolStripLabel1, Me.ToolStripTextBox_ID, Me.ToolStripButton_SelectByID})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(601, 25)
+        Me.ToolStrip1.Size = New System.Drawing.Size(604, 25)
         Me.ToolStrip1.TabIndex = 15
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -136,10 +136,11 @@ Partial Class SolutionDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(601, 306)
+        Me.ClientSize = New System.Drawing.Size(604, 306)
         Me.Controls.Add(Me.ToolStrip1)
         Me.Controls.Add(Me.DataGridView1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.MinimumSize = New System.Drawing.Size(275, 115)
         Me.Name = "SolutionDialog"
         Me.Text = "Selected solutions"
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
