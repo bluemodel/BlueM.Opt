@@ -264,15 +264,6 @@ Partial Public Class SolutionDialog
         RaiseEvent SelectedSolutionsIDRequested(id)
     End Sub
 
-    'Form resize
-    '***********
-    Private Sub SolutionDialog_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Resize
-
-        Me.DataGridView1.Width = Me.ClientSize.Width
-        Me.DataGridView1.Height = Me.ClientSize.Height - 25       'Minus Höhe der Toolbar
-
-    End Sub
-
     'Form schließen
     '**************
     Private Sub SolutionDialog_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
