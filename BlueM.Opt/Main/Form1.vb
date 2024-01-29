@@ -18,7 +18,6 @@
 Imports System.Xml
 Imports System.Xml.Serialization
 Imports BlueM.Opt.Common.Constants
-Imports DHI.Generic.MikeZero.DFS
 
 ''' <summary>
 ''' Main Window
