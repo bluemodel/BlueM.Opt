@@ -120,7 +120,6 @@
     <ProjectReference Include="..\..\BlueM.Wave\source\Wave.vbproj">
       <Project>{ce4132a2-2e2f-4f54-b66d-1baa928d499e}</Project>
       <Name>Wave</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Algos\DDS\DDS.csproj">
       <Project>{9FA5A4C7-3AA9-420C-9F01-9F1683E36A79}</Project>
