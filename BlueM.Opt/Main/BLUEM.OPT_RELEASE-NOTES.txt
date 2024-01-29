@@ -2,7 +2,7 @@
 BlueM.Opt Release Notes
 ===============================================================
 
-Development
+Version 2.4.3
 -------------
 NEW:
 * Added the possibility to select a solution by ID #237
