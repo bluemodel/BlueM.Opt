@@ -274,31 +274,31 @@ Public Class Smusi
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
         Dim datei As String, DateiPfad As String, element As String, Zeile As String
-        Dim ASCtmp As Wave.ASC
+        Dim ASCtmp As Wave.Fileformats.ASC
         Dim SpalteVon As Long, SpalteLen As Long, BezVon As Integer
         Dim blnValueAdded As Boolean
 
         'Altes SimErgebnis löschen
-        Me.SimErgebnis.Clear()
+        Me.SimResult.Clear()
 
         'Neu Steffen
         For Each obj As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             'Unterscheidung nach ObjectiveType
             Select Case obj.GetObjType
                 Case Common.ObjectiveFunction.ObjectiveType.Series
-                    element = obj.SimGr.Substring(0, 4)
+                    element = obj.SimResultName.Substring(0, 4)
                     datei = element & "_WEL.ASC"
-                    ASCtmp = New Wave.ASC(IO.Path.Combine(Me.WorkDir_Current, datei), True)
+                    ASCtmp = New Wave.Fileformats.ASC(IO.Path.Combine(Me.WorkDir_Current, datei), True)
                     'Simulationsergebnis abspeichern
-                    For Each zre As Wave.TimeSeries In ASCtmp.Zeitreihen
-                        Me.SimErgebnis.Reihen.Add(element & "_" & zre.Title, zre)
+                    For Each zre As Wave.TimeSeries In ASCtmp.TimeSeries.Values
+                        Me.SimResult.Series.Add(element & "_" & zre.Title, zre)
                     Next
                     ASCtmp = Nothing
                     'Next
                 Case Common.ObjectiveFunction.ObjectiveType.Value
                     'TODO: Umbauen, so dass Datei nicht jedes mal geoeffnet werden muss
                     '.RPT-Datei oeffnen
-                    DateiPfad = IO.Path.Combine(WorkDir_Current, Datensatz & "." & obj.Datei)
+                    DateiPfad = IO.Path.Combine(WorkDir_Current, Datensatz & "." & obj.FileExtension)
                     Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
                     Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
                     Dim KeyWord_Block As String
@@ -310,7 +310,7 @@ Public Class Smusi
                     Select Case objValue.Block
                         Case "EntlVolumen"
                             KeyWord_Block = "* Zulauf"
-                            Select Case objValue.Spalte
+                            Select Case objValue.Column
                                 Case "SumVol"
                                     SpalteVon = 116
                                     SpalteLen = 10
@@ -320,7 +320,7 @@ Public Class Smusi
                             End Select
                         Case "MaxAbfluss"
                             KeyWord_Block = "* Maximal"
-                            Select Case objValue.Spalte
+                            Select Case objValue.Column
                                 Case "Qmax"
                                     SpalteVon = 22
                                     SpalteLen = 7
@@ -330,7 +330,7 @@ Public Class Smusi
                             End Select
                         Case "EntlFracht"
                             KeyWord_Block = "* Schmutzfracht"
-                            Select Case objValue.Spalte
+                            Select Case objValue.Column
                                 Case "CSBspez"
                                     SpalteVon = 108
                                     SpalteLen = 5
@@ -349,9 +349,9 @@ Public Class Smusi
                         If (Zeile.StartsWith(KeyWord_Block)) Then
                             Do
                                 Zeile = StrRead.ReadLine.ToString
-                                If (Trim(Zeile.Substring(BezVon, 4)) = obj.SimGr) Then
+                                If (Trim(Zeile.Substring(BezVon, 4)) = obj.SimResultName) Then
                                     tmpValue = Convert.ToDouble(Zeile.Substring(SpalteVon, SpalteLen))
-                                    Me.SimErgebnis.Werte.Add(obj.Bezeichnung, tmpValue)
+                                    Me.SimResult.Values.Add(obj.Description, tmpValue)
                                     blnValueAdded = True
                                     Exit Do
                                 End If
