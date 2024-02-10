@@ -770,6 +770,11 @@ Partial Public Class Scatterplot
         For i = 0 To dimension - 1
             For j = 0 To dimension - 1
 
+                'skip charts on diagonal
+                If i = j Then
+                    Continue For
+                End If
+
                 With Me.Diags(i, j)
 
                     'Roten Punkt zeichnen
