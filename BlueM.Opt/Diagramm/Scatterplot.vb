@@ -24,8 +24,6 @@ Imports System.Drawing
 Partial Public Class Scatterplot
     Inherits System.Windows.Forms.Form
 
-#Region "Eigenschaften"
-
     'Das Problem
     Private mProblem As BlueM.Opt.Common.Problem
 
@@ -37,15 +35,11 @@ Partial Public Class Scatterplot
     Private ShowSekPopOnly, ShowStartValue, ShowIstWerte, ShowRefResult As Boolean
     Private ShownSpace As BlueM.Opt.Common.SPACE
 
-#End Region 'Eigenschaften
-
     Private ReadOnly Property HighlightingIsActive As Boolean
         Get
             Return Me.ToolStripButton_highlight.Checked
         End Get
     End Property
-
-#Region "Events"
 
     ''' <summary>
     ''' Event wird ausgelöst, wenn in der Scatterplot-Matrix eine Lösung ausgewählt wird
@@ -53,10 +47,6 @@ Partial Public Class Scatterplot
     ''' <param name="ind">Das ausgewählte Individuum</param>
     ''' <remarks>wird von Form1.selectSolution() verarbeitet</remarks>
     Public Event pointSelected(ByVal ind As Common.Individuum)
-
-#End Region 'Events
-
-#Region "Methoden"
 
     ''' <summary>
     ''' Konstruktor
@@ -95,13 +85,13 @@ Partial Public Class Scatterplot
             Me.ShowStartValue = Dialog.ShowStartValue
             Me.ShowIstWerte = Dialog.ShowIstWerte
 
-            If (Me.ShowRefResult And Me.ShownSpace = Common.SPACE.DecisionSpace)
-                If (Not Me.OptResultRef.holdsOptparameters)
+            If (Me.ShowRefResult And Me.ShownSpace = Common.SPACE.DecisionSpace) Then
+                If (Not Me.OptResultRef.holdsOptparameters) Then
                     MsgBox("The comparison result was loaded without optimization parameters and can therefore not be displayed in the decision space!", MsgBoxStyle.Information, "Scatterplot matrix")
                     Me.ShowRefResult = False
                 End If
             End If
-            
+
 
             Application.DoEvents()
 
@@ -684,8 +674,6 @@ Partial Public Class Scatterplot
         End If
     End Sub
 
-#Region "Lösungsauswahl"
-
     'Einen Punkt auswählen
     '*********************
     Private Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -819,9 +807,5 @@ Partial Public Class Scatterplot
         Next i
 
     End Sub
-
-#End Region 'Lösungsauswahl
-
-#End Region 'Methoden
 
 End Class
