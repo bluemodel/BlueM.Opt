@@ -39,6 +39,12 @@ Partial Public Class Scatterplot
 
 #End Region 'Eigenschaften
 
+    Private ReadOnly Property HighlightingIsActive As Boolean
+        Get
+            Return Me.ToolStripButton_highlight.Checked
+        End Get
+    End Property
+
 #Region "Events"
 
     ''' <summary>
@@ -412,10 +418,14 @@ Partial Public Class Scatterplot
     ''' <summary>
     ''' Handles mouse move events on charts
     ''' Highlights the solution nearest to the mouse pointer in all charts
+    ''' if highlighting is switched on
     ''' </summary>
     ''' <param name="sender">chart</param>
     ''' <param name="e"></param>
     Private Sub OnChartMouseMove(sender As Object, e As EventArgs)
+        If Not HighlightingIsActive Then
+            Exit Sub
+        End If
         Try
             Dim diag As Diagramm = CType(sender, Diagramm)
             For Each tool As Steema.TeeChart.Tools.Tool In diag.Chart.Tools
@@ -629,25 +639,49 @@ Partial Public Class Scatterplot
 
         Me.matrix.Name = "Matrix"
 
+        Me.matrix.ColumnStyles.Clear()
         Me.matrix.ColumnCount = Me.dimension
         For i = 1 To Me.dimension
-            Me.matrix.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100 / Me.dimension))
+            Me.matrix.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100 / Me.dimension))
         Next
 
+        Me.matrix.RowStyles.Clear()
         Me.matrix.RowCount = Me.dimension
         For i = 1 To Me.dimension
-            Me.matrix.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100 / Me.dimension))
+            Me.matrix.RowStyles.Add(New RowStyle(SizeType.Percent, 100 / Me.dimension))
         Next
 
     End Sub
 
-    'Form Resize
-    '***********
-    Private Sub ScatterplotResize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+    ''' <summary>
+    ''' Handles toolstrip button highlight clicked
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub ToolStripButton_highlight_Click(sender As Object, e As EventArgs) Handles ToolStripButton_highlight.Click
+        If Not HighlightingIsActive Then
+            'clear all existing highlights
+            Dim i, j As Integer
+            Dim serie As Steema.TeeChart.Styles.Points
 
-        Me.matrix.Width = Me.ClientSize.Width
-        Me.matrix.Height = Me.ClientSize.Height
+            'loop over all charts
+            For i = 0 To dimension - 1
+                For j = 0 To dimension - 1
 
+                    'skip charts on diagonal
+                    If i = j Then
+                        Continue For
+                    End If
+
+                    'get series
+                    serie = Me.Diags(i, j).getSeriesPoint("Highlighted solutions", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 6)
+                    'clear any existing points
+                    serie.Clear()
+
+                Next j
+            Next i
+
+        End If
     End Sub
 
 #Region "Lösungsauswahl"
