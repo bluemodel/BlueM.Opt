@@ -404,7 +404,7 @@ Partial Public Class Scatterplot
                             s.Pointer.Pen.Color = Color.Empty   'Punkte unsichtbar
                         Next
                     Else
-                        'alle anderen kriegen Handler für seriesClick und MouseMove
+                        'add event handlers for seriesClick and MouseMove
                         AddHandler .ClickSeries, AddressOf Me.seriesClick
                         AddHandler .MouseMove, AddressOf Me.OnChartMouseMove
                     End If
@@ -440,7 +440,7 @@ Partial Public Class Scatterplot
                 End If
             Next
         Catch ex As Exception
-
+            'do nothing
         End Try
     End Sub
 
@@ -615,7 +615,7 @@ Partial Public Class Scatterplot
                             s.Pointer.Pen.Color = Color.Empty   'Punkte unsichtbar
                         Next
                     Else
-                        'alle anderen kriegen Handler für seriesClick und MouseMove
+                        'add event handlers for seriesClick and MouseMove
                         AddHandler .ClickSeries, AddressOf Me.seriesClick
                         AddHandler .MouseMove, AddressOf Me.OnChartMouseMove
                     End If
@@ -810,13 +810,11 @@ Partial Public Class Scatterplot
 
         For i = 0 To Me.Diags.GetUpperBound(0)
             For j = 0 To Me.Diags.GetUpperBound(1)
-                With Me.Diags(i, j)
 
-                    'Serie löschen
-                    serie = .getSeriesPoint("Selected solutions")
-                    serie.Dispose()
+                'Serie löschen
+                serie = Me.Diags(i, j).getSeriesPoint("Selected solutions")
+                serie.Dispose()
 
-                End With
             Next j
         Next i
 
