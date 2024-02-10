@@ -394,7 +394,7 @@ Partial Public Class Scatterplot
                     '=======================================
                     If (i = j) Then
                         'Hintergrund grau anzeigen
-                        .Walls.Back.Color = Color.LightGray
+                        .Panel.Brush.Color = Color.FromArgb(241, 241, 241)
                         'MarksTips entfernen
                         .Tools.Clear(True)
                         'Serien unsichtbar machen
@@ -605,7 +605,7 @@ Partial Public Class Scatterplot
                     '=======================================
                     If (i = j) Then
                         'Hintergrund grau anzeigen
-                        .Walls.Back.Color = Color.LightGray
+                        .Panel.Brush.Color = Color.FromArgb(241, 241, 241)
                         'MarksTips entfernen
                         .Tools.Clear(True)
                         'Serien unsichtbar machen
