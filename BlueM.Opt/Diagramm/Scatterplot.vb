@@ -31,7 +31,7 @@ Partial Public Class Scatterplot
     Private NearestPointTools(,) As Steema.TeeChart.Tools.NearestPoint
     Private dimension As Integer
     Private OptResult, OptResultRef As BlueM.Opt.OptResult.OptResult
-    Private Auswahl() As Integer
+    Private selectedIndices() As Integer
     Private ShowSekPopOnly, ShowStartValue, ShowIstWerte, ShowRefResult As Boolean
     Private ShownSpace As BlueM.Opt.Common.SPACE
 
@@ -79,7 +79,7 @@ Partial Public Class Scatterplot
         If (diagresult = DialogResult.OK) Then
             'Einstellungen übernehmen
             Me.ShownSpace = Dialog.selectedSpace
-            Me.Auswahl = Dialog.selectedVariables
+            Me.selectedIndices = Dialog.selectedIndices
             Me.ShowSekPopOnly = Dialog.ShowSekPopOnly
             Me.ShowRefResult = Dialog.ShowRefResult
             Me.ShowStartValue = Dialog.ShowStartValue
@@ -109,7 +109,7 @@ Partial Public Class Scatterplot
     Private Sub Display()
 
         'Matrix dimensionieren
-        Call Me.dimensionieren(Me.Auswahl.Length)
+        Call Me.dimensionieren(Me.selectedIndices.Length)
 
         'Diagramme zeichnen
         Select Case Me.ShownSpace
@@ -156,37 +156,37 @@ Partial Public Class Scatterplot
             If (Me.ShowSekPopOnly) Then
                 'Nur Sekundäre Population
                 For Each ind In Me.OptResult.getSekPop()
-                    min(i) = Math.Min(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, min(i))
-                    max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, max(i))
+                    min(i) = Math.Min(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, min(i))
+                    max(i) = Math.Max(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, max(i))
                 Next
             Else
                 'Alle Lösungen
                 For Each ind In Me.OptResult.Solutions
-                    min(i) = Math.Min(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, min(i))
-                    max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, max(i))
+                    min(i) = Math.Min(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, min(i))
+                    max(i) = Math.Max(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, max(i))
                 Next
             End If
 
             'Startwert
             If (Me.ShowStartValue) Then
                 ind = Me.OptResult.getSolution(1)
-                min(i) = Math.Min(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, min(i))
-                max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, max(i))
+                min(i) = Math.Min(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, min(i))
+                max(i) = Math.Max(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, max(i))
             End If
 
             'IstWerte
             If Me.ShowIstWerte Then
-                If (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasCurrentValue) Then
-                    min(i) = Math.Min(Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, min(i))
-                    max(i) = Math.Max(Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, max(i))
+                If (Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).hasCurrentValue) Then
+                    min(i) = Math.Min(Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, min(i))
+                    max(i) = Math.Max(Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, max(i))
                 End If
             End If
 
             'Vergleichsergebnis
             If (Me.ShowRefResult) Then
                 For Each ind In Me.OptResultRef.getSekPop()
-                    min(i) = Math.Min(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, min(i))
-                    max(i) = Math.Max(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, max(i))
+                    min(i) = Math.Min(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, min(i))
+                    max(i) = Math.Max(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, max(i))
                 Next
             End If
 
@@ -220,8 +220,8 @@ Partial Public Class Scatterplot
                     'Achsen
                     '------
                     'Titel
-                    xAchse = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Description
-                    yAchse = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Description
+                    xAchse = Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Description
+                    yAchse = Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Description
 
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
@@ -278,8 +278,8 @@ Partial Public Class Scatterplot
                     '==================
                     If (Me.ShowIstWerte) Then
                         If (i <> j And
-                            (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasCurrentValue Or
-                            Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).hasCurrentValue)) Then
+                            (Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).hasCurrentValue Or
+                            Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).hasCurrentValue)) Then
 
                             shape1 = New Steema.TeeChart.Styles.Shape(.Chart)
                             shape1.Style = Steema.TeeChart.Styles.ShapeStyles.Rectangle
@@ -293,12 +293,12 @@ Partial Public Class Scatterplot
                             shape1.Pen.Width = 1
 
                             'X-Werte
-                            If Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasCurrentValue Then
-                                If Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction = Common.EVO_DIRECTION.Minimization Then
+                            If Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).hasCurrentValue Then
+                                If Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction = Common.EVO_DIRECTION.Minimization Then
                                     shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
-                                    shape1.X1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction
+                                    shape1.X1 = Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction
                                 Else
-                                    shape1.X0 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction
+                                    shape1.X0 = Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction
                                     shape1.X1 = max(i) * 1.1 ^ (max(i) / Math.Abs(max(i)))
                                 End If
                             Else
@@ -306,12 +306,12 @@ Partial Public Class Scatterplot
                                 shape1.X1 = max(i) * 1.1 ^ (max(i) / Math.Abs(max(i)))
                             End If
                             'Y-Werte
-                            If Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).hasCurrentValue Then
-                                If Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction = Common.EVO_DIRECTION.Minimization Then
+                            If Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).hasCurrentValue Then
+                                If Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction = Common.EVO_DIRECTION.Minimization Then
                                     shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
-                                    shape1.Y1 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction
+                                    shape1.Y1 = Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction
                                 Else
-                                    shape1.Y0 = Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction
+                                    shape1.Y0 = Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction
                                     shape1.Y1 = max(j) * 1.1 ^ (max(j) / Math.Abs(max(j)))
                                 End If
                             Else
@@ -341,10 +341,10 @@ Partial Public Class Scatterplot
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
                                 'gültige Lösung Zeichnen
-                                serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
+                                serie.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID.ToString())
                             Else
                                 'ungültige Lösung zeichnen
-                                serie_inv.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
+                                serie_inv.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID.ToString())
                             End If
                         Next
                         'assign series to NearestPointTool
@@ -355,7 +355,7 @@ Partial Public Class Scatterplot
                     '--------------------
                     serie = .getSeriesPoint($"{xAchse}, {yAchse} (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                     For Each ind In Me.OptResult.getSekPop()
-                        serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
+                        serie.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID.ToString())
                     Next
                     If Me.ShowSekPopOnly Then
                         'assign sec pop series to NearestPointTool
@@ -367,7 +367,7 @@ Partial Public Class Scatterplot
                     If (Me.ShowStartValue) Then
                         serie = .getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
                         ind = Me.OptResult.getSolution(1)
-                        serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
+                        serie.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID.ToString())
                     End If
 
 
@@ -376,7 +376,7 @@ Partial Public Class Scatterplot
                     If (Me.ShowRefResult) Then
                         serie = .getSeriesPoint($"{xAchse}, {yAchse} (comparison result)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind In Me.OptResultRef.getSekPop()
-                            serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID & " (comparison result)")
+                            serie.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID & " (comparison result)")
                         Next
                     End If
 
@@ -449,8 +449,8 @@ Partial Public Class Scatterplot
         ReDim min(Me.dimension - 1)
         ReDim max(Me.dimension - 1)
         For i = 0 To Me.dimension - 1
-            min(i) = Me.mProblem.List_OptParameter(Me.Auswahl(i)).Min
-            max(i) = Me.mProblem.List_OptParameter(Me.Auswahl(i)).Max
+            min(i) = Me.mProblem.List_OptParameter(Me.selectedIndices(i)).Min
+            max(i) = Me.mProblem.List_OptParameter(Me.selectedIndices(i)).Max
         Next
 
         'Schleife über Spalten
@@ -481,8 +481,8 @@ Partial Public Class Scatterplot
                     'Achsen
                     '------
                     'Titel
-                    xAchse = Me.mProblem.List_OptParameter(Me.Auswahl(i)).Bezeichnung
-                    yAchse = Me.mProblem.List_OptParameter(Me.Auswahl(j)).Bezeichnung
+                    xAchse = Me.mProblem.List_OptParameter(Me.selectedIndices(i)).Bezeichnung
+                    yAchse = Me.mProblem.List_OptParameter(Me.selectedIndices(j)).Bezeichnung
 
                     .Axes.Bottom.Title.Caption = xAchse
                     .Axes.Left.Title.Caption = yAchse
@@ -554,10 +554,10 @@ Partial Public Class Scatterplot
                             'Constraintverletzung prüfen
                             If (ind.Is_Feasible) Then
                                 'gültige Lösung Zeichnen
-                                serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                                serie.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID.ToString())
                             Else
                                 'ungültige Lösung zeichnen
-                                serie_inv.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                                serie_inv.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID.ToString())
                             End If
                         Next
                         'assign series to NearestPointTool
@@ -568,7 +568,7 @@ Partial Public Class Scatterplot
                     '--------------------
                     serie = .getSeriesPoint($"{xAchse}, {yAchse} (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                     For Each ind As Common.Individuum In Me.OptResult.getSekPop()
-                        serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                        serie.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID.ToString())
                     Next
                     If Me.ShowSekPopOnly Then
                         'assign sec pop series to NearestPointTool
@@ -580,7 +580,7 @@ Partial Public Class Scatterplot
                     If (Me.ShowRefResult) Then
                         serie = .getSeriesPoint($"{xAchse}, {yAchse} (comparison result)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
-                            serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID & " (comparison result)")
+                            serie.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID & " (comparison result)")
                         Next
                     End If
 
@@ -588,7 +588,7 @@ Partial Public Class Scatterplot
                     '==================================
                     If (Me.ShowStartValue) Then
                         serie = .getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
-                        serie.Add(Me.mProblem.List_OptParameter(Me.Auswahl(i)).StartWert, Me.mProblem.List_OptParameter(Me.Auswahl(j)).StartWert, "Start value")
+                        serie.Add(Me.mProblem.List_OptParameter(Me.selectedIndices(i)).StartWert, Me.mProblem.List_OptParameter(Me.selectedIndices(j)).StartWert, "Start value")
                     End If
 
                     'Diagramme auf der Diagonalen ausblenden
@@ -734,9 +734,9 @@ Partial Public Class Scatterplot
                 'plot the point
                 Select Case Me.ShownSpace
                     Case Common.SPACE.SolutionSpace
-                        serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
+                        serie.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID.ToString())
                     Case Common.SPACE.DecisionSpace
-                        serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                        serie.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID.ToString())
                 End Select
             Next j
         Next i
@@ -770,9 +770,9 @@ Partial Public Class Scatterplot
 
                     Select Case Me.ShownSpace
                         Case Common.SPACE.SolutionSpace
-                            serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
+                            serie.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID.ToString())
                         Case Common.SPACE.DecisionSpace
-                            serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                            serie.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID.ToString())
                     End Select
 
                     'Mark anzeigen

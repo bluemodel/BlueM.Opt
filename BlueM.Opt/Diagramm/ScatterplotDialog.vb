@@ -33,7 +33,7 @@ Public Class ScatterplotDialog
         End Get
     End Property
 
-    Public ReadOnly Property selectedVariables() As Integer()
+    Public ReadOnly Property selectedIndices() As Integer()
         Get
             Dim selection(-1) As Integer
             For Each indexChecked As Integer In Me.CheckedListBox_Auswahl.CheckedIndices
