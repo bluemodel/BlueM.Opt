@@ -535,16 +535,17 @@ Partial Public Class Scatterplot
                         .Axes.Bottom.Labels.Font.Color = System.Drawing.Color.Empty
                     End If
 
+                    'setup NearestPoint tool
+                    Me.NearestPointTools(i, j) = New Steema.TeeChart.Tools.NearestPoint(.Chart) With
+                    {
+                        .Style = Steema.TeeChart.Tools.NearestPointStyles.None,
+                        .DrawLine = False,
+                        .Direction = Steema.TeeChart.Tools.NearestPointDirection.Both
+                    }
+
                     'Punkte eintragen
                     '================
-                    If (Me.ShowSekPopOnly) Then
-                        'Nur Sekundäre Population
-                        '------------------------
-                        serie = .getSeriesPoint($"{xAchse}, {yAchse}", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Common.Individuum In Me.OptResult.getSekPop()
-                            serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
-                        Next
-                    Else
+                    If Not Me.ShowSekPopOnly Then
                         'Alle Lösungen
                         '-------------
                         serie = .getSeriesPoint($"{xAchse}, {yAchse}", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
@@ -559,11 +560,19 @@ Partial Public Class Scatterplot
                                 serie_inv.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
                             End If
                         Next
-                        'draw sec pop
-                        serie = .getSeriesPoint($"{xAchse}, {yAchse} (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Common.Individuum In Me.OptResult.getSekPop()
-                            serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
-                        Next
+                        'assign series to NearestPointTool
+                        Me.NearestPointTools(i, j).Series = serie
+                    End If
+
+                    'Sekundäre Population
+                    '--------------------
+                    serie = .getSeriesPoint($"{xAchse}, {yAchse} (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                    For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                        serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                    Next
+                    If Me.ShowSekPopOnly Then
+                        'assign sec pop series to NearestPointTool
+                        Me.NearestPointTools(i, j).Series = serie
                     End If
 
                     'Vergleichsergebnis anzeigen
@@ -596,8 +605,9 @@ Partial Public Class Scatterplot
                             s.Pointer.Pen.Color = Color.Empty   'Punkte unsichtbar
                         Next
                     Else
-                        'alle anderen kriegen Handler für seriesClick
+                        'alle anderen kriegen Handler für seriesClick und MouseMove
                         AddHandler .ClickSeries, AddressOf Me.seriesClick
+                        AddHandler .MouseMove, AddressOf Me.OnChartMouseMove
                     End If
 
                 End With
