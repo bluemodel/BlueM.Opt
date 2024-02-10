@@ -30,6 +30,7 @@ Partial Public Class Scatterplot
     Private mProblem As BlueM.Opt.Common.Problem
 
     Private Diags(,) As BlueM.Opt.Diagramm.Diagramm
+    Private NearestPointTools(,) As Steema.TeeChart.Tools.NearestPoint
     Private dimension As Integer
     Private OptResult, OptResultRef As BlueM.Opt.OptResult.OptResult
     Private Auswahl() As Integer
@@ -280,8 +281,8 @@ Partial Public Class Scatterplot
                     'IstWerte eintragen
                     '==================
                     If (Me.ShowIstWerte) Then
-                        If (i <> j And _
-                            (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasCurrentValue Or _
+                        If (i <> j And
+                            (Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).hasCurrentValue Or
                             Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).hasCurrentValue)) Then
 
                             shape1 = New Steema.TeeChart.Styles.Shape(.Chart)
@@ -325,16 +326,17 @@ Partial Public Class Scatterplot
                         End If
                     End If
 
+                    'setup NearestPoint tool
+                    Me.NearestPointTools(i, j) = New Steema.TeeChart.Tools.NearestPoint(.Chart) With
+                    {
+                        .Style = Steema.TeeChart.Tools.NearestPointStyles.None,
+                        .DrawLine = False,
+                        .Direction = Steema.TeeChart.Tools.NearestPointDirection.Both
+                    }
+
                     'Lösungen eintragen
                     '==================
-                    If (Me.ShowSekPopOnly) Then
-                        'Nur Sekundäre Population
-                        '------------------------
-                        serie = .getSeriesPoint($"{xAchse}, {yAchse}", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind In Me.OptResult.getSekPop()
-                            serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
-                        Next
-                    Else
+                    If Not Me.ShowSekPopOnly Then
                         'Alle Lösungen
                         '-------------
                         serie = .getSeriesPoint($"{xAchse}, {yAchse}", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
@@ -349,11 +351,19 @@ Partial Public Class Scatterplot
                                 serie_inv.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
                             End If
                         Next
-                        'draw sec pop
-                        serie = .getSeriesPoint($"{xAchse}, {yAchse} (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind In Me.OptResult.getSekPop()
-                            serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
-                        Next
+                        'assign series to NearestPointTool
+                        Me.NearestPointTools(i, j).Series = serie
+                    End If
+
+                    'Sekundäre Population
+                    '--------------------
+                    serie = .getSeriesPoint($"{xAchse}, {yAchse} (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
+                    For Each ind In Me.OptResult.getSekPop()
+                        serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
+                    Next
+                    If Me.ShowSekPopOnly Then
+                        'assign sec pop series to NearestPointTool
+                        Me.NearestPointTools(i, j).Series = serie
                     End If
 
                     'Startwert
@@ -388,14 +398,40 @@ Partial Public Class Scatterplot
                             s.Pointer.Pen.Color = Color.Empty   'Punkte unsichtbar
                         Next
                     Else
-                        'alle anderen kriegen Handler für seriesClick
+                        'alle anderen kriegen Handler für seriesClick und MouseMove
                         AddHandler .ClickSeries, AddressOf Me.seriesClick
+                        AddHandler .MouseMove, AddressOf Me.OnChartMouseMove
                     End If
 
                 End With
             Next
         Next
 
+    End Sub
+
+    ''' <summary>
+    ''' Handles mouse move events on charts
+    ''' Highlights the solution nearest to the mouse pointer in all charts
+    ''' </summary>
+    ''' <param name="sender">chart</param>
+    ''' <param name="e"></param>
+    Private Sub OnChartMouseMove(sender As Object, e As EventArgs)
+        Try
+            Dim diag As Diagramm = CType(sender, Diagramm)
+            For Each tool As Steema.TeeChart.Tools.Tool In diag.Chart.Tools
+                If TypeOf tool Is Steema.TeeChart.Tools.NearestPoint Then
+                    Dim nearestPointTool As Steema.TeeChart.Tools.NearestPoint = CType(tool, Steema.TeeChart.Tools.NearestPoint)
+                    If nearestPointTool.Point > 1 Then
+                        Dim id As Integer = nearestPointTool.Series.Labels(nearestPointTool.Point)
+                        Dim ind = Me.OptResult.getSolution(id)
+                        Call Me.showHighlightedSolution(ind)
+                    End If
+                    Exit For
+                End If
+            Next
+        Catch ex As Exception
+
+        End Try
     End Sub
 
     'Entscheidungsraum zeichnen
@@ -577,6 +613,7 @@ Partial Public Class Scatterplot
         Me.dimension = _dimension
 
         ReDim Me.Diags(Me.dimension - 1, Me.dimension - 1)
+        ReDim Me.NearestPointTools(Me.dimension - 1, Me.dimension - 1)
 
         Dim i As Integer
 
@@ -633,6 +670,44 @@ Partial Public Class Scatterplot
             Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
             MsgBox($"Solution is not selectable!{Common.Constants.eol}{ex.Message}", MsgBoxStyle.Information)
         End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' Highlight a solution in all charts
+    ''' </summary>
+    ''' <param name="ind">the solution to highlight</param>
+    ''' <remarks></remarks>
+    Private Sub showHighlightedSolution(ByVal ind As Common.Individuum)
+
+        Dim serie As Steema.TeeChart.Styles.Points
+        Dim i, j As Integer
+
+        'loop over all charts
+        For i = 0 To dimension - 1
+            For j = 0 To dimension - 1
+
+                'skip charts on diagonal
+                If i = j Then
+                    Continue For
+                End If
+
+                'get/create a series
+                serie = Me.Diags(i, j).getSeriesPoint("Highlighted solutions", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 6)
+                serie.Pointer.Brush.Color = Color.Empty
+                serie.Pointer.Pen.Width = 2
+                'clear any existing points
+                serie.Clear()
+
+                'plot the point
+                Select Case Me.ShownSpace
+                    Case Common.SPACE.SolutionSpace
+                        serie.Add(ind.Objectives(Me.Auswahl(i)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(i)).Direction, ind.Objectives(Me.Auswahl(j)) * Me.mProblem.List_ObjectiveFunctions(Me.Auswahl(j)).Direction, ind.ID.ToString())
+                    Case Common.SPACE.DecisionSpace
+                        serie.Add(ind.OptParameter_RWerte(Me.Auswahl(i)), ind.OptParameter_RWerte(Me.Auswahl(j)), ind.ID.ToString())
+                End Select
+            Next j
+        Next i
 
     End Sub
 
