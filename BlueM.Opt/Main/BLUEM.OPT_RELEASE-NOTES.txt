@@ -2,6 +2,11 @@
 BlueM.Opt Release Notes
 ===============================================================
 
+Version 2.4.4
+-------------
+NEW:
+* Added a button for highlighting solutions on mouse hover in the scatterplot matrix #240
+
 Version 2.4.3
 -------------
 NEW:
