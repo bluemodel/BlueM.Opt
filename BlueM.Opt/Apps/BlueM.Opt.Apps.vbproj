@@ -176,6 +176,7 @@
     <ProjectReference Include="..\..\BlueM.Wave\source\Wave.vbproj">
       <Project>{ce4132a2-2e2f-4f54-b66d-1baa928d499e}</Project>
       <Name>Wave</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Common\BlueM.Opt.Common.vbproj">
       <Project>{CAA1CE91-0973-4BE7-9BD8-16B5D40BC93C}</Project>

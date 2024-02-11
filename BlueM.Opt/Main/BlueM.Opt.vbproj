@@ -120,6 +120,7 @@
     <ProjectReference Include="..\..\BlueM.Wave\source\Wave.vbproj">
       <Project>{ce4132a2-2e2f-4f54-b66d-1baa928d499e}</Project>
       <Name>Wave</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Algos\DDS\DDS.csproj">
       <Project>{9FA5A4C7-3AA9-420C-9F01-9F1683E36A79}</Project>
@@ -325,8 +326,38 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>XCOPY $(SolutionDir)BlueM.Wave\source\bin\$(PlatformName)\$(ConfigurationName)\* $(TargetDir)BlueM.Wave /Y /S /I
+    <PostBuildEvent>:: copy license file to output
+COPY /Y $(SolutionDir)COPYING $(TargetDir)COPYING
+:: copy BlueM.Sim assemblies to output
 XCOPY $(SolutionDir)BlueM.Opt\Apps\BlueM\$(PlatformName)\* $(TargetDir)BlueM /Y /S /I
-COPY /Y $(SolutionDir)COPYING $(TargetDir)COPYING</PostBuildEvent>
+:: copy BlueM.Wave .NET assemblies to output
+XCOPY $(SolutionDir)BlueM.Wave\source\bin\$(PlatformName)\$(ConfigurationName)\* $(TargetDir)BlueM.Wave /Y /S /I
+:: move BlueM.Wave native assemblies to subdir
+move /Y $(TargetDir)de $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)ams2004.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)amsT2004.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)DHI.Generic.MikeZero.DFS.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)DHI.Generic.MikeZero.EUM.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)DHI.PFS.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)DHI.Projections.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)DHIfl.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)DotNetZip.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)DotNetZip.pdb $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)ellipsoid.pfs $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)eum.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)EUM.ubg $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)EUM.xml $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)EUM_Default_Units.ubg $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)EUM_US_Units.ubg $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)map_projection.pfs $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)MathNet.Numerics.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)MzCart.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)Newtonsoft.Json.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)PdfSharp.Charting.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)PdfSharp.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)pfs2004.dll $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)state_plane_nad27.pfs $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)state_plane_nad83.pfs $(TargetDir)BlueM.Wave
+move /Y $(TargetDir)ufs.dll $(TargetDir)BlueM.Wave</PostBuildEvent>
   </PropertyGroup>
 </Project>
