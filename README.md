@@ -15,4 +15,4 @@ Where possible, BlueM.Opt utilizes multithreading in order to evaluate multiple 
 
 **Documentation:** https://wiki.bluemodel.org/index.php/BlueM.Opt
 
-**Downloads:** https://downloads.bluemodel.org/?dir=BlueM.Opt
+**Download:** https://github.com/bluemodel/BlueM.Opt/releases/latest
