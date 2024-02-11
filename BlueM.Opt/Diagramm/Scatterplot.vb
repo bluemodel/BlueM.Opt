@@ -327,8 +327,11 @@ Partial Public Class Scatterplot
                     {
                         .Style = Steema.TeeChart.Tools.NearestPointStyles.None,
                         .DrawLine = False,
-                        .Direction = Steema.TeeChart.Tools.NearestPointDirection.Both
+                        .Direction = Steema.TeeChart.Tools.NearestPointDirection.Both,
+                        .Active = False
                     }
+                    'add event handler
+                    AddHandler Me.NearestPointTools(i, j).Change, AddressOf Me.OnNearestPointChange
 
                     'Lösungen eintragen
                     '==================
@@ -394,9 +397,10 @@ Partial Public Class Scatterplot
                             s.Pointer.Pen.Color = Color.Empty   'Punkte unsichtbar
                         Next
                     Else
-                        'add event handlers for seriesClick and MouseMove
+                        'add event handlers
                         AddHandler .ClickSeries, AddressOf Me.seriesClick
-                        AddHandler .MouseMove, AddressOf Me.OnChartMouseMove
+                        AddHandler .MouseEnter, AddressOf Me.OnChartMouseEnter
+                        AddHandler .MouseLeave, AddressOf Me.OnChartMouseLeave
                     End If
 
                 End With
@@ -406,26 +410,62 @@ Partial Public Class Scatterplot
     End Sub
 
     ''' <summary>
-    ''' Handles mouse move events on charts
-    ''' Highlights the solution nearest to the mouse pointer in all charts
-    ''' if highlighting is switched on
+    ''' Handles NearestPointTool changing to a new point
+    ''' Highlights the solution in all charts
     ''' </summary>
-    ''' <param name="sender">chart</param>
+    ''' <param name="nearestPointTool">tool</param>
     ''' <param name="e"></param>
-    Private Sub OnChartMouseMove(sender As Object, e As EventArgs)
+    Private Sub OnNearestPointChange(nearestPointTool As Steema.TeeChart.Tools.NearestPoint, e As EventArgs)
         If Not HighlightingIsActive Then
             Exit Sub
         End If
         Try
-            Dim diag As Diagramm = CType(sender, Diagramm)
+            If nearestPointTool.Active And nearestPointTool.Point > -1 Then
+                Dim id As Integer = nearestPointTool.Series.Labels(nearestPointTool.Point)
+                Dim ind = Me.OptResult.getSolution(id)
+                Call Me.showHighlightedSolution(ind)
+            End If
+        Catch ex As Exception
+            'do nothing
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Activates the NearestPointTool when the mouse enters the chart
+    ''' </summary>
+    ''' <param name="diag"></param>
+    ''' <param name="e"></param>
+    Private Sub OnChartMouseEnter(diag As Diagramm, e As EventArgs)
+        If Not HighlightingIsActive Then
+            Exit Sub
+        End If
+        Try
             For Each tool As Steema.TeeChart.Tools.Tool In diag.Chart.Tools
                 If TypeOf tool Is Steema.TeeChart.Tools.NearestPoint Then
                     Dim nearestPointTool As Steema.TeeChart.Tools.NearestPoint = CType(tool, Steema.TeeChart.Tools.NearestPoint)
-                    If nearestPointTool.Point > 1 Then
-                        Dim id As Integer = nearestPointTool.Series.Labels(nearestPointTool.Point)
-                        Dim ind = Me.OptResult.getSolution(id)
-                        Call Me.showHighlightedSolution(ind)
-                    End If
+                    nearestPointTool.Active = True
+                    Exit For
+                End If
+            Next
+        Catch ex As Exception
+            'do nothing
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Deactivates the NearestPointTool when the mouse leaves the chart
+    ''' </summary>
+    ''' <param name="diag"></param>
+    ''' <param name="e"></param>
+    Private Sub OnChartMouseLeave(diag As Diagramm, e As EventArgs)
+        If Not HighlightingIsActive Then
+            Exit Sub
+        End If
+        Try
+            For Each tool As Steema.TeeChart.Tools.Tool In diag.Chart.Tools
+                If TypeOf tool Is Steema.TeeChart.Tools.NearestPoint Then
+                    Dim nearestPointTool As Steema.TeeChart.Tools.NearestPoint = CType(tool, Steema.TeeChart.Tools.NearestPoint)
+                    nearestPointTool.Active = False
                     Exit For
                 End If
             Next
@@ -540,8 +580,11 @@ Partial Public Class Scatterplot
                     {
                         .Style = Steema.TeeChart.Tools.NearestPointStyles.None,
                         .DrawLine = False,
-                        .Direction = Steema.TeeChart.Tools.NearestPointDirection.Both
+                        .Direction = Steema.TeeChart.Tools.NearestPointDirection.Both,
+                        .Active = False
                     }
+                    'add event handler
+                    AddHandler Me.NearestPointTools(i, j).Change, AddressOf Me.OnNearestPointChange
 
                     'Punkte eintragen
                     '================
@@ -605,9 +648,10 @@ Partial Public Class Scatterplot
                             s.Pointer.Pen.Color = Color.Empty   'Punkte unsichtbar
                         Next
                     Else
-                        'add event handlers for seriesClick and MouseMove
+                        'add event handlers
                         AddHandler .ClickSeries, AddressOf Me.seriesClick
-                        AddHandler .MouseMove, AddressOf Me.OnChartMouseMove
+                        AddHandler .MouseEnter, AddressOf Me.OnChartMouseEnter
+                        AddHandler .MouseLeave, AddressOf Me.OnChartMouseLeave
                     End If
 
                 End With
