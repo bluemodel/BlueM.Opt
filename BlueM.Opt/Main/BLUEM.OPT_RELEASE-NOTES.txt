@@ -10,6 +10,7 @@ NEW:
 CHANGED:
 * Parameter values written to model input files are now padded right instead of left with spaces to avoid issues with some simulation models
 * Updated Talsim to v4.1.8
+* Update BlueM.Wave to v2.12.2
 
 FIXED:
 * Fixed iteration break condition for parameter mutation of dependent parameters
