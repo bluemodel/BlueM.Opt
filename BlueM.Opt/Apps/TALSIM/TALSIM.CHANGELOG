@@ -1,6 +1,143 @@
 Talsim-NG simulation engine changelog
 *************************************
 
+Version 4.1.8
+-------------
+FIXED:
+* Fixed ETP problem when simulation timestep < 1 hour #415
+
+Version 4.1.07
+--------------
+FIXED:
+* Fixed groundwater result file being output even when switched off in the ALL file #414
+* Fixed reading variable annual patterns with more than 12 date-value pairs #327
+* Fixed interpolation of variable annual pattern values that do not start on January 1 #325
+
+Version 4.1.06
+--------------
+CHANGED:
+* The engine now checks whether all elements have a flow path to the outlet. If not, an error is produced and the simulation is aborted.
+* HRU elevation is used to determine whether individual temperature and evaporation calculation for a HRU is applied or not. 
+  Default HRU elevation is 0 ("not provided"). In this case the mean elevation of the subbasin is used and individual calculation is discarded.
+
+Version 4.1.05
+--------------
+FIXED:
+* Fixed crash when reading soil properties from sydrodomain.ini
+* Fixed error when no KAL file is provided
+* Fixed error when using old KAL file format with multiline entries (annual patterns)
+
+Version 4.1.04
+--------------
+CHANGED: 
+* Change SPEIBELI volume error correction mode to SPEIBELI_ADJUST_NONE (no correction)
+
+Version 4.1.03
+--------------
+CHANGED:
+* Volume or Function correction re-introduced with SPE_CALC_VOL. Flags, constants and variables added accordingly.
+  Currently, the mode is set to SPEIBELI_ADJUST_VOL which is adjust the storage volume and prevent negative storage.
+
+Version 4.1.02
+--------------
+CHANGED:
+* Major update, transfer of all changes between 3.2.29 and 3.2.41 to 4.x branch
+
+Version 4.0.11
+--------------
+FIXED:
+* When a DB includes objective functions, these are now ignored instead of leading to an endless loop
+
+Version 4.0.10
+--------------
+NEW:
+* Updated DB support to 20250630090821_update_nullable_ScenarioFolderId_Scenario
+
+Version 4.0.9
+-------------
+FIXED:
+* Fix an issue where storage release functions, hydraulic objects and diversions were being scaled with the wrong system state
+
+Version 4.0.8
+-------------
+NEW:
+* Updated DB support to 20250512075334_add_CalibrationMapping_Table
+FIXED:
+* Fix expected unit of subbasin imperviousness in database
+
+Version 4.0.7
+-------------
+FIXED:
+* Allow short format YYYY-MM-dd for dates in database
+* Fixed wording in some eror messages
+
+Version 4.0.6
+-------------
+NEW:
+* Updated DB support to 20250114141906_default_TranslationTime_to_1min_TransportReach
+FIXED:
+* Fixed unwarranted simulation error when a scenario contains no functions
+
+Version 4.0.5
+-------------
+NEW:
+* Added support for reading system element and virtual states from database
+* Updated DB support to MigrationId 20241210135327_setnull__ActiveScenarioId_ProjectData (Talsim5 v0.5.7)
+CHANGED:
+* Handle databases with more than 27 rows for a transport reach capacity curve by ignoring the excess rows and emitting a warning #287
+FIXED:
+* Fixed assignments between system elements and functions, evaporation and hydraulic objects when reading from a database 
+* Fixed consumer functions read from ASCII dataset URB file not being stored properly
+
+Version 4.0.4
+-------------
+NEW:
+* Added support for reading the following objects from an sqlite database:
+  * Flexible annual patterns
+  * Hydraulic objects (weirs, pipes and turbines)
+  * Hydrological objects (evaporation)
+  * Functions
+  * Diversions
+  * Consumers
+* ScenarioId and SimulationId are now output to the console and the log when simulating from database
+* Updated DB support to MigrationId 20240926111308_on_delete_set_null_StorageReleaseInternalDependency
+FIXED:
+* Several fixes for reading storage elements, internal dependencies and constraints from database
+* Fix SQL for reading transport reach channel profile values from database
+
+Version 4.0.3
+-------------
+NEW:
+* Added support for reading storage elements from an sqlite database
+FIXED:
+* Improved checks and error messages when reading storage elements
+* Fixed query for retrieving time series metadata from sqlite database which would return 0 rows in some cases
+* Fixed unwarranted output of warning 2200 about release scaling factor < 0
+* Fixed tolerance when checking sum of area shares for HRUs (should be 5%)
+
+Version 4.0.2
+-------------
+FIXED:
+* Fixed output of error 3322 (invalid land use parameters)
+* Fixed default value of land use parameter pTAW for old LNZ files to 0.05
+
+Version 4.0.1
+-------------
+CHANGED:
+* Update to DB version 20231211142313_rename_SurfaceRetentionNonLinear_to_IsSCSConstantLoss_SubBasin
+
+Version 4.0.0
+-------------
+NEW:
+* Added support for reading a dataset from a sqlite database #150 (not yet fully implemented)
+  * Requires new parameters `DBFile`, `ScenarioId` and `SimulationId` to be given in the run file
+CHANGED:
+* Parameter `ExecMode` is no longer read from run file, Talsim now always runs in DOS mode
+* Parameter `PostProcessing` is no longer read from run file, post processing must be configured externally
+* Removed commandline option `-domaininfo`
+* sydrodomain.ini is now always assumed to be located in the working directory
+* removed warnings 2500, 2600 and 2700 about daily, weekly and annual patterns with mean values unequal to 1.
+
 Version 3.2.29
 --------------
 FIXED:
