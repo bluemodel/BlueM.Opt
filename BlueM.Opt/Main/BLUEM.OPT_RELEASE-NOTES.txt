@@ -4,6 +4,9 @@ BlueM.Opt Release Notes
 
 Version 2.5.0
 -------------
+NEW:
+* Added a new objective function Annual Peak Flow Bias (APFB) after Mizukami et al., 2019 https://hess.copernicus.org/articles/23/2601/2019/
+
 CHANGED:
 * Parameter values written to model input files are now padded right instead of left with spaces to avoid issues with some simulation models
 
