@@ -816,6 +816,7 @@ Public Class PES
             For v = 0 To Me.mProblem.NumOptParams - 1
                 i = 0
                 Do
+                    i += 1
                     'Abbruchkriterium f¸r abh‰ngige Parameter
                     '----------------------------------------
                     If (i >= 1000) Then
@@ -823,8 +824,8 @@ Public Class PES
                         'Vermutlich ist die aktuelle Schrittweite nicht groﬂ genug.
                         'Elterwert des aktuellen Parameters auf aktuellen Wert 
                         'des Parameters setzen, von dem der aktuelle Parameter abh‰ngig ist
-                        i = 0
                         Xe(v, n, PES_iAkt.iAktPop) = XeTemp(v - 1, n, PES_iAkt.iAktPop)
+                        i = 0
                     End If
 
                     'Schrittweitenvektor

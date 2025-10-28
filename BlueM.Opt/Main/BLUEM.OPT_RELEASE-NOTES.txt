@@ -2,6 +2,11 @@
 BlueM.Opt Release Notes
 ===============================================================
 
+Version 2.5.0
+-------------
+FIXED:
+* Fixed iteration break condition for parameter mutation of dependent parameters
+
 Version 2.4.4
 -------------
 NEW:
