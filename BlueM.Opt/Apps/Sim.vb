@@ -639,7 +639,7 @@ Public MustInherit Class Sim
             End If
 
             'Falls erforderlich, Wert mit Leerzeichen füllen
-            WertStr = WertStr.PadLeft(AnzZeichen)
+            WertStr = WertStr.PadRight(AnzZeichen)
 
             'Zeile wieder zusammensetzen
             Zeile = StrLeft & WertStr & StrRight
