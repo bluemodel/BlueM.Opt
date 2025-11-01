@@ -1,0 +1,43 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  run-tests:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Add vstest to PATH
+        uses: darenm/Setup-VSTest@v1.2
+
+      - name: Create empty TeeChart license file
+        run: |
+          copy /Y nul > "BlueM.Opt\Main\My Project\TeeChart.licenses"
+          copy /Y nul > "BlueM.Wave\source\My Project\TeeChart.licenses"
+          copy /Y nul > "BlueM.Opt\Tests\SensiPlot_ParameterSampling\My Project\TeeChart.licenses"
+        shell: cmd
+
+      - name: Build BlueM.Opt.Tests
+        run: msbuild BlueM.Opt\Tests\BlueM.Opt.Tests\BlueM.Opt.Tests.vbproj -restore -property:Platform=x64 -property:Configuration=Debug
+
+      - name: Run Tests
+        run: |
+          vstest.console.exe BlueM.Opt\tests\BlueM.Opt.Tests\bin\x64\Debug\net48\BlueM.Opt.Tests.exe /Settings:BlueM.Opt\tests\BlueM.Opt.Tests\tests.runsettings
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: BlueM.Opt\Tests\BlueM.Opt.Tests\TestResults
