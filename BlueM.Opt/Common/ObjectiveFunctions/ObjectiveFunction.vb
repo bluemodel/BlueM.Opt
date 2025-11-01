@@ -175,7 +175,7 @@ Public MustInherit Class ObjectiveFunction
     ''' <param name="[Function]">comparison function</param>
     ''' <returns>function value</returns>
     ''' <remarks>Konstante und gleiche Zeitschrittweiten vorausgesetzt! (#151)</remarks>
-    Protected Shared Function compareSeries(ByVal SimSeries As Wave.TimeSeries, ByVal RefSeries As Wave.TimeSeries, ByVal [Function] As String) As Double
+    Public Shared Function compareSeries(ByVal SimSeries As Wave.TimeSeries, ByVal RefSeries As Wave.TimeSeries, ByVal [Function] As String) As Double
 
         Dim objectiveValue As Double
         Dim i As Integer
