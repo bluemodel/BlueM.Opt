@@ -1,6 +1,12 @@
 Talsim-NG simulation engine changelog
 *************************************
 
+Version 4.1.9
+-------------
+FIXED:
+* Fixed error when HYO file is present with no subbasins defined #423
+* Fixed crash when multiple substances are defined #424
+
 Version 4.1.8
 -------------
 FIXED:
