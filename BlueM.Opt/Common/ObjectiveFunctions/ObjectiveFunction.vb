@@ -198,29 +198,16 @@ Public MustInherit Class ObjectiveFunction
                 'Annual Peak Flow Bias
                 'Mizukami et al., 2019 https://hess.copernicus.org/articles/23/2601/2019/
                 '---------------------
-                Dim cal As Calendar = CultureInfo.InvariantCulture.Calendar
-                Dim simMaxAnnual As New List(Of Double)
-                Dim refMaxAnnual As New List(Of Double)
-                Dim yearStart, yearEnd As DateTime
-                yearStart = SimSeries.StartDate
-                Do While yearStart < SimSeries.EndDate
-                    yearEnd = cal.AddYears(yearStart, 1)
-                    yearEnd = cal.AddDays(yearEnd, -1)
-                    Dim simMax As Double = SimSeries.Maximum(yearStart, yearEnd)
-                    Dim refMax As Double = RefSeries.Maximum(yearStart, yearEnd)
-                    simMaxAnnual.Add(simMax)
-                    refMaxAnnual.Add(refMax)
-                    yearStart = cal.AddYears(yearStart, 1)
-                Loop
-                Dim simMaxMean As Double = simMaxAnnual.Average()
-                Dim refMaxMean As Double = refMaxAnnual.Average()
-
+                Dim simYears As Dictionary(Of Integer, Wave.TimeSeries) = SimSeries.SplitHydroYears(SimSeries.StartDate.Month)
+                Dim refYears As Dictionary(Of Integer, Wave.TimeSeries) = RefSeries.SplitHydroYears(SimSeries.StartDate.Month)
+                Dim simMaxMean As Double = simYears.Values.Select(Function(ts) ts.Maximum()).Average()
+                Dim refMaxMean As Double = refYears.Values.Select(Function(ts) ts.Maximum()).Average()
                 objectiveValue = Math.Sqrt(Math.Pow((simMaxMean / refMaxMean) - 1.0, 2))
 
             Case "SSE", "ABQUAD"
-                    'Sum of squared errors
-                    '---------------------
-                    objectiveValue = 0
+                'Sum of squared errors
+                '---------------------
+                objectiveValue = 0
                 For i = 0 To SimSeries.Length - 1
                     objectiveValue += (RefSeries.Values(i) - SimSeries.Values(i)) ^ 2
                 Next
