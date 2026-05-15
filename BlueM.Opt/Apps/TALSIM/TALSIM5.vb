@@ -15,12 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.Globalization
-Imports System.IO
 Imports System.Threading
 Imports System.Windows.Forms
-Imports BlueM
-Imports BlueM.Opt.Apps.Talsim5
 Imports BlueM.Opt.Common
 Imports Microsoft.Data.Sqlite
 
@@ -97,7 +93,7 @@ Public Class Talsim5
         'attempt to get exe_path from UserSettings
         exe_path = My.Settings.TALSIM_path
 
-        If (Not File.Exists(exe_path)) Then
+        If (Not IO.File.Exists(exe_path)) Then
             'use default location instead
             exe_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "TALSIM\talsimw64.exe")
             If My.Settings.TALSIM_path.Trim() <> "" Then
@@ -105,7 +101,7 @@ Public Class Talsim5
             End If
         End If
 
-        If (Not File.Exists(exe_path)) Then
+        If (Not IO.File.Exists(exe_path)) Then
             Throw New Exception(exe_path & " not found!")
         End If
 
@@ -122,7 +118,7 @@ Public Class Talsim5
         Talsim5Thread.exe_path = Me.exe_path
         ReDim MyTalsimThreads(n_Threads - 1)
         For i = 0 To n_Threads - 1
-            MyTalsimThreads(i) = New Talsim5Thread(i, -1, "Folder", Datensatz)
+            MyTalsimThreads(i) = New Talsim5Thread(i, -1, "Folder", Datensatz, Me.scenarioId, Me.simulationId, Me.timeseriesPath)
             MyTalsimThreads(i).set_is_OK()
         Next
         ReDim MyThreads(n_Threads - 1)
@@ -156,7 +152,11 @@ Public Class Talsim5
 
     End Sub
 
-    Private ReadOnly Property dbfile As String
+    ''' <summary>
+    ''' Path to the database file (in the original directory)
+    ''' </summary>
+    ''' <returns></returns>
+    Private ReadOnly Property DBFile As String
         Get
             Return IO.Path.Combine(Me.WorkDir_Original, Me.Datensatz & ".db")
         End Get
@@ -167,7 +167,7 @@ Public Class Talsim5
     ''' </summary>
     Protected Overrides Sub Read_SimParameter()
 
-        Dim dlg As New TALSIM5_Dialog(Me.dbfile)
+        Dim dlg As New TALSIM5_Dialog(Me.DBFile)
         If dlg.ShowDialog() <> DialogResult.OK Then
             Throw New Exception("Talsim5 settings incomplete!")
         End If
@@ -178,7 +178,7 @@ Public Class Talsim5
         Me.timeseriesPath = dlg.TimeseriesPath
 
         'read simulation start and end from database
-        Using connection As New SqliteConnection($"Data Source={Me.dbfile}")
+        Using connection As New SqliteConnection($"Data Source={Me.DBFile}")
             connection.Open()
             Using command As SqliteCommand = connection.CreateCommand()
                 command.CommandText = "
@@ -196,6 +196,7 @@ Public Class Talsim5
                     End While
                 End Using
             End Using
+            connection.Close()
         End Using
 
     End Sub
@@ -232,7 +233,7 @@ Public Class Talsim5
         Dim Folder As String
 
         Folder = getThreadWorkDir(Thread_ID)
-        MyTalsimThreads(Thread_ID) = New Talsim5Thread(Thread_ID, Child_ID, Folder, Datensatz)
+        MyTalsimThreads(Thread_ID) = New Talsim5Thread(Thread_ID, Child_ID, Folder, Datensatz, Me.scenarioId, Me.simulationId, Me.timeseriesPath)
         MyThreads(Thread_ID) = New Thread(AddressOf MyTalsimThreads(Thread_ID).launchSim) With {
             .IsBackground = True
         }
@@ -257,16 +258,16 @@ Public Class Talsim5
 
         Try
 
-            'write the path to the dataset and the dataset name into a new run file
+            'write the required settings into a new run file
             'this is done for every simulation because the workdir may change
-            Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
-            If (Not File.Exists(runfile)) Then
+            Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim5.run")
+            If (Not IO.File.Exists(runfile)) Then
                 Throw New Exception(runfile & " not found!")
             End If
             Dim line As String
             'read the template run file
-            filestr = New FileStream(runfile, FileMode.Open, IO.FileAccess.Read)
-            strread = New StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            filestr = New IO.FileStream(runfile, IO.FileMode.Open, IO.FileAccess.Read)
+            strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim lines As New Collections.Generic.List(Of String)
             Do
                 line = strread.ReadLine()
@@ -278,14 +279,20 @@ Public Class Talsim5
             'write a new run file
             Dim runfilename As String = MyBase.Datensatz & ".run"
             runfile = IO.Path.Combine(IO.Path.GetDirectoryName(Me.exe_path), runfilename)
-            Dim strwrite As New StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim strwrite As New IO.StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
             For Each line In lines
                 If line.StartsWith("Path=") Then
-                    'update the sim path
                     line = "Path=" & MyBase.WorkDir_Current
                 ElseIf line.StartsWith("System=") Then
-                    'update the dataset name
                     line = "System=" & MyBase.Datensatz
+                ElseIf line.StartsWith("DBFile=") Then
+                    line = "DBFile=" & Me.DBFile
+                ElseIf line.StartsWith("ZrePath=") Then
+                    line = "ZrePath=" & Me.timeseriesPath & "\"
+                ElseIf line.StartsWith("ScenarioId=") Then
+                    line = "ScenarioId=" & Me.scenarioId.ToString()
+                ElseIf line.StartsWith("SimulationId=") Then
+                    line = "SimulationId=" & Me.simulationId.ToString()
                 End If
                 strwrite.WriteLine(line)
             Next
@@ -374,12 +381,57 @@ Public Class Talsim5
                 SimIsOK = Thr_C.Sim_Is_OK
                 Thread_ID = Thr_C.get_Thread_ID
                 MyThreads(Thread_ID).Join()
-                MyTalsimThreads(Thread_ID) = New Talsim5Thread(Thread_ID, -1, "Folder", Datensatz)
+                MyTalsimThreads(Thread_ID) = New Talsim5Thread(Thread_ID, -1, "Folder", Datensatz, Me.scenarioId, Me.simulationId, Me.timeseriesPath)
                 MyTalsimThreads(Thread_ID).set_is_OK()
             End If
         Next
 
     End Function
+
+    ''' <summary>
+    ''' Update model parameters in database
+    ''' </summary>
+    Public Overrides Sub Write_ModellParameter()
+
+        'ModellParameter aus OptParametern kalkulieren()
+        Call MyBase.OptParameter_to_ModellParameter()
+
+        Dim dbfileCurrent As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".db")
+
+        Try
+            Using connection As New SqliteConnection($"Data Source={dbfileCurrent}")
+                connection.Open()
+                Dim i As Integer = 0
+                Using transaction As SqliteTransaction = connection.BeginTransaction()
+                    For Each modParam As Struct_ModellParameter In Me.mProblem.List_ModellParameter
+                        Try
+                            Using command As SqliteCommand = connection.CreateCommand()
+                                command.CommandText = $"
+                                    UPDATE {modParam.DBTable}
+                                    SET {modParam.DBField} = @Value
+                                    WHERE Id = @Id
+                                "
+                                command.Parameters.AddWithValue("@Value", Me.Akt.ModPara(i))
+                                command.Parameters.AddWithValue("@Id", modParam.DBId)
+                                Dim nrows As Integer = command.ExecuteNonQuery()
+                                If nrows = 0 Then
+                                    Throw New Exception($"No row with Id {modParam.DBId} found in table {modParam.DBTable} for updating model parameter '{modParam.Bezeichnung}'!")
+                                End If
+                                i += 1
+                            End Using
+                        Catch ex As Exception
+                            Throw New Exception($"Error while updating model parameter '{modParam.Bezeichnung}' in database: {ex.Message}", ex)
+                        End Try
+                    Next
+                    transaction.Commit()
+                End Using
+                connection.Close()
+            End Using
+        Catch ex As Exception
+            Throw New Exception($"Error while updating model parameters in database: {ex.Message}", ex)
+        End Try
+
+    End Sub
 
     ''' <summary>
     ''' Simulationsergebnis lesen

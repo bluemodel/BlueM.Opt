@@ -79,6 +79,7 @@ Friend Class TALSIM5_Dialog
                     End While
                 End Using
             End Using
+            connection.Close()
         End Using
 
         Me.ComboBox_Scenario.Items.AddRange(scenarios.ToArray())
@@ -115,6 +116,7 @@ Friend Class TALSIM5_Dialog
                     End While
                 End Using
             End Using
+            connection.Close()
         End Using
 
         Me.ComboBox_Simulation.Items.Clear()

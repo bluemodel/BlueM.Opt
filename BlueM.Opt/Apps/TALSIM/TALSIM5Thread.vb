@@ -25,15 +25,31 @@ Public Class Talsim5Thread
     Private ReadOnly Child_ID As Integer
     Private ReadOnly WorkFolder As String
     Private ReadOnly DS_Name As String
+    Private ReadOnly ScenarioId As Integer
+    Private ReadOnly SimulationId As Integer
+    Private ReadOnly TimeseriesPath As String
     Private SimIsOK As Boolean
     Private launchReady As Boolean
     Public Shared exe_path As String
 
-    Public Sub New(ByVal _Thread_ID As Integer, ByVal _Child_ID As Integer, ByVal _WorkFolder As String, ByVal _DS_Name As String)
+    ''' <summary>
+    ''' Path to the database file (in the thread's working directory)
+    ''' </summary>
+    ''' <returns></returns>
+    Private ReadOnly Property DBFile As String
+        Get
+            Return IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".db")
+        End Get
+    End Property
+
+    Public Sub New(_Thread_ID As Integer, _Child_ID As Integer, _WorkFolder As String, _DS_Name As String, scenarioId As Integer, simulationId As Integer, timeseriesPath As String)
         Me.Thread_ID = _Thread_ID
         Me.Child_ID = _Child_ID
         Me.WorkFolder = _WorkFolder
         Me.DS_Name = _DS_Name
+        Me.ScenarioId = scenarioId
+        Me.SimulationId = simulationId
+        Me.TimeseriesPath = timeseriesPath
     End Sub
 
     ''' <summary>
@@ -53,9 +69,9 @@ Public Class Talsim5Thread
         System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
         Try
-            'write the path to the dataset and the dataset name into a new run file
+            'write the required settings into a new run file
             'this is done for every simulation because otherwise we would have to keep track of runfiles and thread IDs separately
-            Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
+            Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim5.run")
             If (Not IO.File.Exists(runfile)) Then
                 Throw New Exception(runfile & " not found!")
             End If
@@ -77,11 +93,17 @@ Public Class Talsim5Thread
             Dim strwrite As New IO.StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
             For Each line In lines
                 If line.StartsWith("Path=") Then
-                    'update the sim path
                     line = "Path=" & Me.WorkFolder
                 ElseIf line.StartsWith("System=") Then
-                    'update the dataset name
                     line = "System=" & Me.DS_Name
+                ElseIf line.StartsWith("DBFile=") Then
+                    line = "DBFile=" & Me.dbfile
+                ElseIf line.StartsWith("ZrePath=") Then
+                    line = "ZrePath=" & Me.TimeseriesPath & "\"
+                ElseIf line.StartsWith("ScenarioId=") Then
+                    line = "ScenarioId=" & Me.scenarioId.ToString()
+                ElseIf line.StartsWith("SimulationId=") Then
+                    line = "SimulationId=" & Me.simulationId.ToString()
                 End If
                 strwrite.WriteLine(line)
             Next

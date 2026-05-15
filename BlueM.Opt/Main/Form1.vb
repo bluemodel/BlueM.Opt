@@ -911,7 +911,7 @@ Partial Public Class Form1
         '=================
         Select Case Me.Anwendung
 
-            Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM
+            Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM, ANW_TALSIM5
 
                 'Bei allen Sim-Anwendungen
                 '-----------------------------------------------------
@@ -1044,7 +1044,7 @@ Partial Public Class Form1
 
             Select Case Anwendung
 
-                Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM
+                Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM, ANW_TALSIM5
                     'Sim-Anwendungen
 
                     'Save settings to file
@@ -1279,7 +1279,7 @@ Partial Public Class Form1
 
                 Call Testprobleme1.DiagInitialise(Me.Hauptdiagramm1)
 
-            Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM
+            Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM, ANW_TALSIM5
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 Select Case Me.mProblem.Method
