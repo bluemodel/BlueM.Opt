@@ -26,7 +26,7 @@ Partial Class TALSIM5_Dialog
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.OK_Button = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Label_DBPath = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
@@ -34,7 +34,7 @@ Partial Class TALSIM5_Dialog
         Me.ComboBox_Scenario = New System.Windows.Forms.ComboBox()
         Me.ComboBox_Simulation = New System.Windows.Forms.ComboBox()
         Me.TextBox_TimeseriesPath = New System.Windows.Forms.TextBox()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.Button_BrowseFolder = New System.Windows.Forms.Button()
         Me.FolderBrowserDialog1 = New System.Windows.Forms.FolderBrowserDialog()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
@@ -75,12 +75,12 @@ Partial Class TALSIM5_Dialog
         '
         'Label1
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 9)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(56, 13)
-        Me.Label1.TabIndex = 1
-        Me.Label1.Text = "Database:"
+        Me.Label_DBPath.AutoSize = True
+        Me.Label_DBPath.Location = New System.Drawing.Point(12, 9)
+        Me.Label_DBPath.Name = "Label1"
+        Me.Label_DBPath.Size = New System.Drawing.Size(56, 13)
+        Me.Label_DBPath.TabIndex = 1
+        Me.Label_DBPath.Text = "Database:"
         '
         'Label2
         '
@@ -151,13 +151,13 @@ Partial Class TALSIM5_Dialog
         '
         'Button1
         '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.Location = New System.Drawing.Point(288, 85)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(30, 23)
-        Me.Button1.TabIndex = 9
-        Me.Button1.Text = "..."
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.Button_BrowseFolder.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button_BrowseFolder.Location = New System.Drawing.Point(288, 85)
+        Me.Button_BrowseFolder.Name = "Button1"
+        Me.Button_BrowseFolder.Size = New System.Drawing.Size(30, 23)
+        Me.Button_BrowseFolder.TabIndex = 9
+        Me.Button_BrowseFolder.Text = "..."
+        Me.Button_BrowseFolder.UseVisualStyleBackColor = True
         '
         'TALSIM5_Dialog
         '
@@ -166,7 +166,7 @@ Partial Class TALSIM5_Dialog
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.Cancel_Button
         Me.ClientSize = New System.Drawing.Size(330, 160)
-        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.Button_BrowseFolder)
         Me.Controls.Add(Me.TextBox_TimeseriesPath)
         Me.Controls.Add(Me.ComboBox_Simulation)
         Me.Controls.Add(Me.ComboBox_Scenario)
@@ -174,7 +174,7 @@ Partial Class TALSIM5_Dialog
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.Label_DBPath)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -192,7 +192,7 @@ Partial Class TALSIM5_Dialog
     Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
     Friend WithEvents OK_Button As System.Windows.Forms.Button
     Friend WithEvents Cancel_Button As System.Windows.Forms.Button
-    Friend WithEvents Label1 As Windows.Forms.Label
+    Friend WithEvents Label_DBPath As Windows.Forms.Label
     Friend WithEvents Label2 As Windows.Forms.Label
     Friend WithEvents Label3 As Windows.Forms.Label
     Friend WithEvents Label4 As Windows.Forms.Label
@@ -200,6 +200,6 @@ Partial Class TALSIM5_Dialog
     Friend WithEvents ComboBox_Scenario As Windows.Forms.ComboBox
     Friend WithEvents ComboBox_Simulation As Windows.Forms.ComboBox
     Friend WithEvents TextBox_TimeseriesPath As Windows.Forms.TextBox
-    Friend WithEvents Button1 As Windows.Forms.Button
+    Friend WithEvents Button_BrowseFolder As Windows.Forms.Button
     Friend WithEvents FolderBrowserDialog1 As Windows.Forms.FolderBrowserDialog
 End Class

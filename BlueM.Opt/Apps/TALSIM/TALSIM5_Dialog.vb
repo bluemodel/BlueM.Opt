@@ -22,6 +22,10 @@ Friend Class TALSIM5_Dialog
 
     Private dbPath As String
 
+    ''' <summary>
+    ''' Selected scenario in the dialog, or null if no scenario is selected
+    ''' </summary>
+    ''' <returns></returns>
     Friend ReadOnly Property SelectedScenario As Talsim5.Scenario
         Get
             Try
@@ -32,6 +36,10 @@ Friend Class TALSIM5_Dialog
         End Get
     End Property
 
+    ''' <summary>
+    ''' Selected simulation in the dialog, or null if no simulation is selected
+    ''' </summary>
+    ''' <returns></returns>
     Friend ReadOnly Property SelectedSimulation As Talsim5.Simulation
         Get
             Try
@@ -42,20 +50,29 @@ Friend Class TALSIM5_Dialog
         End Get
     End Property
 
+    ''' <summary>
+    ''' Selected timeseries path in the dialog
+    ''' </summary>
+    ''' <returns></returns>
     Friend ReadOnly Property TimeseriesPath As String
         Get
             Return Me.TextBox_TimeseriesPath.Text.Trim()
         End Get
     End Property
 
+    ''' <summary>
+    ''' Create a new instance of the dialog with the given database path.
+    ''' The dialog will read the scenarios and simulations from the database and show them in the corresponding combo boxes.
+    ''' </summary>
+    ''' <param name="dbPath">Path to the database</param>
     Public Sub New(dbPath As String)
         ' Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent()
         ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Me.dbPath = dbPath
 
-        'show dtabase path
-        Me.Label1.Text = dbPath
+        'show database path
+        Me.Label_DBPath.Text = dbPath
 
         'read scenarios from database
         Dim scenarios As New List(Of Talsim5.Scenario)
@@ -85,14 +102,10 @@ Friend Class TALSIM5_Dialog
         Me.ComboBox_Scenario.Items.AddRange(scenarios.ToArray())
         Me.ComboBox_Scenario.SelectedIndex = 0
 
-        ''Reset simulations
-        'Me.ComboBox_Simulation.Items.Clear()
-        'Me.ComboBox_Simulation.Enabled = False
-
     End Sub
 
     Private Sub ComboBox_Scenario_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox_Scenario.SelectedIndexChanged
-        'read simulations from database
+        'read simulations of currently selected scenario from database
         Dim simulations As New List(Of Talsim5.Simulation)
         Using connection As New SQLiteConnection($"Data Source={dbPath}")
             connection.Open()
@@ -122,11 +135,14 @@ Friend Class TALSIM5_Dialog
         Me.ComboBox_Simulation.Items.Clear()
         Me.ComboBox_Simulation.Items.AddRange(simulations.ToArray())
         Me.ComboBox_Simulation.SelectedIndex = 0
-        'Me.ComboBox_Simulation.Enabled = True
+
+        If simulations.Count = 0 Then
+            MessageBox.Show("The selected scenario does not contain any simulations!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
 
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Sub Button_BrowseFolder_Click(sender As Object, e As EventArgs) Handles Button_BrowseFolder.Click
         If Me.TimeseriesPath <> "" Then
             Me.FolderBrowserDialog1.SelectedPath = Me.TimeseriesPath
         End If

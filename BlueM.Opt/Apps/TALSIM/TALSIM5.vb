@@ -41,6 +41,9 @@ Public Class Talsim5
     Dim MyTalsimThreads() As Talsim5Thread
     Dim MyThreads() As Thread
 
+    ''' <summary>
+    ''' Class to represent a scenario in a TALSIM5 database
+    ''' </summary>
     Friend Class Scenario
         Public Id As Integer
         Public Name As String
@@ -49,6 +52,9 @@ Public Class Talsim5
         End Function
     End Class
 
+    ''' <summary>
+    ''' Class to represent a simulation in a Talsim5 database
+    ''' </summary>
     Friend Class Simulation
         Public Id As Integer
         Public Name As String
@@ -77,6 +83,16 @@ Public Class Talsim5
     ''' </summary>
     ''' <returns>True</returns>
     Public Overrides ReadOnly Property MultithreadingSupported As Boolean = True
+
+    ''' <summary>
+    ''' Path to the database file (in the current working directory)
+    ''' </summary>
+    ''' <returns></returns>
+    Private ReadOnly Property DBFile As String
+        Get
+            Return IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".db")
+        End Get
+    End Property
 
     'Konstruktor
     '***********
@@ -153,25 +169,15 @@ Public Class Talsim5
     End Sub
 
     ''' <summary>
-    ''' Path to the database file (in the current working directory)
-    ''' </summary>
-    ''' <returns></returns>
-    Private ReadOnly Property DBFile As String
-        Get
-            Return IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".db")
-        End Get
-    End Property
-
-    ''' <summary>
     ''' Simulationsparameter einlesen
     ''' </summary>
     Protected Overrides Sub Read_SimParameter()
 
+        'Show Talsim5 settings dialog
         Dim dlg As New TALSIM5_Dialog(Me.DBFile)
         If dlg.ShowDialog() <> DialogResult.OK Then
-            Throw New Exception("Talsim5 settings incomplete!")
+            Throw New Exception("Talsim5 settings not set!")
         End If
-
         'save settings from dialog
         Me.scenarioId = dlg.SelectedScenario.Id
         Me.simulationId = dlg.SelectedSimulation.Id
