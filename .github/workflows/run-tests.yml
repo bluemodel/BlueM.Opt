@@ -34,7 +34,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          vstest.console.exe BlueM.Opt\tests\BlueM.Opt.Tests\bin\x64\Debug\net48\BlueM.Opt.Tests.exe /Settings:BlueM.Opt\tests\BlueM.Opt.Tests\tests.runsettings
+          vstest.console.exe BlueM.Opt\Tests\BlueM.Opt.Tests\bin\x64\Debug\net48\BlueM.Opt.Tests.exe /Settings:BlueM.Opt\Tests\BlueM.Opt.Tests\.runsettings
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
