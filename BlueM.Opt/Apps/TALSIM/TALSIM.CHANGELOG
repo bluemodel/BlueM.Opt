@@ -1,6 +1,97 @@
 Talsim-NG simulation engine changelog
 *************************************
 
+Version 4.1.22
+--------------
+FIXED:
+* Fixed internal calculation of ETP resulting in exaggerated values when using a simulation timestep smaller than 1 day #463
+
+Version 4.1.21
+--------------
+FIXED:
+* Read additional transport reach data from database #363
+
+CHANGED:
+* Updated DB support to 20260318095742_AddStorageReleaseIdToConflictiveConnection (requires Talsim5 >= v0.6.23)
+
+Version 4.1.20
+--------------
+FIXED
+* When reading from database, interpret time series elevation of 0 as error value and do not apply temperature elevation correction in this case #420
+* Fixed evaporation mode for sub-basins not being respected #455
+
+Version 4.1.19
+--------------
+CHANGED:
+* Updated DB support to 20260127100510_change_defaultvalues (requires Talsim5 >= v0.6.20)
+
+Version 4.1.18
+--------------
+FIXED:
+* Fixed ETP for subbasins from timeseries sometimes randomly being set to 0 #447
+* Fixed negative reservoir releases when the number of maximum iterations in the non-linear solver was exceeded and the solver exited through a gateway solving the water balance #399
+ 
+Version 4.1.17
+--------------
+NEW:
+* New command line argument '-ktrcheck'. If set as argument when calling the engine, the engine will read the system and checks consistency of clusters and states only. 
+  The engine stops directly after checking. A file '<datasetname>.ktr.analysis.txt' is written with the results of the consistency check.
+  
+FIXED:
+* Calibration parameter "NLESolverMaxLoops" was not read
+* Attribute 'Number of time series' in *.WELINFO files corrected for SOIL Wel, CROP Wel, HRU Wel, STORAGE Wel, 
+
+Version 4.1.16
+--------------
+FIXED:
+* Fixed states with no function transformation causing a simulation error #351
+* Fixed storage releases not respecting annual patterns #436
+* Fixed unused internal dependencies in DB causing a crash #434, #319
+* Fixed grammar in error and warning messages #416
+
+Version 4.1.15
+--------------
+CHANGED:
+* Enable scenario simulations when using a database by checking for an SCE file with the same name as the database
+FIXED:
+* Added some missing error messages
+
+Version 4.1.14
+--------------
+CHANGED:
+* When the simulation timestep is set to 43200 minutes, this is assumed to signify a monthly timestep. 
+
+Version 4.1.13
+--------------
+CHANGED:
+* Ported from v3.2.34:
+  Simstart and simend are introduced for QIF (QIF: scenario discharge files)
+  The header of a *.qif file has changed and requires: 
+  1. Simstart in ISO date format, 
+  2. timestep in minutes, 
+  3. number of timesteps for allocation, 
+  4. number of rows in the file. 
+  The keywords are ignored, the structure is text parameter, Fortran reads format free.
+* Updated DB support to 20251118142933_add_remaining_fk_constraints_and_delete_ausgezeichnetes_project
+FIXED:
+* Log output of timeseries start and end date now only occurs when actively set
+* Fixed reading calibration parameter SoilTypeShift from database #429
+
+Version 4.1.12
+--------------
+FIXED:
+* Fixed crash due to non-associated pointer when no evaporation objects are defined in a dataset #2
+
+Version 4.1.11
+--------------
+FIXED:
+* Fixed update of initial soil moisture (BFO) not working
+
+Version 4.1.10
+--------------
+NEW:
+* Output for relative soil moisture in % related to saturation (in *.all file set Soil=4)
+
 Version 4.1.9
 -------------
 FIXED:

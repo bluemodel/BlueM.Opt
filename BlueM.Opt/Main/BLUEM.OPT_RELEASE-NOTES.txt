@@ -4,7 +4,8 @@ BlueM.Opt Release Notes
 
 Version X.X.X
 -------------
-* Update BlueM.Wave to v2.17.0
+* Updated Talsim.Engine to v4.1.22
+* Updated BlueM.Wave to v2.17.0
 
 Version 2.5.0
 -------------
