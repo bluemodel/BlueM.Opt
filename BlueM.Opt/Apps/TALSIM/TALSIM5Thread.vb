@@ -89,7 +89,7 @@ Public Class Talsim5Thread
 
             'write a new run file
             Dim runfilename As String = $"{Me.DS_Name}_{Me.Thread_ID}.run"
-            runfile = IO.Path.Combine(IO.Path.GetDirectoryName(TalsimThread.exe_path), runfilename)
+            runfile = IO.Path.Combine(IO.Path.GetDirectoryName(Talsim5Thread.exe_path), runfilename)
             Dim strwrite As New IO.StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
             For Each line In lines
                 If line.StartsWith("Path=") Then
@@ -115,11 +115,11 @@ Public Class Talsim5Thread
             Dim simendfile As String = IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".SIMEND")
             Dim proc As Process
             Dim startInfo As New ProcessStartInfo With {
-                .FileName = TalsimThread.exe_path,
+                .FileName = Talsim5Thread.exe_path,
                 .Arguments = runfilename,
                 .UseShellExecute = True,
                 .WindowStyle = ProcessWindowStyle.Hidden,
-                .WorkingDirectory = IO.Path.GetDirectoryName(TalsimThread.exe_path)
+                .WorkingDirectory = IO.Path.GetDirectoryName(Talsim5Thread.exe_path)
             }
 
             'Carry out up to 5 simulation attempts, because TALSIM sometimes blocks access to the time series files in multithreading mode
