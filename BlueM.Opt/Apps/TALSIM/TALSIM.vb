@@ -30,12 +30,12 @@ Public Class Talsim
 
 #Region "Eigenschaften"
 
-    Private exe_path As String
+    Private ReadOnly exe_path As String
 
     ''' <summary>
     ''' List of result file extensions to use (e.g. "WEL", "KTR.WEL", "CHLO.WEL", "WBL", etc.)
     ''' </summary>
-    Private resultFiles As List(Of String)
+    Private ReadOnly resultFiles As List(Of String)
 
     '**** Multithreading ****
     Dim MyTalsimThreads() As TalsimThread
@@ -264,8 +264,9 @@ Public Class Talsim
 
         Folder = getThreadWorkDir(Thread_ID)
         MyTalsimThreads(Thread_ID) = New TalsimThread(Thread_ID, Child_ID, Folder, Datensatz)
-        MyThreads(Thread_ID) = New Thread(AddressOf MyTalsimThreads(Thread_ID).launchSim)
-        MyThreads(Thread_ID).IsBackground = True
+        MyThreads(Thread_ID) = New Thread(AddressOf MyTalsimThreads(Thread_ID).launchSim) With {
+            .IsBackground = True
+        }
         MyThreads(Thread_ID).Start()
         launchSim = True
 
@@ -325,12 +326,13 @@ Public Class Talsim
             Dim errfile As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".err")
             Dim simendfile As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".SIMEND")
             Dim proc As Process
-            Dim startInfo As New ProcessStartInfo()
-            startInfo.FileName = Me.exe_path
-            startInfo.Arguments = runfilename
-            startInfo.UseShellExecute = True
-            startInfo.WindowStyle = ProcessWindowStyle.Hidden
-            startInfo.WorkingDirectory = IO.Path.GetDirectoryName(Me.exe_path)
+            Dim startInfo As New ProcessStartInfo With {
+                .FileName = Me.exe_path,
+                .Arguments = runfilename,
+                .UseShellExecute = True,
+                .WindowStyle = ProcessWindowStyle.Hidden,
+                .WorkingDirectory = IO.Path.GetDirectoryName(Me.exe_path)
+            }
             'start
             proc = Process.Start(startInfo)
             'DEBUG: write to log

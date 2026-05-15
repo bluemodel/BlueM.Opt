@@ -21,10 +21,10 @@
 ''' <remarks></remarks>
 Public Class TalsimThread
 
-    Private Thread_ID As Integer
-    Private Child_ID As Integer
-    Private WorkFolder As String
-    Private DS_Name As String
+    Private ReadOnly Thread_ID As Integer
+    Private ReadOnly Child_ID As Integer
+    Private ReadOnly WorkFolder As String
+    Private ReadOnly DS_Name As String
     Private SimIsOK As Boolean
     Private launchReady As Boolean
     Public Shared exe_path As String
@@ -92,12 +92,13 @@ Public Class TalsimThread
             Dim errmsg As String
             Dim simendfile As String = IO.Path.Combine(Me.WorkFolder, Me.DS_Name & ".SIMEND")
             Dim proc As Process
-            Dim startInfo As New ProcessStartInfo()
-            startInfo.FileName = TalsimThread.exe_path
-            startInfo.Arguments = runfilename
-            startInfo.UseShellExecute = True
-            startInfo.WindowStyle = ProcessWindowStyle.Hidden
-            startInfo.WorkingDirectory = IO.Path.GetDirectoryName(TalsimThread.exe_path)
+            Dim startInfo As New ProcessStartInfo With {
+                .FileName = TalsimThread.exe_path,
+                .Arguments = runfilename,
+                .UseShellExecute = True,
+                .WindowStyle = ProcessWindowStyle.Hidden,
+                .WorkingDirectory = IO.Path.GetDirectoryName(TalsimThread.exe_path)
+            }
 
             'Carry out up to 5 simulation attempts, because TALSIM sometimes blocks access to the time series files in multithreading mode
             Dim n_attempts As Integer = 5
