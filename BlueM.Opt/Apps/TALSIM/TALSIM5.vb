@@ -153,12 +153,12 @@ Public Class Talsim5
     End Sub
 
     ''' <summary>
-    ''' Path to the database file (in the original directory)
+    ''' Path to the database file (in the current working directory)
     ''' </summary>
     ''' <returns></returns>
     Private ReadOnly Property DBFile As String
         Get
-            Return IO.Path.Combine(Me.WorkDir_Original, Me.Datensatz & ".db")
+            Return IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".db")
         End Get
     End Property
 
@@ -396,10 +396,8 @@ Public Class Talsim5
         'ModellParameter aus OptParametern kalkulieren()
         Call MyBase.OptParameter_to_ModellParameter()
 
-        Dim dbfileCurrent As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".db")
-
         Try
-            Using connection As New SqliteConnection($"Data Source={dbfileCurrent}")
+            Using connection As New SqliteConnection($"Data Source={Me.DBFile}")
                 connection.Open()
                 Dim i As Integer = 0
                 Using transaction As SqliteTransaction = connection.BeginTransaction()
