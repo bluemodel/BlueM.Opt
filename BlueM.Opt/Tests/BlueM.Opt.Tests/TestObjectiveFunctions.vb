@@ -164,19 +164,27 @@ Public Class TestObjectiveFunctions
     End Sub
 
     <TestMethod>
-    <ExpectedException(GetType(Exception))>
     Public Sub CompareSeries_DifferentLength_ThrowsException()
         Dim sim As TimeSeries = CreateTimeSeries({1.0, 2.0})
         Dim ref As TimeSeries = CreateTimeSeries({1.0, 2.0, 3.0})
-        ObjectiveFunction.compareSeries(sim, ref, "SSE")
+        Try
+            ObjectiveFunction.compareSeries(sim, ref, "SSE")
+            Assert.Fail("Expected exception for different length series was not thrown.")
+        Catch ex As Exception
+            'Expected exception, test passes
+        End Try
     End Sub
 
     <TestMethod>
-    <ExpectedException(GetType(Exception))>
     Public Sub CompareSeries_UnsupportedFunction_ThrowsException()
         Dim sim As TimeSeries = CreateTimeSeries({1.0, 2.0, 3.0})
         Dim ref As TimeSeries = CreateTimeSeries({1.0, 2.0, 3.0})
-        ObjectiveFunction.compareSeries(sim, ref, "UNSUPPORTED")
+        Try
+            ObjectiveFunction.compareSeries(sim, ref, "UNSUPPORTED")
+            Assert.Fail("Expected exception for unsupported objective function was not thrown.")
+        Catch ex As Exception
+            'Expected exception, test passes
+        End Try
     End Sub
 
 End Class
