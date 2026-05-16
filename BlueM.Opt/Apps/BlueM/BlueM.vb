@@ -335,10 +335,11 @@ Public Class BlueMSim
         'Altes Simulationsergebnis löschen
         Me.SimResult.Clear()
 
-        'Benötigte SimReihen zusammenstellen
+        'Benötigte SimReihen zusammenstellen {file: [series]}
         'TODO: das braucht eigentlich nicht nach jeder Simulation nochmal neu getan zu werden
-        Dim SimReihen As New Dictionary(Of String, List(Of String)) '{file: [series]}
-        SimReihen.Add("WEL", New List(Of String))
+        Dim SimReihen As New Dictionary(Of String, List(Of String)) From {
+            {"WEL", New List(Of String)}
+        }
         If Me.useKWL Then
             SimReihen.Add("KWL", New List(Of String))
         End If
