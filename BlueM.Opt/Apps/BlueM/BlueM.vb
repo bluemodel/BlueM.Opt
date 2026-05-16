@@ -253,8 +253,9 @@ Public Class BlueMSim
 
         Folder = getThreadWorkDir(Thread_ID)
         MyBlueMThreads(Thread_ID) = New BlueMSimThread(Thread_ID, Child_ID, Folder, Datensatz, bluem_dll(Thread_ID))
-        MyThreads(Thread_ID) = New Thread(AddressOf MyBlueMThreads(Thread_ID).launchSim)
-        MyThreads(Thread_ID).IsBackground = True
+        MyThreads(Thread_ID) = New Thread(AddressOf MyBlueMThreads(Thread_ID).launchSim) With {
+            .IsBackground = True
+        }
         MyThreads(Thread_ID).Start()
         launchSim = True
 

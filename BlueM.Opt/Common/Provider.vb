@@ -23,11 +23,11 @@ Public Module Provider
         Get
             'Fortran Provider einrichten
             '---------------------------
-            Dim provider As New NumberFormatInfo()
-
-            provider.NumberDecimalSeparator = "."
-            provider.NumberGroupSeparator = ""
-            provider.NumberGroupSizes = New Integer() {3}
+            Dim provider As New NumberFormatInfo With {
+                .NumberDecimalSeparator = ".",
+                .NumberGroupSeparator = "",
+                .NumberGroupSizes = New Integer() {3}
+            }
 
             Return provider
         End Get

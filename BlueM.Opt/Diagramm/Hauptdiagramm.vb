@@ -113,8 +113,9 @@ Public Class Hauptdiagramm
                 .Chart.Aspect.Zoom = 66
 
                 'Rotate Tool
-                Dim rotate As New Steema.TeeChart.Tools.Rotate(.Chart)
-                rotate.Button = Windows.Forms.MouseButtons.Right
+                Dim rotate As New Steema.TeeChart.Tools.Rotate(.Chart) With {
+                    .Button = Windows.Forms.MouseButtons.Right
+                }
 
             End If
 

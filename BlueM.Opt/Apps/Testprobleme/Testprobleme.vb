@@ -116,8 +116,9 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = 0
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = 0
+                    }
                 Next
 
             Case TP_BealeProblem
@@ -127,8 +128,9 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = 0.5
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = 0.5
+                    }
                 Next
 
             Case TP_Schwefel24Problem
@@ -138,8 +140,9 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = 1
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = 1
+                    }
                 Next
 
             Case TP_Deb1
@@ -150,8 +153,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_ZitzlerDebT1
@@ -162,8 +166,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_ZitzlerDebT2
@@ -174,8 +179,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_ZitzlerDebT3
@@ -186,8 +192,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_ZitzlerDebT4
@@ -198,8 +205,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_CONSTR
@@ -210,8 +218,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_Box
@@ -222,8 +231,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_DependentParameters
@@ -233,8 +243,9 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = 1
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = 1
+                    }
                 Next
                 'Beziehungen
                 Me.mOptPara(0).Beziehung = Common.Constants.Relationship.none
@@ -248,8 +259,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                        .Xn = Rnd()
+                    }
 
                 Next
                 For i = 0 To 3
@@ -292,9 +304,10 @@ Public Class Testprobleme
         ReDim Me.mProblem.List_ObjectiveFunctions(Me.mAnzZiele - 1)
         For i = 0 To Me.mProblem.NumObjectives - 1
             'Check_SH: 
-            Me.mProblem.List_ObjectiveFunctions(i) = New Common.ObjectiveFunction_Series()
-            Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective = True
-            Me.mProblem.List_ObjectiveFunctions(i).Direction = EVO_DIRECTION.Minimization
+            Me.mProblem.List_ObjectiveFunctions(i) = New Common.ObjectiveFunction_Series With {
+                .isPrimObjective = True,
+                .Direction = EVO_DIRECTION.Minimization
+            }
         Next
         ReDim Me.mProblem.List_Constraintfunctions(Me.mAnzConstraints - 1)
         For i = 0 To Me.mProblem.NumConstraints - 1
@@ -425,10 +438,11 @@ Public Class Testprobleme
         Call Diag.DiagInitialise("Beale problem", achsen, Me.mProblem)
 
         'Linie für den Ausgangswert anzeigen
-        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
-        colorline1.AllowDrag = False
-        colorline1.Axis = Diag.Axes.Left
-        colorline1.Value = Ausgangswert
+        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart) With {
+            .AllowDrag = False,
+            .Axis = Diag.Axes.Left,
+            .Value = Ausgangswert
+        }
         colorline1.Pen.Color = Drawing.Color.Green
 
     End Sub
@@ -474,10 +488,11 @@ Public Class Testprobleme
         Call Diag.DiagInitialise("Schwefel 2.4 problem", achsen, Me.mProblem)
 
         'Linie für den Ausgangswert anzeigen
-        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
-        colorline1.AllowDrag = False
-        colorline1.Axis = Diag.Axes.Left
-        colorline1.Value = Ausgangswert
+        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart) With {
+            .AllowDrag = False,
+            .Axis = Diag.Axes.Left,
+            .Value = Ausgangswert
+        }
         colorline1.Pen.Color = Drawing.Color.Red
 
     End Sub
@@ -774,14 +789,14 @@ Public Class Testprobleme
             Next
         Next
 
-        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-        surface.Title = "Constraint 1"
-        surface.IrregularGrid = True
-        surface.NumXValues = surfaceRes
-        surface.NumZValues = surfaceRes
-        surface.Add(ArrayX, ArrayY, ArrayZ)
-        surface.UseColorRange = False
-        surface.UsePalette = False
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart) With {
+            .Title = "Constraint 1",
+            .IrregularGrid = True,
+            .NumXValues = surfaceRes,
+            .NumZValues = surfaceRes,
+            .UseColorRange = False,
+            .UsePalette = False
+        }
         surface.Brush.Solid = True
         surface.Brush.Color = System.Drawing.Color.Green
         surface.Brush.Transparency = 70
@@ -789,6 +804,7 @@ Public Class Testprobleme
         surface.SideBrush.Visible = True
         surface.SideBrush.Color = System.Drawing.Color.Red
         surface.SideBrush.Transparency = 70
+        surface.Add(ArrayX, ArrayY, ArrayZ)
 
         'Constraint 2
         'x + y <= 0.5
@@ -806,14 +822,14 @@ Public Class Testprobleme
             Next
         Next
 
-        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-        surface.Title = "Constraint 2"
-        surface.IrregularGrid = True
-        surface.NumXValues = 10
-        surface.NumZValues = 10
-        surface.Add(ArrayX, ArrayY, ArrayZ)
-        surface.UseColorRange = False
-        surface.UsePalette = False
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart) With {
+            .Title = "Constraint 2",
+            .IrregularGrid = True,
+            .NumXValues = 10,
+            .NumZValues = 10,
+            .UseColorRange = False,
+            .UsePalette = False
+        }
         surface.Brush.Solid = True
         surface.Brush.Color = System.Drawing.Color.Blue
         surface.Brush.Transparency = 70
@@ -821,10 +837,12 @@ Public Class Testprobleme
         surface.SideBrush.Visible = True
         surface.SideBrush.Color = System.Drawing.Color.Red
         surface.SideBrush.Transparency = 70
+        surface.Add(ArrayX, ArrayY, ArrayZ)
 
         'Schnittgerade zwischen den Constraints
-        series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-        series3D.Title = "Intersection"
+        series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart) With {
+            .Title = "Intersection"
+        }
         series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
         series3D.LinePen.Visible = True
         series3D.LinePen.Width = 1
@@ -904,18 +922,19 @@ Public Class Testprobleme
             Next
         Next
 
-        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-        surface.Title = "Ackley function"
-        surface.IrregularGrid = True
-        surface.NumXValues = length
-        surface.NumZValues = length
-        surface.Add(ArrayX, ArrayZ, ArrayY)
-        surface.UseColorRange = False
-        surface.UsePalette = True
-        surface.PaletteStyle = Steema.TeeChart.Styles.PaletteStyles.Rainbow
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart) With {
+            .Title = "Ackley function",
+            .IrregularGrid = True,
+            .NumXValues = length,
+            .NumZValues = length,
+            .UseColorRange = False,
+            .UsePalette = True,
+            .PaletteStyle = Steema.TeeChart.Styles.PaletteStyles.Rainbow
+        }
         surface.Brush.Solid = True
         surface.Brush.Transparency = 70
         surface.Pen.Visible = False
+        surface.Add(ArrayX, ArrayZ, ArrayY)
 
     End Sub
 
@@ -982,14 +1001,14 @@ Public Class Testprobleme
             Next
         Next
 
-        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-        surface.Title = "X = Y"
-        surface.IrregularGrid = True
-        surface.NumXValues = surfaceRes
-        surface.NumZValues = surfaceRes
-        surface.Add(ArrayX, ArrayY, ArrayZ)
-        surface.UseColorRange = False
-        surface.UsePalette = False
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart) With {
+            .Title = "X = Y",
+            .IrregularGrid = True,
+            .NumXValues = surfaceRes,
+            .NumZValues = surfaceRes,
+            .UseColorRange = False,
+            .UsePalette = False
+        }
         surface.Brush.Solid = True
         surface.Brush.Color = System.Drawing.Color.Green
         surface.Brush.Transparency = 70
@@ -997,6 +1016,7 @@ Public Class Testprobleme
         surface.SideBrush.Visible = True
         surface.SideBrush.Color = System.Drawing.Color.Red
         surface.SideBrush.Transparency = 70
+        surface.Add(ArrayX, ArrayY, ArrayZ)
 
     End Sub
 

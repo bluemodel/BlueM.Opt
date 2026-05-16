@@ -562,8 +562,9 @@ Public Class OptResult
         Call db_connect()
 
         Try
-            command = New OleDbCommand("", db)
-            command.CommandText = "SELECT MAX(Generation) FROM SekPop"
+            command = New OleDbCommand("", db) With {
+                .CommandText = "SELECT MAX(Generation) FROM SekPop"
+            }
             igen = command.ExecuteScalar()
         Catch ex As Exception
             'Keine SekPop vorhanden
