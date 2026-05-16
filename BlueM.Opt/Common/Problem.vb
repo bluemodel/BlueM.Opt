@@ -20,7 +20,7 @@ Imports BlueM
 
 ''' <summary>
 ''' Klasse Problem
-''' Definiert das zu lösende Optimierungsproblem
+''' Definiert das zu lÃ¶sende Optimierungsproblem
 ''' </summary>
 Public Class Problem
 
@@ -62,7 +62,7 @@ Public Class Problem
     ''' <summary>
     ''' Liste der Objective Functions
     ''' </summary>
-    ''' <remarks>Enthält sowohl Objective Functions als auch PrimaryObjectiveFunctions</remarks>
+    ''' <remarks>EnthÃ¤lt sowohl Objective Functions als auch PrimaryObjectiveFunctions</remarks>
     Public List_ObjectiveFunctions() As ObjectiveFunction
     ''' <summary>
     ''' Liste der Constraint Functions
@@ -279,7 +279,7 @@ Public Class Problem
         '-----------
         'Modell-/Optparameter validieren
         Call Me.Validate_OPT_fits_to_MOD()
-        'Prüfen der Anfangswerte
+        'PrÃ¼fen der Anfangswerte
         Call Me.Validate_Startvalues()
 
 
@@ -315,7 +315,7 @@ Public Class Problem
 
         ReDim List_OptParameter(AnzParam - 1)
 
-        'Zurück zum Dateianfang und lesen
+        'ZurÃ¼ck zum Dateianfang und lesen
         FiStr.Seek(0, SeekOrigin.Begin)
 
         Dim array() As String
@@ -383,7 +383,7 @@ Public Class Problem
 
         ReDim Me.List_ModellParameter(AnzParam - 1)
 
-        'Zurück zum Dateianfang und lesen
+        'ZurÃ¼ck zum Dateianfang und lesen
         FiStr.Seek(0, SeekOrigin.Begin)
 
         Dim array() As String
@@ -424,7 +424,6 @@ Public Class Problem
     Private Sub Read_OBF(ByVal SimStart As DateTime, ByVal SimEnde As DateTime)
 
         Const AnzSpalten_ObjFSeries As Integer = 13                 'Anzahl Spalten Reihenvergleich in der OBF-Datei
-        Const AnzSpalten_ObjFValue As Integer = 12                  'Anzahl Spalten Wertevergleich in der OBF-Datei
         Const AnzSpalten_ObjFValueFromSeries As Integer = 13        'Anzahl Spalten Reihenwertevergleich in der OBF-Datei
         Const AnzSpalten_ObjFAggregate As Integer = 5               'Anzahl Spalten Aggregierte Ziele in der OBF-Datei
 
@@ -454,7 +453,7 @@ Public Class Problem
                 If Zeile.StartsWith("*Series") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.Series
                 ElseIf Zeile.StartsWith("*Values") Then
-                    currentObjectiveType = ObjectiveFunction.ObjectiveType.Value
+                    Throw New Exception("The block ""*Values"" is no longer supported in the OBF file!")
                 ElseIf Zeile.StartsWith("*ValueFromSeries") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.ValueFromSeries
                 ElseIf Zeile.StartsWith("*Aggregate") Then
@@ -527,46 +526,6 @@ Public Class Problem
                         'Neue ObjectiveFunction abspeichern
                         ReDim Preserve Me.List_ObjectiveFunctions(i)
                         Me.List_ObjectiveFunctions(i) = Objective_Series
-                        i += 1
-
-                    Case ObjectiveFunction.ObjectiveType.Value
-
-                        'Wertevergleich
-                        '==============
-
-                        'Kontrolle
-                        If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValue + 1) Then
-                            Throw New Exception("The block ""Values"" in the OBF input file has the wrong number of columns!")
-                        End If
-
-                        'ObjectiveFunction instanzieren
-                        Dim Objective_Value As New Common.Objectivefunction_Value()
-
-                        'Gemeinsame Spalten einlesen
-                        Call Me.Read_OBF_CommonColumns(Objective_Value, Zeile)
-
-                        'Restliche Spalten einlesen
-                        With Objective_Value
-                            .Block = WerteArray(9).Trim()
-                            .Column = WerteArray(10).Trim()
-                            If (WerteArray(11).Trim() <> "") Then
-                                .RefValue = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
-                            End If
-                            If (WerteArray(12).Trim() <> "") Then
-                                .hasCurrentValue = True
-                                .CurrentValue = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
-                                'Reverse the sign for objective functions that should be maximized (#198)
-                                If .Direction = EVO_DIRECTION.Maximization Then
-                                    .CurrentValue = .CurrentValue * -1
-                                End If
-                            Else
-                                .hasCurrentValue = False
-                            End If
-                        End With
-
-                        'Neue ObjectiveFunction abspeichern
-                        ReDim Preserve Me.List_ObjectiveFunctions(i)
-                        Me.List_ObjectiveFunctions(i) = Objective_Value
                         i += 1
 
                     Case ObjectiveFunction.ObjectiveType.ValueFromSeries
@@ -754,13 +713,13 @@ Public Class Problem
             Throw New Exception($"Unable to read reference series '{filePath}'!{eol}Error: {ex.Message}", ex)
         End Try
 
-        'Zeitraum der Referenzreihe überprüfen
+        'Zeitraum der Referenzreihe Ã¼berprÃ¼fen
         If (refSeries.StartDate > EvalStart Or refSeries.EndDate < EvalEnde) Then
             'Referenzreihe deckt Evaluierungszeitraum nicht ab
             Throw New Exception($"The reference series '{filePath}' does not cover the evaluation period!")
         End If
 
-        'Referenzreihe auf Evaluierungszeitraum kürzen
+        'Referenzreihe auf Evaluierungszeitraum kÃ¼rzen
         Call refSeries.Cut(EvalStart, EvalEnde)
         If refSeries.Length = 0 Then
             Throw New Exception($"The reference series '{filePath}' is empty after cutting to the evaluation period!")
@@ -789,7 +748,7 @@ Public Class Problem
         'Format:
         '*|---------------|----------|-------|-----------|------------|----------------------|-----------------------------|
         '*|               |          |       |           |            |      Grenzwert       |        Grenzreihe           |
-        '*| Bezeichnung   | GrenzTyp | Datei | SimGröße  | Oben/Unten | WertTyp  | Grenzwert | Grenzgröße | Datei          |
+        '*| Bezeichnung   | GrenzTyp | Datei | SimGrÃ¶ÃŸe  | Oben/Unten | WertTyp  | Grenzwert | GrenzgrÃ¶ÃŸe | Datei          |
         '*|---------------|----------|-------|-----------|------------|----------|-----------|------------|----------------|
 
         Dim i As Integer
@@ -865,7 +824,7 @@ Public Class Problem
                             .GrenzReihe = fileInstance.getTimeSeries(.GrenzGr)
                         End If
 
-                        'Zeitraum der Grenzwertreihe überprüfen
+                        'Zeitraum der Grenzwertreihe Ã¼berprÃ¼fen
                         '--------------------------------------
                         GrenzStart = .GrenzReihe.StartDate
                         GrenzEnde = .GrenzReihe.EndDate
@@ -874,7 +833,7 @@ Public Class Problem
                             'Grenzwertreihe deckt Simulationszeitraum nicht ab
                             Throw New Exception($"Constraints: The threshold series '{ .GrenzReiheDatei}' does not cover the simulation period!")
                         Else
-                            'Zielreihe auf Simulationszeitraum kürzen
+                            'Zielreihe auf Simulationszeitraum kÃ¼rzen
                             Call .GrenzReihe.Cut(SimStart, SimEnde)
                             If .GrenzReihe.Length = 0 Then
                                 Throw New Exception($"Constraints: The threshold series '{ .GrenzReiheDatei}' is empty after cutting to the simulation period!")
@@ -901,7 +860,7 @@ Public Class Problem
 
 
     ''' <summary>
-    ''' Prüft ob Optparameter und Modellparameter zusammenpassen
+    ''' PrÃ¼ft ob Optparameter und Modellparameter zusammenpassen
     ''' </summary>
     Private Sub Validate_OPT_fits_to_MOD()
 
@@ -910,7 +869,7 @@ Public Class Problem
         Dim isValid_B As Boolean = True
         Dim isValid As Boolean = False
 
-        'A: Prüfung ob für jeden OptParameter mindestens ein Modellparameter existiert
+        'A: PrÃ¼fung ob fÃ¼r jeden OptParameter mindestens ein Modellparameter existiert
         For i = 0 To List_OptParameter.GetUpperBound(0)
             isValid = False
             For j = 0 To List_ModellParameter.GetUpperBound(0)
@@ -923,7 +882,7 @@ Public Class Problem
             End If
         Next
 
-        'B: Prüfung ob jeder ModellParameter einem richtigen OptParameter zugewiesen ist.
+        'B: PrÃ¼fung ob jeder ModellParameter einem richtigen OptParameter zugewiesen ist.
         For i = 0 To List_ModellParameter.GetUpperBound(0)
             isValid = False
             For j = 0 To List_OptParameter.GetUpperBound(0)
@@ -947,7 +906,7 @@ Public Class Problem
     End Sub
 
     ''' <summary>
-    ''' Prüft ob die Startwerte der OptParameter innerhalb der Min und Max Grenzen liegen
+    ''' PrÃ¼ft ob die Startwerte der OptParameter innerhalb der Min und Max Grenzen liegen
     ''' </summary>
     Private Sub Validate_Startvalues()
         Dim i As Integer
@@ -960,7 +919,7 @@ Public Class Problem
     End Sub
 
     '''' <summary>
-    '''' Validierungsfunktion der Ziele Datei (Objectives), prüft ob die Gruppenzuordnung passt
+    '''' Validierungsfunktion der Ziele Datei (Objectives), prÃ¼ft ob die Gruppenzuordnung passt
     '''' </summary>
 
     'Public Sub Validate_Objectives()
@@ -992,8 +951,8 @@ Public Class Problem
     ''' </summary>
     ''' <remarks>
     ''' Beta-Version - erlaubt Kalirbierung der Tagesganlinie
-    ''' dafür muss für den jeweiligen Tagesgangwert in der .mod Datei in der Spalte "Elem" "TGG_QH" eingetragen werden
-    ''' Vorschlag: Aktivierung der kalibrierung des Tagesganlinie über einen Schalter, damit diese Funktion nicht bei jeder optimierung aufgerufen wird
+    ''' dafÃ¼r muss fÃ¼r den jeweiligen Tagesgangwert in der .mod Datei in der Spalte "Elem" "TGG_QH" eingetragen werden
+    ''' Vorschlag: Aktivierung der kalibrierung des Tagesganlinie Ã¼ber einen Schalter, damit diese Funktion nicht bei jeder optimierung aufgerufen wird
     ''' Kontakt: Valentin Gamerith
     ''' </remarks>
     Private Sub VG_Kalibrierung_Tagesganglinie()
@@ -1018,13 +977,13 @@ Public Class Problem
                 Next
             End If
         Next
-        'Überprüft ob 24 Werte zugeordnet wurden
+        'ÃœberprÃ¼ft ob 24 Werte zugeordnet wurden
         If VG_check_24 = 24 Then
             'Faktor um auf 24 zu kommen:Xi = Xsim,i * n/Summe(Xi,Sim)
             VG_Faktor = VG_check_24 / VG_sum_TGG
             For i = 0 To List_ModellParameter.GetUpperBound(0)
                 If Trim(List_ModellParameter(i).Element) = "TGG_QH" Then
-                    List_ModellParameter(i).Faktor = VG_Faktor 'setzt den Faktor für den jeweiligen Tagesgangwert
+                    List_ModellParameter(i).Faktor = VG_Faktor 'setzt den Faktor fÃ¼r den jeweiligen Tagesgangwert
                 End If
             Next
         Else
@@ -1032,10 +991,10 @@ Public Class Problem
     End Sub
 
     ''' <summary>
-    ''' Gibt ein neues Individuum zurück, dessen Optparameter alle auf die Startwerte gesetzt sind
+    ''' Gibt ein neues Individuum zurÃ¼ck, dessen Optparameter alle auf die Startwerte gesetzt sind
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>Das Individuum erhält die ID 1</remarks>
+    ''' <remarks>Das Individuum erhÃ¤lt die ID 1</remarks>
     Public Function getIndividuumStart() As BlueM.Opt.Common.Individuum
 
         Dim startind As BlueM.Opt.Common.Individuum

@@ -19,7 +19,7 @@ Imports System.Globalization
 Imports BlueM
 
 ''' <summary>
-''' Klasse für die Definition von Objective Funktionen
+''' Klasse fÃ¼r die Definition von Objective Funktionen
 ''' </summary>
 Public MustInherit Class ObjectiveFunction
 
@@ -46,7 +46,6 @@ Public MustInherit Class ObjectiveFunction
 
     Public Enum ObjectiveType As Integer
         Series = 1
-        Value = 2
         ValueFromSeries = 3
         Aggregate = 5
     End Enum
@@ -272,7 +271,7 @@ Public MustInherit Class ObjectiveFunction
                 Next
                 objectiveValue = sUnter
 
-            Case "NGT", "NÜBER"
+            Case "NGT", "NÃœBER"
                 'Relative number of timesteps where simulation is greater than reference [%]
                 '---------------------------------------------------------------------------
                 Dim nUeber As Integer = 0
@@ -283,7 +282,7 @@ Public MustInherit Class ObjectiveFunction
                 Next
                 objectiveValue = nUeber / SimSeries.Length * 100
 
-            Case "SGT", "SÜBER"
+            Case "SGT", "SÃœBER"
                 'Sum of simulation values greater than reference
                 '-----------------------------------------------
                 Dim sUeber As Double = 0

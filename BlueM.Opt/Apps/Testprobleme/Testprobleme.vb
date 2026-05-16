@@ -74,7 +74,7 @@ Public Class Testprobleme
         End Get
     End Property
 
-    'gewähltes Testproblem holen
+    'gewÃ¤hltes Testproblem holen
     '***************************
     Public ReadOnly Property selectedTestproblem() As String
         Get
@@ -97,7 +97,7 @@ Public Class Testprobleme
 
     End Sub
 
-    'Parameterübergabe
+    'ParameterÃ¼bergabe
     '*****************
     Public Sub getProblem(ByRef prob As BlueM.Opt.Common.Problem)
 
@@ -106,7 +106,7 @@ Public Class Testprobleme
         'Das Problem setzen
         Me.mProblem = prob
 
-        'Je nach Datensatz/Testproblem initialisierungen durchführen
+        'Je nach Datensatz/Testproblem initialisierungen durchfÃ¼hren
         Select Case Me.mSelectedTestproblem
 
             Case TP_SinusFunktion
@@ -288,11 +288,11 @@ Public Class Testprobleme
 
         End Select
 
-        'Das Problem mit Pseudo-Werten füllen
+        'Das Problem mit Pseudo-Werten fÃ¼llen
         ReDim Me.mProblem.List_ObjectiveFunctions(Me.mAnzZiele - 1)
         For i = 0 To Me.mProblem.NumObjectives - 1
             'Check_SH: 
-            Me.mProblem.List_ObjectiveFunctions(i) = New Common.Objectivefunction_Value()
+            Me.mProblem.List_ObjectiveFunctions(i) = New Common.ObjectiveFunction_Series()
             Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective = True
             Me.mProblem.List_ObjectiveFunctions(i).Direction = EVO_DIRECTION.Minimization
         Next
@@ -340,7 +340,7 @@ Public Class Testprobleme
 
     End Sub
 
-    'Diagramm für Sinus-Funktion initialisieren
+    'Diagramm fÃ¼r Sinus-Funktion initialisieren
     '*******************************************
     Private Sub DiagInitialise_SinusFunktion(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -393,7 +393,7 @@ Public Class Testprobleme
 
     End Sub
 
-    'Diagramm für Beale-Problem initialisieren
+    'Diagramm fÃ¼r Beale-Problem initialisieren
     '*****************************************
     Private Sub DiagInitialise_BealeProblem(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -424,7 +424,7 @@ Public Class Testprobleme
 
         Call Diag.DiagInitialise("Beale problem", achsen, Me.mProblem)
 
-        'Linie für den Ausgangswert anzeigen
+        'Linie fÃ¼r den Ausgangswert anzeigen
         colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
         colorline1.AllowDrag = False
         colorline1.Axis = Diag.Axes.Left
@@ -433,7 +433,7 @@ Public Class Testprobleme
 
     End Sub
 
-    'Diagramm für Schwefel-Problem initialisieren
+    'Diagramm fÃ¼r Schwefel-Problem initialisieren
     '********************************************
     Private Sub DiagInitialise_SchwefelProblem(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -473,7 +473,7 @@ Public Class Testprobleme
 
         Call Diag.DiagInitialise("Schwefel 2.4 problem", achsen, Me.mProblem)
 
-        'Linie für den Ausgangswert anzeigen
+        'Linie fÃ¼r den Ausgangswert anzeigen
         colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
         colorline1.AllowDrag = False
         colorline1.Axis = Diag.Axes.Left
@@ -482,7 +482,7 @@ Public Class Testprobleme
 
     End Sub
 
-    'Diagramm für MultiObjective-Probleme initialisieren
+    'Diagramm fÃ¼r MultiObjective-Probleme initialisieren
     '***************************************************
     Private Sub DiagInitialise_MultiTestProb(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -626,7 +626,7 @@ Public Class Testprobleme
 
             Case TP_ZitzlerDebT3
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                'TODO: Titel der Serien (für Export)
+                'TODO: Titel der Serien (fÃ¼r Export)
                 Dim ArrayX(100) As Double
                 Dim ArrayY(100) As Double
 
@@ -710,7 +710,7 @@ Public Class Testprobleme
 
     End Sub
 
-    'Diagramm für Box-Problem (3D) initialisieren
+    'Diagramm fÃ¼r Box-Problem (3D) initialisieren
     '********************************************
     Private Sub DiagInitialise_3D_Box(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -834,7 +834,7 @@ Public Class Testprobleme
 
     End Sub
 
-    'Diagramm für Ackley function initialisieren (3D)
+    'Diagramm fÃ¼r Ackley function initialisieren (3D)
     '************************************************
     Private Sub DiagInitialise_Ackley(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -920,7 +920,7 @@ Public Class Testprobleme
     End Sub
 
 
-    'Diagramm für Abhängige Parameter initialisieren
+    'Diagramm fÃ¼r AbhÃ¤ngige Parameter initialisieren
     '***********************************************
     Private Sub DiagInitialise_AbhParameter(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -1059,7 +1059,7 @@ Public Class Testprobleme
             Case TP_BealeProblem
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswert berechnen
+                'QualitÃ¤tswert berechnen
                 '-----------------------
                 x1 = -5 + (ind.OptParameter(0).Xn * 10)
                 x2 = -2 + (ind.OptParameter(1).Xn * 4)
@@ -1074,7 +1074,7 @@ Public Class Testprobleme
             Case TP_Schwefel24Problem
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswert berechnen
+                'QualitÃ¤tswert berechnen
                 '-----------------------
                 ReDim x_arr(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
@@ -1097,7 +1097,7 @@ Public Class Testprobleme
             Case TP_Deb1 'Deb 2000, D1 (Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswert berechnen
+                'QualitÃ¤tswert berechnen
                 '-----------------------
                 ind.Objectives(0) = ind.OptParameter(0).Xn * (9 / 10) + 0.1
                 ind.Objectives(1) = (1 + 5 * ind.OptParameter(1).Xn) / (ind.OptParameter(0).Xn * (9 / 10) + 0.1)
@@ -1110,7 +1110,7 @@ Public Class Testprobleme
             Case TP_ZitzlerDebT1 'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswert berechnen
+                'QualitÃ¤tswert berechnen
                 '-----------------------
                 f1 = ind.OptParameter(0).Xn
                 f2 = 0
@@ -1130,7 +1130,7 @@ Public Class Testprobleme
             Case TP_ZitzlerDebT2 'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 f1 = ind.OptParameter(0).Xn
                 f2 = 0
@@ -1150,7 +1150,7 @@ Public Class Testprobleme
             Case TP_ZitzlerDebT3 'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 f1 = ind.OptParameter(0).Xn
                 f2 = 0
@@ -1170,7 +1170,7 @@ Public Class Testprobleme
             Case TP_ZitzlerDebT4 'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 f1 = ind.OptParameter(0).Xn
                 f2 = 0
@@ -1191,7 +1191,7 @@ Public Class Testprobleme
             Case TP_CONSTR
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 f1 = ind.OptParameter(0).Xn * (9 / 10) + 0.1
                 f2 = (1 + 5 * ind.OptParameter(1).Xn) / (ind.OptParameter(0).Xn * (9 / 10) + 0.1)
@@ -1210,10 +1210,10 @@ Public Class Testprobleme
                 'Zeichnen
                 '--------
                 If (Not ind.Is_Feasible) Then
-                    'Ungültige Lösung
+                    'UngÃ¼ltige LÃ¶sung
                     serie = Diag.getSeriesPoint("Population (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 Else
-                    'Gültige Lösung
+                    'GÃ¼ltige LÃ¶sung
                     serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 End If
                 serie.Add(ind.Objectives(0), ind.Objectives(1))
@@ -1221,7 +1221,7 @@ Public Class Testprobleme
             Case TP_Box
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 ind.Objectives(0) = ind.OptParameter(0).Xn
                 ind.Objectives(1) = ind.OptParameter(1).Xn
@@ -1236,10 +1236,10 @@ Public Class Testprobleme
                 '--------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
                 If (Not ind.Is_Feasible) Then
-                    'Ungültige Lösung
+                    'UngÃ¼ltige LÃ¶sung
                     serie3D = Diag.getSeries3DPoint("Population (invalid)", "Gray")
                 Else
-                    'Gültige Lösung
+                    'GÃ¼ltige LÃ¶sung
                     serie3D = Diag.getSeries3DPoint("Population", "Orange")
                 End If
                 serie3D.Add(ind.Objectives(0), ind.Objectives(1), ind.Objectives(2))
@@ -1247,7 +1247,7 @@ Public Class Testprobleme
             Case TP_DependentParameters
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 ind.Objectives(0) = ind.OptParameter(0).Xn ^ 2 + ind.OptParameter(1).Xn ^ 2
 
@@ -1317,7 +1317,7 @@ Public Class Testprobleme
                 serie.Add(ind.Objectives(0), ind.Objectives(1))
 
             Case TP_Ackley
-                'Qualitätswert berechnen
+                'QualitÃ¤tswert berechnen
                 '-----------------------
                 x = ind.OptParameter(0).RWert
                 y = ind.OptParameter(1).RWert

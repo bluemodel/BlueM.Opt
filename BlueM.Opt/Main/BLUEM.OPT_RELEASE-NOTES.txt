@@ -13,6 +13,7 @@ CHANGED:
 
 REMOVED:
 * Removed support for SWMM #231
+* Removed support for reading objective functions of type "Values" from OBF files
 
 Version 2.5.0
 -------------
