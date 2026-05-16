@@ -1,4 +1,4 @@
-﻿' Copyright (c) BlueM Dev Group
+' Copyright (c) BlueM Dev Group
 ' Website: http://bluemodel.org
 ' 
 ' All rights reserved.
@@ -65,20 +65,6 @@ Public Class Generic
     ''' </summary>
     Protected Overrides Sub Read_SimParameter()
         'TODO
-    End Sub
-
-    ''' <summary>
-    ''' TODO: this should not be MustOverride in the base class
-    ''' </summary>
-    Protected Overrides Sub Read_Verzweigungen()
-        'pass
-    End Sub
-
-    ''' <summary>
-    ''' TODO: this should not be MustOverride in the base class
-    ''' </summary>
-    Protected Overrides Sub Write_Verzweigungen()
-        'pass
     End Sub
 
     ''' <summary>
