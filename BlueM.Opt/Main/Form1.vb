@@ -145,7 +145,7 @@ Partial Public Class Form1
         '---------
         'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Anwendung.Items.Clear()
-        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_TALSIM, ANW_TALSIM5, ANW_TESTPROBLEMS, ANW_TSP}) 'ANW_SMUSI entfernt (#184)
+        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_TALSIM, ANW_TALSIM5, ANW_TESTPROBLEMS, ANW_TSP})
         Me.ComboBox_Anwendung.SelectedIndex = 0
 
         'Datensatz
@@ -415,13 +415,6 @@ Partial Public Class Form1
 
                     'Objekt der Klasse BlueM initialisieren
                     Sim1 = New BlueM.Opt.Apps.BlueMSim()
-
-
-                Case ANW_SMUSI 'Anwendung Smusi
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Objekt der Klasse Smusi initialisieren
-                    'Sim1 = New BlueM.Opt.Apps.Smusi()
 
 
                 Case ANW_TALSIM 'Anwendung TALSIM
@@ -904,7 +897,7 @@ Partial Public Class Form1
         '=================
         Select Case Me.Anwendung
 
-            Case ANW_BLUEM, ANW_SMUSI, ANW_TALSIM, ANW_TALSIM5
+            Case ANW_BLUEM, ANW_TALSIM, ANW_TALSIM5
 
                 'Bei allen Sim-Anwendungen
                 '-----------------------------------------------------
@@ -1037,7 +1030,7 @@ Partial Public Class Form1
 
             Select Case Anwendung
 
-                Case ANW_BLUEM, ANW_SMUSI, ANW_TALSIM, ANW_TALSIM5
+                Case ANW_BLUEM, ANW_TALSIM, ANW_TALSIM5
                     'Sim-Anwendungen
 
                     'Save settings to file
@@ -1272,7 +1265,7 @@ Partial Public Class Form1
 
                 Call Testprobleme1.DiagInitialise(Me.Hauptdiagramm1)
 
-            Case ANW_BLUEM, ANW_SMUSI, ANW_TALSIM, ANW_TALSIM5
+            Case ANW_BLUEM, ANW_TALSIM, ANW_TALSIM5
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 Select Case Me.mProblem.Method

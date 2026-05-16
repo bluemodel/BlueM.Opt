@@ -112,9 +112,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Sim.vb" />
-    <None Include="SMUSI\Smusi.vb">
-      <SubType>Code</SubType>
-    </None>
     <Compile Include="TALSIM\TALSIM5.vb" />
     <Compile Include="TALSIM\TALSIM.vb" />
     <Compile Include="TALSIM\TALSIM5Thread.vb" />
