@@ -1,7 +1,7 @@
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
 Imports System.Runtime.InteropServices
-Imports BlueM.Opt.Common.Constants
+Imports BlueM.Opt.Common
 
 ' Allgemeine Informationen über eine Assembly werden über die folgende
 ' Attributgruppe gesteuert. Ändern Sie diese Attributwerte, um die
@@ -9,10 +9,10 @@ Imports BlueM.Opt.Common.Constants
 
 
 <Assembly: AssemblyTitle("BlueM.Opt")>
-<Assembly: AssemblyDescription("BlueM.Opt is part of the BlueM software package." & eol & eol _
+<Assembly: AssemblyDescription("BlueM.Opt is part of the BlueM software package." & Constants.eol & Constants.eol _
                                & "BlueM.Opt is an optimization framework for optimization, autocalibration and sensitivity analysis of model parameters and the visualization thereof." & eol & eol _
-                               & "Included simulation models:" & eol _
-                               & "* BlueM.Sim v0.9.8 (https://www.bluemodel.org)" & eol _
+                               & "Included simulation models:" & Constants.eol _
+                               & "* BlueM.Sim v0.9.8 (https://www.bluemodel.org)" & Constants.eol _
                                & "* Talsim (https://www.talsim.de/)")>
 <Assembly: AssemblyCompany("BlueM Dev Group")> 
 <Assembly: AssemblyProduct("BlueM.Opt")>

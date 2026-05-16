@@ -49,7 +49,7 @@ Public Class OptParameter
     Public C As Double
 
     'Beziehung
-    Public Beziehung As Common.Constants.Relationship
+    Public Beziehung As Constants.Relationship
 
 #End Region 'Eigenschaften
 
@@ -118,7 +118,7 @@ Public Class OptParameter
 
     'Konvertiert eine Liste von OptParametern in ein Array von Doubles (Xn)
     '**********************************************************************
-    Public Shared Function Get_OptParas_Xn(ByVal OptParameter() As BlueM.Opt.Common.OptParameter) As Double()
+    Public Shared Function Get_OptParas_Xn(ByVal OptParameter() As OptParameter) As Double()
 
         Dim i As Integer
         Dim Xn() As Double

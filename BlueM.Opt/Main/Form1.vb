@@ -15,10 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.Xml
-Imports System.Xml.Serialization
-Imports BlueM.Opt.Common.Constants
-
+Imports System.Windows.Forms
+Imports BlueM.Opt.Common
 ''' <summary>
 ''' Main Window
 ''' </summary>
@@ -33,13 +31,13 @@ Partial Public Class Form1
     Private Anwendung As String
 
     'Problem
-    Public mProblem As BlueM.Opt.Common.Problem
+    Public mProblem As Problem
 
     'Settings
-    Private mSettings As BlueM.Opt.Common.Settings
+    Private mSettings As Settings
 
     'Progress
-    Private mProgress As BlueM.Opt.Common.Progress
+    Private mProgress As Progress
 
     'Apps
     Private Testprobleme1 As BlueM.Opt.Apps.Testprobleme
@@ -108,14 +106,14 @@ Partial Public Class Form1
     '***********
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
         'XP-look
-        System.Windows.Forms.Application.EnableVisualStyles()
+        Application.EnableVisualStyles()
 
         'Monitor zuweisen
         Me.Monitor1 = BlueM.Opt.Diagramm.Monitor.getInstance()
         'Monitor zentrieren
         Me.Monitor1.Location = New Drawing.Point(Me.Location.X + Me.Width / 2 - Me.Monitor1.Width / 2, Me.Location.Y + Me.Height / 2 - Me.Monitor1.Height / 2)
         'Add handler for log messages
-        AddHandler BlueM.Opt.Common.Log.LogMessageAdded, AddressOf Monitor1.LogAppend
+        AddHandler Log.LogMessageAdded, AddressOf Monitor1.LogAppend
 
         'Formular initialisieren
         Call Me.INI()
@@ -136,7 +134,7 @@ Partial Public Class Form1
         Me.IsInitializing = True
 
         'clear the log
-        BlueM.Opt.Common.Log.Reset()
+        Log.Reset()
 
         'Anwendungs-Groupbox aktivieren
         Me.GroupBox_Anwendung.Enabled = True
@@ -165,7 +163,7 @@ Partial Public Class Form1
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'Einstellungen
-        Me.mSettings = New Common.Settings()
+        Me.mSettings = New Settings()
         Me.EVO_Einstellungen1.Reset() 'für Neustart wichtig
         Me.EVO_Einstellungen1.setSettings(Me.mSettings)
 
@@ -173,7 +171,7 @@ Partial Public Class Form1
         Me.Monitor1.Reset()
 
         'Progress instanzieren und an EVO_Opt_Verlauf übergeben
-        Me.mProgress = New BlueM.Opt.Common.Progress()
+        Me.mProgress = New Progress()
         Me.EVO_Opt_Verlauf1.Initialisieren(Me.mProgress)
 
         'Toolbar-Buttons deaktivieren
@@ -324,7 +322,7 @@ Partial Public Class Form1
     Public Sub loadSettings(ByVal filename As String)
 
         'read settings from file
-        Dim settings As Common.Settings = Common.Settings.Load(filename)
+        Dim settings As Settings = Settings.Load(filename)
 
         'Checks: PES OptMode has to be identical
         If settings.PES.OptModus <> Me.mSettings.PES.OptModus Then
@@ -478,11 +476,11 @@ Partial Public Class Form1
             Call Me.mProgress.Initialize()
 
             'log
-            Common.Log.AddMessage(Common.Log.levels.info, $"Set application to {Me.Anwendung}")
+            Log.AddMessage(Log.levels.info, $"Set application to {Me.Anwendung}")
 
         Catch ex As Exception
 
-            MsgBox("Error while initializing the application:" & eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Error while initializing the application:" & Constants.eol & ex.Message, MsgBoxStyle.Critical)
             Me.IsInitializing = True
             Me.ComboBox_Anwendung.SelectedIndex = 0
             Me.IsInitializing = False
@@ -715,7 +713,7 @@ Partial Public Class Form1
             Call Me.mProgress.Initialize()
 
             'log
-            Common.Log.AddMessage(Common.Log.levels.info, $"Set dataset to {selectedDatensatz}")
+            Log.AddMessage(Log.levels.info, $"Set dataset to {selectedDatensatz}")
 
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical)
@@ -871,7 +869,7 @@ Partial Public Class Form1
 
         Catch ex As Exception
 
-            MsgBox("Error while setting the method:" & eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Error while setting the method:" & Constants.eol & ex.Message, MsgBoxStyle.Critical)
             'Combobox zurücksetzen
             Me.IsInitializing = True
             Me.ComboBox_Methode.SelectedIndex = 0
@@ -891,7 +889,7 @@ Partial Public Class Form1
     Private Sub INI_Problem(ByVal Method As String)
 
         'Neues Problem mit ausgewählter Methode instanzieren
-        Me.mProblem = New BlueM.Opt.Common.Problem(Method)
+        Me.mProblem = New Problem(Method)
 
         'Problemdefinition
         '=================
@@ -932,15 +930,15 @@ Partial Public Class Form1
 
         'Individuumsklasse mit Problem initialisieren
         '--------------------------------------------
-        Call BlueM.Opt.Common.Individuum.Initialise(Me.mProblem)
+        Call Individuum.Initialise(Me.mProblem)
 
         'Problembeschreibung in Log schreiben
         '------------------------------------
-        Common.Log.AddMessage(Common.Log.levels.info, $"Set method to {Me.mProblem.Method}")
+        Log.AddMessage(Log.levels.info, $"Set method to {Me.mProblem.Method}")
         Dim msg As String
-        msg = "Optimization problem loaded:" & eol
+        msg = "Optimization problem loaded:" & Constants.eol
         msg &= Me.mProblem.Description()
-        Common.Log.AddMessage(Common.Log.levels.info, msg)
+        Log.AddMessage(Log.levels.info, msg)
 
         Me.Monitor1.SelectTabLog()
         Me.Monitor1.Show()
@@ -976,13 +974,13 @@ Partial Public Class Form1
         'Stoppuhr
         Dim AllOptTime As New Stopwatch
 
-        Common.Log.AddMessage(Common.Log.levels.info, "Starting optimization...")
+        Log.AddMessage(Log.levels.info, "Starting optimization...")
 
         Call StarteDurchlauf(AllOptTime)
 
         MsgBox("Optimization ended!", MsgBoxStyle.Information, "BlueM.Opt")
 
-        Common.Log.AddMessage(Common.Log.levels.info, $"The optimization took {AllOptTime.Elapsed.Days}d {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
+        Log.AddMessage(Log.levels.info, $"The optimization took {AllOptTime.Elapsed.Days}d {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
 
     End Sub
 
@@ -1039,7 +1037,7 @@ Partial Public Class Form1
 
                     'Set log file
                     Dim logfilename As String = IO.Path.Combine(Me.mProblem.WorkDir, $"{Me.mProblem.Datensatz}.BlueM.Opt.{starttime:yyyyMMddHHmm}.log")
-                    BlueM.Opt.Common.Log.SetLogFile(logfilename)
+                    Log.SetLogFile(logfilename)
 
                     'Prepare OptResult (database)
                     Call Me.Sim1.PrepareOptResult(starttime)
@@ -1082,7 +1080,7 @@ Partial Public Class Form1
         Catch ex As Exception
 
             'Globale Fehlerbehandlung für Optimierungslauf:
-            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
+            Log.AddMessage(Log.levels.error, ex.Message)
             MsgBox(ex.Message, MsgBoxStyle.Critical, "Error")
 
         Finally
@@ -1121,7 +1119,7 @@ Partial Public Class Form1
 
                 'Pausen Magic :-)
                 Do While (Me.isPause)
-                    System.Threading.Thread.Sleep(20)
+                    Threading.Thread.Sleep(20)
                     Application.DoEvents()
                 Loop
 
@@ -1208,7 +1206,7 @@ Partial Public Class Form1
         SaveFileDialog1.DefaultExt = Me.Hauptdiagramm1.Export.Data.Excel.FileExtension
         SaveFileDialog1.FileName = Me.Hauptdiagramm1.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "Excel files (*.xls)|*.xls"
-        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+        If (Me.SaveFileDialog1.ShowDialog() = DialogResult.OK) Then
             Me.Hauptdiagramm1.Export.Data.Excel.Series = Nothing 'export all series
             Me.Hauptdiagramm1.Export.Data.Excel.IncludeLabels = True
             Me.Hauptdiagramm1.Export.Data.Excel.IncludeIndex = True
@@ -1224,7 +1222,7 @@ Partial Public Class Form1
         SaveFileDialog1.DefaultExt = Me.Hauptdiagramm1.Export.Image.PNG.FileExtension
         SaveFileDialog1.FileName = Me.Hauptdiagramm1.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "PNG files (*.png)|*.png"
-        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+        If (Me.SaveFileDialog1.ShowDialog() = DialogResult.OK) Then
             Me.Hauptdiagramm1.Export.Image.PNG.GrayScale = False
             Me.Hauptdiagramm1.Export.Image.PNG.Save(Me.SaveFileDialog1.FileName)
         End If
@@ -1236,7 +1234,7 @@ Partial Public Class Form1
         SaveFileDialog1.DefaultExt = Me.Hauptdiagramm1.Export.Template.FileExtension
         SaveFileDialog1.FileName = Me.Hauptdiagramm1.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "TeeChart files (*.ten)|*.ten"
-        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+        If (Me.SaveFileDialog1.ShowDialog() = DialogResult.OK) Then
             Me.Hauptdiagramm1.Export.Template.IncludeData = True
             Me.Hauptdiagramm1.Export.Template.Save(Me.SaveFileDialog1.FileName)
         End If
@@ -1413,7 +1411,7 @@ Partial Public Class Form1
 
                             'Warnung bei mehr als 3 OptZielen
                             If (Me.mProblem.NumPrimObjective > 3) Then
-                                MsgBox("The number of primary objectives is more than 3!" & eol _
+                                MsgBox("The number of primary objectives is more than 3!" & Constants.eol _
                                         & "Only the first three primary objectives will be displayed in the main chart!", MsgBoxStyle.Information)
                             End If
 
@@ -1447,7 +1445,7 @@ Partial Public Class Form1
             Me.scatterplot2 = New BlueM.Opt.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult, Sim1.OptResultRef)
         Else
             Cursor = Cursors.Default
-            MsgBox($"There are already two scatterplot matrices open!{eol}Please close at least one of them first!", MsgBoxStyle.Information)
+            MsgBox($"There are already two scatterplot matrices open!{Constants.eol}Please close at least one of them first!", MsgBoxStyle.Information)
         End If
 
         Cursor = Cursors.Default
@@ -1508,7 +1506,7 @@ Partial Public Class Form1
         Else
 
             Dim indID_clicked As Integer
-            Dim ind As Common.Individuum
+            Dim ind As Individuum
 
             Try
                 'Solution-ID
@@ -1521,8 +1519,8 @@ Partial Public Class Form1
                 Call Me.selectSolution(ind)
 
             Catch ex As Exception
-                Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
-                MsgBox($"Solution is not selectable!{Common.Constants.eol}{ex.Message}", MsgBoxStyle.Information)
+                Log.AddMessage(Log.levels.error, ex.Message)
+                MsgBox($"Solution is not selectable!{Constants.eol}{ex.Message}", MsgBoxStyle.Information)
             End Try
 
         End If
@@ -1534,7 +1532,7 @@ Partial Public Class Form1
     ''' </summary>
     ''' <param name="id">the solution ID to select</param>
     Private Overloads Sub selectSolution(id As Integer) Handles solutionDialog.SelectedSolutionsIDRequested
-        Dim ind As Common.Individuum
+        Dim ind As Individuum
         Try
             ind = Sim1.OptResult.getSolution(id)
             Call Me.selectSolution(ind)
@@ -1547,7 +1545,7 @@ Partial Public Class Form1
     ''' Selects a solution
     ''' </summary>
     ''' <param name="ind">the individual to select</param>
-    Private Overloads Sub selectSolution(ByVal ind As Common.Individuum) Handles scatterplot1.pointSelected, scatterplot2.pointSelected, customPlot.pointSelected
+    Private Overloads Sub selectSolution(ByVal ind As Individuum) Handles scatterplot1.pointSelected, scatterplot2.pointSelected, customPlot.pointSelected
 
         Dim isOK As Boolean
 
@@ -1636,21 +1634,21 @@ Partial Public Class Form1
 
         'Im Hauptdiagramm neu zeichnen
         Call Me.Hauptdiagramm1.LöscheAusgewählteLösungen()
-        For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+        For Each ind As Individuum In Me.Sim1.OptResult.getSelectedSolutions
             Call Me.Hauptdiagramm1.DrawSelectedSolution(ind)
         Next
 
         'In den Scatterplot-Matrizen neu zeichnen
         If (Not IsNothing(Me.scatterplot1)) Then
             Call scatterplot1.clearSelection()
-            For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+            For Each ind As Individuum In Me.Sim1.OptResult.getSelectedSolutions
                 Call Me.scatterplot1.showSelectedSolution(ind)
             Next
         End If
 
         If (Not IsNothing(Me.scatterplot2)) Then
             Call scatterplot2.clearSelection()
-            For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+            For Each ind As Individuum In Me.Sim1.OptResult.getSelectedSolutions
                 Call Me.scatterplot2.showSelectedSolution(ind)
             Next
         End If
@@ -1658,7 +1656,7 @@ Partial Public Class Form1
         'Im CustomPlot neu zeichnen
         If (Not IsNothing(Me.customPlot)) Then
             Call Me.customPlot.clearSelection()
-            For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+            For Each ind As Individuum In Me.Sim1.OptResult.getSelectedSolutions
                 Call Me.customPlot.showSelectedSolution(ind)
             Next
         End If
@@ -1694,7 +1692,7 @@ Partial Public Class Form1
 
         'Alle ausgewählten Lösungen durchlaufen
         '======================================
-        For Each ind As Common.Individuum In Sim1.OptResult.getSelectedSolutions()
+        For Each ind As Individuum In Sim1.OptResult.getSelectedSolutions()
 
             'Lösung per Checkbox ausgewählt?
             '-------------------------------
@@ -1724,17 +1722,17 @@ Partial Public Class Form1
 
             'zu zeichnenden Reihen aus Liste der Ziele raussuchen
             '----------------------------------------------------
-            For Each objective As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+            For Each objective As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
 
-                If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Series _
-                    Or objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.ValueFromSeries) Then
+                If (objective.GetObjType = ObjectiveFunction.ObjectiveType.Series _
+                    Or objective.GetObjType = ObjectiveFunction.ObjectiveType.ValueFromSeries) Then
 
                     With objective
 
                         'Referenzreihe in Wave laden
                         '---------------------------
-                        If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Series) Then
-                            With CType(objective, Common.ObjectiveFunction_Series)
+                        If (objective.GetObjType = ObjectiveFunction.ObjectiveType.Series) Then
+                            With CType(objective, ObjectiveFunction_Series)
                                 'Referenzreihen nur jeweils ein Mal zeichnen
                                 'TODO: Dieselbe Referenzreihe könnte aber mehrfach mit jeweils 
                                 '      unterschiedlichen Evaluierungszeiträumen definiert sein.
@@ -1883,7 +1881,7 @@ Partial Public Class Form1
                     '========
                     If (importDialog.ComboBox_SekPop.SelectedItem <> "exclusively") Then
 
-                        For Each ind As Common.Individuum In Sim1.OptResult.Solutions
+                        For Each ind As Individuum In Sim1.OptResult.Solutions
 
                             If (Me.Hauptdiagramm1.ZielIndexZ = -1 And Me.Hauptdiagramm1.ZielIndexY = -1) Then
                                 '1D
@@ -1930,7 +1928,7 @@ Partial Public Class Form1
                     '==================
                     If (importDialog.ComboBox_SekPop.SelectedItem <> "none") Then
 
-                        For Each sekpopind As Common.Individuum In Sim1.OptResult.getSekPop()
+                        For Each sekpopind As Individuum In Sim1.OptResult.getSekPop()
                             If (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                                 '2D
                                 '--
@@ -2010,7 +2008,7 @@ Partial Public Class Form1
             End If
 
         Catch ex As Exception
-            MsgBox("Error while loading result database:" & eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Error while loading result database:" & Constants.eol & ex.Message, MsgBoxStyle.Critical)
 
         Finally
 
@@ -2043,7 +2041,7 @@ Partial Public Class Form1
                 sourceFile = Me.OpenFileDialog1.FileName
 
                 'Abfrage
-                diagresult = MsgBox("Should the optimization parameters of the comparison result be loaded as well?" & eol _
+                diagresult = MsgBox("Should the optimization parameters of the comparison result be loaded as well?" & Constants.eol _
                                 & "(This requires that the optimization parameter definition of both results are identical!)", MsgBoxStyle.YesNo)
 
                 If (diagresult = Windows.Forms.DialogResult.Yes) Then
@@ -2065,7 +2063,7 @@ Partial Public Class Form1
                 Dim serie As Steema.TeeChart.Styles.Points
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-                For Each sekpopind As Common.Individuum In Sim1.OptResultRef.getSekPop()
+                For Each sekpopind As Individuum In Sim1.OptResultRef.getSekPop()
                     If (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                         '2D
                         '--
@@ -2115,8 +2113,8 @@ Partial Public Class Form1
                     Call Clipboard.SetDataObject(indicatorDiff, True)
 
                     'Anzeige in Messagebox
-                    MsgBox("Hypervolume difference to comparison result:" & eol _
-                        & indicatorDiff.ToString() & eol _
+                    MsgBox("Hypervolume difference to comparison result:" & Constants.eol _
+                        & indicatorDiff.ToString() & Constants.eol _
                         & "(Value was copied to the clipboard)", MsgBoxStyle.Information, "Hypervolume")
 
                 End If
@@ -2129,7 +2127,7 @@ Partial Public Class Form1
 
                 'Im Monitor anzeigen
                 Dim colorline1 As New Steema.TeeChart.Tools.ColorLine(Me.Monitor1.Diag.Chart)
-                colorline1.Pen.Color = System.Drawing.Color.Red
+                colorline1.Pen.Color = Color.Red
                 colorline1.Pen.Width = 2
                 colorline1.AllowDrag = False
                 colorline1.Axis = Me.Monitor1.Diag.Axes.Right
@@ -2138,7 +2136,7 @@ Partial Public Class Form1
             End If
 
         Catch ex As Exception
-            MsgBox("Error while loading reference result database:" & eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Error while loading reference result database:" & Constants.eol & ex.Message, MsgBoxStyle.Critical)
 
         Finally
 
@@ -2158,7 +2156,7 @@ Partial Public Class Form1
     Private Function evaluateStartwerte() As Boolean
 
         Dim isOK As Boolean
-        Dim startind As BlueM.Opt.Common.Individuum
+        Dim startind As Individuum
 
         startind = Me.mProblem.getIndividuumStart()
 

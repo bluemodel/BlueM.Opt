@@ -15,12 +15,7 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.IO
-Imports System.Windows.Forms
-Imports System.Globalization
-Imports System.Threading
-Imports BlueM.Opt.Common.Constants
-Imports BlueM
+Imports BlueM.Opt.Common
 
 ''' <summary>
 ''' Klasse Sim
@@ -62,14 +57,14 @@ Public MustInherit Class Sim
     ''' <summary>
     ''' The simulation result
     ''' </summary>
-    Public SimResult As BlueM.Opt.Common.ObjectiveFunction.SimResults
+    Public SimResult As ObjectiveFunction.SimResults
 
     'Das Problem
     '-----------
-    Protected mProblem As BlueM.Opt.Common.Problem
+    Protected mProblem As Problem
 
     'Die Einstellungen
-    Protected mSettings As BlueM.Opt.Common.Settings
+    Protected mSettings As Settings
 
     Protected Structure Aktuell
         Public OptPara() As Double
@@ -104,7 +99,7 @@ Public MustInherit Class Sim
     ''' </summary>
     ''' <param name="ind">das evaluierte Individuum</param>
     ''' <param name="i_Nachf">0-basierte Nachfahren-Nummer</param>
-    Public Event IndividuumEvaluated(ByRef ind As BlueM.Opt.Common.Individuum, ByVal i_Nachf As Integer)
+    Public Event IndividuumEvaluated(ByRef ind As Individuum, ByVal i_Nachf As Integer)
 
 #End Region
 
@@ -189,12 +184,12 @@ Public MustInherit Class Sim
     ''' <param name="pfad">Der Pfad</param>
     Public Sub setDatensatz(ByVal pfad As String)
 
-        If (File.Exists(pfad)) Then
+        If (IO.File.Exists(pfad)) Then
             'Datensatzname bestimmen
-            Me.Datensatz = Path.GetFileNameWithoutExtension(pfad)
+            Me.Datensatz = IO.Path.GetFileNameWithoutExtension(pfad)
             'Arbeitsverzeichnis bestimmen
-            Me.WorkDir_Current = Path.GetDirectoryName(pfad)
-            Me.WorkDir_Original = Path.GetDirectoryName(pfad)
+            Me.WorkDir_Current = IO.Path.GetDirectoryName(pfad)
+            Me.WorkDir_Original = IO.Path.GetDirectoryName(pfad)
         Else
             Throw New Exception($"Dataset '{pfad}' not found!")
         End If
@@ -203,7 +198,7 @@ Public MustInherit Class Sim
         Try
             Call Me.Read_SimParameter()
         Catch ex As Exception
-            Throw New Exception("Unable to read simulation parameters!" & eol & ex.Message)
+            Throw New Exception("Unable to read simulation parameters!" & Constants.eol & ex.Message)
         End Try
 
     End Sub
@@ -212,7 +207,7 @@ Public MustInherit Class Sim
     ''' Das Problem übergeben
     ''' </summary>
     ''' <param name="prob">Das Problem</param>
-    Public Overridable Sub setProblem(ByRef prob As BlueM.Opt.Common.Problem)
+    Public Overridable Sub setProblem(ByRef prob As Problem)
 
         'Problem speichern
         Me.mProblem = prob
@@ -235,7 +230,7 @@ Public MustInherit Class Sim
     ''' Einstellungen setzen
     ''' </summary>
     ''' <param name="settings">Die Einstellungen</param>
-    Public Sub setSettings(ByRef settings As BlueM.Opt.Common.Settings)
+    Public Sub setSettings(ByRef settings As Settings)
 
         'Settings speichern
         Me.mSettings = settings
@@ -269,7 +264,7 @@ Public MustInherit Class Sim
     ''' <param name="ind">das zu evaluierende Individuum</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <returns>True wenn erfolgreich, False wenn fehlgeschlagen</returns>
-    Public Overloads Function Evaluate(ByRef ind As BlueM.Opt.Common.Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean
+    Public Overloads Function Evaluate(ByRef ind As Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean
 
         Dim isOK As Boolean
 
@@ -290,7 +285,7 @@ Public MustInherit Class Sim
         Try
             Call Me.SIM_Ergebnis_auswerten(ind, storeInDB)
         Catch e As Exception
-            Common.Log.AddMessage(Common.Log.levels.error, "Failed to evaluate simulation: " & eol & e.Message)
+            Log.AddMessage(Log.levels.error, "Failed to evaluate simulation: " & Constants.eol & e.Message)
             Return False
         End Try
 
@@ -307,10 +302,10 @@ Public MustInherit Class Sim
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <returns>True/False für jedes Individuum</returns>
     ''' <remarks>je nach Einstellung läuft die Evaluierung in multiplen Threads oder single-threaded ab</remarks>
-    Public Overloads Function Evaluate(ByRef inds() As BlueM.Opt.Common.Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean()
+    Public Overloads Function Evaluate(ByRef inds() As Individuum, Optional ByVal storeInDB As Boolean = True) As Boolean()
 
         Dim isOK() As Boolean
-        Dim tmpind As BlueM.Opt.Common.Individuum
+        Dim tmpind As Individuum
         Dim n_individuals As Integer
         Dim ThreadID_Free As Integer = 0
         Dim ThreadID_Ready As Integer = 0
@@ -329,7 +324,7 @@ Public MustInherit Class Sim
 
             'Mit Multithreading
             '==================
-            System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+            Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
             OptTimePara.Start()
 
             Do
@@ -375,7 +370,7 @@ Public MustInherit Class Sim
                         isOK(n_ind_Ready) = True
 
                     Catch e As Exception
-                        Common.Log.AddMessage(Common.Log.levels.error, "Failed to evaluate simulation: " & eol & e.Message)
+                        Log.AddMessage(Log.levels.error, "Failed to evaluate simulation: " & Constants.eol & e.Message)
                         isOK(n_ind_Ready) = False
                         SIM_Eval_is_OK = False
                     End Try
@@ -409,15 +404,15 @@ Public MustInherit Class Sim
                     '-------------------------------------------------
 
                     Do While (Me.isPause)
-                        System.Threading.Thread.Sleep(20)
-                        Application.DoEvents()
+                        Threading.Thread.Sleep(20)
+                        Windows.Forms.Application.DoEvents()
                     Loop
 
                 Else
                     'Falls total im Stress
                     '---------------------
-                    System.Threading.Thread.Sleep(400)
-                    Application.DoEvents()
+                    Threading.Thread.Sleep(400)
+                    Windows.Forms.Application.DoEvents()
 
                 End If
 
@@ -438,7 +433,7 @@ Public MustInherit Class Sim
         End If
 
         OptTimePara.Stop()
-        'BlueM.Opt.Common.Log.AddMessage($"Die Evaluierung der Generation dauerte:   {OptTimePara.Elapsed.Hours}h  {OptTimePara.Elapsed.Minutes}m  {OptTimePara.Elapsed.Seconds}s {OptTimePara.Elapsed}ms")
+        'BlueM.Opt.Log.AddMessage($"Die Evaluierung der Generation dauerte:   {OptTimePara.Elapsed.Hours}h  {OptTimePara.Elapsed.Minutes}m  {OptTimePara.Elapsed.Seconds}s {OptTimePara.Elapsed}ms")
 
         Return isOK
 
@@ -446,7 +441,7 @@ Public MustInherit Class Sim
 
     'Evaluierung des SimModells für ParameterOptimierung - Steuerungseinheit
     '***********************************************************************
-    Private Sub PREPARE_Evaluation_PES(ByVal OptParams() As BlueM.Opt.Common.OptParameter)
+    Private Sub PREPARE_Evaluation_PES(ByVal OptParams() As OptParameter)
 
         'Wenn Fehler: guckst du ob der Elementname richtig angegeben ist!!
 
@@ -468,10 +463,10 @@ Public MustInherit Class Sim
     ''' <param name="ind">das zu evaluierende Individuum</param>
     ''' <param name="storeInDB">Ob das Individuum in OptResult-DB gespeichert werden soll</param>
     ''' <remarks>Die Simulation muss bereits erfolgt sein</remarks>
-    Private Sub SIM_Ergebnis_auswerten(ByRef ind As Common.Individuum, Optional ByVal storeInDB As Boolean = True)
+    Private Sub SIM_Ergebnis_auswerten(ByRef ind As Individuum, Optional ByVal storeInDB As Boolean = True)
 
         Dim i, j, k As Short
-        Dim aggroziel As BlueM.Opt.Common.ObjectiveFunction_Aggregate
+        Dim aggroziel As ObjectiveFunction_Aggregate
         Dim aggregateIndices As New Collections.Generic.List(Of Integer)
 
         'Simulationsergebnis einlesen
@@ -567,11 +562,11 @@ Public MustInherit Class Sim
         Dim StrRight As String
         Dim DateiPfad As String
         Dim WriteCheck As Boolean = False
-        Dim FiStr As FileStream
-        Dim StrRead As StreamReader
-        Dim StrReadSync As TextReader
-        Dim StrWrite As StreamWriter
-        Dim StrWriteSync As TextWriter
+        Dim FiStr As IO.FileStream
+        Dim StrRead As IO.StreamReader
+        Dim StrReadSync As IO.TextReader
+        Dim StrWrite As IO.StreamWriter
+        Dim StrWriteSync As IO.TextWriter
 
         'ModellParameter aus OptParametern kalkulieren()
         Call Me.OptParameter_to_ModellParameter()
@@ -582,9 +577,9 @@ Public MustInherit Class Sim
 
             DateiPfad = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & "." & Me.mProblem.List_ModellParameter(i).Datei)
             'Datei öffnen
-            FiStr = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.Read)
-            StrRead = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-            StrReadSync = TextReader.Synchronized(StrRead)
+            FiStr = New IO.FileStream(DateiPfad, IO.FileMode.Open, IO.FileAccess.Read)
+            StrRead = New IO.StreamReader(FiStr, Text.Encoding.GetEncoding("iso8859-1"))
+            StrReadSync = IO.TextReader.Synchronized(StrRead)
 
             Zeilen = New Collections.Generic.Dictionary(Of Integer, String)
 
@@ -618,7 +613,7 @@ Public MustInherit Class Sim
             'Wert auf verfügbare Stellen kürzen
             '----------------------------------
             'Auf ganze Zahl runden und zu String konvertieren
-            WertStr = Convert.ToString(Convert.ToInt32(Me.Akt.ModPara(i), Common.Provider.FortranProvider))
+            WertStr = Convert.ToString(Convert.ToInt32(Me.Akt.ModPara(i), Provider.FortranProvider))
 
             If (WertStr.Length > AnzZeichen) Then
                 'Wert zu lang
@@ -633,7 +628,7 @@ Public MustInherit Class Sim
             End If
             If AnzNachkomma > 0 Then
                 'Runden auf verfügbare Stellen: 
-                WertStr = Convert.ToString(Math.Round(Me.Akt.ModPara(i), AnzNachkomma), Common.Provider.FortranProvider)
+                WertStr = Convert.ToString(Math.Round(Me.Akt.ModPara(i), AnzNachkomma), Provider.FortranProvider)
             Else
                 'Ganzzahligen Wert benutzen
             End If
@@ -647,8 +642,8 @@ Public MustInherit Class Sim
             Zeilen(Me.mProblem.List_ModellParameter(i).ZeileNr) = Zeile
 
             'Alle Zeilen wieder in Datei schreiben
-            StrWrite = New StreamWriter(DateiPfad, False, System.Text.Encoding.GetEncoding("iso8859-1"))
-            StrWriteSync = TextWriter.Synchronized(StrWrite)
+            StrWrite = New IO.StreamWriter(DateiPfad, False, Text.Encoding.GetEncoding("iso8859-1"))
+            StrWriteSync = IO.TextWriter.Synchronized(StrWrite)
 
             For Each Zeile In Zeilen.Values
                 StrWrite.WriteLine(Zeile)
@@ -682,7 +677,7 @@ Public MustInherit Class Sim
 
     'Constraint berechnen (Constraint < 0 ist Grenzverletzung)
     '*********************************************************
-    Private Function CalculateConstraint(ByVal constr As Common.Constraintfunction) As Double
+    Private Function CalculateConstraint(ByVal constr As Constraintfunction) As Double
 
         Dim i As Integer
 
@@ -807,7 +802,7 @@ Public MustInherit Class Sim
         Dim i As Integer
         Dim isOK As Boolean
         Dim threadDir As String
-        Dim binPath As String = System.Windows.Forms.Application.StartupPath()
+        Dim binPath As String = Windows.Forms.Application.StartupPath()
 
         'Alte Thread-Ordner löschen
         isOK = Me.deleteThreadWorkDirs()
@@ -829,7 +824,7 @@ Public MustInherit Class Sim
     ''' <returns></returns>
     Private Function getDatensatzFiles(ByVal rootdirectory As String) As String()
 
-        Dim Files() As IO.FileInfo
+        Dim files() As IO.FileInfo
         Dim DirInfo, Dirs() As IO.DirectoryInfo
         Dim paths(), subpaths(), ext As String
 
@@ -842,16 +837,16 @@ Public MustInherit Class Sim
         DirInfo = New IO.DirectoryInfo(rootdirectory)
 
         'zu kopierende Dateien anhand der Dateiendung bestimmen
-        Files = DirInfo.GetFiles("*.*")
-        For Each File As IO.FileInfo In Files
+        files = DirInfo.GetFiles("*.*")
+        For Each file As IO.FileInfo In files
             'Dateiendung bestimmen
-            If (File.Extension.Length > 0) Then
-                ext = File.Extension.Substring(1).ToUpper()
+            If (file.Extension.Length > 0) Then
+                ext = file.Extension.Substring(1).ToUpper()
                 'Prüfen, ob es sich ume eine zu kopierende Datei handelt
                 If (Me.DatensatzDateiendungen.Contains(ext)) Then
                     'Relativen Pfad der Datei zu Array hinzufügen
                     ReDim Preserve paths(paths.Length)
-                    paths(paths.Length - 1) = File.Name
+                    paths(paths.Length - 1) = file.Name
                 End If
             End If
         Next
@@ -888,11 +883,11 @@ Public MustInherit Class Sim
 
         For i = 0 To 9
 
-            dir = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "Thread_" & i.ToString())
+            dir = IO.Path.Combine(Windows.Forms.Application.StartupPath(), "Thread_" & i.ToString())
 
-            If Directory.Exists(dir) Then
-                Call BlueM.Opt.Common.FileHelper.purgeReadOnly(dir)
-                Directory.Delete(dir, True)
+            If IO.Directory.Exists(dir) Then
+                Call FileHelper.purgeReadOnly(dir)
+                IO.Directory.Delete(dir, True)
             End If
         Next
 
@@ -908,7 +903,7 @@ Public MustInherit Class Sim
 
         Dim dir As String
 
-        dir = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "Thread_" & Thread_ID.ToString())
+        dir = IO.Path.Combine(Windows.Forms.Application.StartupPath(), "Thread_" & Thread_ID.ToString())
 
         Return dir
 

@@ -1,4 +1,4 @@
-﻿'BlueM.Opt
+'BlueM.Opt
 'Copyright (C) BlueM Dev Group
 'Website: <https://www.bluemodel.org>
 '
@@ -15,8 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports Microsoft.Data.Sqlite
 Imports System.Windows.Forms
+Imports Microsoft.Data.Sqlite
 
 Friend Class TALSIM5_Dialog
 
@@ -61,7 +61,7 @@ Friend Class TALSIM5_Dialog
     End Property
 
     ''' <summary>
-    ''' Create a new instance of the dialog with the given database path.
+    ''' Create a new instance of the dialog with the given database IO.Path.
     ''' The dialog will read the scenarios and simulations from the database and show them in the corresponding combo boxes.
     ''' </summary>
     ''' <param name="dbPath">Path to the database</param>
@@ -168,12 +168,12 @@ Friend Class TALSIM5_Dialog
             MessageBox.Show("The selected timeseries path does not exist!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             Return
         End If
-        Me.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.DialogResult = DialogResult.OK
         Me.Close()
     End Sub
 
     Private Sub Cancel_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Cancel_Button.Click
-        Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.DialogResult = DialogResult.Cancel
         Me.Close()
     End Sub
 

@@ -15,15 +15,14 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.Globalization
 
 Public Module Provider
 
-    Public ReadOnly Property FortranProvider() As NumberFormatInfo
+    Public ReadOnly Property FortranProvider() As Globalization.NumberFormatInfo
         Get
             'Fortran Provider einrichten
             '---------------------------
-            Dim provider As New NumberFormatInfo With {
+            Dim provider As New Globalization.NumberFormatInfo With {
                 .NumberDecimalSeparator = ".",
                 .NumberGroupSeparator = "",
                 .NumberGroupSizes = New Integer() {3}

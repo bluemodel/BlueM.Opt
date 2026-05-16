@@ -15,13 +15,13 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports BlueM.Opt.Common.Constants
+Imports BlueM.Opt.Common
 
 ''' <summary>
 ''' Controller für Hooke And Jeeves
 ''' </summary>
 Public Class HJController
-    Implements BlueM.Opt.Algos.IController
+    Implements Algos.IController
 
     ''' <summary>
     ''' Multithreading Support
@@ -32,14 +32,14 @@ Public Class HJController
         End Get
     End Property
 
-    Private myProblem As BlueM.Opt.Common.Problem
-    Private mySettings As BlueM.Opt.Common.Settings
-    Private myProgress As BlueM.Opt.Common.Progress 'TODO: Verlaufsanzeige für H&J
-    Private myHauptDiagramm As BlueM.Opt.Diagramm.Hauptdiagramm
+    Private myProblem As Problem
+    Private mySettings As Settings
+    Private myProgress As Progress 'TODO: Verlaufsanzeige für H&J
+    Private myHauptDiagramm As Diagramm.Hauptdiagramm
 
-    Private myAppType As BlueM.Opt.Common.ApplicationTypes
-    Private WithEvents Sim1 As BlueM.Opt.Apps.Sim
-    Private Testprobleme1 As BlueM.Opt.Apps.Testprobleme
+    Private myAppType As ApplicationTypes
+    Private WithEvents Sim1 As Apps.Sim
+    Private Testprobleme1 As Apps.Testprobleme
 
     Private stopped As Boolean
 
@@ -52,9 +52,9 @@ Public Class HJController
     ''' <param name="inputSettings"></param>
     ''' <param name="inputProgress"></param>
     ''' <param name="inputHptDiagramm"></param>
-    Public Sub Init(ByRef inputProblem As Common.Problem,
-                    ByRef inputSettings As Common.Settings,
-                    ByRef inputProgress As Common.Progress,
+    Public Sub Init(ByRef inputProblem As Problem,
+                    ByRef inputSettings As Settings,
+                    ByRef inputProgress As Progress,
                     ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
 
         Me.myProblem = inputProblem
@@ -68,7 +68,7 @@ Public Class HJController
     ''' Initialisiert den Controller für Sim-Anwendungen
     ''' </summary>
     ''' <param name="inputSim">die Simulationsanwendung</param>
-    Public Sub InitApp(ByRef inputSim As BlueM.Opt.Apps.Sim) Implements IController.InitApp
+    Public Sub InitApp(ByRef inputSim As Apps.Sim) Implements IController.InitApp
         Me.myAppType = ApplicationTypes.Sim
         Me.Sim1 = inputSim
     End Sub
@@ -76,7 +76,7 @@ Public Class HJController
     ''' <summary>
     ''' Initialisiert den Controller für Testprobleme
     ''' </summary>
-    Public Sub InitApp(ByRef inputTestprobleme As BlueM.Opt.Apps.Testprobleme) Implements IController.InitApp
+    Public Sub InitApp(ByRef inputTestprobleme As Apps.Testprobleme) Implements IController.InitApp
         Me.myAppType = ApplicationTypes.Testproblems
         Me.Testprobleme1 = inputTestprobleme
     End Sub
@@ -91,7 +91,7 @@ Public Class HJController
         Dim j As Integer
         Dim k As Integer
         Dim b As Boolean
-        Dim ind As Common.Individuum
+        Dim ind As Individuum
         Dim QNBest() As Double
         Dim QBest() As Double
         Dim aktuellePara(Me.myProblem.NumOptParams - 1) As Double
@@ -141,7 +141,7 @@ Public Class HJController
             'Bestimmen der Ausgangsgüte
             '==========================
             'Individuum instanzieren
-            ind = New Common.Individuum_PES("HJ", durchlauf)
+            ind = New Individuum_PES("HJ", durchlauf)
 
             'OptParameter ins Individuum kopieren
             For i = 0 To ind.OptParameter.Length - 1
@@ -165,7 +165,7 @@ Public Class HJController
                 Call Me.Testprobleme1.Evaluate(ind, 0, Me.myHauptDiagramm)
 
             End If
-            Call System.Windows.Forms.Application.DoEvents()
+            Call Windows.Forms.Application.DoEvents()
 
             'Penalties in Bestwert kopieren
             Call ind.PrimObjectives.CopyTo(QNBest, 0)
@@ -183,10 +183,10 @@ Public Class HJController
                 durchlauf += 1
 
                 'Monitor
-                Common.Log.AddMessage(Common.Log.levels.info, "Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+                Log.AddMessage(Log.levels.info, "Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
 
                 'Individuum instanzieren
-                ind = New Common.Individuum_PES("HJ", durchlauf)
+                ind = New Individuum_PES("HJ", durchlauf)
 
                 'OptParameter ins Individuum kopieren
                 For i = 0 To ind.OptParameter.Length - 1
@@ -210,7 +210,7 @@ Public Class HJController
                     Call Me.Testprobleme1.Evaluate(ind, 0, Me.myHauptDiagramm)
 
                 End If
-                Call System.Windows.Forms.Application.DoEvents()
+                Call Windows.Forms.Application.DoEvents()
 
                 If (ind.PrimObjectives(0) >= QNBest(0)) Then
 
@@ -220,10 +220,10 @@ Public Class HJController
                     durchlauf += 1
 
                     'Monitor
-                    Common.Log.AddMessage(Common.Log.levels.info, "Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+                    Log.AddMessage(Log.levels.info, "Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
 
                     'Individuum instanzieren
-                    ind = New Common.Individuum_PES("HJ", durchlauf)
+                    ind = New Individuum_PES("HJ", durchlauf)
 
                     'OptParameter ins Individuum kopieren
                     For i = 0 To ind.OptParameter.Length - 1
@@ -248,7 +248,7 @@ Public Class HJController
                         Call Me.Testprobleme1.Evaluate(ind, 0, Me.myHauptDiagramm)
 
                     End If
-                    Call System.Windows.Forms.Application.DoEvents()
+                    Call Windows.Forms.Application.DoEvents()
 
                     If (ind.PrimObjectives(0) >= QNBest(0)) Then
                         aktuellePara = HookJeeves.TastschrittResetParameter(j)
@@ -264,9 +264,9 @@ Public Class HJController
             Tastschritte_aktuell = 0
 
             'Monitor
-            Common.Log.AddMessage(Common.Log.levels.info, "Tastschritte gesamt: " & Tastschritte_gesamt.ToString())
-            Common.Log.AddMessage(Common.Log.levels.info, "Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
-            Common.Log.AddMessage(Common.Log.levels.info, "Tastschritte mittel: " & Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString())
+            Log.AddMessage(Log.levels.info, "Tastschritte gesamt: " & Tastschritte_gesamt.ToString())
+            Log.AddMessage(Log.levels.info, "Tastschritte aktuell: " & Tastschritte_aktuell.ToString())
+            Log.AddMessage(Log.levels.info, "Tastschritte mittel: " & Math.Round((Tastschritte_gesamt / Iterationen), 2).ToString())
 
             'Extrapolationsschritt
             If (QNBest(0) < QBest(0)) Then
@@ -276,14 +276,14 @@ Public Class HJController
                 serie = Me.myHauptDiagramm.getSeriesPoint("Hooke and Jeeves Best", "Green")
                 Call serie.Add(durchlauf, ind.PrimObjectives(0), durchlauf.ToString())
 
-                Call System.Windows.Forms.Application.DoEvents()
+                Call Windows.Forms.Application.DoEvents()
 
                 Call QNBest.CopyTo(QBest, 0)
                 Call HookJeeves.Extrapolationsschritt()
                 Extrapolationsschritte += 1
 
                 'Monitor
-                Common.Log.AddMessage(Common.Log.levels.info, "Extrapolationsschritte: " & Extrapolationsschritte.ToString())
+                Log.AddMessage(Log.levels.info, "Extrapolationsschritte: " & Extrapolationsschritte.ToString())
 
                 k += 1
                 aktuellePara = HookJeeves.getLetzteParameter
@@ -293,7 +293,7 @@ Public Class HJController
                         Rueckschritte += 1
 
                         'Monitor
-                        Common.Log.AddMessage(Common.Log.levels.info, "Rückschritte: " & Rueckschritte.ToString())
+                        Log.AddMessage(Log.levels.info, "Rückschritte: " & Rueckschritte.ToString())
 
                         k += -1
                         HookJeeves.Schrittweitenhalbierung()
@@ -313,7 +313,7 @@ Public Class HJController
                     HookJeeves.Rueckschritt()
 
                     'Monitor
-                    Common.Log.AddMessage(Common.Log.levels.info, "Rückschritte: " & Rueckschritte.ToString())
+                    Log.AddMessage(Log.levels.info, "Rückschritte: " & Rueckschritte.ToString())
 
                     HookJeeves.Schrittweitenhalbierung()
                     aktuellePara = HookJeeves.getLetzteParameter()

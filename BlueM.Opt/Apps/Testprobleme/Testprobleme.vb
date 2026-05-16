@@ -15,7 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports BlueM.Opt.Common.Constants
+Imports System.Drawing
+Imports BlueM.Opt.Common
 
 Public Class Testprobleme
 
@@ -40,12 +41,12 @@ Public Class Testprobleme
     Private mSelectedTestproblem As String
     Private mTestProblemDescription As String
 
-    Private mProblem As BlueM.Opt.Common.Problem
+    Private mProblem As Problem
 
     Private mAnzParameter As Integer
     Private mAnzZiele As Integer
     Private mAnzConstraints As Integer
-    Private mOptPara() As Common.OptParameter
+    Private mOptPara() As OptParameter
 
     'Properties
     '##########
@@ -99,7 +100,7 @@ Public Class Testprobleme
 
     'Parameterübergabe
     '*****************
-    Public Sub getProblem(ByRef prob As BlueM.Opt.Common.Problem)
+    Public Sub getProblem(ByRef prob As Problem)
 
         Dim i As Integer
 
@@ -116,7 +117,7 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = 0
                     }
                 Next
@@ -128,7 +129,7 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = 0.5
                     }
                 Next
@@ -140,7 +141,7 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = 1
                     }
                 Next
@@ -153,7 +154,7 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = Rnd()
                     }
                 Next
@@ -166,7 +167,7 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = Rnd()
                     }
                 Next
@@ -179,7 +180,7 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = Rnd()
                     }
                 Next
@@ -192,7 +193,7 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = Rnd()
                     }
                 Next
@@ -205,7 +206,7 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = Rnd()
                     }
                 Next
@@ -218,7 +219,7 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = Rnd()
                     }
                 Next
@@ -231,7 +232,7 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = Rnd()
                     }
                 Next
@@ -243,13 +244,13 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = 1
                     }
                 Next
                 'Beziehungen
-                Me.mOptPara(0).Beziehung = Common.Constants.Relationship.none
-                Me.mOptPara(1).Beziehung = Common.Constants.Relationship.larger_than
+                Me.mOptPara(0).Beziehung = Constants.Relationship.none
+                Me.mOptPara(1).Beziehung = Constants.Relationship.larger_than
 
             Case TP_FloodMitigation 'Ajay
                 Me.mTestProblemDescription = "Multicriteria Problem Flood Mitigation and Hydropower Generation"
@@ -259,7 +260,7 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter With {
+                    Me.mOptPara(i) = New OptParameter With {
                         .Xn = Rnd()
                     }
 
@@ -280,7 +281,7 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
+                    Me.mOptPara(i) = New OptParameter()
                 Next
                 Randomize()
                 With Me.mOptPara(0)
@@ -304,14 +305,14 @@ Public Class Testprobleme
         ReDim Me.mProblem.List_ObjectiveFunctions(Me.mAnzZiele - 1)
         For i = 0 To Me.mProblem.NumObjectives - 1
             'Check_SH: 
-            Me.mProblem.List_ObjectiveFunctions(i) = New Common.ObjectiveFunction_Series With {
+            Me.mProblem.List_ObjectiveFunctions(i) = New ObjectiveFunction_Series With {
                 .isPrimObjective = True,
                 .Direction = EVO_DIRECTION.Minimization
             }
         Next
         ReDim Me.mProblem.List_Constraintfunctions(Me.mAnzConstraints - 1)
         For i = 0 To Me.mProblem.NumConstraints - 1
-            Me.mProblem.List_Constraintfunctions(i) = New Common.Constraintfunction()
+            Me.mProblem.List_Constraintfunctions(i) = New Constraintfunction()
         Next
         ReDim Me.mProblem.List_OptParameter(Me.mAnzParameter - 1)
         For i = 0 To Me.mProblem.NumOptParams - 1
@@ -798,11 +799,11 @@ Public Class Testprobleme
             .UsePalette = False
         }
         surface.Brush.Solid = True
-        surface.Brush.Color = System.Drawing.Color.Green
+        surface.Brush.Color = Color.Green
         surface.Brush.Transparency = 70
-        surface.Pen.Color = System.Drawing.Color.Green
+        surface.Pen.Color = Color.Green
         surface.SideBrush.Visible = True
-        surface.SideBrush.Color = System.Drawing.Color.Red
+        surface.SideBrush.Color = Color.Red
         surface.SideBrush.Transparency = 70
         surface.Add(ArrayX, ArrayY, ArrayZ)
 
@@ -831,11 +832,11 @@ Public Class Testprobleme
             .UsePalette = False
         }
         surface.Brush.Solid = True
-        surface.Brush.Color = System.Drawing.Color.Blue
+        surface.Brush.Color = Color.Blue
         surface.Brush.Transparency = 70
-        surface.Pen.Color = System.Drawing.Color.Blue
+        surface.Pen.Color = Color.Blue
         surface.SideBrush.Visible = True
-        surface.SideBrush.Color = System.Drawing.Color.Red
+        surface.SideBrush.Color = Color.Red
         surface.SideBrush.Transparency = 70
         surface.Add(ArrayX, ArrayY, ArrayZ)
 
@@ -846,7 +847,7 @@ Public Class Testprobleme
         series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
         series3D.LinePen.Visible = True
         series3D.LinePen.Width = 1
-        series3D.LinePen.Color = System.Drawing.Color.Red
+        series3D.LinePen.Color = Color.Red
         series3D.Add(0.5, 0, 0.3)
         series3D.Add(0, 0.5, 0.3)
 
@@ -1010,11 +1011,11 @@ Public Class Testprobleme
             .UsePalette = False
         }
         surface.Brush.Solid = True
-        surface.Brush.Color = System.Drawing.Color.Green
+        surface.Brush.Color = Color.Green
         surface.Brush.Transparency = 70
-        surface.Pen.Color = System.Drawing.Color.Green
+        surface.Pen.Color = Color.Green
         surface.SideBrush.Visible = True
-        surface.SideBrush.Color = System.Drawing.Color.Red
+        surface.SideBrush.Color = Color.Red
         surface.SideBrush.Transparency = 70
         surface.Add(ArrayX, ArrayY, ArrayZ)
 
@@ -1031,7 +1032,7 @@ Public Class Testprobleme
     ''' <param name="ipop">Populationsnummer (0-basiert)</param>
     ''' <param name="Diag">Referenz auf das Hauptdiagramm</param>
     ''' <remarks></remarks>
-    Public Sub Evaluate(ByRef ind As Common.Individuum, ByVal ipop As Short, ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
+    Public Sub Evaluate(ByRef ind As Individuum, ByVal ipop As Short, ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
         Dim i As Integer
         Dim Unterteilung_X As Double
@@ -1138,7 +1139,7 @@ Public Class Testprobleme
                     f2 = f2 + ind.OptParameter(i).Xn
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
+                f2 = f2 * (1 - Math.Sqrt(f1 / f2))
                 ind.Objectives(0) = f1
                 ind.Objectives(1) = f2
 
@@ -1199,7 +1200,7 @@ Public Class Testprobleme
                     f2 = f2 + (x2 * x2 - 10 * Math.Cos(4 * Math.PI * x2))
                 Next i
                 f2 = 1 + 10 * (globalAnzPar - 1) + f2
-                f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
+                f2 = f2 * (1 - Math.Sqrt(f1 / f2))
                 ind.Objectives(0) = f1
                 ind.Objectives(1) = f2
 

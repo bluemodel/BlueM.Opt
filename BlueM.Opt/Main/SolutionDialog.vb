@@ -15,6 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports BlueM.Opt.Common
+
 ''' <summary>
 ''' Zeigt die ausgewählten Lösungen an
 ''' </summary>
@@ -22,7 +24,7 @@ Partial Public Class SolutionDialog
     Inherits System.Windows.Forms.Form
 
     'Das Problem
-    Private mProblem As BlueM.Opt.Common.Problem
+    Private mProblem As Problem
 
     'Properties
     '**********
@@ -52,7 +54,7 @@ Partial Public Class SolutionDialog
     ''' Konstruktor
     ''' </summary>
     ''' <param name="prob">Das Problem</param>
-    Public Sub New(ByRef prob As BlueM.Opt.Common.Problem)
+    Public Sub New(ByRef prob As Problem)
 
         ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent()
@@ -75,7 +77,7 @@ Partial Public Class SolutionDialog
 
         'Ziele
         '--------
-        For Each feature As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+        For Each feature As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             column = New DataGridViewTextBoxColumn With {
                 .Name = feature.Description,
                 .ReadOnly = True,
@@ -97,7 +99,7 @@ Partial Public Class SolutionDialog
         '-----------
         cellstyle.BackColor = Color.LightCoral
 
-        For Each Constraint As Common.Constraintfunction In Me.mProblem.List_Constraintfunctions
+        For Each Constraint As Constraintfunction In Me.mProblem.List_Constraintfunctions
             column = New DataGridViewTextBoxColumn With {
                 .Name = Constraint.Bezeichnung,
                 .DefaultCellStyle = cellstyle.Clone(),
@@ -112,7 +114,7 @@ Partial Public Class SolutionDialog
         '------------
         cellstyle.BackColor = Color.LightGray
 
-        For Each OptPara As BlueM.Opt.Common.OptParameter In Me.mProblem.List_OptParameter
+        For Each OptPara As OptParameter In Me.mProblem.List_OptParameter
             column = New DataGridViewTextBoxColumn With {
                 .Name = OptPara.Bezeichnung,
                 .DefaultCellStyle = cellstyle.Clone(),
@@ -135,7 +137,7 @@ Partial Public Class SolutionDialog
     ''' Ein Individuum zur Lösungsauswahl hinzufügen
     ''' </summary>
     ''' <param name="ind">das ausgewählte Individuum</param>
-    Public Sub addSolution(ByVal ind As Common.Individuum)
+    Public Sub addSolution(ByVal ind As Individuum)
 
         Dim i As Integer
         Dim cellvalues() As Object

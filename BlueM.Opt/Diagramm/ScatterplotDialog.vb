@@ -16,19 +16,20 @@
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
 Imports System.Windows.Forms
+Imports BlueM.Opt.Common
 
 Public Class ScatterplotDialog
 
-    Private mProblem As BlueM.Opt.Common.Problem
+    Private mProblem As Problem
     Private isInitializing As Boolean
     Private RefResultExists As Boolean
 
-    Public ReadOnly Property selectedSpace() As BlueM.Opt.Common.SPACE
+    Public ReadOnly Property selectedSpace() As Constants.SPACE
         Get
             If (Me.RadioButton_SolutionSpace.Checked) Then
-                Return Common.SPACE.SolutionSpace
+                Return Constants.SPACE.SolutionSpace
             Else
-                Return Common.SPACE.DecisionSpace
+                Return Constants.SPACE.DecisionSpace
             End If
         End Get
     End Property
@@ -72,7 +73,7 @@ Public Class ScatterplotDialog
         End Get
     End Property
 
-    Public Sub New(ByRef prob As BlueM.Opt.Common.Problem, Optional ByVal _refResultExists As Boolean = False)
+    Public Sub New(ByRef prob As Problem, Optional ByVal _refResultExists As Boolean = False)
 
         ' This call is required by the Windows Form Designer.
         Me.isInitializing = True
@@ -91,13 +92,13 @@ Public Class ScatterplotDialog
 
     Private Sub ScatterplotDialog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-        'Option für Referenz-Ergebnis ggf. ausblenden
+        'Option fÃ¼r Referenz-Ergebnis ggf. ausblenden
         If (Not Me.RefResultExists) Then
             Me.CheckBox_showRef.Enabled = False
         End If
 
         'Deactive SekPop only option for SensiPlot
-        If Me.mProblem.Method = Common.METH_SENSIPLOT Then
+        If Me.mProblem.Method = Constants.METH_SENSIPLOT Then
             Me.CheckBox_SekPopOnly.Checked = False
             Me.CheckBox_SekPopOnly.Enabled = False
         End If
@@ -111,7 +112,7 @@ Public Class ScatterplotDialog
 
         Dim i As Integer
 
-        'Alle Variablen auswählen
+        'Alle Variablen auswÃ¤hlen
         For i = 0 To Me.CheckedListBox_Auswahl.Items.Count - 1
             Me.CheckedListBox_Auswahl.SetItemCheckState(i, CheckState.Checked)
         Next
@@ -130,18 +131,18 @@ Public Class ScatterplotDialog
 
         Select Case Me.selectedSpace
 
-            Case Common.SPACE.SolutionSpace
+            Case Constants.SPACE.SolutionSpace
                 'Solution Space
-                For Each feature As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+                For Each feature As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
                     bezeichnung = feature.Description
                     'Penalty-Functions mit Sternchen markieren
                     If (feature.isPrimObjective) Then bezeichnung &= " (*)"
                     Me.CheckedListBox_Auswahl.Items.Add(bezeichnung)
                 Next
 
-            Case Common.SPACE.DecisionSpace
+            Case Constants.SPACE.DecisionSpace
                 'Decision Space
-                For Each param As Common.OptParameter In Me.mProblem.List_OptParameter
+                For Each param As OptParameter In Me.mProblem.List_OptParameter
                     bezeichnung = param.Bezeichnung
                     Me.CheckedListBox_Auswahl.Items.Add(bezeichnung)
                 Next
@@ -151,9 +152,9 @@ Public Class ScatterplotDialog
     End Sub
 
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_OK.Click
-        'Mindestens 2 Variablen müssen ausgewählt sein
+        'Mindestens 2 Variablen mÃ¼ssen ausgewÃ¤hlt sein
         If (Me.CheckedListBox_Auswahl.CheckedIndices.Count < 2) Then
-            MsgBox("Bitte mindestens 2 Variablen auswählen!", MsgBoxStyle.Exclamation)
+            MsgBox("Bitte mindestens 2 Variablen auswÃ¤hlen!", MsgBoxStyle.Exclamation)
             Me.DialogResult = Windows.Forms.DialogResult.None
             Exit Sub
         End If

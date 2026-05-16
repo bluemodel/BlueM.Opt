@@ -15,7 +15,7 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.IO
+Imports BlueM.Opt.Common
 
 ''' <summary>
 ''' Traveling Salesman Problem
@@ -31,7 +31,7 @@ Public Class TSP
 
     'PNG Export exportiert alle 100 Generationen png Bilder
     Public pngExport As Boolean = True
-    'Standardm‰ig unter den bin Verzeichnis
+    'Standardm√§ig unter den bin Verzeichnis
     Public ExPath As String
 
     'Batch_Mode
@@ -46,7 +46,7 @@ Public Class TSP
     End Enum
 
     'Settings
-    Private mySettings As Common.Settings_TSP
+    Private mySettings As Settings_TSP
 
     Public ListOfCities(,) As Object
 
@@ -69,7 +69,7 @@ Public Class TSP
 
     '******************************** Initialisierung *************************************
 
-    Public Sub TSP_Initialize(ByRef mySettingsInput As Common.Settings_TSP)
+    Public Sub TSP_Initialize(ByRef mySettingsInput As Settings_TSP)
 
         mySettings = mySettingsInput
 
@@ -82,7 +82,7 @@ Public Class TSP
 
         Select Case mySettings.Problem
 
-            Case Common.EnProblem.circle
+            Case EnProblem.circle
                 Dim Radius As Integer = 45
                 Dim factor As Double = (Math.PI * 2) / mySettings.N_Cities
                 For i = 0 To mySettings.N_Cities - 1
@@ -92,7 +92,7 @@ Public Class TSP
                 Next
                 circumference = 2 * Math.PI * Radius
 
-            Case Common.EnProblem.random
+            Case EnProblem.random
                 Dim lowerb As Integer = 2
                 Dim upperb1 As Integer = 98
                 Dim upperb2 As Integer = 128
@@ -104,8 +104,8 @@ Public Class TSP
         End Select
 
         If pngExport = True Then
-            Directory.CreateDirectory(IO.Path.Combine(Directory.GetCurrentDirectory, "TSP_Export"))
-            ExPath = IO.Path.Combine(Directory.GetCurrentDirectory, "TSP_Export")
+            IO.Directory.CreateDirectory(IO.Path.Combine(IO.Directory.GetCurrentDirectory, "TSP_Export"))
+            ExPath = IO.Path.Combine(IO.Directory.GetCurrentDirectory, "TSP_Export")
         End If
 
     End Sub
@@ -141,7 +141,7 @@ Public Class TSP
 
     End Sub
 
-    'Generiert zuf‰llige Paths f¸r alle Kinder
+    'Generiert zuf√§llige Paths f√ºr alle Kinder
     Public Sub Generate_Random_Path_TSP()
         Dim i, j As Integer
         Dim tmp As Integer
@@ -163,7 +163,7 @@ Public Class TSP
 
     '************************ Functionen innerhalb der Generationsschleife ****************************
 
-    'Weist den KinderPfaden die St‰dte zu
+    'Weist den KinderPfaden die St√§dte zu
     Public Sub Cities_according_ChildPath()
         Dim i, j As Integer
 
@@ -178,7 +178,7 @@ Public Class TSP
 
     End Sub
 
-    'Ermittelt die Qualit‰t bzw. die L‰nge des Weges F¸r TSP
+    'Ermittelt die Qualit√§t bzw. die L√§nge des Weges F√ºr TSP
     Public Sub Evaluate_child_Quality()
         Dim i, j As Integer
         Dim distance As Double
@@ -211,14 +211,14 @@ Public Class TSP
     Public Sub Selection_Process()
         Dim i, j As Integer
 
-        If mySettings.Strategy = Common.EVO_STRATEGY.Comma_Strategy Then
+        If mySettings.Strategy = Constants.EVO_STRATEGY.Comma_Strategy Then
             For i = 0 To mySettings.N_Parents - 1
                 ParentList(i).Penalty = ChildrenList(i).Penalty
                 Array.Copy(ChildrenList(i).Image, ParentList(i).Image, ChildrenList(i).Image.Length)
                 Array.Copy(ChildrenList(i).Path, ParentList(i).Path, ChildrenList(i).Path.Length)
             Next i
 
-        ElseIf mySettings.Strategy = Common.EVO_STRATEGY.Plus_Strategy Then
+        ElseIf mySettings.Strategy = Constants.EVO_STRATEGY.Plus_Strategy Then
             j = 0
             For i = 0 To mySettings.N_Parents - 1
                 If ParentList(i).Penalty < ChildrenList(j).Penalty Then
@@ -234,7 +234,7 @@ Public Class TSP
 
     End Sub
 
-    'Kinder werden zur Sicherheit gelˆscht aber nicht zerstˆrt ;-)
+    'Kinder werden zur Sicherheit gel√∂scht aber nicht zerst√∂rt ;-)
     Public Sub Reset_Children()
         Dim i As Integer
 
@@ -256,8 +256,8 @@ Public Class TSP
         Dim Einzelkind(mySettings.N_Cities - 1) As Integer
 
         Select Case mySettings.ReprodOperator
-            'UPGRADE: Eltern werden nicht zuf‰llig gew‰hlt sondern immer in Top Down Reihenfolge
-            Case Common.EnReprodOperator.Order_Crossover_OX
+            'UPGRADE: Eltern werden nicht zuf√§llig gew√§hlt sondern immer in Top Down Reihenfolge
+            Case Constants.EnReprodOperator.Order_Crossover_OX
                 x = 0
                 y = 1
                 For i = 0 To mySettings.N_Children - 2 Step 2
@@ -271,7 +271,7 @@ Public Class TSP
                     Call ReprodOp_OX(ParentList(x).Path, ParentList(y).Path, ChildrenList(mySettings.N_Children - 1).Path, Einzelkind)
                 End If
 
-            Case Common.EnReprodOperator.Partially_Mapped_Crossover_PMX
+            Case Constants.EnReprodOperator.Partially_Mapped_Crossover_PMX
                 x = 0
                 y = 1
                 For i = 0 To mySettings.N_Children - 2 Step 2
@@ -289,8 +289,8 @@ Public Class TSP
     End Sub
 
     'Reproductionsoperator "Order_Crossover (OX)"
-    'Kopiert den mittleren Teil des einen Elter und f¸llt den Rest aus der Reihenfolge des anderen Elter auf
-    'UPGRADE: Es wird immer nur der mittlere Teil Kopiert, kˆnnte auch mal ein einderer sein
+    'Kopiert den mittleren Teil des einen Elter und f√ºllt den Rest aus der Reihenfolge des anderen Elter auf
+    'UPGRADE: Es wird immer nur der mittlere Teil Kopiert, k√∂nnte auch mal ein einderer sein
     Private Sub ReprodOp_OX(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
 
         Dim i As Integer
@@ -304,7 +304,7 @@ Public Class TSP
             ChildPath_A(i) = ParPath_A(i)
             ChildPath_B(i) = ParPath_B(i)
         Next
-        'Auff¸llen des Paths Teil 3 des Child A mit dem anderen Elter beginnend bei 0
+        'Auff√ºllen des Paths Teil 3 des Child A mit dem anderen Elter beginnend bei 0
         x = 0
         For i = CutPoint(1) + 1 To mySettings.N_Cities - 1
             If Is_No_OK(ParPath_B(x), ChildPath_A) Then
@@ -314,7 +314,7 @@ Public Class TSP
             End If
             x += 1
         Next
-        'Auff¸llen des Paths Teil 3 des Child B mit dem anderen Elter beginnend bei 0
+        'Auff√ºllen des Paths Teil 3 des Child B mit dem anderen Elter beginnend bei 0
         y = 0
         For i = CutPoint(1) + 1 To mySettings.N_Cities - 1
             If Is_No_OK(ParPath_A(y), ChildPath_B) Then
@@ -324,7 +324,7 @@ Public Class TSP
             End If
             y += 1
         Next
-        'Auff¸llen des Paths Teil 1 des Child A mit dem anderen Elter beginnend bei 0
+        'Auff√ºllen des Paths Teil 1 des Child A mit dem anderen Elter beginnend bei 0
         For i = 0 To CutPoint(0)
             If Is_No_OK(ParPath_B(x), ChildPath_A) Then
                 ChildPath_A(i) = ParPath_B(x)
@@ -333,7 +333,7 @@ Public Class TSP
             End If
             x += 1
         Next
-        'Auff¸llen des Paths Teil 1 des Child B mit dem anderen Elter beginnend bei 0
+        'Auff√ºllen des Paths Teil 1 des Child B mit dem anderen Elter beginnend bei 0
         For i = 0 To CutPoint(0)
             If Is_No_OK(ParPath_A(y), ChildPath_B) Then
                 ChildPath_B(i) = ParPath_A(y)
@@ -345,7 +345,7 @@ Public Class TSP
     End Sub
 
     'Reproductionsoperator: "Partially_Mapped_Crossover_(PMX)"
-    'Kopiert den mittleren Teil des anderen Elter und f¸llt den Rest mit dem eigenen auf. Falls Doppelt wird gemaped.
+    'Kopiert den mittleren Teil des anderen Elter und f√ºllt den Rest mit dem eigenen auf. Falls Doppelt wird gemaped.
     Public Sub ReprodOp_PMX(ByVal ParPath_A() As Integer, ByVal ParPath_B() As Integer, ByRef ChildPath_A() As Integer, ByRef ChildPath_B() As Integer)
         Dim i As Integer
         Dim x As Integer
@@ -357,7 +357,7 @@ Public Class TSP
             Call Create_n_Cutpoints(CutPoint)
         Next
 
-        'Kopieren des mittleren Paths und f¸llen des Mappers
+        'Kopieren des mittleren Paths und f√ºllen des Mappers
         x = 0
         For i = CutPoint(0) + 1 To CutPoint(1)
             ChildPath_B(i) = ParPath_A(i)
@@ -365,9 +365,9 @@ Public Class TSP
             x += 1
         Next
 
-        'Auff¸llen des Paths Teil 1 des Child A und B mit dem anderen Elter beginnend bei 0
+        'Auff√ºllen des Paths Teil 1 des Child A und B mit dem anderen Elter beginnend bei 0
         For i = 0 To CutPoint(0)
-            'f¸r Child A
+            'f√ºr Child A
             If Is_No_OK(ParPath_A(i), ChildPath_A) Then
                 ChildPath_A(i) = ParPath_A(i)
             Else
@@ -379,7 +379,7 @@ Public Class TSP
                 ChildPath_A(i) = mapper
             End If
 
-            'f¸r Child B
+            'f√ºr Child B
             If Is_No_OK(ParPath_B(i), ChildPath_B) Then
                 ChildPath_B(i) = ParPath_B(i)
             Else
@@ -392,9 +392,9 @@ Public Class TSP
             End If
         Next i
 
-        'Auff¸llen des Paths Teil 3 des Child A und B mit dem anderen Elter beginnend bei 0
+        'Auff√ºllen des Paths Teil 3 des Child A und B mit dem anderen Elter beginnend bei 0
         For i = CutPoint(1) + 1 To mySettings.N_Cities - 1
-            'f¸r Child A
+            'f√ºr Child A
             If Is_No_OK(ParPath_A(i), ChildPath_A) Then
                 ChildPath_A(i) = ParPath_A(i)
             Else
@@ -406,7 +406,7 @@ Public Class TSP
                 ChildPath_A(i) = mapper
             End If
 
-            'f¸r Child B
+            'f√ºr Child B
             If Is_No_OK(ParPath_B(i), ChildPath_B) Then
                 ChildPath_B(i) = ParPath_B(i)
             Else
@@ -427,23 +427,23 @@ Public Class TSP
         Dim i As Integer
 
         Select Case mySettings.MutOperator
-            Case Common.EnMutOperator.Inversion_SIM
+            Case Constants.EnMutOperator.Inversion_SIM
                 For i = 0 To mySettings.N_Children - 1
                     Call MutOp_SIM(ChildrenList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
-            Case Common.EnMutOperator.Translocation_3_Opt
+            Case Constants.EnMutOperator.Translocation_3_Opt
                 For i = 0 To mySettings.N_Children - 1
                     Call MutOp_3_opt(ChildrenList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
-            Case Common.EnMutOperator.Translocation_n_Opt
+            Case Constants.EnMutOperator.Translocation_n_Opt
                 For i = 0 To mySettings.N_Children - 1
                     Call MutOp_n_opt(ChildrenList(i).Path)
                     'If PathValid(ChildList(i).Path) = False Then Throw New Exception("Fehler im Path")
                 Next i
 
-            Case Common.EnMutOperator.Exchange_Mutation_EM
+            Case Constants.EnMutOperator.Exchange_Mutation_EM
                 For i = 0 To mySettings.N_Children - 1
                     Call MutOp_EM(ChildrenList(i).Path)
                 Next
@@ -452,7 +452,7 @@ Public Class TSP
     End Sub
 
     'Mutationsoperator "Inversion (SIM)"
-    'Schneidet ein Segment aus dem Path heraus und f¸gt es invers wieder ein
+    'Schneidet ein Segment aus dem Path heraus und f√ºgt es invers wieder ein
     'UPGRADE: Wird bis jetzt nur auf den mittleren Teil angewendet
     Private Sub MutOp_SIM(ByVal Path() As Integer)
         Dim i As Integer
@@ -470,7 +470,7 @@ Public Class TSP
             x += 1
         Next
 
-        'Invertiertes einf¸gen
+        'Invertiertes einf√ºgen
         For i = CutPoint(0) + 1 To CutPoint(1)
             x -= 1
             Path(i) = SubPath(x)
@@ -479,8 +479,8 @@ Public Class TSP
     End Sub
 
     'Mutationsoperator "Translocation (3-Opt"
-    'Vertauscht zuf‰llig 3 Abschnitte aus dem String und verwendet Bernoulli verteilt die Inverse
-    'UPGRADE: Jetzt werden immer 3 Translocation durchgef¸hrt kˆnnte man auf n-Ausbauen
+    'Vertauscht zuf√§llig 3 Abschnitte aus dem String und verwendet Bernoulli verteilt die Inverse
+    'UPGRADE: Jetzt werden immer 3 Translocation durchgef√ºhrt k√∂nnte man auf n-Ausbauen
     Private Sub MutOp_3_opt(ByVal Path() As Integer)
         Dim i, j As Integer
         Dim x As Integer
@@ -529,7 +529,7 @@ Public Class TSP
             SwapPath(i) -= 1
         Next
 
-        '‹bertragen der Substrings in den Path
+        '√úbertragen der Substrings in den Path
         x = 0
         For i = 0 To 2
             For j = 0 To SubPath(SwapPath(i)).GetUpperBound(0)
@@ -540,7 +540,7 @@ Public Class TSP
 
     End Sub
     'Mutationsoperator "Translocation (n-Opt)"
-    'Vertauscht zuf‰llig n Abschnitte aus dem String und verwendet Bernoulli verteilt die Inverse
+    'Vertauscht zuf√§llig n Abschnitte aus dem String und verwendet Bernoulli verteilt die Inverse
     Private Sub MutOp_n_opt(ByVal Path() As Integer)
         Dim i, j As Integer
         Dim x As Integer
@@ -593,7 +593,7 @@ Public Class TSP
             SwapPath(i) -= 1
         Next
 
-        '‹bertragen der Substrings in den Path
+        '√úbertragen der Substrings in den Path
         x = 0
         For i = 0 To n_SP - 1
             For j = 0 To SubPath(SwapPath(i)).GetUpperBound(0)
@@ -634,18 +634,18 @@ Public Class TSP
 
     'Hilfsfunktion: Validierung der Paths
     'UPGRADE:Option zum ein und Ausschalten dieser Function
-    Public Function PathValid(ByVal Path() As Integer) As Boolean
+    Public Function PathValid(ByVal path() As Integer) As Boolean
         Dim i As Integer
-        Array.Sort(Path)
-        For i = 0 To Path.GetUpperBound(0)
-            If Path(i) <> i + 1 Then
+        Array.Sort(path)
+        For i = 0 To path.GetUpperBound(0)
+            If path(i) <> i + 1 Then
                 Exit Function
             End If
         Next
         PathValid = True
     End Function
 
-    'Hilfsfunktion um zu Pr¸fen ob eine Zahl bereits in einem Array vorhanden ist oder nicht
+    'Hilfsfunktion um zu Pr√ºfen ob eine Zahl bereits in einem Array vorhanden ist oder nicht
     Public Function Is_No_OK(ByRef No As Integer, ByRef Path() As Integer) As Boolean
         Is_No_OK = True
 
@@ -683,7 +683,7 @@ Public Class TSP
 
     End Sub
 
-    'Hilfsfunktion zum generieren von zuf‰lligen Schnittpunkten innerhalb eines Pfades
+    'Hilfsfunktion zum generieren von zuf√§lligen Schnittpunkten innerhalb eines Pfades
     Public Sub Create_n_Cutpoints(ByRef CutPoint() As Integer)
 
         Dim i As Integer

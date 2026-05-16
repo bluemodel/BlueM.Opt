@@ -1,4 +1,4 @@
-﻿'BlueM.Opt
+'BlueM.Opt
 'Copyright (C) BlueM Dev Group
 'Website: <https://www.bluemodel.org>
 '
@@ -15,8 +15,6 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.IO
-Imports System.Net.Sockets
 ''' <summary>
 ''' The log
 ''' </summary>
@@ -69,7 +67,7 @@ Public Module Log
     Public Sub AddMessage(level As levels, msg As String)
 
         'format message
-        msg = $"{DateTime.Now:dd.MM.yyyy HH:mm:ss} {level.ToString.ToUpper()}: {msg}{eol}"
+        msg = $"{DateTime.Now:dd.MM.yyyy HH:mm:ss} {level.ToString.ToUpper()}: {msg}{Constants.eol}"
 
         'store
         _Log &= msg
@@ -79,7 +77,7 @@ Public Module Log
             Try
                 'use a lock to ensure only one thread writes to the file at a time
                 SyncLock locker
-                    Using writer As New StreamWriter(_File, True)
+                    Using writer As New IO.StreamWriter(_File, True)
                         writer.WriteLine(msg)
                     End Using
                 End SyncLock

@@ -15,15 +15,15 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports BlueM.Opt.Common.Constants
+Imports BlueM.Opt.Common
 
 Public Class EVO_Einstellungen
     Inherits Windows.Forms.UserControl
 
 #Region "Eigenschaften"
 
-    Private mSettings As BlueM.Opt.Common.Settings
-    Private mProblem As BlueM.Opt.Common.Problem           'Das Problem
+    Private mSettings As Settings
+    Private mProblem As Problem           'Das Problem
     Private isInitializing As Boolean
 
 #End Region
@@ -36,32 +36,32 @@ Public Class EVO_Einstellungen
 
         Me.isInitializing = True
 
-        ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        ' Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         Call Me.InitializeComponent()
 
         'Comboboxen initialisieren
         '-------------------------
         'PES:
-        Me.PES_Combo_Strategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGY))
-        Me.PES_Combo_Startparameter.DataSource = System.Enum.GetValues(GetType(EVO_STARTPARAMETERS))
-        Me.PES_Combo_DnMutation.DataSource = System.Enum.GetValues(GetType(PES_MUTATIONSOP))
-        Me.PES_Combo_OptEltern.DataSource = System.Enum.GetValues(GetType(PES_REPRODOP))
-        Me.PES_Combo_PopEltern.DataSource = System.Enum.GetValues(GetType(EVO_POP_ELTERN))
-        Me.PES_Combo_PopStrategie.DataSource = System.Enum.GetValues(GetType(EVO_STRATEGY))
+        Me.PES_Combo_Strategie.DataSource = [Enum].GetValues(GetType(EVO_STRATEGY))
+        Me.PES_Combo_Startparameter.DataSource = [Enum].GetValues(GetType(EVO_STARTPARAMETERS))
+        Me.PES_Combo_DnMutation.DataSource = [Enum].GetValues(GetType(PES_MUTATIONSOP))
+        Me.PES_Combo_OptEltern.DataSource = [Enum].GetValues(GetType(PES_REPRODOP))
+        Me.PES_Combo_PopEltern.DataSource = [Enum].GetValues(GetType(EVO_POP_ELTERN))
+        Me.PES_Combo_PopStrategie.DataSource = [Enum].GetValues(GetType(EVO_STRATEGY))
 
         'TSP
-        Me.TSP_ComboBox_prob_instance.DataSource = System.Enum.GetValues(GetType(EnProblem))
-        Me.TSP_ComboBox_Reproductionoperator.DataSource = System.Enum.GetValues(GetType(EnReprodOperator))
-        Me.TSP_ComboBox_Mutationoperator.DataSource = System.Enum.GetValues(GetType(EnMutOperator))
+        Me.TSP_ComboBox_prob_instance.DataSource = [Enum].GetValues(GetType(EnProblem))
+        Me.TSP_ComboBox_Reproductionoperator.DataSource = [Enum].GetValues(GetType(EnReprodOperator))
+        Me.TSP_ComboBox_Mutationoperator.DataSource = [Enum].GetValues(GetType(EnMutOperator))
 
-        'Listboxen von SensiPlot werden erst bei setProblem() gefüllt!
+        'Listboxen von SensiPlot werden erst bei setProblem() gefÃ¼llt!
 
         Me.isInitializing = False
 
     End Sub
 
     ''' <summary>
-    ''' Setzt das Problem zurück
+    ''' Setzt das Problem zurÃ¼ck
     ''' </summary>
     Public Sub Reset()
         Me.mProblem = Nothing
@@ -71,7 +71,7 @@ Public Class EVO_Einstellungen
     ''' Setzt die Settings und aktiviert die entsprechenden TabPages
     ''' </summary>
     ''' <param name="settings">Settings</param>
-    Public Sub setSettings(ByRef settings As Common.Settings)
+    Public Sub setSettings(ByRef settings As Settings)
 
         Me.mSettings = settings
 
@@ -158,7 +158,7 @@ Public Class EVO_Einstellungen
     ''' und zeigt die entsprechenden TabPages an
     ''' </summary>
     ''' <param name="prob">Das Problem</param>
-    Public Sub setProblem(ByRef prob As BlueM.Opt.Common.Problem)
+    Public Sub setProblem(ByRef prob As Problem)
 
         'Problem speichern
         Me.mProblem = prob
@@ -168,47 +168,47 @@ Public Class EVO_Einstellungen
 
             Case METH_PES
                 'PES-Settings instanzieren
-                Me.mSettings.PES = New Common.Settings_PES()
+                Me.mSettings.PES = New Settings_PES()
                 Me.mSettings.PES.setStandard(Me.mProblem.Modus)
 
             Case METH_HOOKEJEEVES
                 'HJ-Settings instanzieren
-                Me.mSettings.HookeJeeves = New Common.Settings_HookeJeeves()
+                Me.mSettings.HookeJeeves = New Settings_HookeJeeves()
                 Me.mSettings.HookeJeeves.setStandard()
 
             Case METH_DDS
                 'DDS-Settings initialisieren
-                Me.mSettings.DDS = New Common.Settings_DDS()
+                Me.mSettings.DDS = New Settings_DDS()
                 Me.mSettings.DDS.setStandard()
 
             Case METH_METAEVO
                 'MetaEvo-Settings instanzieren
-                Me.mSettings.MetaEvo = New Common.Settings_MetaEvo()
+                Me.mSettings.MetaEvo = New Settings_MetaEvo()
                 Me.mSettings.MetaEvo.setStandard()
 
             Case METH_SENSIPLOT
                 'Sensiplot-Settings instanzieren
-                Me.mSettings.SensiPlot = New Common.Settings_Sensiplot()
+                Me.mSettings.SensiPlot = New Settings_Sensiplot()
                 Me.mSettings.SensiPlot.setStandard()
 
-                'Listboxen füllen
+                'Listboxen fÃ¼llen
                 Me.isInitializing = True
                 Me.SensiPlot_ListBox_OptParameter.Items.Clear()
-                For Each optpara As Common.OptParameter In Me.mProblem.List_OptParameter
+                For Each optpara As OptParameter In Me.mProblem.List_OptParameter
                     Call Me.SensiPlot_ListBox_OptParameter.Items.Add(optpara)
                 Next
                 Me.SensiPlot_ListBox_Objectives.Items.Clear()
-                For Each objective As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+                For Each objective As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
                     Call Me.SensiPlot_ListBox_Objectives.Items.Add(objective)
                 Next
                 Me.isInitializing = False
-                'Standardmäßig ersten OptParameter und erste ObjectiveFunction auswählen
+                'StandardmÃ¤ÃŸig ersten OptParameter und erste ObjectiveFunction auswÃ¤hlen
                 Me.SensiPlot_ListBox_OptParameter.SetSelected(0, True)
                 Me.SensiPlot_ListBox_Objectives.SetSelected(0, True)
 
             Case METH_TSP
                 'TSP-Settings instanzieren
-                Me.mSettings.TSP = New Common.Settings_TSP()
+                Me.mSettings.TSP = New Settings_TSP()
                 Me.mSettings.TSP.setStandard()
 
             Case Else
@@ -372,7 +372,7 @@ Public Class EVO_Einstellungen
             End If
             SensiPlot_Label_NumCombinations.Text = $"{NumCombinations} parameter combinations"
         Catch ex As OverflowException
-            MsgBox($"The current settings result in too many parameter combinations!{eol}Setting no. of steps to 2.")
+            MsgBox($"The current settings result in too many parameter combinations!{Constants.eol}Setting no. of steps to 2.")
             SensiPlot_NumericUpDown_NumSteps.Value = 2
         End Try
 

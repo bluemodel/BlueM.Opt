@@ -16,6 +16,7 @@
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
 Imports System.Drawing
+Imports BlueM.Opt.Common
 
 ''' <summary>
 ''' Klasse stellt Diagrammfunktionalitäten zur Verfügung
@@ -63,7 +64,7 @@ Public Class Diagramm
         Try
             Call Steema.TeeChart.Editor.Show(Me)
         Catch ex As Exception
-            MsgBox("Fehler in TeeChart!" & BlueM.Opt.Common.eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Fehler in TeeChart!" & Constants.eol & ex.Message, MsgBoxStyle.Critical)
         End Try
     End Sub
 

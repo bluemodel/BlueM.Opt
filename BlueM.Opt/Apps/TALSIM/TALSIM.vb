@@ -15,10 +15,7 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.IO
 Imports System.Threading
-Imports System.Globalization
-Imports BlueM
 Imports BlueM.Opt.Common
 
 ''' <summary>
@@ -46,9 +43,9 @@ Public Class Talsim
 #Region "Properties"
 
     ''' <summary>
-    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
+    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen kÃ¶nnen
     ''' </summary>
-    ''' <remarks>Die erste Dateiendung in dieser Collection repräsentiert den Datensatz (wird z.B. als Filter für OpenFile-Dialoge verwendet)</remarks>
+    ''' <remarks>Die erste Dateiendung in dieser Collection reprÃ¤sentiert den Datensatz (wird z.B. als Filter fÃ¼r OpenFile-Dialoge verwendet)</remarks>
     Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
         Get
             Dim exts As New Collections.Specialized.StringCollection()
@@ -66,7 +63,7 @@ Public Class Talsim
     End Property
 
     ''' <summary>
-    ''' Ob die Anwendung Multithreading unterstützt
+    ''' Ob die Anwendung Multithreading unterstÃ¼tzt
     ''' </summary>
     ''' <returns>True</returns>
     Public Overrides ReadOnly Property MultithreadingSupported() As Boolean
@@ -97,15 +94,15 @@ Public Class Talsim
         'attempt to get exe_path from UserSettings
         exe_path = My.Settings.TALSIM_path
 
-        If (Not File.Exists(exe_path)) Then
+        If (Not IO.File.Exists(exe_path)) Then
             'use default location instead
-            exe_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "TALSIM\talsimw64.exe")
+            exe_path = IO.Path.Combine(Windows.Forms.Application.StartupPath(), "TALSIM\talsimw64.exe")
             If My.Settings.TALSIM_path.Trim() <> "" Then
-                MsgBox($"UserSetting for TALSIM_path {My.Settings.TALSIM_path} was not found.{eol}Using default {exe_path} instead.", MsgBoxStyle.Information)
+                MsgBox($"UserSetting for TALSIM_path {My.Settings.TALSIM_path} was not found.{Constants.eol}Using default {exe_path} instead.", MsgBoxStyle.Information)
             End If
         End If
 
-        If (Not File.Exists(exe_path)) Then
+        If (Not IO.File.Exists(exe_path)) Then
             Throw New Exception(exe_path & " not found!")
         End If
 
@@ -129,12 +126,12 @@ Public Class Talsim
 
     End Sub
 
-    Public Overrides Sub setProblem(ByRef prob As BlueM.Opt.Common.Problem)
+    Public Overrides Sub setProblem(ByRef prob As Problem)
 
         Call MyBase.setProblem(prob)
 
         'TALSIM-spezifische Weiterverarbeitung von ZielReihen:
-        Dim objective As Common.ObjectiveFunction
+        Dim objective As ObjectiveFunction
 
         'Feststellen, welche WEL/WBL-Dateien in Zielfunktionen genutzt werden
         For Each objective In Me.mProblem.List_ObjectiveFunctions
@@ -172,8 +169,8 @@ Public Class Talsim
 
         'read all settings
         Try
-            Using FiStr As New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
-                Using StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Using FiStr As New IO.FileStream(Datei, IO.FileMode.Open, IO.FileAccess.Read)
+                Using StrRead As New IO.StreamReader(FiStr, Text.Encoding.GetEncoding("iso8859-1"))
                     Do
                         line = StrRead.ReadLine.ToString().Trim()
 
@@ -232,7 +229,7 @@ Public Class Talsim
 #Region "Evaluierung"
 
     ''' <summary>
-    ''' Gibt zurück ob ein beliebiger Thread beendet ist und gibt die ID diesen freien Threads zurück
+    ''' Gibt zurÃ¼ck ob ein beliebiger Thread beendet ist und gibt die ID diesen freien Threads zurÃ¼ck
     ''' </summary>
     ''' <param name="Thread_ID"></param>
     ''' <returns></returns>
@@ -291,13 +288,13 @@ Public Class Talsim
             'write the path to the dataset and the dataset name into a new run file
             'this is done for every simulation because the workdir may change
             Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
-            If (Not File.Exists(runfile)) Then
+            If (Not IO.File.Exists(runfile)) Then
                 Throw New Exception(runfile & " not found!")
             End If
             Dim line As String
             'read the template run file
-            filestr = New FileStream(runfile, FileMode.Open, IO.FileAccess.Read)
-            strread = New StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            filestr = New IO.FileStream(runfile, IO.FileMode.Open, IO.FileAccess.Read)
+            strread = New IO.StreamReader(filestr, Text.Encoding.GetEncoding("iso8859-1"))
             Dim lines As New Collections.Generic.List(Of String)
             Do
                 line = strread.ReadLine()
@@ -309,7 +306,7 @@ Public Class Talsim
             'write a new run file
             Dim runfilename As String = MyBase.Datensatz & ".run"
             runfile = IO.Path.Combine(IO.Path.GetDirectoryName(Me.exe_path), runfilename)
-            Dim strwrite As New StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim strwrite As New IO.StreamWriter(runfile, False, Text.Encoding.GetEncoding("iso8859-1"))
             For Each line In lines
                 If line.StartsWith("Path=") Then
                     'update the sim path
@@ -336,11 +333,11 @@ Public Class Talsim
             'start
             proc = Process.Start(startInfo)
             'DEBUG: write to log
-            'BlueM.Opt.Common.Log.AddMessage(startInfo.FileName & " " & startInfo.Arguments)
+            'BlueM.Opt.Log.AddMessage(startInfo.FileName & " " & startInfo.Arguments)
             'wait until finished
             Do
                 isFinished = proc.WaitForExit(100)
-                System.Windows.Forms.Application.DoEvents()
+                Windows.Forms.Application.DoEvents()
             Loop Until isFinished
             'close the process
             proc.Close()
@@ -350,10 +347,10 @@ Public Class Talsim
                 'read err-file
                 Dim errmsg As String = "TALSIM simulation ended with errors:"
                 filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
-                strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+                strread = New IO.StreamReader(filestr, Text.Encoding.GetEncoding("iso8859-1"))
                 Do
                     line = strread.ReadLine()
-                    errmsg &= BlueM.Opt.Common.eol & line
+                    errmsg &= Constants.eol & line
                 Loop Until strread.Peek = -1
                 strread.Close()
                 filestr.Close()
@@ -372,7 +369,7 @@ Public Class Talsim
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
+            Log.AddMessage(Log.levels.error, ex.Message)
 
             'Simulation nicht erfolgreich
             simOK = False
@@ -388,8 +385,8 @@ Public Class Talsim
     End Function
 
     ''' <summary>
-    ''' Prüft ob das aktuelle Child mit der ID die oben übergeben wurde fertig ist
-    ''' Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
+    ''' PrÃ¼ft ob das aktuelle Child mit der ID die oben Ã¼bergeben wurde fertig ist
+    ''' Gibt die Thread ID zurÃ¼ck um zum auswerten in das Arbeitsverzeichnis zu wechseln
     ''' </summary>
     ''' <param name="Thread_ID"></param>
     ''' <param name="SimIsOK"></param>
@@ -418,7 +415,7 @@ Public Class Talsim
     ''' <remarks></remarks>
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
-        'Altes Simulationsergebnis löschen
+        'Altes Simulationsergebnis lÃ¶schen
         Me.SimResult.Clear()
 
         'Collect required result files and series

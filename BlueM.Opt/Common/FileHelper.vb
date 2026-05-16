@@ -15,7 +15,6 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.IO
 
 Public Module FileHelper
 
@@ -23,25 +22,25 @@ Public Module FileHelper
     '*****************************************************************************************
     Public Sub purgeReadOnly(ByVal path As String)
 
-        Dim mainDir As New DirectoryInfo(path)
+        Dim mainDir As New IO.DirectoryInfo(path)
         Dim fInfo As IO.FileInfo() = mainDir.GetFiles("*.*")
 
         'now loop through all the files and change the file attributes to normal
         Dim file As IO.FileInfo
 
         For Each file In fInfo
-            If (file.Attributes And FileAttributes.ReadOnly) Then
-                file.Attributes = FileAttributes.Normal
+            If (file.Attributes And IO.FileAttributes.ReadOnly) Then
+                file.Attributes = IO.FileAttributes.Normal
             End If
         Next
 
         'do the same for the directories
-        Dim dInfo As DirectoryInfo() = mainDir.GetDirectories("*.*")
-        Dim dir As DirectoryInfo
+        Dim dInfo As IO.DirectoryInfo() = mainDir.GetDirectories("*.*")
+        Dim dir As IO.DirectoryInfo
 
         For Each dir In dInfo
-            If (dir.Attributes And FileAttributes.ReadOnly) Then
-                dir.Attributes = FileAttributes.Normal
+            If (dir.Attributes And IO.FileAttributes.ReadOnly) Then
+                dir.Attributes = IO.FileAttributes.Normal
             End If
 
             'Call method recursively

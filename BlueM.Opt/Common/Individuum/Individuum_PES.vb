@@ -23,7 +23,7 @@ Public Class Individuum_PES
     ''' <summary>
     ''' Die OptParameter als Objekte
     ''' </summary>
-    Public Overrides Property OptParameter() As BlueM.Opt.Common.OptParameter()
+    Public Overrides Property OptParameter() As OptParameter()
         Get
             Return Me.mOptParas
         End Get

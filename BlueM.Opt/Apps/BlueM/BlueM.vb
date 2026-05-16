@@ -15,11 +15,9 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.IO
 Imports System.Threading
-Imports BlueM.DllAdapter
-Imports BlueM
 Imports BlueM.Opt.Common
+Imports BlueM.DllAdapter
 
 ''' <summary>
 ''' Klasse BlueMSim
@@ -98,9 +96,9 @@ Public Class BlueMSim
 
         'Pfad zu BlueM.DLL bestimmen
         '---------------------------
-        dll_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "BlueM\BlueM.Sim.dll")
+        dll_path = IO.Path.Combine(Windows.Forms.Application.StartupPath(), "BlueM\BlueM.Sim.dll")
 
-        If (Not File.Exists(dll_path)) Then
+        If (Not IO.File.Exists(dll_path)) Then
             Throw New Exception("BlueM.Sim.dll nicht gefunden!")
         End If
 
@@ -132,13 +130,13 @@ Public Class BlueMSim
 
     End Sub
 
-    Public Overrides Sub setProblem(ByRef prob As BlueM.Opt.Common.Problem)
+    Public Overrides Sub setProblem(ByRef prob As Problem)
 
         Call MyBase.setProblem(prob)
 
         'BlueM-spezifische Weiterverarbeitung von ZielReihen:
         '====================================================
-        Dim objective As Common.ObjectiveFunction
+        Dim objective As ObjectiveFunction
 
         'KWL: Feststellen, ob irgendeine Zielfunktion die KWL-Datei benutzt
         '------------------------------------------------------------------
@@ -173,8 +171,8 @@ Public Class BlueMSim
         '----------------
         Dim Datei As String = IO.Path.Combine(Me.WorkDir_Original, Me.Datensatz & ".ALL")
 
-        Dim FiStr As New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
-        Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As New IO.FileStream(Datei, IO.FileMode.Open, IO.FileAccess.Read)
+        Dim StrRead As New IO.StreamReader(FiStr, Text.Encoding.GetEncoding("iso8859-1"))
 
         'Alle Zeilen durchlaufen
         Dim Zeile As String
@@ -290,7 +288,7 @@ Public Class BlueMSim
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
+            Log.AddMessage(Log.levels.error, ex.Message)
 
             'Simulation abschliessen
             Call bluem_dll(0).Finish()
@@ -401,7 +399,7 @@ Public Class BlueMSim
     'Qualitätswert aus PRB-Datei
     'TODO: PRB geht nicht (#153)
     '***********************
-    Private Function CalculateObjective_PRB(ByVal objective As Common.ObjectiveFunction) As Double
+    Private Function CalculateObjective_PRB(ByVal objective As ObjectiveFunction) As Double
 
         'Dim i As Integer
         'Dim IsOK As Boolean
@@ -472,9 +470,9 @@ Public Class BlueMSim
         Dim Zeile As String
         Read_PRB = True
 
-        Dim FiStr As New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-        Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
+        Dim FiStr As New IO.FileStream(DateiPfad, IO.FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As New IO.StreamReader(FiStr, Text.Encoding.GetEncoding("iso8859-1"))
+        Dim StrReadSync As IO.TextReader = IO.TextReader.Synchronized(StrRead)
 
         'Array redimensionieren
         ReDim PRB(AnzZeil - 1, 1)

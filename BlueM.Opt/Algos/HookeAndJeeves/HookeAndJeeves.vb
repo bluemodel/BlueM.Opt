@@ -15,6 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports BlueM.Opt.Common
+
 Public Class HookeAndJeeves
     'Settings
     Private intAnzahlParameter As Integer
@@ -31,8 +33,8 @@ Public Class HookeAndJeeves
 
 
     Public Enum TastschrittRichtung As Integer
-        Vorwärts = 1
-        Rückwärts = -1
+        VorwÃ¤rts = 1
+        RÃ¼ckwÃ¤rts = -1
     End Enum
 
     'Schnittstellen
@@ -93,12 +95,12 @@ Public Class HookeAndJeeves
         ReDim dblExtrapolationsschritt(Anzahlparameter - 1)
     End Sub
 
-    Public Sub Initialize(ByVal OptParameter() As BlueM.Opt.Common.OptParameter)
+    Public Sub Initialize(ByVal OptParameter() As OptParameter)
         Dim i As Integer
 
-        'Prüfung
+        'PrÃ¼fung
         If OptParameter.GetUpperBound(0) <> intAnzahlParameter - 1 Then
-            Throw New Exception("Die Anzahl der übergebenen Parameter ist nicht gleich der definierten Anzahl!")
+            Throw New Exception("Die Anzahl der Ã¼bergebenen Parameter ist nicht gleich der definierten Anzahl!")
         End If
         'Dynamisches Array wird mit Werten belegt (Vektor der zu optimierenden Parameter)
         For i = 0 To intAnzahlParameter - 1
@@ -110,7 +112,7 @@ Public Class HookeAndJeeves
         dblStartparameter.CopyTo(dblLetzteParameter, 0)
         dblStartparameter.CopyTo(dblLetzteParameterBackup, 0)
         dblStartparameter.CopyTo(dblAktuelleParameter, 0)
-        'Startschrittweite wird übergeben
+        'Startschrittweite wird Ã¼bergeben
         dblAktuelleSchrittweite = dblStartSchrittweite
 
     End Sub
@@ -121,39 +123,39 @@ Public Class HookeAndJeeves
 
     Public Function Tastschritt(ByVal parameter As Integer, ByVal Richtung As TastschrittRichtung) As Double()
 
-        'Prüfung
+        'PrÃ¼fung
         If parameter < 0 Then
-            Throw New Exception("Der Index des aufgerufenen Parameters für einen Tastschritt muss >= 0 sein!")
+            Throw New Exception("Der Index des aufgerufenen Parameters fÃ¼r einen Tastschritt muss >= 0 sein!")
         ElseIf parameter > intAnzahlParameter - 1 Then
-            Throw New Exception("Der Index des aufgerufenen Parameters für einen Tastschritt ist größer als die Anzahl der definierten Parameter!")
+            Throw New Exception("Der Index des aufgerufenen Parameters fÃ¼r einen Tastschritt ist grÃ¶ÃŸer als die Anzahl der definierten Parameter!")
         End If
         'Tastschritt
         dblAktuelleParameter(parameter) = dblLetzteParameter(parameter) + dblAktuelleSchrittweite * Richtung
         If dblAktuelleParameter(parameter) > 1 Or dblAktuelleParameter(parameter) < 0 Then
             dblAktuelleParameter(parameter) = dblLetzteParameter(parameter)
         End If
-        'Rückgabe des aktuelle Parametervektors
+        'RÃ¼ckgabe des aktuelle Parametervektors
         Return dblAktuelleParameter
 
     End Function
 
     Public Function TastschrittResetParameter(ByVal parameter As Integer) As Double()
-        'Reset des Übergebenen Parameters
+        'Reset des Ãœbergebenen Parameters
         dblAktuelleParameter(parameter) = dblLetzteParameter(parameter)
-        'Rückgabe des aktuelle Parametervektors
+        'RÃ¼ckgabe des aktuelle Parametervektors
         Return dblAktuelleParameter
     End Function
 
     Public Sub Extrapolationsschritt()
         Dim i As Integer
-        'Bestimmen und Durchführen des Extrapolationsschrittes
+        'Bestimmen und DurchfÃ¼hren des Extrapolationsschrittes
         For i = 0 To intAnzahlParameter - 1
             'Bestimmen des Schrittes
             dblExtrapolationsschritt(i) = Math.Round((dblAktuelleParameter(i) - dblLetzteParameterBackup(i)), 7)
-            'Durchführen des Extrapolationsschrittes
+            'DurchfÃ¼hren des Extrapolationsschrittes
             dblLetzteParameter(i) = dblAktuelleParameter(i) + dblExtrapolationsschritt(i)
         Next
-        'Backup des letzten Schrittes, falls Rückschritt erforderlich
+        'Backup des letzten Schrittes, falls RÃ¼ckschritt erforderlich
         dblAktuelleParameter.CopyTo(dblLetzteParameterBackup, 0)
         dblLetzteParameter.CopyTo(dblAktuelleParameter, 0)
     End Sub

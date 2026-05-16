@@ -16,9 +16,8 @@
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
 Imports System.Threading
-Imports System.Windows.Forms
-Imports BlueM.Opt.Common
 Imports Microsoft.Data.Sqlite
+Imports BlueM.Opt.Common
 
 ''' <summary>
 ''' Class TALSIM5 for carrying out simulations using TALSIM5 (same simulation executable but different dataset format than TALSIM4)
@@ -64,9 +63,9 @@ Public Class Talsim5
     End Class
 
     ''' <summary>
-    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
+    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen kÃ¶nnen
     ''' </summary>
-    ''' <remarks>Die erste Dateiendung in dieser Collection repräsentiert den Datensatz (wird z.B. als Filter für OpenFile-Dialoge verwendet)</remarks>
+    ''' <remarks>Die erste Dateiendung in dieser Collection reprÃ¤sentiert den Datensatz (wird z.B. als Filter fÃ¼r OpenFile-Dialoge verwendet)</remarks>
     Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
         Get
             Dim exts As New Collections.Specialized.StringCollection()
@@ -79,7 +78,7 @@ Public Class Talsim5
     End Property
 
     ''' <summary>
-    ''' Ob die Anwendung Multithreading unterstützt
+    ''' Ob die Anwendung Multithreading unterstÃ¼tzt
     ''' </summary>
     ''' <returns>True</returns>
     Public Overrides ReadOnly Property MultithreadingSupported As Boolean = True
@@ -111,9 +110,9 @@ Public Class Talsim5
 
         If (Not IO.File.Exists(exe_path)) Then
             'use default location instead
-            exe_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "TALSIM\talsimw64.exe")
+            exe_path = IO.Path.Combine(Windows.Forms.Application.StartupPath(), "TALSIM\talsimw64.exe")
             If My.Settings.TALSIM_path.Trim() <> "" Then
-                MsgBox($"UserSetting for TALSIM_path {My.Settings.TALSIM_path} was not found.{eol}Using default {exe_path} instead.", MsgBoxStyle.Information)
+                MsgBox($"UserSetting for TALSIM_path {My.Settings.TALSIM_path} was not found.{Constants.eol}Using default {exe_path} instead.", MsgBoxStyle.Information)
             End If
         End If
 
@@ -141,12 +140,12 @@ Public Class Talsim5
 
     End Sub
 
-    Public Overrides Sub setProblem(ByRef prob As BlueM.Opt.Common.Problem)
+    Public Overrides Sub setProblem(ByRef prob As Problem)
 
         Call MyBase.setProblem(prob)
 
         'TALSIM-spezifische Weiterverarbeitung von ZielReihen:
-        Dim objective As Common.ObjectiveFunction
+        Dim objective As ObjectiveFunction
 
         'Feststellen, welche WEL/WBL-Dateien in Zielfunktionen genutzt werden
         For Each objective In Me.mProblem.List_ObjectiveFunctions
@@ -175,7 +174,7 @@ Public Class Talsim5
 
         'Show Talsim5 settings dialog
         Dim dlg As New TALSIM5_Dialog(Me.DBFile)
-        If dlg.ShowDialog() <> DialogResult.OK Then
+        If dlg.ShowDialog() <> Windows.Forms.DialogResult.OK Then
             Throw New Exception("Talsim5 settings not set!")
         End If
         'save settings from dialog
@@ -208,7 +207,7 @@ Public Class Talsim5
     End Sub
 
     ''' <summary>
-    ''' Gibt zurück ob ein beliebiger Thread beendet ist und gibt die ID diesen freien Threads zurück
+    ''' Gibt zurÃ¼ck ob ein beliebiger Thread beendet ist und gibt die ID diesen freien Threads zurÃ¼ck
     ''' </summary>
     ''' <param name="Thread_ID"></param>
     ''' <returns></returns>
@@ -273,7 +272,7 @@ Public Class Talsim5
             Dim line As String
             'read the template run file
             filestr = New IO.FileStream(runfile, IO.FileMode.Open, IO.FileAccess.Read)
-            strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            strread = New IO.StreamReader(filestr, Text.Encoding.GetEncoding("iso8859-1"))
             Dim lines As New Collections.Generic.List(Of String)
             Do
                 line = strread.ReadLine()
@@ -285,7 +284,7 @@ Public Class Talsim5
             'write a new run file
             Dim runfilename As String = MyBase.Datensatz & ".run"
             runfile = IO.Path.Combine(IO.Path.GetDirectoryName(Me.exe_path), runfilename)
-            Dim strwrite As New IO.StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim strwrite As New IO.StreamWriter(runfile, False, Text.Encoding.GetEncoding("iso8859-1"))
             For Each line In lines
                 If line.StartsWith("Path=") Then
                     line = "Path=" & MyBase.WorkDir_Current
@@ -318,11 +317,11 @@ Public Class Talsim5
             'start
             proc = Process.Start(startInfo)
             'DEBUG: write to log
-            'BlueM.Opt.Common.Log.AddMessage(startInfo.FileName & " " & startInfo.Arguments)
+            'BlueM.Opt.Log.AddMessage(startInfo.FileName & " " & startInfo.Arguments)
             'wait until finished
             Do
                 isFinished = proc.WaitForExit(100)
-                System.Windows.Forms.Application.DoEvents()
+                Windows.Forms.Application.DoEvents()
             Loop Until isFinished
             'close the process
             proc.Close()
@@ -332,10 +331,10 @@ Public Class Talsim5
                 'read err-file
                 Dim errmsg As String = "TALSIM simulation ended with errors:"
                 filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
-                strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+                strread = New IO.StreamReader(filestr, Text.Encoding.GetEncoding("iso8859-1"))
                 Do
                     line = strread.ReadLine()
-                    errmsg &= BlueM.Opt.Common.eol & line
+                    errmsg &= Constants.eol & line
                 Loop Until strread.Peek = -1
                 strread.Close()
                 filestr.Close()
@@ -354,7 +353,7 @@ Public Class Talsim5
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
+            Log.AddMessage(Log.levels.error, ex.Message)
 
             'Simulation nicht erfolgreich
             simOK = False
@@ -370,8 +369,8 @@ Public Class Talsim5
     End Function
 
     ''' <summary>
-    ''' Prüft ob das aktuelle Child mit der ID die oben übergeben wurde fertig ist
-    ''' Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
+    ''' PrÃ¼ft ob das aktuelle Child mit der ID die oben Ã¼bergeben wurde fertig ist
+    ''' Gibt die Thread ID zurÃ¼ck um zum auswerten in das Arbeitsverzeichnis zu wechseln
     ''' </summary>
     ''' <param name="Thread_ID"></param>
     ''' <param name="SimIsOK"></param>
@@ -443,7 +442,7 @@ Public Class Talsim5
     ''' <remarks></remarks>
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
-        'Altes Simulationsergebnis löschen
+        'Altes Simulationsergebnis lÃ¶schen
         Me.SimResult.Clear()
 
         'Collect required result files and series

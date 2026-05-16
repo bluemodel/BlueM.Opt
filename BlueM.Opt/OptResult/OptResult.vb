@@ -16,6 +16,7 @@
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
 Imports System.Data.OleDb
+Imports BlueM.Opt.Common
 
 ''' <summary>
 ''' Speichert und verwaltet die Ergebnisse eines Optimierungslaufs,
@@ -27,7 +28,7 @@ Public Class OptResult
     Private Datensatz As String
 
     'Das Problem
-    Private mProblem As Common.Problem
+    Private mProblem As Problem
 
     'Ergebnisdatenbank
     Public Ergebnisdb As Boolean = True              'Gibt an, ob die Ergebnisdatenbank geschrieben werden soll
@@ -35,7 +36,7 @@ Public Class OptResult
     Private db As OleDb.OleDbConnection
 
     'Array von Lösungen
-    Public Solutions() As Common.Individuum
+    Public Solutions() As Individuum
 
     'Structure für Sekundäre Population
     Public Structure Struct_SekPop
@@ -61,7 +62,7 @@ Public Class OptResult
     ''' <param name="prob"></param>
     ''' <param name="createNewMdb"></param>
     ''' <param name="starttime">optional start time to use for the database filename</param>
-    Public Sub New(ByVal Datensatzname As String, ByRef prob As Common.Problem, Optional ByVal createNewMdb As Boolean = True, Optional starttime As DateTime = Nothing)
+    Public Sub New(ByVal Datensatzname As String, ByRef prob As Problem, Optional ByVal createNewMdb As Boolean = True, Optional starttime As DateTime = Nothing)
 
         'Standardmäßig mit Optparametern
         Me.holdsOptparameters = True
@@ -109,9 +110,9 @@ Public Class OptResult
 
     'Ausgewählte Lösungen holen
     '**************************
-    Public ReadOnly Property getSelectedSolutions() As Common.Individuum()
+    Public ReadOnly Property getSelectedSolutions() As Individuum()
         Get
-            Dim solutions() As Common.Individuum
+            Dim solutions() As Individuum
 
             solutions = getSolutions(Me.selSolutionIDs)
 
@@ -129,7 +130,7 @@ Public Class OptResult
 
     'Eine Lösung zum Optimierungsergebnis hinzufügen
     '***********************************************
-    Public Sub addSolution(ByVal Ind As Common.Individuum)
+    Public Sub addSolution(ByVal Ind As Individuum)
 
         'Lösung zu OptResult hinzufügen
         ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
@@ -142,7 +143,7 @@ Public Class OptResult
 
     'Eine Lösung identifizieren
     '**************************
-    Public Function getSolution(ByVal ID As Integer) As Common.Individuum
+    Public Function getSolution(ByVal ID As Integer) As Individuum
 
         Dim i As Integer
 
@@ -158,13 +159,13 @@ Public Class OptResult
 
     'Sekundäre Population hinzufügen
     '*******************************
-    Public Sub setSekPop(ByVal pop() As Common.Individuum, ByVal _igen As Integer)
+    Public Sub setSekPop(ByVal pop() As Individuum, ByVal _igen As Integer)
 
         Dim SekPop As Struct_SekPop
         Dim sekpopvalues(,) As Double
 
         'Population in Array von Penalty-Werten transformieren
-        sekpopvalues = Common.Individuum.Get_All_Penalty_of_Array(pop)
+        sekpopvalues = Individuum.Get_All_Penalty_of_Array(pop)
 
         'SekPop in DB speichern
         Call Me.db_setSekPop(sekpopvalues, _igen)
@@ -190,9 +191,9 @@ Public Class OptResult
 
     'Sekundäre Population holen
     '**************************
-    Public Function getSekPop(Optional ByVal _igen As Integer = -1) As Common.Individuum()
+    Public Function getSekPop(Optional ByVal _igen As Integer = -1) As Individuum()
 
-        Dim sekpopsolutions() As Common.Individuum
+        Dim sekpopsolutions() As Individuum
 
         'Wenn keine Generation angegeben, dann letzte SekPop ausgeben
         If (_igen = -1) Then
@@ -219,7 +220,7 @@ Public Class OptResult
     '*********************************************************
     Public Function getSekPopValues(Optional ByVal igen As Integer = -1) As Double(,)
 
-        Dim inds() As Common.Individuum
+        Dim inds() As Individuum
         Dim values(,) As Double
         Dim i, j As Integer
 
@@ -250,10 +251,10 @@ Public Class OptResult
 
     'Lösungen anhand von IDs holen
     '*****************************
-    Private Function getSolutions(ByVal IDs() As Integer) As Common.Individuum()
+    Private Function getSolutions(ByVal IDs() As Integer) As Individuum()
 
         Dim i As Integer
-        Dim solutions() As Common.Individuum
+        Dim solutions() As Individuum
 
         ReDim solutions(IDs.GetUpperBound(0))
 
@@ -267,10 +268,10 @@ Public Class OptResult
 
     'Beste Lösung zurückgeben
     '************************
-    Public Function getBestSolution() As Common.Individuum
+    Public Function getBestSolution() As Individuum
 
         Dim i As Integer
-        Dim bestInd As Common.Individuum
+        Dim bestInd As Individuum
 
         bestInd = Solutions(0)
 
@@ -307,7 +308,7 @@ Public Class OptResult
         Me.db_path = IO.Path.Combine(workdir, filename)
 
         'Pfad zur Vorlage
-        Dim db_source_path As String = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "EVO.mdb")
+        Dim db_source_path As String = IO.Path.Combine(Windows.Forms.Application.StartupPath(), "EVO.mdb")
 
         'Datei kopieren
         My.Computer.FileSystem.CopyFile(db_source_path, Me.db_path, True)
@@ -320,13 +321,13 @@ Public Class OptResult
 
         'Methodenspezifische Anpassungen
         Select Case Me.mProblem.Method
-            Case Common.METH_PES, Common.METH_METAEVO, Common.METH_SENSIPLOT, Common.METH_HOOKEJEEVES, Common.METH_DDS
+            Case Constants.METH_PES, Constants.METH_METAEVO, Constants.METH_SENSIPLOT, Constants.METH_HOOKEJEEVES, Constants.METH_DDS
                 Call Me.db_prepare_PES()
             Case Else
                 Throw New NotImplementedException($"Method '{Me.mProblem.Method}' not implemented in OptResult.db_init()!")
         End Select
 
-        Common.Log.AddMessage(Common.Log.levels.info, $"Initialized result database {filename}")
+        Log.AddMessage(Log.levels.info, $"Initialized result database {filename}")
 
     End Sub
 
@@ -345,7 +346,7 @@ Public Class OptResult
         '----------------
         'Spalten festlegen:
         fieldnames = New List(Of String)
-        For Each objfun As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+        For Each objfun As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             fieldnames.Add($"[{objfun.Description}] DOUBLE")
         Next
         'Tabelle anpassen
@@ -357,7 +358,7 @@ Public Class OptResult
         If (Me.mProblem.NumConstraints > 0) Then
             'Spalten festlegen:
             fieldnames = New List(Of String)
-            For Each constraint As Common.Constraintfunction In Me.mProblem.List_Constraintfunctions
+            For Each constraint As Constraintfunction In Me.mProblem.List_Constraintfunctions
                 fieldnames.Add($"[{constraint.Bezeichnung}] DOUBLE")
             Next
             'Tabelle anpassen
@@ -380,7 +381,7 @@ Public Class OptResult
         '----------------------
         'Spalten festlegen:
         Dim fieldnames As New List(Of String)
-        For Each optpara As Common.OptParameter In Me.mProblem.List_OptParameter
+        For Each optpara As OptParameter In Me.mProblem.List_OptParameter
             fieldnames.Add($"[{optpara.Bezeichnung}] DOUBLE")
         Next
         'Tabelle anpassen
@@ -421,7 +422,7 @@ Public Class OptResult
 
     'Eine PES-Lösung in die ErgebnisDB schreiben
     '*******************************************
-    Private Overloads Function db_insert(ByVal ind As Common.Individuum) As Boolean
+    Private Overloads Function db_insert(ByVal ind As Individuum) As Boolean
 
         Call db_connect()
 
@@ -442,7 +443,7 @@ Public Class OptResult
         fieldvalues = New List(Of String)
         For i = 0 To Me.mProblem.NumObjectives - 1
             fieldnames.Add($"[{Me.mProblem.List_ObjectiveFunctions(i).Description}]")
-            fieldvalues.Add(ind.Objectives(i).ToString(Common.Provider.FortranProvider))
+            fieldvalues.Add(ind.Objectives(i).ToString(Provider.FortranProvider))
         Next
         command.CommandText = "INSERT INTO QWerte (Sim_ID, " & String.Join(", ", fieldnames) & $") VALUES ({ind.ID}, " & String.Join(", ", fieldvalues) & ");"
         command.ExecuteNonQuery()
@@ -454,7 +455,7 @@ Public Class OptResult
             fieldvalues = New List(Of String)
             For i = 0 To Me.mProblem.NumConstraints - 1
                 fieldnames.Add($"[{Me.mProblem.List_Constraintfunctions(i).Bezeichnung}]")
-                fieldvalues.Add(ind.Constraints(i).ToString(Common.Provider.FortranProvider))
+                fieldvalues.Add(ind.Constraints(i).ToString(Provider.FortranProvider))
             Next
             command.CommandText = "INSERT INTO [Constraints] (Sim_ID, " & String.Join(", ", fieldnames) & $") VALUES ({ind.ID}, " & String.Join(", ", fieldvalues) & ");"
             command.ExecuteNonQuery()
@@ -466,7 +467,7 @@ Public Class OptResult
         fieldvalues = New List(Of String)
         For i = 0 To Me.mProblem.List_OptParameter.GetUpperBound(0)
             fieldnames.Add($"[{Me.mProblem.List_OptParameter(i).Bezeichnung}]")
-            fieldvalues.Add(ind.OptParameter(i).RWert.ToString(Common.Provider.FortranProvider))
+            fieldvalues.Add(ind.OptParameter(i).RWert.ToString(Provider.FortranProvider))
         Next
         command.CommandText = "INSERT INTO OptParameter (Sim_ID, " & String.Join(", ", fieldnames) & $") VALUES ({ind.ID}, " & String.Join(", ", fieldvalues) & ");"
         command.ExecuteNonQuery()
@@ -496,7 +497,7 @@ Public Class OptResult
             'zugehörige Sim_ID bestimmen
             bedingung = ""
             For j = 0 To Me.mProblem.NumPrimObjective - 1
-                bedingung &= $" AND QWerte.[{Me.mProblem.List_PrimObjectiveFunctions(j).Description}] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
+                bedingung &= $" AND QWerte.[{Me.mProblem.List_PrimObjectiveFunctions(j).Description}] = " & SekPop(i, j).ToString(Provider.FortranProvider)
             Next
             command.CommandText = $"SELECT Sim.ID FROM Sim INNER JOIN QWerte ON Sim.ID = QWerte.Sim_ID WHERE (1=1{bedingung});"
             Sim_ID = command.ExecuteScalar()
@@ -598,12 +599,12 @@ Public Class OptResult
             Me.db_path = sourceFile
 
             Select Case Me.mProblem.Method
-                Case Common.METH_PES, Common.METH_HOOKEJEEVES, Common.METH_METAEVO
+                Case Constants.METH_PES, Constants.METH_HOOKEJEEVES, Constants.METH_METAEVO
                     'Individuen laden
                     Call Me.db_getIndividuen_PES()
                     'Sekundärpopulationen laden
                     Call Me.db_loadSekPops()
-                Case Common.METH_SENSIPLOT
+                Case Constants.METH_SENSIPLOT
                     'Nur Individuen laden
                     Call Me.db_getIndividuen_PES()
                 Case Else
@@ -611,7 +612,7 @@ Public Class OptResult
             End Select
 
         Catch ex As Exception
-            Throw New Exception("Failed to load optimization result!" & Common.eol & ex.Message)
+            Throw New Exception("Failed to load optimization result!" & Constants.eol & ex.Message)
         End Try
 
     End Sub
@@ -653,9 +654,9 @@ Public Class OptResult
 
         For i = 0 To numSolutions - 1
 
-            Me.Solutions(i) = New Common.Individuum_PES("Solution", i)
+            Me.Solutions(i) = New Individuum_PES("Solution", i)
 
-            With CType(Me.Solutions(i), Common.Individuum_PES)
+            With CType(Me.Solutions(i), Individuum_PES)
                 'ID
                 '--
                 .ID = ds.Tables(0).Rows(i).Item("Sim.ID")

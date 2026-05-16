@@ -18,6 +18,7 @@
 'Klasse beinhaltet alle Infomationen für einen Simulationslauf im Thread
 '***********************************************************************
 Imports BlueM.DllAdapter
+Imports BlueM.Opt.Common
 
 Public Class BlueMSimThread
 
@@ -45,7 +46,7 @@ Public Class BlueMSimThread
         Me.launchReady = False
 
         'Priority
-        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+        Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
         Try
             'Datensatz übergeben und initialisieren
@@ -67,7 +68,7 @@ Public Class BlueMSimThread
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
+            Log.AddMessage(Log.levels.error, ex.Message)
 
             'Simulation abschliessen
             Call bluem_dll.Finish()

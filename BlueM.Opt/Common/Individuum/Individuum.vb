@@ -16,7 +16,7 @@
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
 ''' <summary>
-''' Basisklasse Individuum für das Speichern eines Evaluierungssatzes
+''' Basisklasse Individuum fÃ¼r das Speichern eines Evaluierungssatzes
 ''' </summary>
 Public MustInherit Class Individuum
 
@@ -40,12 +40,12 @@ Public MustInherit Class Individuum
     Protected mID As Integer                'ID des Individuums
 
     Protected mAllObjectives() As Double    'Array aller Objectivefunktionswerte (inkl. PrimaryObjectives)
-    Protected mConstraints() As Double      'Werte der Randbedingungen (Wenn negativ dann ungültig)
+    Protected mConstraints() As Double      'Werte der Randbedingungen (Wenn negativ dann ungÃ¼ltig)
 
-    'Für ND Sorting -------------------------------------------------
+    'FÃ¼r ND Sorting -------------------------------------------------
     Protected mDominated As Boolean         'Kennzeichnung ob Dominiert
     Protected mFront As Integer             'Nummer der Pareto Front
-    Protected mDistance As Double           'Für crowding distance
+    Protected mDistance As Double           'FÃ¼r crowding distance
 
 #End Region 'Eigenschaften
 
@@ -66,7 +66,7 @@ Public MustInherit Class Individuum
     ''' <summary>
     ''' Die OptParameter als Objekte
     ''' </summary>
-    Public MustOverride Property OptParameter() As BlueM.Opt.Common.OptParameter()
+    Public MustOverride Property OptParameter() As OptParameter()
 
     ''' <summary>
     ''' Die OptParameter als skalierte Werte
@@ -87,12 +87,12 @@ Public MustInherit Class Individuum
         End Get
         Set(ByVal values As Double())
 
-            'Prüfung: Anzahl Parameter
+            'PrÃ¼fung: Anzahl Parameter
             If (values.Length <> Individuum.mProblem.NumOptParams) Then
-                Throw New Exception("Falsche Anzahl Parameter übergeben!")
+                Throw New Exception("Falsche Anzahl Parameter Ã¼bergeben!")
             End If
 
-            'Prüfung: zwischen 0 und 1
+            'PrÃ¼fung: zwischen 0 und 1
             For Each param As Double In values
                 If (param < 0 Or param > 1) Then
                     Throw New Exception("Skalierter Parameterwert muss zwischen 0 und 1 liegen!")
@@ -127,9 +127,9 @@ Public MustInherit Class Individuum
         End Get
         Set(ByVal values As Double())
 
-            'Prüfung: Anzahl Parameter
+            'PrÃ¼fung: Anzahl Parameter
             If (values.Length <> Individuum.mProblem.NumOptParams) Then
-                Throw New Exception("Falsche Anzahl Parameter übergeben!")
+                Throw New Exception("Falsche Anzahl Parameter Ã¼bergeben!")
             End If
 
             Dim i As Integer
@@ -166,7 +166,7 @@ Public MustInherit Class Individuum
 
             j = 0
             For i = 0 To Individuum.mProblem.NumObjectives - 1
-                'Nur die Objective-Werte von PrimaryObjective-Funktionen zurückgeben!
+                'Nur die Objective-Werte von PrimaryObjective-Funktionen zurÃ¼ckgeben!
                 If (Individuum.mProblem.List_ObjectiveFunctions(i).isPrimObjective) Then
                     Array(j) = Me.Objectives(i)
                     j += 1
@@ -202,7 +202,7 @@ Public MustInherit Class Individuum
     End Property
 
     ''' <summary>
-    ''' Nummer der Pareto-Front, zu dem das Individuum gehört
+    ''' Nummer der Pareto-Front, zu dem das Individuum gehÃ¶rt
     ''' </summary>
     Public Property Front() As Integer
         Get
@@ -226,9 +226,9 @@ Public MustInherit Class Individuum
     End Property
 
     ''' <summary>
-    ''' Zeigt an, ob das Individuum gültig ist
+    ''' Zeigt an, ob das Individuum gÃ¼ltig ist
     ''' </summary>
-    ''' <remarks>wenn einer der Werte der Constraint-Funktionen negativ ist, ist das Individuum ungültig (Is_Feasible = False)</remarks>
+    ''' <remarks>wenn einer der Werte der Constraint-Funktionen negativ ist, ist das Individuum ungÃ¼ltig (Is_Feasible = False)</remarks>
     Public ReadOnly Property Is_Feasible() As Boolean
         Get
             For i As Integer = 0 To Me.Constraints.GetUpperBound(0)
@@ -294,7 +294,7 @@ Public MustInherit Class Individuum
         'Nummer der Pareto Front
         Me.Front = 0
 
-        'Für crowding distance
+        'FÃ¼r crowding distance
         Me.Distance = 0
 
     End Sub
@@ -309,7 +309,7 @@ Public MustInherit Class Individuum
     ''' Erzeugt ein Array von neuen Individuen
     ''' </summary>
     ''' <param name="klasse">Individuumsklasse</param>
-    ''' <param name="length">Länge des Arrays</param>
+    ''' <param name="length">LÃ¤nge des Arrays</param>
     ''' <param name="type">beliebiger String</param>
     ''' <returns>Array von Individuen</returns>
     ''' <remarks></remarks>

@@ -15,11 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports BlueM.Opt.Common.Constants
-Imports System.Windows.Forms
-Imports System.ComponentModel
 Imports System.Drawing
-Imports System.Threading
+Imports BlueM.Opt.Common
 
 ''' <summary>
 ''' Kontrolliert den Ablauf der Evolutionsstrategie
@@ -36,60 +33,60 @@ Public Class ESController
         End Get
     End Property
 
-    Private myProblem As BlueM.Opt.Common.Problem
-    Private mySettings As BlueM.Opt.Common.Settings
-    Private myProgress As BlueM.Opt.Common.Progress
-    Private myMonitor As BlueM.Opt.Diagramm.Monitor
-    Private myHauptDiagramm As BlueM.Opt.Diagramm.Hauptdiagramm
+    Private myProblem As Problem
+    Private mySettings As Settings
+    Private myProgress As Progress
+    Private myMonitor As Diagramm.Monitor
+    Private myHauptDiagramm As Diagramm.Hauptdiagramm
 
-    Private myAppType As BlueM.Opt.Common.ApplicationTypes
-    Private WithEvents Sim1 As BlueM.Opt.Apps.Sim
-    Private Testprobleme1 As BlueM.Opt.Apps.Testprobleme
+    Private myAppType As ApplicationTypes
+    Private WithEvents Sim1 As Apps.Sim
+    Private Testprobleme1 As Apps.Testprobleme
 
     Private PES1 As PES
 
     Private stopped As Boolean
 
-    'Serien für Monitor
+    'Serien fÃ¼r Monitor
     Private Line_Dn() As Steema.TeeChart.Styles.Line
     Private Line_Hypervolume As Steema.TeeChart.Styles.Line
 
 #Region "Methoden"
 
     ''' <summary>
-    ''' Initialisiert den ES-Controller und übergibt alle erforderlichen Objekte
+    ''' Initialisiert den ES-Controller und Ã¼bergibt alle erforderlichen Objekte
     ''' </summary>
     ''' <param name="inputProblem"></param>
     ''' <param name="inputSettings"></param>
     ''' <param name="inputProgress"></param>
     ''' <param name="inputHptDiagramm"></param>
-    Public Sub Init(ByRef inputProblem As BlueM.Opt.Common.Problem, _
-                    ByRef inputSettings As BlueM.Opt.Common.Settings, _
-                    ByRef inputProgress As BlueM.Opt.Common.Progress, _
-                    ByRef inputHptDiagramm As BlueM.Opt.Diagramm.Hauptdiagramm) Implements IController.Init
+    Public Sub Init(ByRef inputProblem As Problem,
+                    ByRef inputSettings As Settings,
+                    ByRef inputProgress As Progress,
+                    ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
 
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
         Me.myProgress = inputProgress
         Me.myHauptDiagramm = inputHptDiagramm
 
-        Me.myMonitor = BlueM.Opt.Diagramm.Monitor.getInstance()
+        Me.myMonitor = Diagramm.Monitor.getInstance()
 
     End Sub
 
     ''' <summary>
-    ''' Initialisiert den Controller für Sim-Anwendungen
+    ''' Initialisiert den Controller fÃ¼r Sim-Anwendungen
     ''' </summary>
     ''' <param name="inputSim">die Simulationsanwendung</param>
-    Public Sub InitApp(ByRef inputSim As BlueM.Opt.Apps.Sim) Implements IController.InitApp
+    Public Sub InitApp(ByRef inputSim As Apps.Sim) Implements IController.InitApp
         Me.myAppType = ApplicationTypes.Sim
         Me.Sim1 = inputSim
     End Sub
 
     ''' <summary>
-    ''' Initialisiert den Controller für Testprobleme
+    ''' Initialisiert den Controller fÃ¼r Testprobleme
     ''' </summary>
-    Public Sub InitApp(ByRef inputTestprobleme As BlueM.Opt.Apps.Testprobleme) Implements IController.InitApp
+    Public Sub InitApp(ByRef inputTestprobleme As Apps.Testprobleme) Implements IController.InitApp
         Me.myAppType = ApplicationTypes.Testproblems
         Me.Testprobleme1 = inputTestprobleme
     End Sub
@@ -120,24 +117,24 @@ Public Class ESController
     ''' </summary>
     ''' <param name="ind">zu verarbeitendes Individuum</param>
     ''' <param name="iNachfahre">0-basierte Nachfahre-Nummer</param>
-    ''' <remarks>Fängt auch das Multithreading-Event Sim.IndividuumEvaluated ab</remarks>
-    Private Sub processIndividuum(ByRef ind As Common.Individuum, ByVal iNachfahre As Integer) Handles Sim1.IndividuumEvaluated
+    ''' <remarks>FÃ¤ngt auch das Multithreading-Event Sim.IndividuumEvaluated ab</remarks>
+    Private Sub processIndividuum(ByRef ind As Individuum, ByVal iNachfahre As Integer) Handles Sim1.IndividuumEvaluated
         Call Me.processIndividuum_PES(ind, iNachfahre)
     End Sub
 
 #Region "PES"
 
-    'Anwendung Evolutionsstrategie für Parameter Optimierung - hier Steuerung       
+    'Anwendung Evolutionsstrategie fÃ¼r Parameter Optimierung - hier Steuerung       
     '************************************************************************
     Private Sub STARTEN_PES()
 
         Dim i_Nachf, durchlauf As Integer
-        Dim inds() As Common.Individuum_PES
+        Dim inds() As Individuum_PES
         Dim isOK() As Boolean
 
         'Hypervolumen instanzieren
-        Dim Hypervolume As BlueM.Opt.MO_Indicators.Indicators
-        Hypervolume = BlueM.Opt.MO_Indicators.MO_IndicatorFabrik.GetInstance(BlueM.Opt.MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.myProblem.NumPrimObjective)
+        Dim Hypervolume As MO_Indicators.Indicators
+        Hypervolume = MO_Indicators.MO_IndicatorFabrik.GetInstance(MO_Indicators.MO_IndicatorFabrik.IndicatorsType.Hypervolume, Me.myProblem.NumPrimObjective)
 
         'Schritte 0: Objekt der Klasse PES wird erzeugt
         '**********************************************
@@ -152,23 +149,23 @@ Public Class ESController
 
         durchlauf = 1
 
-        'Über alle Runden
+        'Ãœber alle Runden
         'xxxxxxxxxxxxxxxx
         For PES1.PES_iAkt.iAktRunde = 0 To Me.mySettings.PES.Pop.N_Runden - 1
 
-            Common.Log.AddMessage(Common.Log.levels.info, $"Starting round {PES1.PES_iAkt.iAktRunde}...")
+            Log.AddMessage(Log.levels.info, $"Starting round {PES1.PES_iAkt.iAktRunde}...")
 
             Call PES1.EsResetPopBWSpeicher() 'Nur bei Komma Strategie
 
-            'Über alle Populationen
+            'Ãœber alle Populationen
             'xxxxxxxxxxxxxxxxxxxxxx
             For PES1.PES_iAkt.iAktPop = 0 To Me.mySettings.PES.Pop.N_Popul - 1
 
-                Common.Log.AddMessage(Common.Log.levels.info, $"Starting population {PES1.PES_iAkt.iAktPop}...")
+                Log.AddMessage(Log.levels.info, $"Starting population {PES1.PES_iAkt.iAktPop}...")
 
                 'POPULATIONS REPRODUKTIONSPROZESS
                 '################################
-                'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern der Population
+                'Ermitteln der neuen Ausgangswerte fÃ¼r Nachkommen aus den Eltern der Population
                 Call PES1.EsPopReproduktion()
 
                 'POPULATIONS MUTATIONSPROZESS
@@ -176,18 +173,18 @@ Public Class ESController
                 'Mutieren der Ausgangswerte der Population
                 Call PES1.EsPopMutation()
 
-                'Über alle Generationen
+                'Ãœber alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxx
                 For PES1.PES_iAkt.iAktGen = 0 To Me.mySettings.PES.N_Gen - 1
 
-                    Common.Log.AddMessage(Common.Log.levels.info, $"Starting generation {PES1.PES_iAkt.iAktGen}...")
+                    Log.AddMessage(Log.levels.info, $"Starting generation {PES1.PES_iAkt.iAktGen}...")
 
                     Call PES1.EsResetBWSpeicher()  'Nur bei Komma Strategie
 
                     ReDim inds(Me.mySettings.PES.N_Nachf - 1)
                     ReDim isOK(Me.mySettings.PES.N_Nachf - 1)
 
-                    'Schleife über alle Nachkommen
+                    'Schleife Ã¼ber alle Nachkommen
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                     For i_Nachf = 0 To Me.mySettings.PES.N_Nachf - 1
 
@@ -197,7 +194,7 @@ Public Class ESController
                         durchlauf += 1
 
                         'Neues Individuum instanzieren
-                        inds(i_Nachf) = New Common.Individuum_PES("PES", durchlauf)
+                        inds(i_Nachf) = New Individuum_PES("PES", durchlauf)
 
                         'Neue Parameter holen
                         Call PES_getNewParameters(inds(i_Nachf))
@@ -207,7 +204,7 @@ Public Class ESController
                             'Testprobleme immer direkt auswerten
                             '===================================
 
-                            'Lösung evaluieren und zeichnen
+                            'LÃ¶sung evaluieren und zeichnen
                             Call Testprobleme1.Evaluate(inds(i_Nachf), PES1.PES_iAkt.iAktPop, Me.myHauptDiagramm)
 
                             'Evaluierung verarbeiten
@@ -228,7 +225,7 @@ Public Class ESController
                             '----------------------------
                             If (Not isOK(i_Nachf)) Then
 
-                                Common.Log.AddMessage(Common.Log.levels.warning, $"Evaluation of child {i_Nachf} was unsuccessful, a new parameter set will be generated and evaluated...")
+                                Log.AddMessage(Log.levels.warning, $"Evaluation of child {i_Nachf} was unsuccessful, a new parameter set will be generated and evaluated...")
 
                                 Dim n_Tries As Integer = 0
 
@@ -260,7 +257,7 @@ Public Class ESController
                     If (Me.mySettings.General.UseMultithreading) Then
 
                         'Simulationsanwendungen mit Multithreading
-                        'nachträglich auswerten
+                        'nachtrÃ¤glich auswerten
                         '=========================================
 
                         'Alle Individuen evaluieren
@@ -277,7 +274,7 @@ Public Class ESController
                         If errorcount > 0 Then
                             Dim msg As String
                             msg = $"Evaluation of {errorcount} children of the current generation failed, will generate and evaluate new parameter sets..."
-                            Common.Log.AddMessage(Common.Log.levels.warning, msg)
+                            Log.AddMessage(Log.levels.warning, msg)
                         End If
 
                         'Alle evaluierten Individuen durchlaufen
@@ -309,68 +306,68 @@ Public Class ESController
 
                             End If
 
-                            'erfolgreich evaluierte Individuen wurden bereits über Event verarbeitet
+                            'erfolgreich evaluierte Individuen wurden bereits Ã¼ber Event verarbeitet
 
                         Next
 
                     End If 'Ende alle Nachfahren (multithread)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    Common.Log.AddMessage(Common.Log.levels.info, $"Generation {PES1.PES_iAkt.iAktGen} completed.")
+                    Log.AddMessage(Log.levels.info, $"Generation {PES1.PES_iAkt.iAktGen} completed.")
 
-                    'SELEKTIONSPROZESS Schritt 2 für NDSorting sonst Xe = Xb
+                    'SELEKTIONSPROZESS Schritt 2 fÃ¼r NDSorting sonst Xe = Xb
                     'Die neuen Eltern werden generiert
-                    Common.Log.AddMessage(Common.Log.levels.info, "Determining new parents...")
+                    Log.AddMessage(Log.levels.info, "Determining new parents...")
                     Call PES1.EsEltern()
 
-                    'Sekundäre Population
+                    'SekundÃ¤re Population
                     '====================
-                    If (Me.mySettings.PES.OptModus = Common.Constants.EVO_MODE.Multi_Objective) Then
+                    If (Me.mySettings.PES.OptModus = Constants.EVO_MODE.Multi_Objective) Then
 
-                        Common.Log.AddMessage(Common.Log.levels.info, "Updating secondary population...")
+                        Log.AddMessage(Log.levels.info, "Updating secondary population...")
 
                         'SekPop abspeichern
                         '------------------
                         If (Not IsNothing(Sim1)) Then
-                            Call Sim1.OptResult.setSekPop(PES1.SekundärQb, PES1.PES_iAkt.iAktGen)
+                            Call Sim1.OptResult.setSekPop(PES1.SekundÃ¤rQb, PES1.PES_iAkt.iAktGen)
                         End If
 
                         'SekPop zeichnen
                         '---------------
                         If (Not IsNothing(Sim1)) Then
-                            'Umweg über Sim1.OptResult gehen, weil es im PES keine Individuum-IDs gibt (#177)
+                            'Umweg Ã¼ber Sim1.OptResult gehen, weil es im PES keine Individuum-IDs gibt (#177)
                             Call Me.myHauptDiagramm.ZeichneSekPopulation(Sim1.OptResult.getSekPop())
                         Else
-                            Call Me.myHauptDiagramm.ZeichneSekPopulation(PES1.SekundärQb)
+                            Call Me.myHauptDiagramm.ZeichneSekPopulation(PES1.SekundÃ¤rQb)
                         End If
 
                         'Hypervolumen berechnen und Zeichnen
                         '-----------------------------------
-                        Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(PES1.SekundärQb))
+                        Call Hypervolume.update_dataset(Common.Individuum.Get_All_Penalty_of_Array(PES1.SekundÃ¤rQb))
                         Call Me.ZeichneNadirpunkt(Hypervolume.nadir)
                         Call Me.ZeichneHyperVolumen(PES1.PES_iAkt.iAktGen + 1, Math.Abs(Hypervolume.calc_indicator()))
 
                     End If
 
-                    'ggf. alte Generation aus Diagramm löschen
+                    'ggf. alte Generation aus Diagramm lÃ¶schen
                     If (Me.mySettings.General.DrawOnlyCurrentGeneration _
                         And PES1.PES_iAkt.iAktGen < Me.mySettings.PES.N_Gen - 1) Then
-                        Call Me.myHauptDiagramm.LöscheLetzteGeneration(PES1.PES_iAkt.iAktPop)
+                        Call Me.myHauptDiagramm.LÃ¶scheLetzteGeneration(PES1.PES_iAkt.iAktPop)
                     End If
 
                     'Verlauf aktualisieren
                     Me.myProgress.iNachf = 0
                     Me.myProgress.iGen = PES1.PES_iAkt.iAktGen + 1
 
-                    System.Windows.Forms.Application.DoEvents()
+                    Windows.Forms.Application.DoEvents()
 
                 Next 'Ende alle Generationen
                 'xxxxxxxxxxxxxxxxxxxxxxxxxxx
-                System.Windows.Forms.Application.DoEvents()
+                Windows.Forms.Application.DoEvents()
 
                 'POPULATIONS SELEKTIONSPROZESS  Schritt 1
                 '########################################
-                'Einordnen der Qualitätsfunktion im PopulationsBestwertspeicher
+                'Einordnen der QualitÃ¤tsfunktion im PopulationsBestwertspeicher
                 Call PES1.EsPopBest()
 
                 'Verlauf aktualisieren
@@ -393,13 +390,13 @@ Public Class ESController
     End Sub
 
     ''' <summary>
-    ''' Führt Reproduktion und Mutation aus und kopiert die neu gewonnenen Parameter ins Individuum
+    ''' FÃ¼hrt Reproduktion und Mutation aus und kopiert die neu gewonnenen Parameter ins Individuum
     ''' </summary>
     ''' <param name="ind">Das Individuum, dessen Parameter erneuert werden soll</param>
-    Private Sub PES_getNewParameters(ByRef ind As BlueM.Opt.Common.Individuum_PES)
+    Private Sub PES_getNewParameters(ByRef ind As Individuum_PES)
 
         'REPRODUKTIONSPROZESS
-        'Ermitteln der neuen Ausgangswerte für Nachkommen aus den Eltern
+        'Ermitteln der neuen Ausgangswerte fÃ¼r Nachkommen aus den Eltern
         Call PES1.EsReproduktion()
 
         'MUTATIONSPROZESS
@@ -407,22 +404,22 @@ Public Class ESController
         Call PES1.EsMutation()
 
         'Auslesen der variierten Parameter und in Individuum kopieren
-        ind.OptParameter = BlueM.Opt.Common.OptParameter.Clone_Array(PES1.EsGetParameter())
+        ind.OptParameter = OptParameter.Clone_Array(PES1.EsGetParameter())
 
     End Sub
 
     ''' <summary>
-    ''' Verarbeitet ein evaluiertes Individuum für PES:
+    ''' Verarbeitet ein evaluiertes Individuum fÃ¼r PES:
     ''' * Individuum im PES-Bestwertspeicher einordnen
-    ''' * Lösung im Hauptdiagramm zeichnen
+    ''' * LÃ¶sung im Hauptdiagramm zeichnen
     ''' * Dn im Monitor zeichnen
     ''' * Verlaufsanzeige aktualisieren
     ''' </summary>
     ''' <param name="ind">Das zu verarbeitende Individuum</param>
     ''' <param name="iNachfahre">0-basierte Nachfahrens-Nummer</param>
-    Private Sub processIndividuum_PES(ByRef ind As Common.Individuum_PES, ByVal iNachfahre As Integer)
+    Private Sub processIndividuum_PES(ByRef ind As Individuum_PES, ByVal iNachfahre As Integer)
 
-        'Lösung im Hauptdiagramm zeichnen (Testprobleme zeichnen sich selber)
+        'LÃ¶sung im Hauptdiagramm zeichnen (Testprobleme zeichnen sich selber)
         If (myAppType = ApplicationTypes.Sim) Then
             Call Me.myHauptDiagramm.ZeichneIndividuum(ind, PES1.PES_iAkt.iAktRunde, PES1.PES_iAkt.iAktPop, PES1.PES_iAkt.iAktGen, iNachfahre + 1, Color.Orange)
         End If
@@ -431,15 +428,15 @@ Public Class ESController
         Me.Zeichne_Dn(PES1.PES_iAkt.iAktGen * Me.mySettings.PES.N_Nachf + iNachfahre + 1, ind)
 
         'SELEKTIONSPROZESS Schritt 1
-        'Einordnen der Qualitätsfunktion im Bestwertspeicher bei SO
-        'Falls MO Einordnen der Qualitätsfunktion in NDSorting
+        'Einordnen der QualitÃ¤tsfunktion im Bestwertspeicher bei SO
+        'Falls MO Einordnen der QualitÃ¤tsfunktion in NDSorting
         PES1.PES_iAkt.iAktNachf = iNachfahre
         Call PES1.EsBest(ind)
 
         'Verlauf aktualisieren (don't use iNachf as they are not always processed in order)
         Me.myProgress.NextNachf()
 
-        System.Windows.Forms.Application.DoEvents()
+        Windows.Forms.Application.DoEvents()
 
     End Sub
 
@@ -466,7 +463,7 @@ Public Class ESController
 
         If (Me.mySettings.PES.SetMutation.IsDnVektor) Then
 
-            'Bei PES-Schrittweitenvektor eine Linie für jeden Parameter
+            'Bei PES-Schrittweitenvektor eine Linie fÃ¼r jeden Parameter
             ReDim Me.Line_Dn(Me.myProblem.List_OptParameter.Length - 1)
             For i As Integer = 0 To Me.myProblem.List_OptParameter.Length - 1
                 Me.Line_Dn(i) = Me.myMonitor.Diag.getSeriesLine("Step size " & Me.myProblem.List_OptParameter(i).Bezeichnung)
@@ -511,10 +508,10 @@ Public Class ESController
             Me.Line_Hypervolume = Me.myMonitor.Diag.getSeriesLine("Hypervolume", "Red")
             Me.Line_Hypervolume.CustomHorizAxis = Me.myMonitor.Diag.Axes.Top
             Me.Line_Hypervolume.CustomVertAxis = Me.myMonitor.Diag.Axes.Right
-            Me.Line_Hypervolume.Color = System.Drawing.Color.Red
+            Me.Line_Hypervolume.Color = Color.Red
             Me.Line_Hypervolume.Pointer.Visible = True
             Me.Line_Hypervolume.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Me.Line_Hypervolume.Pointer.Brush.Color = System.Drawing.Color.Red
+            Me.Line_Hypervolume.Pointer.Brush.Color = Color.Red
             Me.Line_Hypervolume.Pointer.HorizSize = 2
             Me.Line_Hypervolume.Pointer.VertSize = 2
             Me.Line_Hypervolume.Pointer.Pen.Visible = False
@@ -534,9 +531,9 @@ Public Class ESController
     ''' <summary>
     ''' Schrittweite(n) in Monitordiagramm eintragen
     ''' </summary>
-    ''' <param name="durchlauf">Durchlaufnummer (für X-Achse)</param>
+    ''' <param name="durchlauf">Durchlaufnummer (fÃ¼r X-Achse)</param>
     ''' <param name="ind">Individuum, dessen Schrittweite(n) gezeichnet werden sollen</param>
-    Private Sub Zeichne_Dn(ByVal durchlauf As Integer, ByVal ind As Common.Individuum)
+    Private Sub Zeichne_Dn(ByVal durchlauf As Integer, ByVal ind As Individuum)
 
         Dim i As Integer
 
