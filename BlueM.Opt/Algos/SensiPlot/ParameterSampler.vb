@@ -1,4 +1,4 @@
-﻿'BlueM.Opt
+'BlueM.Opt
 'Copyright (C) BlueM Dev Group
 'Website: <https://www.bluemodel.org>
 '
@@ -15,6 +15,7 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports BlueM.Opt.Common
 
 ''' <summary>
 ''' Class for sampling the parameter space using different methods
@@ -28,14 +29,14 @@ Public Class ParameterSampler
     ''' <param name="NumSteps">number of steps</param>
     ''' <param name="method">sampling method</param>
     ''' <returns>list of parameter combinations</returns>
-    Public Function Sample(NumParams As Integer, NumSteps As Integer, method As Common.Settings_Sensiplot.SensiType) As List(Of Double())
+    Public Function Sample(NumParams As Integer, NumSteps As Integer, method As Settings_Sensiplot.SensiType) As List(Of Double())
 
         Dim random As New Random()
         Dim parameterCombinations As New List(Of Double())
 
         Select Case method
 
-            Case Common.Settings_Sensiplot.SensiType.randomDistribution
+            Case Settings_Sensiplot.SensiType.randomDistribution
 
                 ' no. of combinations: NumSteps
                 For n = 0 To NumSteps - 1
@@ -47,7 +48,7 @@ Public Class ParameterSampler
                     parameterCombinations.Add(parameterCombination)
                 Next
 
-            Case Common.Settings_Sensiplot.SensiType.evenDistribution
+            Case Settings_Sensiplot.SensiType.evenDistribution
 
                 ' no. of combinations: NumSteps ^ NumParams
                 Dim totalCombinations As Integer = NumSteps ^ NumParams
@@ -61,7 +62,7 @@ Public Class ParameterSampler
                     parameterCombinations.Add(parameterCombination)
                 Next
 
-            Case Common.Settings_Sensiplot.SensiType.latinHypercube
+            Case Settings_Sensiplot.SensiType.latinHypercube
 
                 ' no. of combinations: NumSteps
                 Dim lhsMatrix(NumSteps - 1)() As Double

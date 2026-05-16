@@ -15,6 +15,7 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports BlueM.Opt.Common
 ''' <summary>
 ''' Form for displaying a custom plot
 ''' </summary>
@@ -22,7 +23,7 @@ Public Class CustomPlot
 
     Private _isInitializing As Boolean
 
-    Private _problem As Common.Problem
+    Private _problem As Problem
     Private _optresult As OptResult.OptResult
 
     Private _series_StartValue As Steema.TeeChart.Styles.Points
@@ -34,7 +35,7 @@ Public Class CustomPlot
     ''' Is raised when a solution is selected
     ''' </summary>
     ''' <param name="ind">the selected individual</param>
-    Public Event pointSelected(ByVal ind As Common.Individuum)
+    Public Event pointSelected(ByVal ind As Individuum)
 
     ''' <summary>
     ''' Index of the currently set optimization parameter
@@ -61,7 +62,7 @@ Public Class CustomPlot
     ''' </summary>
     ''' <param name="problem">the optimization problem definition</param>
     ''' <param name="optresult">the optresult data to plot</param>
-    Public Sub New(problem As Common.Problem, optresult As OptResult.OptResult)
+    Public Sub New(problem As Problem, optresult As OptResult.OptResult)
 
         ' This call is required by the designer.
         InitializeComponent()
@@ -75,13 +76,13 @@ Public Class CustomPlot
 
         ' populate combo boxes
         Me.ComboBox_OptParameters.Items.Clear()
-        For Each param As Common.OptParameter In Me._problem.List_OptParameter
+        For Each param As OptParameter In Me._problem.List_OptParameter
             Me.ComboBox_OptParameters.Items.Add(param)
         Next
         Me.ComboBox_OptParameters.SelectedIndex = 0
 
         Me.ComboBox_ObjectiveFunctions.Items.Clear()
-        For Each objective As Common.ObjectiveFunction In Me._problem.List_ObjectiveFunctions
+        For Each objective As ObjectiveFunction In Me._problem.List_ObjectiveFunctions
             Me.ComboBox_ObjectiveFunctions.Items.Add(objective)
         Next
         Me.ComboBox_ObjectiveFunctions.SelectedIndex = 0
@@ -98,7 +99,7 @@ Public Class CustomPlot
 
         'instantiate series
         Me._series_Population = Me.Diag.getSeriesPoint("Population", "Orange")
-        If Me._problem.Method <> Common.METH_SENSIPLOT Then
+        If Me._problem.Method <> Constants.METH_SENSIPLOT Then
             Me._series_StartValue = Me.Diag.getSeriesPoint("Start value", "Yellow", Steema.TeeChart.Styles.PointerStyles.Circle, 4)
             Me._series_SekPop = Me.Diag.getSeriesPoint("Secondary population", "Green")
         End If
@@ -127,8 +128,8 @@ Public Class CustomPlot
     Private Sub UpdateChart()
 
         'get selection from comboboxes
-        Dim param As Common.OptParameter = Me.ComboBox_OptParameters.SelectedItem
-        Dim objective As Common.ObjectiveFunction = Me.ComboBox_ObjectiveFunctions.SelectedItem
+        Dim param As OptParameter = Me.ComboBox_OptParameters.SelectedItem
+        Dim objective As ObjectiveFunction = Me.ComboBox_ObjectiveFunctions.SelectedItem
 
         'set chart title
         Me.Diag.Chart.Header.Text = $"{param.Bezeichnung} vs. {objective.Description}"
@@ -164,9 +165,9 @@ Public Class CustomPlot
     ''' </summary>
     Private Sub UpdatePlot()
 
-        Dim ind As Common.Individuum
+        Dim ind As Individuum
 
-        If Me._problem.Method <> Common.METH_SENSIPLOT Then
+        If Me._problem.Method <> Constants.METH_SENSIPLOT Then
             'plot start value
             _series_StartValue.Clear()
             ind = _optresult.getSolution(1)
@@ -179,7 +180,7 @@ Public Class CustomPlot
             _series_Population.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Direction, ind.ID.ToString)
         Next
 
-        If Me._problem.Method <> Common.METH_SENSIPLOT Then
+        If Me._problem.Method <> Constants.METH_SENSIPLOT Then
             'plot secondary population
             _series_SekPop.Clear()
             For Each ind In Me._optresult.getSekPop
@@ -206,7 +207,7 @@ Public Class CustomPlot
     ''' Shows a selected solution in the plot
     ''' </summary>
     ''' <param name="ind">the selected individual</param>
-    Public Sub showSelectedSolution(ind As Common.Individuum)
+    Public Sub showSelectedSolution(ind As Individuum)
         Me._series_Selected.Add(ind.OptParameter(iParameter).RWert, ind.Objectives(iObjective) * _problem.List_ObjectiveFunctions(iObjective).Direction, ind.ID.ToString)
     End Sub
 
@@ -217,7 +218,7 @@ Public Class CustomPlot
     Private Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
         Dim indID_clicked As Integer
-        Dim ind As Common.Individuum
+        Dim ind As Individuum
 
         Try
             'get solution ID from series label
@@ -230,8 +231,8 @@ Public Class CustomPlot
             RaiseEvent pointSelected(ind)
 
         Catch ex As Exception
-            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
-            MsgBox($"Solution is not selectable!{Common.Constants.eol}{ex.Message}", MsgBoxStyle.Information)
+            Log.AddMessage(Log.levels.error, ex.Message)
+            MsgBox($"Solution is not selectable!{Constants.eol}{ex.Message}", MsgBoxStyle.Information)
         End Try
 
     End Sub

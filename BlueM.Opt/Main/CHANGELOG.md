@@ -1,15 +1,19 @@
-﻿===============================================================
-BlueM.Opt Release Notes
-===============================================================
+﻿BlueM.Opt Release Notes
+=======================
 
 Version 2.6.0
 -------------
 NEW:
-* Added support for Talsim datasets in Talsim5 database format (select `TALSIM5` as the app)
+* Added support for Talsim datasets in Talsim5 database format (select `TALSIM5` as the app) #243
 
 CHANGED:
 * Updated Talsim.Engine to v4.1.22
 * Updated BlueM.Wave to v2.17.0
+
+REMOVED:
+* Removed support for SWMM #231
+* Removed support for reading objective functions of type "Values" from OBF files
+* Removed deprecated objective functions "NashSutt" and "LnNashSutt" (use "NSE" or "lnNSE" instead)
 
 Version 2.5.0
 -------------

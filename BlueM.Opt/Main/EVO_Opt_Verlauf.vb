@@ -15,6 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports BlueM.Opt.Common
+
 ''' <summary>
 ''' Ein Benutzersteuerelement, dass den in einem Progress-Objekt 
 ''' abgebildeten Optimierungsverlauf in GUI-Form wiedergibt
@@ -22,19 +24,19 @@
 Partial Public Class EVO_Opt_Verlauf
     Inherits System.Windows.Forms.UserControl
 
-    Private WithEvents mProgress As BlueM.Opt.Common.Progress
+    Private WithEvents mProgress As Progress
 
     ''' <summary>
     ''' EVO_Opt_Verlauf initialisieren
     ''' </summary>
-    ''' <param name="progress">Übergabe des Progress-Objekts</param>
+    ''' <param name="progress">Ãœbergabe des Progress-Objekts</param>
     ''' <remarks>Braucht nur ein einziges Mal aufgerufen zu werden</remarks>
-    Public Sub Initialisieren(ByRef progress As BlueM.Opt.Common.Progress)
+    Public Sub Initialisieren(ByRef progress As Progress)
 
         'Progress-Objekt speichern
         Me.mProgress = progress
 
-        'Zurücksetzen
+        'ZurÃ¼cksetzen
         Call Me.Reset()
 
     End Sub
@@ -76,7 +78,7 @@ Partial Public Class EVO_Opt_Verlauf
 
         ProgressBarRunde.Value = Me.mProgress.iRunde
         LabelaktRunde.Text = Me.mProgress.iRunde.ToString()
-        System.Windows.Forms.Application.DoEvents()
+        Application.DoEvents()
 
     End Sub
 
@@ -84,7 +86,7 @@ Partial Public Class EVO_Opt_Verlauf
 
         ProgressBarPop.Value = Me.mProgress.iPopul
         LabelaktPop.Text = Me.mProgress.iPopul.ToString()
-        System.Windows.Forms.Application.DoEvents()
+        Application.DoEvents()
 
     End Sub
 
@@ -92,7 +94,7 @@ Partial Public Class EVO_Opt_Verlauf
 
         ProgressBarGen.Value = Me.mProgress.iGen
         LabelaktGen.Text = Me.mProgress.iGen.ToString()
-        System.Windows.Forms.Application.DoEvents()
+        Application.DoEvents()
 
     End Sub
 
@@ -100,7 +102,7 @@ Partial Public Class EVO_Opt_Verlauf
 
         ProgressBarNach.Value = Me.mProgress.iNachf
         LabelaktNachf.Text = Me.mProgress.iNachf.ToString()
-        System.Windows.Forms.Application.DoEvents()
+        Application.DoEvents()
 
     End Sub
 

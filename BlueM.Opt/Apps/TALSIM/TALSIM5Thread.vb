@@ -15,6 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports BlueM.Opt.Common
+
 '''<summary>
 ''' Klasse beinhaltet alle Infomationen für einen Simulationslauf im Thread
 ''' </summary>
@@ -66,7 +68,7 @@ Public Class Talsim5Thread
         Me.launchReady = False
 
         'Priority
-        System.Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
+        Threading.Thread.CurrentThread.Priority = Threading.ThreadPriority.Normal
 
         Try
             'write the required settings into a new run file
@@ -78,7 +80,7 @@ Public Class Talsim5Thread
             Dim line As String
             'read the template run file
             filestr = New IO.FileStream(runfile, IO.FileMode.Open, IO.FileAccess.Read)
-            strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            strread = New IO.StreamReader(filestr, Text.Encoding.GetEncoding("iso8859-1"))
             Dim lines As New Collections.Generic.List(Of String)
             Do
                 line = strread.ReadLine()
@@ -90,20 +92,20 @@ Public Class Talsim5Thread
             'write a new run file
             Dim runfilename As String = $"{Me.DS_Name}_{Me.Thread_ID}.run"
             runfile = IO.Path.Combine(IO.Path.GetDirectoryName(Talsim5Thread.exe_path), runfilename)
-            Dim strwrite As New IO.StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim strwrite As New IO.StreamWriter(runfile, False, Text.Encoding.GetEncoding("iso8859-1"))
             For Each line In lines
                 If line.StartsWith("Path=") Then
                     line = "Path=" & Me.WorkFolder
                 ElseIf line.StartsWith("System=") Then
                     line = "System=" & Me.DS_Name
                 ElseIf line.StartsWith("DBFile=") Then
-                    line = "DBFile=" & Me.dbfile
+                    line = "DBFile=" & Me.DBFile
                 ElseIf line.StartsWith("ZrePath=") Then
                     line = "ZrePath=" & Me.TimeseriesPath & "\"
                 ElseIf line.StartsWith("ScenarioId=") Then
-                    line = "ScenarioId=" & Me.scenarioId.ToString()
+                    line = "ScenarioId=" & Me.ScenarioId.ToString()
                 ElseIf line.StartsWith("SimulationId=") Then
-                    line = "SimulationId=" & Me.simulationId.ToString()
+                    line = "SimulationId=" & Me.SimulationId.ToString()
                 End If
                 strwrite.WriteLine(line)
             Next
@@ -132,11 +134,11 @@ Public Class Talsim5Thread
                 'start
                 proc = Process.Start(startInfo)
                 'DEBUG: write to log
-                'BlueM.Opt.Common.Log.AddMessage($"Thread {Me.Thread_ID}: {startInfo.FileName} {startInfo.Arguments}")
+                'BlueM.Opt.Log.AddMessage($"Thread {Me.Thread_ID}: {startInfo.FileName} {startInfo.Arguments}")
                 'wait until finished
                 Do
                     isFinished = proc.WaitForExit(100)
-                    System.Windows.Forms.Application.DoEvents()
+                    Windows.Forms.Application.DoEvents()
                 Loop Until isFinished
                 'close the process
                 proc.Close()
@@ -152,10 +154,10 @@ Public Class Talsim5Thread
                     'read err-file
                     errmsg = $"Thread {Me.Thread_ID}: TALSIM simulation ended with errors:"
                     filestr = New IO.FileStream(errfile, IO.FileMode.Open, IO.FileAccess.Read)
-                    strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+                    strread = New IO.StreamReader(filestr, Text.Encoding.GetEncoding("iso8859-1"))
                     Do
                         line = strread.ReadLine()
-                        errmsg &= BlueM.Opt.Common.eol & line
+                        errmsg &= Constants.eol & line
                     Loop Until strread.Peek = -1
                     strread.Close()
                     filestr.Close()
@@ -167,13 +169,13 @@ Public Class Talsim5Thread
                 End If
 
                 'Log error message
-                Common.Log.AddMessage(Common.Log.levels.error, errmsg)
+                Log.AddMessage(Log.levels.error, errmsg)
 
                 If i_attempt < n_attempts Then
-                    Common.Log.AddMessage(Common.Log.levels.error, $"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, trying again...")
-                    System.Threading.Thread.Sleep(100)
+                    Log.AddMessage(Log.levels.error, $"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, trying again...")
+                    Threading.Thread.Sleep(100)
                 Else
-                    Common.Log.AddMessage(Common.Log.levels.error, $"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, parameter set will be discarded!")
+                    Log.AddMessage(Log.levels.error, $"Thread {Me.Thread_ID}: TALSIM simulation attempt {i_attempt} was unsuccessful, parameter set will be discarded!")
                 End If
 
             Next
@@ -181,7 +183,7 @@ Public Class Talsim5Thread
         Catch ex As Exception
 
             'Simulationsfehler aufgetreten
-            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
+            Log.AddMessage(Log.levels.error, ex.Message)
 
             'Simulation nicht erfolgreich
             Me.SimIsOK = False

@@ -15,6 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports BlueM.Opt.Common
+
 ''' <summary>
 ''' Interface für Algorithmus-Controller
 ''' </summary>
@@ -32,22 +34,22 @@ Public Interface IController
     ''' <param name="inputSettings">die Einstellungen</param>
     ''' <param name="inputProgress">der Verlauf</param>
     ''' <param name="inputHptDiagramm">das Hauptdiagramm</param>
-    Sub Init(ByRef inputProblem As BlueM.Opt.Common.Problem, _
-             ByRef inputSettings As BlueM.Opt.Common.Settings, _
-             ByRef inputProgress As BlueM.Opt.Common.Progress, _
-             ByRef inputHptDiagramm As BlueM.Opt.Diagramm.Hauptdiagramm)
+    Sub Init(ByRef inputProblem As Problem,
+             ByRef inputSettings As Settings,
+             ByRef inputProgress As Progress,
+             ByRef inputHptDiagramm As Diagramm.Hauptdiagramm)
 
     ''' <summary>
     ''' Initialisiert den Controller für Sim-Anwendungen
     ''' </summary>
     ''' <param name="inputSim">die Simulationsanwendung</param>
-    Sub InitApp(ByRef inputSim As BlueM.Opt.Apps.Sim)
+    Sub InitApp(ByRef inputSim As Apps.Sim)
 
     ''' <summary>
     ''' Initialisiert den Controller für Testprobleme
     ''' </summary>
     ''' <param name="inputTestprobleme">das Testproblem</param>
-    Sub InitApp(ByRef inputTestprobleme As BlueM.Opt.Apps.Testprobleme)
+    Sub InitApp(ByRef inputTestprobleme As Apps.Testprobleme)
 
     ''' <summary>
     ''' Optimierung starten

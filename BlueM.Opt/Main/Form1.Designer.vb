@@ -4,11 +4,11 @@ Partial Class Form1
 
     Public Sub New()
         MyBase.New()
-        'Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        'Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         IsInitializing = True
         InitializeComponent()
     End Sub
-    'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
+    'Das Formular Ã¼berschreibt den LÃ¶schvorgang, um die Komponentenliste zu bereinigen.
     Protected Overloads Overrides Sub Dispose(ByVal Disposing As Boolean)
         If Disposing Then
             If Not components Is Nothing Then
@@ -17,12 +17,12 @@ Partial Class Form1
         End If
         MyBase.Dispose(Disposing)
     End Sub
-    'Wird vom Windows Form-Designer benötigt.
+    'Wird vom Windows Form-Designer benÃ¶tigt.
     Private components As System.ComponentModel.IContainer
     Public ToolTip1 As System.Windows.Forms.ToolTip
-    'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benötigt.
-    'Das Verändern mit dem Windows Form-Designer ist nicht möglich.
-    'Das Verändern mit dem Code-Editor ist nicht möglich.
+    'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benÃ¶tigt.
+    'Das VerÃ¤ndern mit dem Windows Form-Designer ist nicht mÃ¶glich.
+    'Das VerÃ¤ndern mit dem Code-Editor ist nicht mÃ¶glich.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim MenuStrip1 As System.Windows.Forms.MenuStrip
@@ -36,9 +36,9 @@ Partial Class Form1
         Dim ToolStripSeparator7 As System.Windows.Forms.ToolStripSeparator
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Dim Margins1 As Steema.TeeChart.Margins = New Steema.TeeChart.Margins()
-        Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem()
+        Me.MenuItem_DatensatzZurÃ¼cksetzen = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_Help = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ReleaseNotesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem_Changelog = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_About = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button()
@@ -99,22 +99,22 @@ Partial Class Form1
         '
         'MenuItem_Tools
         '
-        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen})
+        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurÃ¼cksetzen})
         MenuItem_Tools.Name = "MenuItem_Tools"
         MenuItem_Tools.Size = New System.Drawing.Size(46, 20)
         MenuItem_Tools.Text = "Tools"
         '
-        'MenuItem_DatensatzZurücksetzen
+        'MenuItem_DatensatzZurÃ¼cksetzen
         '
-        Me.MenuItem_DatensatzZurücksetzen.Enabled = False
-        Me.MenuItem_DatensatzZurücksetzen.Name = "MenuItem_DatensatzZurücksetzen"
-        Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(143, 22)
-        Me.MenuItem_DatensatzZurücksetzen.Text = "Reset dataset"
+        Me.MenuItem_DatensatzZurÃ¼cksetzen.Enabled = False
+        Me.MenuItem_DatensatzZurÃ¼cksetzen.Name = "MenuItem_DatensatzZurÃ¼cksetzen"
+        Me.MenuItem_DatensatzZurÃ¼cksetzen.Size = New System.Drawing.Size(143, 22)
+        Me.MenuItem_DatensatzZurÃ¼cksetzen.Text = "Reset dataset"
         '
         'MenuItem_Info
         '
         MenuItem_Info.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        MenuItem_Info.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_Help, Me.ReleaseNotesToolStripMenuItem, Me.ToolStripMenuItem_About})
+        MenuItem_Info.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_Help, Me.ToolStripMenuItem_Changelog, Me.ToolStripMenuItem_About})
         MenuItem_Info.Name = "MenuItem_Info"
         MenuItem_Info.Size = New System.Drawing.Size(24, 20)
         MenuItem_Info.Text = "?"
@@ -122,19 +122,19 @@ Partial Class Form1
         'ToolStripMenuItem_Help
         '
         Me.ToolStripMenuItem_Help.Name = "ToolStripMenuItem_Help"
-        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(145, 22)
+        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem_Help.Text = "Help"
         '
-        'ReleaseNotesToolStripMenuItem
+        'ToolStripMenuItem_Changelog
         '
-        Me.ReleaseNotesToolStripMenuItem.Name = "ReleaseNotesToolStripMenuItem"
-        Me.ReleaseNotesToolStripMenuItem.Size = New System.Drawing.Size(145, 22)
-        Me.ReleaseNotesToolStripMenuItem.Text = "Release notes"
+        Me.ToolStripMenuItem_Changelog.Name = "ToolStripMenuItem_Changelog"
+        Me.ToolStripMenuItem_Changelog.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem_Changelog.Text = "Changelog"
         '
         'ToolStripMenuItem_About
         '
         Me.ToolStripMenuItem_About.Name = "ToolStripMenuItem_About"
-        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(145, 22)
+        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem_About.Text = "About"
         '
         'ToolStripSeparator4
@@ -294,7 +294,7 @@ Partial Class Form1
         '
         Me.ToolStripButton_New.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.ToolStripButton_New.Image = Global.BlueM.Opt.My.Resources.Resources.page_white
-        Me.ToolStripButton_New.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton_New.ImageTransparentColor = Color.Magenta
         Me.ToolStripButton_New.Name = "ToolStripButton_New"
         Me.ToolStripButton_New.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_New.Text = "New"
@@ -304,7 +304,7 @@ Partial Class Form1
         '
         Me.ToolStripSplitButton_Settings.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_SettingsLoad})
         Me.ToolStripSplitButton_Settings.Image = Global.BlueM.Opt.My.Resources.Resources.wrench
-        Me.ToolStripSplitButton_Settings.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripSplitButton_Settings.ImageTransparentColor = Color.Magenta
         Me.ToolStripSplitButton_Settings.Name = "ToolStripSplitButton_Settings"
         Me.ToolStripSplitButton_Settings.Size = New System.Drawing.Size(81, 22)
         Me.ToolStripSplitButton_Settings.Text = "Settings"
@@ -313,14 +313,14 @@ Partial Class Form1
         '
         Me.ToolStripMenuItem_SettingsLoad.Image = Global.BlueM.Opt.My.Resources.Resources.page_white_get
         Me.ToolStripMenuItem_SettingsLoad.Name = "ToolStripMenuItem_SettingsLoad"
-        Me.ToolStripMenuItem_SettingsLoad.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem_SettingsLoad.Size = New System.Drawing.Size(153, 22)
         Me.ToolStripMenuItem_SettingsLoad.Text = "Load settings..."
         '
         'ToolStripSplitButton_ErgebnisDB
         '
         Me.ToolStripSplitButton_ErgebnisDB.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_ErgebnisDBLoad, Me.ToolStripMenuItem_ErgebnisDBCompare})
         Me.ToolStripSplitButton_ErgebnisDB.Image = Global.BlueM.Opt.My.Resources.Resources.database
-        Me.ToolStripSplitButton_ErgebnisDB.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripSplitButton_ErgebnisDB.ImageTransparentColor = Color.Magenta
         Me.ToolStripSplitButton_ErgebnisDB.Name = "ToolStripSplitButton_ErgebnisDB"
         Me.ToolStripSplitButton_ErgebnisDB.Size = New System.Drawing.Size(71, 22)
         Me.ToolStripSplitButton_ErgebnisDB.Text = "Result"
@@ -346,7 +346,7 @@ Partial Class Form1
         '
         Me.ToolStripSplitButton_Diagramm.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_TChartEdit, Me.ToolStripMenuItem_TChartSave, Me.ToolStripMenuItem_TChart2PNG, Me.ToolStripMenuItem_Tchart2CSV})
         Me.ToolStripSplitButton_Diagramm.Image = Global.BlueM.Opt.My.Resources.Resources.chart_curve
-        Me.ToolStripSplitButton_Diagramm.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripSplitButton_Diagramm.ImageTransparentColor = Color.Magenta
         Me.ToolStripSplitButton_Diagramm.Name = "ToolStripSplitButton_Diagramm"
         Me.ToolStripSplitButton_Diagramm.Size = New System.Drawing.Size(68, 22)
         Me.ToolStripSplitButton_Diagramm.Text = "Chart"
@@ -388,7 +388,7 @@ Partial Class Form1
         Me.ToolStripButton_Monitor.CheckOnClick = True
         Me.ToolStripButton_Monitor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.ToolStripButton_Monitor.Image = Global.BlueM.Opt.My.Resources.Resources.monitor
-        Me.ToolStripButton_Monitor.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton_Monitor.ImageTransparentColor = Color.Magenta
         Me.ToolStripButton_Monitor.Name = "ToolStripButton_Monitor"
         Me.ToolStripButton_Monitor.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_Monitor.Text = "Show/hide Monitor"
@@ -397,7 +397,7 @@ Partial Class Form1
         '
         Me.ToolStripButton_Scatterplot.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.ToolStripButton_Scatterplot.Image = Global.BlueM.Opt.My.Resources.Resources.scatterplot
-        Me.ToolStripButton_Scatterplot.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton_Scatterplot.ImageTransparentColor = Color.Magenta
         Me.ToolStripButton_Scatterplot.Name = "ToolStripButton_Scatterplot"
         Me.ToolStripButton_Scatterplot.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_Scatterplot.Text = "Scatterplot"
@@ -407,7 +407,7 @@ Partial Class Form1
         '
         Me.ToolStripButton_CustomPlot.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.ToolStripButton_CustomPlot.Image = CType(resources.GetObject("ToolStripButton_CustomPlot.Image"), System.Drawing.Image)
-        Me.ToolStripButton_CustomPlot.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton_CustomPlot.ImageTransparentColor = Color.Magenta
         Me.ToolStripButton_CustomPlot.Name = "ToolStripButton_CustomPlot"
         Me.ToolStripButton_CustomPlot.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_CustomPlot.Text = "Display/update custom plot"
@@ -417,7 +417,7 @@ Partial Class Form1
         '
         Me.ToolStripButton_SelectedSolutions.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.ToolStripButton_SelectedSolutions.Image = Global.BlueM.Opt.My.Resources.Resources.table
-        Me.ToolStripButton_SelectedSolutions.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton_SelectedSolutions.ImageTransparentColor = Color.Magenta
         Me.ToolStripButton_SelectedSolutions.Name = "ToolStripButton_SelectedSolutions"
         Me.ToolStripButton_SelectedSolutions.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButton_SelectedSolutions.Text = "Show selected solutions window"
@@ -452,13 +452,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.Bottom.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Bottom.Labels.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Labels.Brush.Color = System.Drawing.Color.White
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.Brush.Color = Color.White
         Me.Hauptdiagramm1.Axes.Bottom.Labels.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Labels.Brush.Visible = True
         '
@@ -468,7 +468,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Labels.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.Font.Brush.Color = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Bottom.Labels.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Labels.Font.Brush.Visible = True
         '
@@ -477,7 +477,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Labels.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Bottom.Labels.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Labels.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.Bottom.Labels.Font.Size = 9
@@ -488,7 +488,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Labels.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.Bottom.Labels.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Labels.ImageBevel.Brush.Visible = True
         '
@@ -497,7 +497,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Labels.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Bottom.Labels.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Bottom.Labels.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Labels.Shadow.Brush.Visible = True
         '
@@ -507,13 +507,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.Bottom.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Bottom.Title.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Bottom.Title.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Bottom.Title.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Title.Brush.Color = System.Drawing.Color.Silver
+        Me.Hauptdiagramm1.Axes.Bottom.Title.Brush.Color = Color.Silver
         Me.Hauptdiagramm1.Axes.Bottom.Title.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Title.Brush.Visible = True
         '
@@ -523,7 +523,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Title.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Bottom.Title.Font.Brush.Color = Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Bottom.Title.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Title.Font.Brush.Visible = True
         '
@@ -532,7 +532,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Title.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Bottom.Title.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Bottom.Title.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Title.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.Bottom.Title.Font.Size = 11
@@ -543,7 +543,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Title.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.Bottom.Title.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.Bottom.Title.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Title.ImageBevel.Brush.Visible = True
         '
@@ -552,10 +552,9 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Bottom.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Bottom.Title.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Bottom.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.Bottom.UseMaxPixelPos = True
         '
         '
         '
@@ -565,13 +564,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.Depth.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Depth.Labels.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Depth.Labels.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Depth.Labels.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Labels.Brush.Color = System.Drawing.Color.White
+        Me.Hauptdiagramm1.Axes.Depth.Labels.Brush.Color = Color.White
         Me.Hauptdiagramm1.Axes.Depth.Labels.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Labels.Brush.Visible = True
         '
@@ -581,7 +580,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Labels.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Depth.Labels.Font.Brush.Color = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Depth.Labels.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Labels.Font.Brush.Visible = True
         '
@@ -590,7 +589,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Labels.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Depth.Labels.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Depth.Labels.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Labels.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.Depth.Labels.Font.Size = 9
@@ -601,7 +600,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Labels.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.Depth.Labels.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.Depth.Labels.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Labels.ImageBevel.Brush.Visible = True
         '
@@ -610,7 +609,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Labels.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Depth.Labels.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Depth.Labels.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Labels.Shadow.Brush.Visible = True
         '
@@ -620,13 +619,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.Depth.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Depth.Title.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Depth.Title.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Depth.Title.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Title.Brush.Color = System.Drawing.Color.Silver
+        Me.Hauptdiagramm1.Axes.Depth.Title.Brush.Color = Color.Silver
         Me.Hauptdiagramm1.Axes.Depth.Title.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Title.Brush.Visible = True
         '
@@ -636,7 +635,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Title.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Depth.Title.Font.Brush.Color = Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Depth.Title.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Title.Font.Brush.Visible = True
         '
@@ -645,7 +644,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Title.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Depth.Title.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Depth.Title.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Title.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.Depth.Title.Font.Size = 11
@@ -656,7 +655,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Title.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.Depth.Title.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.Depth.Title.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Title.ImageBevel.Brush.Visible = True
         '
@@ -665,10 +664,9 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Depth.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Depth.Title.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Depth.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.Depth.UseMaxPixelPos = True
         '
         '
         '
@@ -678,13 +676,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Brush.Color = System.Drawing.Color.White
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Brush.Color = Color.White
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.Brush.Visible = True
         '
@@ -694,7 +692,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Font.Brush.Color = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.Font.Brush.Visible = True
         '
@@ -703,7 +701,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.Font.Size = 9
@@ -714,7 +712,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Labels.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.ImageBevel.Brush.Visible = True
         '
@@ -723,7 +721,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.DepthTop.Labels.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Labels.Shadow.Brush.Visible = True
         '
@@ -733,13 +731,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.DepthTop.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Title.Brush.Color = System.Drawing.Color.Silver
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.Brush.Color = Color.Silver
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Brush.Visible = True
         '
@@ -749,7 +747,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Title.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.Font.Brush.Color = Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Font.Brush.Visible = True
         '
@@ -758,7 +756,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Title.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Font.Size = 11
@@ -769,7 +767,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Title.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.DepthTop.Title.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Title.ImageBevel.Brush.Visible = True
         '
@@ -778,10 +776,9 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.DepthTop.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.DepthTop.Title.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.DepthTop.UseMaxPixelPos = True
         '
         '
         '
@@ -791,13 +788,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.Left.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Left.Labels.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Left.Labels.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Left.Labels.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Labels.Brush.Color = System.Drawing.Color.White
+        Me.Hauptdiagramm1.Axes.Left.Labels.Brush.Color = Color.White
         Me.Hauptdiagramm1.Axes.Left.Labels.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Labels.Brush.Visible = True
         '
@@ -807,7 +804,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Labels.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Left.Labels.Font.Brush.Color = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Left.Labels.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Labels.Font.Brush.Visible = True
         '
@@ -816,7 +813,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Labels.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Left.Labels.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Left.Labels.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Labels.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.Left.Labels.Font.Size = 9
@@ -827,7 +824,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Labels.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.Left.Labels.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.Left.Labels.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Labels.ImageBevel.Brush.Visible = True
         '
@@ -836,7 +833,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Labels.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Left.Labels.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Left.Labels.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Labels.Shadow.Brush.Visible = True
         '
@@ -846,13 +843,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.Left.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Left.Title.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Left.Title.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Left.Title.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Title.Brush.Color = System.Drawing.Color.Silver
+        Me.Hauptdiagramm1.Axes.Left.Title.Brush.Color = Color.Silver
         Me.Hauptdiagramm1.Axes.Left.Title.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Title.Brush.Visible = True
         '
@@ -862,7 +859,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Title.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Left.Title.Font.Brush.Color = Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Left.Title.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Title.Font.Brush.Visible = True
         '
@@ -871,7 +868,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Title.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Left.Title.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Left.Title.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Title.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.Left.Title.Font.Size = 11
@@ -882,7 +879,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Title.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.Left.Title.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.Left.Title.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Title.ImageBevel.Brush.Visible = True
         '
@@ -891,10 +888,9 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Left.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Left.Title.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Left.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.Left.UseMaxPixelPos = True
         '
         '
         '
@@ -904,13 +900,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.Right.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Right.Labels.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Right.Labels.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Right.Labels.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Labels.Brush.Color = System.Drawing.Color.White
+        Me.Hauptdiagramm1.Axes.Right.Labels.Brush.Color = Color.White
         Me.Hauptdiagramm1.Axes.Right.Labels.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Labels.Brush.Visible = True
         '
@@ -920,7 +916,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Labels.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Right.Labels.Font.Brush.Color = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Right.Labels.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Labels.Font.Brush.Visible = True
         '
@@ -929,7 +925,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Labels.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Right.Labels.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Right.Labels.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Labels.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.Right.Labels.Font.Size = 9
@@ -940,7 +936,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Labels.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.Right.Labels.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.Right.Labels.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Labels.ImageBevel.Brush.Visible = True
         '
@@ -949,7 +945,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Labels.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Right.Labels.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Right.Labels.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Labels.Shadow.Brush.Visible = True
         '
@@ -959,13 +955,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.Right.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Right.Title.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Right.Title.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Right.Title.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Title.Brush.Color = System.Drawing.Color.Silver
+        Me.Hauptdiagramm1.Axes.Right.Title.Brush.Color = Color.Silver
         Me.Hauptdiagramm1.Axes.Right.Title.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Title.Brush.Visible = True
         '
@@ -975,7 +971,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Title.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Right.Title.Font.Brush.Color = Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Right.Title.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Title.Font.Brush.Visible = True
         '
@@ -984,7 +980,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Title.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Right.Title.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Right.Title.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Title.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.Right.Title.Font.Size = 11
@@ -995,7 +991,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Title.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.Right.Title.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.Right.Title.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Title.ImageBevel.Brush.Visible = True
         '
@@ -1004,10 +1000,9 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Right.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Right.Title.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Right.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.Right.UseMaxPixelPos = True
         '
         '
         '
@@ -1017,13 +1012,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Labels.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.Top.Labels.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Top.Labels.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Top.Labels.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Top.Labels.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Labels.Brush.Color = System.Drawing.Color.White
+        Me.Hauptdiagramm1.Axes.Top.Labels.Brush.Color = Color.White
         Me.Hauptdiagramm1.Axes.Top.Labels.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Labels.Brush.Visible = True
         '
@@ -1033,7 +1028,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Labels.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Top.Labels.Font.Brush.Color = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Top.Labels.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Labels.Font.Brush.Visible = True
         '
@@ -1042,7 +1037,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Labels.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Top.Labels.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Top.Labels.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Labels.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.Top.Labels.Font.Size = 9
@@ -1053,7 +1048,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Labels.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.Top.Labels.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.Top.Labels.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Labels.ImageBevel.Brush.Visible = True
         '
@@ -1062,7 +1057,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Labels.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Top.Labels.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Top.Labels.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Labels.Shadow.Brush.Visible = True
         '
@@ -1072,13 +1067,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Axes.Top.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Top.Title.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Top.Title.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Top.Title.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Title.Brush.Color = System.Drawing.Color.Silver
+        Me.Hauptdiagramm1.Axes.Top.Title.Brush.Color = Color.Silver
         Me.Hauptdiagramm1.Axes.Top.Title.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Title.Brush.Visible = True
         '
@@ -1088,7 +1083,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Title.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.Hauptdiagramm1.Axes.Top.Title.Font.Brush.Color = Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.Hauptdiagramm1.Axes.Top.Title.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Title.Font.Brush.Visible = True
         '
@@ -1097,7 +1092,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Title.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Top.Title.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Top.Title.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Title.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Axes.Top.Title.Font.Size = 11
@@ -1108,7 +1103,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Title.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Axes.Top.Title.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Axes.Top.Title.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Title.ImageBevel.Brush.Visible = True
         '
@@ -1117,23 +1112,22 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Axes.Top.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Axes.Top.Title.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Axes.Top.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.Top.UseMaxPixelPos = True
         '
         '
         '
         '
         '
         '
-        Me.Hauptdiagramm1.Footer.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Footer.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Footer.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Footer.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Footer.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Footer.Brush.Color = System.Drawing.Color.Silver
+        Me.Hauptdiagramm1.Footer.Brush.Color = Color.Silver
         Me.Hauptdiagramm1.Footer.Brush.Solid = True
         Me.Hauptdiagramm1.Footer.Brush.Visible = True
         '
@@ -1143,7 +1137,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Footer.Font.Brush.Color = System.Drawing.Color.Red
+        Me.Hauptdiagramm1.Footer.Font.Brush.Color = Color.Red
         Me.Hauptdiagramm1.Footer.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Footer.Font.Brush.Visible = True
         '
@@ -1152,7 +1146,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Footer.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Footer.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Footer.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Footer.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Footer.Font.Size = 8
@@ -1163,7 +1157,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Footer.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Footer.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Footer.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Footer.ImageBevel.Brush.Visible = True
         '
@@ -1172,7 +1166,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Footer.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Footer.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Footer.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Footer.Shadow.Brush.Visible = True
         '
@@ -1181,13 +1175,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Header.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Header.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Header.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Header.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Header.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Header.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.Hauptdiagramm1.Header.Brush.Color = Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
         Me.Hauptdiagramm1.Header.Brush.Solid = True
         Me.Hauptdiagramm1.Header.Brush.Visible = True
         '
@@ -1197,7 +1191,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Header.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Header.Font.Brush.Color = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Header.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Header.Font.Brush.Visible = True
         '
@@ -1206,7 +1200,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Header.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Header.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Header.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Header.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Header.Font.Size = 12
@@ -1217,7 +1211,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Header.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Header.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Header.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Header.ImageBevel.Brush.Visible = True
         Me.Hauptdiagramm1.Header.Lines = New String() {"BlueM.Opt"}
@@ -1227,7 +1221,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Header.Shadow.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(169, Byte), Integer), CType(CType(169, Byte), Integer), CType(CType(169, Byte), Integer))
+        Me.Hauptdiagramm1.Header.Shadow.Brush.Color = Color.FromArgb(CType(CType(169, Byte), Integer), CType(CType(169, Byte), Integer), CType(CType(169, Byte), Integer))
         Me.Hauptdiagramm1.Header.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Header.Shadow.Brush.Visible = True
         '
@@ -1236,13 +1230,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Legend.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Legend.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Legend.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Legend.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Brush.Color = System.Drawing.Color.White
+        Me.Hauptdiagramm1.Legend.Brush.Color = Color.White
         Me.Hauptdiagramm1.Legend.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.Brush.Visible = True
         '
@@ -1252,7 +1246,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.Hauptdiagramm1.Legend.Font.Brush.Color = Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.Hauptdiagramm1.Legend.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.Font.Brush.Visible = True
         '
@@ -1261,7 +1255,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Legend.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Legend.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Legend.Font.Size = 9
@@ -1272,7 +1266,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Legend.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Legend.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.ImageBevel.Brush.Visible = True
         '
@@ -1281,7 +1275,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Shadow.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.Hauptdiagramm1.Legend.Shadow.Brush.Color = Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
         Me.Hauptdiagramm1.Legend.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.Shadow.Brush.Visible = True
         '
@@ -1293,7 +1287,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Symbol.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Legend.Symbol.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Legend.Symbol.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.Symbol.Shadow.Brush.Visible = True
         '
@@ -1302,13 +1296,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Title.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Legend.Title.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Legend.Title.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Legend.Title.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Legend.Title.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Title.Brush.Color = System.Drawing.Color.White
+        Me.Hauptdiagramm1.Legend.Title.Brush.Color = Color.White
         Me.Hauptdiagramm1.Legend.Title.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.Title.Brush.Visible = True
         '
@@ -1318,7 +1312,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Title.Font.Brush.Color = System.Drawing.Color.Black
+        Me.Hauptdiagramm1.Legend.Title.Font.Brush.Color = Color.Black
         Me.Hauptdiagramm1.Legend.Title.Font.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.Title.Font.Brush.Visible = True
         '
@@ -1327,7 +1321,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Title.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Legend.Title.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Legend.Title.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.Title.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Legend.Title.Font.Size = 8
@@ -1338,7 +1332,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Title.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Legend.Title.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Legend.Title.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.Title.ImageBevel.Brush.Visible = True
         '
@@ -1347,7 +1341,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Legend.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Legend.Title.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Legend.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Legend.Title.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Location = New System.Drawing.Point(241, 106)
@@ -1359,13 +1353,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Panel.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Panel.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Panel.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Panel.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Panel.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Panel.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Panel.Brush.Color = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
         Me.Hauptdiagramm1.Panel.Brush.Solid = True
         Me.Hauptdiagramm1.Panel.Brush.Visible = True
         '
@@ -1374,7 +1368,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Panel.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Panel.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Panel.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Panel.ImageBevel.Brush.Visible = True
         '
@@ -1383,7 +1377,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Panel.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Panel.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Panel.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Panel.Shadow.Brush.Visible = True
         '
@@ -1401,13 +1395,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.SubFooter.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.SubFooter.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.SubFooter.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.SubFooter.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.SubFooter.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.SubFooter.Brush.Color = System.Drawing.Color.Silver
+        Me.Hauptdiagramm1.SubFooter.Brush.Color = Color.Silver
         Me.Hauptdiagramm1.SubFooter.Brush.Solid = True
         Me.Hauptdiagramm1.SubFooter.Brush.Visible = True
         '
@@ -1417,7 +1411,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.SubFooter.Font.Brush.Color = System.Drawing.Color.Red
+        Me.Hauptdiagramm1.SubFooter.Font.Brush.Color = Color.Red
         Me.Hauptdiagramm1.SubFooter.Font.Brush.Solid = True
         Me.Hauptdiagramm1.SubFooter.Font.Brush.Visible = True
         '
@@ -1426,7 +1420,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.SubFooter.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.SubFooter.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.SubFooter.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.SubFooter.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.SubFooter.Font.Size = 8
@@ -1437,7 +1431,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.SubFooter.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.SubFooter.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.SubFooter.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.SubFooter.ImageBevel.Brush.Visible = True
         '
@@ -1446,7 +1440,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.SubFooter.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.SubFooter.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.SubFooter.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.SubFooter.Shadow.Brush.Visible = True
         '
@@ -1455,13 +1449,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.SubHeader.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.SubHeader.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.SubHeader.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.SubHeader.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.SubHeader.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.SubHeader.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.Hauptdiagramm1.SubHeader.Brush.Color = Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
         Me.Hauptdiagramm1.SubHeader.Brush.Solid = True
         Me.Hauptdiagramm1.SubHeader.Brush.Visible = True
         '
@@ -1471,7 +1465,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.SubHeader.Font.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.SubHeader.Font.Brush.Color = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.SubHeader.Font.Brush.Solid = True
         Me.Hauptdiagramm1.SubHeader.Font.Brush.Visible = True
         '
@@ -1480,7 +1474,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.SubHeader.Font.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.SubHeader.Font.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.SubHeader.Font.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.SubHeader.Font.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.SubHeader.Font.Size = 12
@@ -1491,7 +1485,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.SubHeader.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.SubHeader.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.SubHeader.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.SubHeader.ImageBevel.Brush.Visible = True
         '
@@ -1500,7 +1494,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.SubHeader.Shadow.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(169, Byte), Integer), CType(CType(169, Byte), Integer), CType(CType(169, Byte), Integer))
+        Me.Hauptdiagramm1.SubHeader.Shadow.Brush.Color = Color.FromArgb(CType(CType(169, Byte), Integer), CType(CType(169, Byte), Integer), CType(CType(169, Byte), Integer))
         Me.Hauptdiagramm1.SubHeader.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.SubHeader.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.TabIndex = 17
@@ -1513,13 +1507,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Back.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Walls.Back.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Back.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Back.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Walls.Back.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Back.Brush.Color = System.Drawing.Color.Silver
+        Me.Hauptdiagramm1.Walls.Back.Brush.Color = Color.Silver
         Me.Hauptdiagramm1.Walls.Back.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Back.Brush.Visible = False
         '
@@ -1528,7 +1522,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Back.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Walls.Back.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Walls.Back.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Back.ImageBevel.Brush.Visible = True
         '
@@ -1537,7 +1531,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Back.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Walls.Back.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Walls.Back.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Back.Shadow.Brush.Visible = True
         '
@@ -1546,13 +1540,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Bottom.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Walls.Bottom.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Bottom.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Bottom.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Walls.Bottom.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Bottom.Brush.Color = System.Drawing.Color.White
+        Me.Hauptdiagramm1.Walls.Bottom.Brush.Color = Color.White
         Me.Hauptdiagramm1.Walls.Bottom.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Bottom.Brush.Visible = True
         '
@@ -1561,7 +1555,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Bottom.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Walls.Bottom.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Walls.Bottom.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Bottom.ImageBevel.Brush.Visible = True
         '
@@ -1570,7 +1564,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Bottom.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Walls.Bottom.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Walls.Bottom.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Bottom.Shadow.Brush.Visible = True
         '
@@ -1579,13 +1573,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Left.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Walls.Left.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Left.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Left.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Walls.Left.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Left.Brush.Color = System.Drawing.Color.LightYellow
+        Me.Hauptdiagramm1.Walls.Left.Brush.Color = Color.LightYellow
         Me.Hauptdiagramm1.Walls.Left.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Left.Brush.Visible = True
         '
@@ -1594,7 +1588,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Left.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Walls.Left.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Walls.Left.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Left.ImageBevel.Brush.Visible = True
         '
@@ -1603,7 +1597,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Left.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Walls.Left.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Walls.Left.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Left.Shadow.Brush.Visible = True
         '
@@ -1612,13 +1606,13 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Right.Bevel.ColorOne = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.Hauptdiagramm1.Walls.Right.Bevel.ColorTwo = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Right.Bevel.ColorOne = Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.Hauptdiagramm1.Walls.Right.Bevel.ColorTwo = Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Hauptdiagramm1.Walls.Right.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Right.Brush.Color = System.Drawing.Color.LightYellow
+        Me.Hauptdiagramm1.Walls.Right.Brush.Color = Color.LightYellow
         Me.Hauptdiagramm1.Walls.Right.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Right.Brush.Visible = True
         '
@@ -1627,7 +1621,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Right.ImageBevel.Brush.Color = System.Drawing.Color.LightGray
+        Me.Hauptdiagramm1.Walls.Right.ImageBevel.Brush.Color = Color.LightGray
         Me.Hauptdiagramm1.Walls.Right.ImageBevel.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Right.ImageBevel.Brush.Visible = True
         '
@@ -1636,7 +1630,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Walls.Right.Shadow.Brush.Color = System.Drawing.Color.DarkGray
+        Me.Hauptdiagramm1.Walls.Right.Shadow.Brush.Color = Color.DarkGray
         Me.Hauptdiagramm1.Walls.Right.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Walls.Right.Shadow.Brush.Visible = True
         Me.Hauptdiagramm1.Walls.View3D = False
@@ -1646,7 +1640,7 @@ Partial Class Form1
         '
         '
         '
-        Me.Hauptdiagramm1.Zoom.Brush.Color = System.Drawing.Color.LightBlue
+        Me.Hauptdiagramm1.Zoom.Brush.Color = Color.LightBlue
         Me.Hauptdiagramm1.Zoom.Brush.Solid = True
         Me.Hauptdiagramm1.Zoom.Brush.Visible = True
         '
@@ -1713,7 +1707,7 @@ Partial Class Form1
     Private WithEvents Label_Methode As System.Windows.Forms.Label
     Friend WithEvents Button_BrowseDatensatz As System.Windows.Forms.Button
     Friend WithEvents ComboBox_Datensatz As System.Windows.Forms.ComboBox
-    Private WithEvents MenuItem_DatensatzZurücksetzen As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents MenuItem_DatensatzZurÃ¼cksetzen As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_About As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_Help As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
@@ -1735,6 +1729,6 @@ Partial Class Form1
     Private WithEvents ToolStripButton_Monitor As System.Windows.Forms.ToolStripButton
     Private WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripButton_SelectedSolutions As System.Windows.Forms.ToolStripButton
-    Friend WithEvents ReleaseNotesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem_Changelog As ToolStripMenuItem
     Friend WithEvents ToolStripButton_CustomPlot As ToolStripButton
 End Class

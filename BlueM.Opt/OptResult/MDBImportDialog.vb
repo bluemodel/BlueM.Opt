@@ -15,11 +15,13 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports BlueM.Opt.Common
+
 Public Class MDBImportDialog
 
-    Private mProblem As BlueM.Opt.Common.Problem
+    Private mProblem As Problem
 
-    Public Sub New(ByRef prob As BlueM.Opt.Common.Problem)
+    Public Sub New(ByRef prob As Problem)
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
@@ -33,9 +35,9 @@ Public Class MDBImportDialog
     '*********
     Private Sub MDBImportDialog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-        'Listboxen füllen
+        'Listboxen fÃ¼llen
         Dim bezeichnung As String
-        For Each feature As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+        For Each feature As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             bezeichnung = feature.Description
             'Penalty-Funktionen mit Sternchen markieren
             If (feature.isPrimObjective) Then bezeichnung &= " (*)"
@@ -62,11 +64,11 @@ Public Class MDBImportDialog
         End If
     End Sub
 
-    'Überprüfung der Benutzereingabe
+    'ÃœberprÃ¼fung der Benutzereingabe
     '*******************************
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
         If (Me.ListBox_ZieleY.Enabled) Then
-            'Mindestens eine X- und Y-Achse ausgewählt?
+            'Mindestens eine X- und Y-Achse ausgewÃ¤hlt?
             If (Me.ListBox_ZieleX.SelectedIndex = -1 Or Me.ListBox_ZieleY.SelectedIndex = -1) Then
                 MsgBox("Please select at least one X and Y axis!", MsgBoxStyle.Exclamation)
                 Me.DialogResult = Windows.Forms.DialogResult.None
@@ -74,11 +76,11 @@ Public Class MDBImportDialog
             End If
         End If
 
-        'Unterschiedliche Achsen ausgewählt?
+        'Unterschiedliche Achsen ausgewÃ¤hlt?
         If (Me.ListBox_ZieleY.Enabled) Then
-            If (Me.ListBox_ZieleX.SelectedIndex = Me.ListBox_ZieleY.SelectedIndex Or _
-                (Not Me.ListBox_ZieleZ.SelectedIndex = -1 And _
-                    (Me.ListBox_ZieleX.SelectedIndex = Me.ListBox_ZieleZ.SelectedIndex Or _
+            If (Me.ListBox_ZieleX.SelectedIndex = Me.ListBox_ZieleY.SelectedIndex Or
+                (Not Me.ListBox_ZieleZ.SelectedIndex = -1 And
+                    (Me.ListBox_ZieleX.SelectedIndex = Me.ListBox_ZieleZ.SelectedIndex Or
                     Me.ListBox_ZieleY.SelectedIndex = Me.ListBox_ZieleZ.SelectedIndex))) Then
                 MsgBox("Please select different axes for each objective function!", MsgBoxStyle.Exclamation)
                 Me.DialogResult = Windows.Forms.DialogResult.None

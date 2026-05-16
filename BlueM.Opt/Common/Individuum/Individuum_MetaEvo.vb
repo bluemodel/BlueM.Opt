@@ -49,10 +49,11 @@ Public Class Individuum_MetaEvo
 
         'Initialisieren der Optparameter
         For i = 0 To numberOptparas - 1
-            Me.mOptparameter(i) = New OptParameter()
-            Me.mOptparameter(i).Min = Individuum.mProblem.List_OptParameter(i).Min
-            Me.mOptparameter(i).Max = Individuum.mProblem.List_OptParameter(i).Max
-            Me.mOptparameter(i).Bezeichnung = Individuum.mProblem.List_OptParameter(i).Bezeichnung
+            Me.mOptparameter(i) = New OptParameter With {
+                .Min = Individuum.mProblem.List_OptParameter(i).Min,
+                .Max = Individuum.mProblem.List_OptParameter(i).Max,
+                .Bezeichnung = Individuum.mProblem.List_OptParameter(i).Bezeichnung
+            }
         Next
 
         'Constraints auf 0 setzen

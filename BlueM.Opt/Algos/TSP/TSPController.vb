@@ -15,8 +15,11 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports System.Drawing
+Imports BlueM.Opt.Common
+
 Public Class TSPController
-    Implements BlueM.Opt.Algos.IController
+    Implements Algos.IController
 
     ''' <summary>
     ''' Multithreading Support
@@ -27,10 +30,10 @@ Public Class TSPController
         End Get
     End Property
 
-    Private myHauptDiagramm As BlueM.Opt.Diagramm.Hauptdiagramm
-    Private myProblem As BlueM.Opt.Common.Problem
-    Private mySettings As BlueM.Opt.Common.Settings
-    Private myProgress As BlueM.Opt.Common.Progress
+    Private myHauptDiagramm As Diagramm.Hauptdiagramm
+    Private myProblem As Problem
+    Private mySettings As Settings
+    Private myProgress As Progress
 
     Private TSP1 As TSP
     Private Stopp As Boolean
@@ -43,7 +46,7 @@ Public Class TSPController
     ''' <param name="inputProgress"></param>
     ''' <param name="inputHptDiagramm"></param>
     ''' <remarks></remarks>
-    Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.Settings, ByRef inputProgress As Common.Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
+    Public Sub Init(ByRef inputProblem As Problem, ByRef inputSettings As Settings, ByRef inputProgress As Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
         Me.myProgress = inputProgress
@@ -81,14 +84,14 @@ Public Class TSPController
         Me.myProgress.Initialize(0, 0, Me.mySettings.TSP.N_Gen, Me.mySettings.TSP.N_Children)
 
         'Log
-        Common.Log.AddMessage(Common.Log.levels.info, "Cities: " & Me.mySettings.TSP.N_Cities)
-        Common.Log.AddMessage(Common.Log.levels.info, "Combinations: " & TSP1.n_Comb(Me.mySettings.TSP.N_Cities))
-        Common.Log.AddMessage(Common.Log.levels.info, "Parents: " & Me.mySettings.TSP.N_Parents)
-        Common.Log.AddMessage(Common.Log.levels.info, "Children: " & Me.mySettings.TSP.N_Children)
-        Common.Log.AddMessage(Common.Log.levels.info, "Generations: " & Me.mySettings.TSP.N_Gen)
-        Common.Log.AddMessage(Common.Log.levels.info, "Evaluations: " & Me.mySettings.TSP.N_Children * Me.mySettings.TSP.N_Gen)
-        If Me.mySettings.TSP.Problem = Common.EnProblem.circle Then
-            Common.Log.AddMessage(Common.Log.levels.info, "Quality Aim: " & Conversion.Int(TSP1.circumference))
+        Log.AddMessage(Log.levels.info, "Cities: " & Me.mySettings.TSP.N_Cities)
+        Log.AddMessage(Log.levels.info, "Combinations: " & TSP1.n_Comb(Me.mySettings.TSP.N_Cities))
+        Log.AddMessage(Log.levels.info, "Parents: " & Me.mySettings.TSP.N_Parents)
+        Log.AddMessage(Log.levels.info, "Children: " & Me.mySettings.TSP.N_Children)
+        Log.AddMessage(Log.levels.info, "Generations: " & Me.mySettings.TSP.N_Gen)
+        Log.AddMessage(Log.levels.info, "Evaluations: " & Me.mySettings.TSP.N_Children * Me.mySettings.TSP.N_Gen)
+        If Me.mySettings.TSP.Problem = Constants.EnProblem.circle Then
+            Log.AddMessage(Log.levels.info, "Quality Aim: " & Conversion.Int(TSP1.circumference))
         End If
 
         Select Case TSP1.Mode
@@ -108,7 +111,7 @@ Public Class TSPController
 
                     For M = 1 To 4
                         Me.mySettings.TSP.MutOperator = M
-                        Common.Log.AddMessage(Common.Log.levels.info, $"ReprodOperator: {Me.mySettings.TSP.ReprodOperator}; MutationOperator: {Me.mySettings.TSP.MutOperator}")
+                        Log.AddMessage(Log.levels.info, $"ReprodOperator: {Me.mySettings.TSP.ReprodOperator}; MutationOperator: {Me.mySettings.TSP.MutOperator}")
 
                         'n Wiederholungen
                         For i = 1 To TSP1.nTests
@@ -134,8 +137,8 @@ Public Class TSPController
                 Next
                 Time.Stop()
 
-                Common.Log.AddMessage(Common.Log.levels.info, $"Number of calculations: {j}")
-                Common.Log.AddMessage(Common.Log.levels.info, $"Time elapsed: {Time.Elapsed.Hours}h {Time.Elapsed.Minutes}m {Time.Elapsed.Seconds}s {Time.Elapsed.Milliseconds}ms")
+                Log.AddMessage(Log.levels.info, $"Number of calculations: {j}")
+                Log.AddMessage(Log.levels.info, $"Time elapsed: {Time.Elapsed.Hours}h {Time.Elapsed.Minutes}m {Time.Elapsed.Seconds}s {Time.Elapsed.Milliseconds}ms")
 
         End Select
     End Sub
@@ -201,7 +204,7 @@ Public Class TSPController
                 jepp += increm
                 Me.myProgress.iGen() = gen
                 If Batch_Mode = False Then
-                    Common.Log.AddMessage(Common.Log.levels.info, $"Gen.: {gen}; Length: {Conversion.Int(TSP1.ParentList(0).Penalty)}; Factor: {Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven)}")
+                    Log.AddMessage(Log.levels.info, $"Gen.: {gen}; Length: {Conversion.Int(TSP1.ParentList(0).Penalty)}; Factor: {Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven)}")
                     'png Export
                     If TSP1.pngExport = True And Conversion.Int(TSP1.ParentList(0).Penalty) < PenaltyTMP Then
                         Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
@@ -211,7 +214,7 @@ Public Class TSPController
             End If
 
             'Fall die Problemstellung ein Kreis ist wird abgebrochen, wenn das Optimum erreicht ist
-            If Me.mySettings.TSP.Problem = Common.EnProblem.circle And TSP1.ParentList(0).Penalty < TSP1.circumference Then
+            If Me.mySettings.TSP.Problem = Constants.EnProblem.circle And TSP1.ParentList(0).Penalty < TSP1.circumference Then
                 GoToExit = True
                 Select Case TSP1.ParentList(0).Path(0) < TSP1.ParentList(0).Path(1)
                     Case True
@@ -236,7 +239,7 @@ Public Class TSPController
                 If Batch_Mode = False Then
                     Call Zeichnen_TSP(TSP1.ParentList(0).Image)
                     Me.myHauptDiagramm.Update()
-                    Common.Log.AddMessage(Common.Log.levels.info, $"Gen.: {gen}; Length: {Conversion.Int(TSP1.ParentList(0).Penalty)}; Factor: {Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven)}")
+                    Log.AddMessage(Log.levels.info, $"Gen.: {gen}; Length: {Conversion.Int(TSP1.ParentList(0).Penalty)}; Factor: {Math.Round(TSP1.ParentList(0).Penalty / TSP1.circumference, 3, MidpointRounding.ToEven)}")
                     'png Export
                     If TSP1.pngExport = True Then
                         Me.myHauptDiagramm.Export.Image.PNG.Save(TSP1.ExPath & gen.ToString.PadLeft(7, "0") & " Qualität " & Conversion.Int(TSP1.ParentList(0).Penalty).ToString.PadLeft(5, "0") & ".png")
@@ -256,7 +259,7 @@ Public Class TSPController
 
         Next gen
 
-        Common.Log.AddMessage(Common.Log.levels.info, "Final Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
+        Log.AddMessage(Log.levels.info, "Final Quality: " & Conversion.Int(TSP1.ParentList(0).Penalty))
 
     End Sub
 
@@ -286,9 +289,9 @@ Public Class TSPController
 
             'Printversion
             .Header.Visible = False
-            .Panel.Color = Drawing.Color.White
-            .Chart.Axes.Left.Ticks.Color = Drawing.Color.Black
-            .Chart.Axes.Right.Ticks.Color = Drawing.Color.Black
+            .Panel.Color = Color.White
+            .Chart.Axes.Left.Ticks.Color = Color.Black
+            .Chart.Axes.Right.Ticks.Color = Color.Black
             .Chart.Axes.Left.Ticks.Width = 1
             .Chart.Axes.Right.Ticks.Width = 1
 
@@ -306,7 +309,7 @@ Public Class TSPController
             Dim Point1 As New Steema.TeeChart.Styles.Points(.Chart)
             Point1.Title = "Städte"
             Point1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-            Point1.Color = System.Drawing.Color.Orange
+            Point1.Color = Color.Orange
             Point1.Pointer.HorizSize = 2
             Point1.Pointer.VertSize = 2
 
@@ -315,7 +318,7 @@ Public Class TSPController
                 Dim Line1 As New Steema.TeeChart.Styles.Line(.Chart)
                 Line1.Title = "Reisen"
                 Line1.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
-                Line1.Color = System.Drawing.Color.Blue
+                Line1.Color = Color.Blue
                 Line1.Pointer.HorizSize = 3
                 Line1.Pointer.VertSize = 3
             Next
@@ -344,8 +347,8 @@ Public Class TSPController
             .Series(1).Clear()
             For i = 1 To Me.mySettings.TSP.N_Cities - 1
                 .Series(i + 1).Clear()
-                .Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), Drawing.Color.Blue)
-                .Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), Drawing.Color.Blue)
+                .Series(i + 1).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), Color.Blue)
+                .Series(i).Add(TmpListOfCities(i, 1), TmpListOfCities(i, 2), Color.Blue)
             Next
 
             'Zeichnen der Verbindung von der ersten bis zur letzten Stadt

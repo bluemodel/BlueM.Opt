@@ -15,7 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports BlueM.Opt.Common.Constants
+Imports System.Drawing
+Imports BlueM.Opt.Common
 
 Public Class Testprobleme
 
@@ -40,12 +41,12 @@ Public Class Testprobleme
     Private mSelectedTestproblem As String
     Private mTestProblemDescription As String
 
-    Private mProblem As BlueM.Opt.Common.Problem
+    Private mProblem As Problem
 
     Private mAnzParameter As Integer
     Private mAnzZiele As Integer
     Private mAnzConstraints As Integer
-    Private mOptPara() As Common.OptParameter
+    Private mOptPara() As OptParameter
 
     'Properties
     '##########
@@ -74,7 +75,7 @@ Public Class Testprobleme
         End Get
     End Property
 
-    'gewähltes Testproblem holen
+    'gewÃ¤hltes Testproblem holen
     '***************************
     Public ReadOnly Property selectedTestproblem() As String
         Get
@@ -97,16 +98,16 @@ Public Class Testprobleme
 
     End Sub
 
-    'Parameterübergabe
+    'ParameterÃ¼bergabe
     '*****************
-    Public Sub getProblem(ByRef prob As BlueM.Opt.Common.Problem)
+    Public Sub getProblem(ByRef prob As Problem)
 
         Dim i As Integer
 
         'Das Problem setzen
         Me.mProblem = prob
 
-        'Je nach Datensatz/Testproblem initialisierungen durchführen
+        'Je nach Datensatz/Testproblem initialisierungen durchfÃ¼hren
         Select Case Me.mSelectedTestproblem
 
             Case TP_SinusFunktion
@@ -116,8 +117,9 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = 0
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = 0
+                    }
                 Next
 
             Case TP_BealeProblem
@@ -127,8 +129,9 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = 0.5
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = 0.5
+                    }
                 Next
 
             Case TP_Schwefel24Problem
@@ -138,8 +141,9 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = 1
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = 1
+                    }
                 Next
 
             Case TP_Deb1
@@ -150,8 +154,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_ZitzlerDebT1
@@ -162,8 +167,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_ZitzlerDebT2
@@ -174,8 +180,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_ZitzlerDebT3
@@ -186,8 +193,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_ZitzlerDebT4
@@ -198,8 +206,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_CONSTR
@@ -210,8 +219,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_Box
@@ -222,8 +232,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = Rnd()
+                    }
                 Next
 
             Case TP_DependentParameters
@@ -233,12 +244,13 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = 1
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = 1
+                    }
                 Next
                 'Beziehungen
-                Me.mOptPara(0).Beziehung = Common.Constants.Relationship.none
-                Me.mOptPara(1).Beziehung = Common.Constants.Relationship.larger_than
+                Me.mOptPara(0).Beziehung = Constants.Relationship.none
+                Me.mOptPara(1).Beziehung = Constants.Relationship.larger_than
 
             Case TP_FloodMitigation 'Ajay
                 Me.mTestProblemDescription = "Multicriteria Problem Flood Mitigation and Hydropower Generation"
@@ -248,8 +260,9 @@ Public Class Testprobleme
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 Randomize()
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
-                    Me.mOptPara(i).Xn = Rnd()
+                    Me.mOptPara(i) = New OptParameter With {
+                        .Xn = Rnd()
+                    }
 
                 Next
                 For i = 0 To 3
@@ -268,7 +281,7 @@ Public Class Testprobleme
                 Me.mAnzConstraints = 0
                 ReDim Me.mOptPara(Me.mAnzParameter - 1)
                 For i = 0 To Me.mAnzParameter - 1
-                    Me.mOptPara(i) = New BlueM.Opt.Common.OptParameter()
+                    Me.mOptPara(i) = New OptParameter()
                 Next
                 Randomize()
                 With Me.mOptPara(0)
@@ -288,17 +301,18 @@ Public Class Testprobleme
 
         End Select
 
-        'Das Problem mit Pseudo-Werten füllen
+        'Das Problem mit Pseudo-Werten fÃ¼llen
         ReDim Me.mProblem.List_ObjectiveFunctions(Me.mAnzZiele - 1)
         For i = 0 To Me.mProblem.NumObjectives - 1
             'Check_SH: 
-            Me.mProblem.List_ObjectiveFunctions(i) = New Common.Objectivefunction_Value()
-            Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective = True
-            Me.mProblem.List_ObjectiveFunctions(i).Direction = EVO_DIRECTION.Minimization
+            Me.mProblem.List_ObjectiveFunctions(i) = New ObjectiveFunction_Series With {
+                .isPrimObjective = True,
+                .Direction = EVO_DIRECTION.Minimization
+            }
         Next
         ReDim Me.mProblem.List_Constraintfunctions(Me.mAnzConstraints - 1)
         For i = 0 To Me.mProblem.NumConstraints - 1
-            Me.mProblem.List_Constraintfunctions(i) = New Common.Constraintfunction()
+            Me.mProblem.List_Constraintfunctions(i) = New Constraintfunction()
         Next
         ReDim Me.mProblem.List_OptParameter(Me.mAnzParameter - 1)
         For i = 0 To Me.mProblem.NumOptParams - 1
@@ -340,7 +354,7 @@ Public Class Testprobleme
 
     End Sub
 
-    'Diagramm für Sinus-Funktion initialisieren
+    'Diagramm fÃ¼r Sinus-Funktion initialisieren
     '*******************************************
     Private Sub DiagInitialise_SinusFunktion(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -393,7 +407,7 @@ Public Class Testprobleme
 
     End Sub
 
-    'Diagramm für Beale-Problem initialisieren
+    'Diagramm fÃ¼r Beale-Problem initialisieren
     '*****************************************
     Private Sub DiagInitialise_BealeProblem(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -424,16 +438,17 @@ Public Class Testprobleme
 
         Call Diag.DiagInitialise("Beale problem", achsen, Me.mProblem)
 
-        'Linie für den Ausgangswert anzeigen
-        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
-        colorline1.AllowDrag = False
-        colorline1.Axis = Diag.Axes.Left
-        colorline1.Value = Ausgangswert
+        'Linie fÃ¼r den Ausgangswert anzeigen
+        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart) With {
+            .AllowDrag = False,
+            .Axis = Diag.Axes.Left,
+            .Value = Ausgangswert
+        }
         colorline1.Pen.Color = Drawing.Color.Green
 
     End Sub
 
-    'Diagramm für Schwefel-Problem initialisieren
+    'Diagramm fÃ¼r Schwefel-Problem initialisieren
     '********************************************
     Private Sub DiagInitialise_SchwefelProblem(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -473,16 +488,17 @@ Public Class Testprobleme
 
         Call Diag.DiagInitialise("Schwefel 2.4 problem", achsen, Me.mProblem)
 
-        'Linie für den Ausgangswert anzeigen
-        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart)
-        colorline1.AllowDrag = False
-        colorline1.Axis = Diag.Axes.Left
-        colorline1.Value = Ausgangswert
+        'Linie fÃ¼r den Ausgangswert anzeigen
+        colorline1 = New Steema.TeeChart.Tools.ColorLine(Diag.Chart) With {
+            .AllowDrag = False,
+            .Axis = Diag.Axes.Left,
+            .Value = Ausgangswert
+        }
         colorline1.Pen.Color = Drawing.Color.Red
 
     End Sub
 
-    'Diagramm für MultiObjective-Probleme initialisieren
+    'Diagramm fÃ¼r MultiObjective-Probleme initialisieren
     '***************************************************
     Private Sub DiagInitialise_MultiTestProb(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -626,7 +642,7 @@ Public Class Testprobleme
 
             Case TP_ZitzlerDebT3
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                'TODO: Titel der Serien (für Export)
+                'TODO: Titel der Serien (fÃ¼r Export)
                 Dim ArrayX(100) As Double
                 Dim ArrayY(100) As Double
 
@@ -710,7 +726,7 @@ Public Class Testprobleme
 
     End Sub
 
-    'Diagramm für Box-Problem (3D) initialisieren
+    'Diagramm fÃ¼r Box-Problem (3D) initialisieren
     '********************************************
     Private Sub DiagInitialise_3D_Box(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -774,21 +790,22 @@ Public Class Testprobleme
             Next
         Next
 
-        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-        surface.Title = "Constraint 1"
-        surface.IrregularGrid = True
-        surface.NumXValues = surfaceRes
-        surface.NumZValues = surfaceRes
-        surface.Add(ArrayX, ArrayY, ArrayZ)
-        surface.UseColorRange = False
-        surface.UsePalette = False
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart) With {
+            .Title = "Constraint 1",
+            .IrregularGrid = True,
+            .NumXValues = surfaceRes,
+            .NumZValues = surfaceRes,
+            .UseColorRange = False,
+            .UsePalette = False
+        }
         surface.Brush.Solid = True
-        surface.Brush.Color = System.Drawing.Color.Green
+        surface.Brush.Color = Color.Green
         surface.Brush.Transparency = 70
-        surface.Pen.Color = System.Drawing.Color.Green
+        surface.Pen.Color = Color.Green
         surface.SideBrush.Visible = True
-        surface.SideBrush.Color = System.Drawing.Color.Red
+        surface.SideBrush.Color = Color.Red
         surface.SideBrush.Transparency = 70
+        surface.Add(ArrayX, ArrayY, ArrayZ)
 
         'Constraint 2
         'x + y <= 0.5
@@ -806,35 +823,37 @@ Public Class Testprobleme
             Next
         Next
 
-        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-        surface.Title = "Constraint 2"
-        surface.IrregularGrid = True
-        surface.NumXValues = 10
-        surface.NumZValues = 10
-        surface.Add(ArrayX, ArrayY, ArrayZ)
-        surface.UseColorRange = False
-        surface.UsePalette = False
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart) With {
+            .Title = "Constraint 2",
+            .IrregularGrid = True,
+            .NumXValues = 10,
+            .NumZValues = 10,
+            .UseColorRange = False,
+            .UsePalette = False
+        }
         surface.Brush.Solid = True
-        surface.Brush.Color = System.Drawing.Color.Blue
+        surface.Brush.Color = Color.Blue
         surface.Brush.Transparency = 70
-        surface.Pen.Color = System.Drawing.Color.Blue
+        surface.Pen.Color = Color.Blue
         surface.SideBrush.Visible = True
-        surface.SideBrush.Color = System.Drawing.Color.Red
+        surface.SideBrush.Color = Color.Red
         surface.SideBrush.Transparency = 70
+        surface.Add(ArrayX, ArrayY, ArrayZ)
 
         'Schnittgerade zwischen den Constraints
-        series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart)
-        series3D.Title = "Intersection"
+        series3D = New Steema.TeeChart.Styles.Points3D(Diag.Chart) With {
+            .Title = "Intersection"
+        }
         series3D.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Nothing
         series3D.LinePen.Visible = True
         series3D.LinePen.Width = 1
-        series3D.LinePen.Color = System.Drawing.Color.Red
+        series3D.LinePen.Color = Color.Red
         series3D.Add(0.5, 0, 0.3)
         series3D.Add(0, 0.5, 0.3)
 
     End Sub
 
-    'Diagramm für Ackley function initialisieren (3D)
+    'Diagramm fÃ¼r Ackley function initialisieren (3D)
     '************************************************
     Private Sub DiagInitialise_Ackley(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -904,23 +923,24 @@ Public Class Testprobleme
             Next
         Next
 
-        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-        surface.Title = "Ackley function"
-        surface.IrregularGrid = True
-        surface.NumXValues = length
-        surface.NumZValues = length
-        surface.Add(ArrayX, ArrayZ, ArrayY)
-        surface.UseColorRange = False
-        surface.UsePalette = True
-        surface.PaletteStyle = Steema.TeeChart.Styles.PaletteStyles.Rainbow
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart) With {
+            .Title = "Ackley function",
+            .IrregularGrid = True,
+            .NumXValues = length,
+            .NumZValues = length,
+            .UseColorRange = False,
+            .UsePalette = True,
+            .PaletteStyle = Steema.TeeChart.Styles.PaletteStyles.Rainbow
+        }
         surface.Brush.Solid = True
         surface.Brush.Transparency = 70
         surface.Pen.Visible = False
+        surface.Add(ArrayX, ArrayZ, ArrayY)
 
     End Sub
 
 
-    'Diagramm für Abhängige Parameter initialisieren
+    'Diagramm fÃ¼r AbhÃ¤ngige Parameter initialisieren
     '***********************************************
     Private Sub DiagInitialise_AbhParameter(ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
@@ -982,21 +1002,22 @@ Public Class Testprobleme
             Next
         Next
 
-        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart)
-        surface.Title = "X = Y"
-        surface.IrregularGrid = True
-        surface.NumXValues = surfaceRes
-        surface.NumZValues = surfaceRes
-        surface.Add(ArrayX, ArrayY, ArrayZ)
-        surface.UseColorRange = False
-        surface.UsePalette = False
+        surface = New Steema.TeeChart.Styles.Surface(Diag.Chart) With {
+            .Title = "X = Y",
+            .IrregularGrid = True,
+            .NumXValues = surfaceRes,
+            .NumZValues = surfaceRes,
+            .UseColorRange = False,
+            .UsePalette = False
+        }
         surface.Brush.Solid = True
-        surface.Brush.Color = System.Drawing.Color.Green
+        surface.Brush.Color = Color.Green
         surface.Brush.Transparency = 70
-        surface.Pen.Color = System.Drawing.Color.Green
+        surface.Pen.Color = Color.Green
         surface.SideBrush.Visible = True
-        surface.SideBrush.Color = System.Drawing.Color.Red
+        surface.SideBrush.Color = Color.Red
         surface.SideBrush.Transparency = 70
+        surface.Add(ArrayX, ArrayY, ArrayZ)
 
     End Sub
 
@@ -1011,7 +1032,7 @@ Public Class Testprobleme
     ''' <param name="ipop">Populationsnummer (0-basiert)</param>
     ''' <param name="Diag">Referenz auf das Hauptdiagramm</param>
     ''' <remarks></remarks>
-    Public Sub Evaluate(ByRef ind As Common.Individuum, ByVal ipop As Short, ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
+    Public Sub Evaluate(ByRef ind As Individuum, ByVal ipop As Short, ByRef Diag As BlueM.Opt.Diagramm.Hauptdiagramm)
 
         Dim i As Integer
         Dim Unterteilung_X As Double
@@ -1059,7 +1080,7 @@ Public Class Testprobleme
             Case TP_BealeProblem
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswert berechnen
+                'QualitÃ¤tswert berechnen
                 '-----------------------
                 x1 = -5 + (ind.OptParameter(0).Xn * 10)
                 x2 = -2 + (ind.OptParameter(1).Xn * 4)
@@ -1074,7 +1095,7 @@ Public Class Testprobleme
             Case TP_Schwefel24Problem
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswert berechnen
+                'QualitÃ¤tswert berechnen
                 '-----------------------
                 ReDim x_arr(globalAnzPar - 1)
                 For i = 0 To globalAnzPar - 1
@@ -1097,7 +1118,7 @@ Public Class Testprobleme
             Case TP_Deb1 'Deb 2000, D1 (Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswert berechnen
+                'QualitÃ¤tswert berechnen
                 '-----------------------
                 ind.Objectives(0) = ind.OptParameter(0).Xn * (9 / 10) + 0.1
                 ind.Objectives(1) = (1 + 5 * ind.OptParameter(1).Xn) / (ind.OptParameter(0).Xn * (9 / 10) + 0.1)
@@ -1110,7 +1131,7 @@ Public Class Testprobleme
             Case TP_ZitzlerDebT1 'Zitzler/Deb/Thiele 2000, T1 (Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswert berechnen
+                'QualitÃ¤tswert berechnen
                 '-----------------------
                 f1 = ind.OptParameter(0).Xn
                 f2 = 0
@@ -1118,7 +1139,7 @@ Public Class Testprobleme
                     f2 = f2 + ind.OptParameter(i).Xn
                 Next i
                 f2 = 1 + 9 / (globalAnzPar - 1) * f2
-                f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
+                f2 = f2 * (1 - Math.Sqrt(f1 / f2))
                 ind.Objectives(0) = f1
                 ind.Objectives(1) = f2
 
@@ -1130,7 +1151,7 @@ Public Class Testprobleme
             Case TP_ZitzlerDebT2 'Zitzler/Deb/Thiele 2000, T2 (Non-Konvexe Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 f1 = ind.OptParameter(0).Xn
                 f2 = 0
@@ -1150,7 +1171,7 @@ Public Class Testprobleme
             Case TP_ZitzlerDebT3 'Zitzler/Deb/Thiele 2000, T3 (disconected Pareto-Front)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 f1 = ind.OptParameter(0).Xn
                 f2 = 0
@@ -1170,7 +1191,7 @@ Public Class Testprobleme
             Case TP_ZitzlerDebT4 'Zitzler/Deb/Thiele 2000, T4 (local/global Pareto-Fronts)
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 f1 = ind.OptParameter(0).Xn
                 f2 = 0
@@ -1179,7 +1200,7 @@ Public Class Testprobleme
                     f2 = f2 + (x2 * x2 - 10 * Math.Cos(4 * Math.PI * x2))
                 Next i
                 f2 = 1 + 10 * (globalAnzPar - 1) + f2
-                f2 = f2 * (1 - System.Math.Sqrt(f1 / f2))
+                f2 = f2 * (1 - Math.Sqrt(f1 / f2))
                 ind.Objectives(0) = f1
                 ind.Objectives(1) = f2
 
@@ -1191,7 +1212,7 @@ Public Class Testprobleme
             Case TP_CONSTR
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 f1 = ind.OptParameter(0).Xn * (9 / 10) + 0.1
                 f2 = (1 + 5 * ind.OptParameter(1).Xn) / (ind.OptParameter(0).Xn * (9 / 10) + 0.1)
@@ -1210,10 +1231,10 @@ Public Class Testprobleme
                 'Zeichnen
                 '--------
                 If (Not ind.Is_Feasible) Then
-                    'Ungültige Lösung
+                    'UngÃ¼ltige LÃ¶sung
                     serie = Diag.getSeriesPoint("Population (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 Else
-                    'Gültige Lösung
+                    'GÃ¼ltige LÃ¶sung
                     serie = Diag.getSeriesPoint("Population", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                 End If
                 serie.Add(ind.Objectives(0), ind.Objectives(1))
@@ -1221,7 +1242,7 @@ Public Class Testprobleme
             Case TP_Box
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 ind.Objectives(0) = ind.OptParameter(0).Xn
                 ind.Objectives(1) = ind.OptParameter(1).Xn
@@ -1236,10 +1257,10 @@ Public Class Testprobleme
                 '--------
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
                 If (Not ind.Is_Feasible) Then
-                    'Ungültige Lösung
+                    'UngÃ¼ltige LÃ¶sung
                     serie3D = Diag.getSeries3DPoint("Population (invalid)", "Gray")
                 Else
-                    'Gültige Lösung
+                    'GÃ¼ltige LÃ¶sung
                     serie3D = Diag.getSeries3DPoint("Population", "Orange")
                 End If
                 serie3D.Add(ind.Objectives(0), ind.Objectives(1), ind.Objectives(2))
@@ -1247,7 +1268,7 @@ Public Class Testprobleme
             Case TP_DependentParameters
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                'Qualitätswerte berechnen
+                'QualitÃ¤tswerte berechnen
                 '------------------------
                 ind.Objectives(0) = ind.OptParameter(0).Xn ^ 2 + ind.OptParameter(1).Xn ^ 2
 
@@ -1317,7 +1338,7 @@ Public Class Testprobleme
                 serie.Add(ind.Objectives(0), ind.Objectives(1))
 
             Case TP_Ackley
-                'Qualitätswert berechnen
+                'QualitÃ¤tswert berechnen
                 '-----------------------
                 x = ind.OptParameter(0).RWert
                 y = ind.OptParameter(1).RWert

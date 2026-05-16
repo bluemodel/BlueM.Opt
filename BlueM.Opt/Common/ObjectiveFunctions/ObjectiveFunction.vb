@@ -15,11 +15,9 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.Globalization
-Imports BlueM
 
 ''' <summary>
-''' Klasse für die Definition von Objective Funktionen
+''' Klasse fÃ¼r die Definition von Objective Funktionen
 ''' </summary>
 Public MustInherit Class ObjectiveFunction
 
@@ -46,7 +44,6 @@ Public MustInherit Class ObjectiveFunction
 
     Public Enum ObjectiveType As Integer
         Series = 1
-        Value = 2
         ValueFromSeries = 3
         Aggregate = 5
     End Enum
@@ -77,7 +74,7 @@ Public MustInherit Class ObjectiveFunction
     Public Factor As Double
 
     ''' <summary>
-    ''' File extension of the result file from which to read the simulation result, e.g. "WEL", "ASC", "KTR.WEL", "WBL", etc.
+    ''' File extension of the result file from which to read the simulation result, e.g. "WEL", "KTR.WEL", "WBL", etc.
     ''' </summary>
     Public FileExtension As String
 
@@ -272,7 +269,7 @@ Public MustInherit Class ObjectiveFunction
                 Next
                 objectiveValue = sUnter
 
-            Case "NGT", "NÜBER"
+            Case "NGT", "NÃœBER"
                 'Relative number of timesteps where simulation is greater than reference [%]
                 '---------------------------------------------------------------------------
                 Dim nUeber As Integer = 0
@@ -283,7 +280,7 @@ Public MustInherit Class ObjectiveFunction
                 Next
                 objectiveValue = nUeber / SimSeries.Length * 100
 
-            Case "SGT", "SÜBER"
+            Case "SGT", "SÃœBER"
                 'Sum of simulation values greater than reference
                 '-----------------------------------------------
                 Dim sUeber As Double = 0
@@ -385,18 +382,6 @@ Public MustInherit Class ObjectiveFunction
                 Dim biasratio As Double = avg_sim / avg_obs
                 Dim variabilityratio As Double = (std_sim / avg_sim) / (std_obs / avg_obs)
                 objectiveValue = 1 - Math.Sqrt((corr - 1) ^ 2 + (biasratio - 1) ^ 2 + (variabilityratio - 1) ^ 2)
-
-            Case "NASHSUTT"
-                'Modified Nash Sutcliffe (deprecated)
-                '1 - NSE
-                '------------------------------------
-                objectiveValue = 1.0 - compareSeries(SimSeries, RefSeries, "NSE")
-
-            Case "LNNASHSUTT"
-                'Modified Logarithmic Nash Sutcliffe (deprecated)
-                '1 - lnNSE
-                '------------------------------------------------
-                objectiveValue = 1.0 - compareSeries(SimSeries, RefSeries, "lnNSE")
 
             Case Else
                 Throw New Exception($"The objective function '{[Function]}' is not supported for series comparisons!")

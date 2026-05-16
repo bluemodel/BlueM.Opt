@@ -15,10 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.Xml
-Imports System.Xml.Serialization
-Imports BlueM.Opt.Common.Constants
-
+Imports System.Windows.Forms
+Imports BlueM.Opt.Common
 ''' <summary>
 ''' Main Window
 ''' </summary>
@@ -27,19 +25,19 @@ Partial Public Class Form1
 
 #Region "Eigenschaften"
 
-    Private IsInitializing As Boolean  'Gibt an, ob das Formular bereits fertig geladen wurde(beim Laden werden sämtliche Events ausgelöst)
+    Private IsInitializing As Boolean  'Gibt an, ob das Formular bereits fertig geladen wurde(beim Laden werden sÃ¤mtliche Events ausgelÃ¶st)
 
     'Anwendung
     Private Anwendung As String
 
     'Problem
-    Public mProblem As BlueM.Opt.Common.Problem
+    Public mProblem As Problem
 
     'Settings
-    Private mSettings As BlueM.Opt.Common.Settings
+    Private mSettings As Settings
 
     'Progress
-    Private mProgress As BlueM.Opt.Common.Progress
+    Private mProgress As Progress
 
     'Apps
     Private Testprobleme1 As BlueM.Opt.Apps.Testprobleme
@@ -54,7 +52,7 @@ Partial Public Class Form1
     Dim _ispause As Boolean = False
 
     ''' <summary>
-    ''' Optimierung läuft
+    ''' Optimierung lÃ¤uft
     ''' </summary>
     Private Property isRun() As Boolean
         Get
@@ -108,19 +106,19 @@ Partial Public Class Form1
     '***********
     Private Sub Form1_Load(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles MyBase.Load
         'XP-look
-        System.Windows.Forms.Application.EnableVisualStyles()
+        Application.EnableVisualStyles()
 
         'Monitor zuweisen
         Me.Monitor1 = BlueM.Opt.Diagramm.Monitor.getInstance()
         'Monitor zentrieren
         Me.Monitor1.Location = New Drawing.Point(Me.Location.X + Me.Width / 2 - Me.Monitor1.Width / 2, Me.Location.Y + Me.Height / 2 - Me.Monitor1.Height / 2)
         'Add handler for log messages
-        AddHandler BlueM.Opt.Common.Log.LogMessageAdded, AddressOf Monitor1.LogAppend
+        AddHandler Log.LogMessageAdded, AddressOf Monitor1.LogAppend
 
         'Formular initialisieren
         Call Me.INI()
 
-        'Handler für Klick auf Serien zuweisen
+        'Handler fÃ¼r Klick auf Serien zuweisen
         AddHandler Me.Hauptdiagramm1.ClickSeries, AddressOf seriesClick
 
         'Ende der Initialisierung
@@ -129,23 +127,23 @@ Partial Public Class Form1
     End Sub
 
     ''' <summary>
-    ''' Formular zurücksetzen
+    ''' Formular zurÃ¼cksetzen
     ''' </summary>
     Public Sub INI()
 
         Me.IsInitializing = True
 
         'clear the log
-        BlueM.Opt.Common.Log.Reset()
+        Log.Reset()
 
         'Anwendungs-Groupbox aktivieren
         Me.GroupBox_Anwendung.Enabled = True
 
         'Anwendung
         '---------
-        'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wählen
+        'Liste der Anwendungen in ComboBox schreiben und Anfangseinstellung wÃ¤hlen
         Me.ComboBox_Anwendung.Items.Clear()
-        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_SWMM, ANW_TALSIM, ANW_TALSIM5, ANW_TESTPROBLEMS, ANW_TSP}) 'ANW_SMUSI entfernt (#184)
+        Me.ComboBox_Anwendung.Items.AddRange(New Object() {"", ANW_BLUEM, ANW_TALSIM, ANW_TALSIM5, ANW_TESTPROBLEMS, ANW_TSP})
         Me.ComboBox_Anwendung.SelectedIndex = 0
 
         'Datensatz
@@ -159,21 +157,21 @@ Partial Public Class Form1
         Me.Label_Methode.Enabled = False
         Me.ComboBox_Methode.Enabled = False
 
-        'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
+        'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wÃ¤hlen
         Me.ComboBox_Methode.Items.Clear()
         Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_METAEVO, METH_SENSIPLOT, METH_HOOKEJEEVES, METH_DDS})
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'Einstellungen
-        Me.mSettings = New Common.Settings()
-        Me.EVO_Einstellungen1.Reset() 'für Neustart wichtig
+        Me.mSettings = New Settings()
+        Me.EVO_Einstellungen1.Reset() 'fÃ¼r Neustart wichtig
         Me.EVO_Einstellungen1.setSettings(Me.mSettings)
 
-        'Monitor zurücksetzen
+        'Monitor zurÃ¼cksetzen
         Me.Monitor1.Reset()
 
-        'Progress instanzieren und an EVO_Opt_Verlauf übergeben
-        Me.mProgress = New BlueM.Opt.Common.Progress()
+        'Progress instanzieren und an EVO_Opt_Verlauf Ã¼bergeben
+        Me.mProgress = New Progress()
         Me.EVO_Opt_Verlauf1.Initialisieren(Me.mProgress)
 
         'Toolbar-Buttons deaktivieren
@@ -224,7 +222,7 @@ Partial Public Class Form1
     Private Sub Button_New_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_New.Click
         'Controller stoppen
         If (Me.STOPPEN()) Then
-            'Formular zurücksetzen
+            'Formular zurÃ¼cksetzen
             Call Me.INI()
         End If
     End Sub
@@ -241,7 +239,7 @@ Partial Public Class Form1
 
     End Sub
 
-    'Wenn Monitor geöffnet/geschlossen wird, ButtonState aktualisieren
+    'Wenn Monitor geÃ¶ffnet/geschlossen wird, ButtonState aktualisieren
     '*****************************************************************
     Private Sub MonitorOpenClose() Handles Monitor1.MonitorClosed, Monitor1.MonitorOpened
         Me.ToolStripButton_Monitor.Checked = Me.Monitor1.Visible
@@ -258,14 +256,14 @@ Partial Public Class Form1
     End Sub
 
     ''' <summary>
-    ''' Handles Release notes menu item clicked
+    ''' Handles Changelog menu item clicked
     ''' Opens the release notes
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
-    Private Sub ReleaseNotesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReleaseNotesToolStripMenuItem.Click
+    Private Sub ToolStripMenuItem_Changelog_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem_Changelog.Click
         Dim filepath As String
-        filepath = IO.Path.Combine(Application.StartupPath, "BLUEM.OPT_RELEASE-NOTES.txt")
+        filepath = IO.Path.Combine(Application.StartupPath, "CHANGELOG.md")
         Try
             System.Diagnostics.Process.Start(filepath)
         Catch ex As Exception
@@ -281,7 +279,7 @@ Partial Public Class Form1
         Call about.ShowDialog(Me)
     End Sub
 
-    'Einstellungen-Button hat selbst keine funktionalität -> nur DropDown
+    'Einstellungen-Button hat selbst keine funktionalitÃ¤t -> nur DropDown
     '********************************************************************
     Private Sub Button_Einstellungen_ButtonClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripSplitButton_Settings.ButtonClick
         Call Me.ToolStripSplitButton_Settings.ShowDropDown()
@@ -324,14 +322,14 @@ Partial Public Class Form1
     Public Sub loadSettings(ByVal filename As String)
 
         'read settings from file
-        Dim settings As Common.Settings = Common.Settings.Load(filename)
+        Dim settings As Settings = Settings.Load(filename)
 
         'Checks: PES OptMode has to be identical
         If settings.PES.OptModus <> Me.mSettings.PES.OptModus Then
             Throw New Exception("The loaded settings use a different optimization mode (single-/multiobjective) and are not compatible!")
         End If
 
-        'Geladene Settings überall neu setzen
+        'Geladene Settings Ã¼berall neu setzen
         Me.mSettings = settings
         Me.EVO_Einstellungen1.setSettings(Me.mSettings)
         Me.Hauptdiagramm1.setSettings(Me.mSettings)
@@ -345,10 +343,10 @@ Partial Public Class Form1
 
 #Region "Initialisierung der Anwendungen"
 
-    'Die Anwendung wurde ausgewählt und wird jetzt initialisiert
+    'Die Anwendung wurde ausgewÃ¤hlt und wird jetzt initialisiert
     'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-    'Anwendung wurde ausgewählt
+    'Anwendung wurde ausgewÃ¤hlt
     '**************************
     Private Sub Combo_App_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Anwendung.SelectedIndexChanged
         If (Not Me.IsInitializing) Then
@@ -368,20 +366,20 @@ Partial Public Class Form1
             Me.ComboBox_Anwendung.SelectedItem = selectedAnwendung
             Me.IsInitializing = False
 
-            'Diagramm zurücksetzen
+            'Diagramm zurÃ¼cksetzen
             Call Me.Hauptdiagramm1.Reset()
 
             'Alles deaktivieren, danach je nach Anwendung aktivieren
             '-------------------------------------------------------
 
-            'Sim1 zerstören
+            'Sim1 zerstÃ¶ren
             Me.Sim1 = Nothing
 
             'Start Button deaktivieren
             Me.Button_Start.Enabled = False
 
             'Datensatz-Reset deaktivieren
-            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
+            Me.MenuItem_DatensatzZurÃ¼cksetzen.Enabled = False
 
             'Methodenauswahl deaktivieren
             Me.Label_Methode.Enabled = False
@@ -394,18 +392,18 @@ Partial Public Class Form1
             Me.ToolStripButton_SelectedSolutions.Enabled = False
             Me.ToolStripMenuItem_ErgebnisDBCompare.Enabled = False
 
-            'Multithreading standardmäßig verbieten
+            'Multithreading standardmÃ¤ÃŸig verbieten
             Me.mSettings.General.MultithreadingAllowed = False
 
             'Mauszeiger busy
             Cursor = Cursors.WaitCursor
 
-            'Ausgewählte Anwendung speichern
+            'AusgewÃ¤hlte Anwendung speichern
             Me.Anwendung = selectedAnwendung
 
             Select Case Me.Anwendung
 
-                Case "" 'Keine Anwendung ausgewählt
+                Case "" 'Keine Anwendung ausgewÃ¤hlt
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
                     'nix
@@ -415,13 +413,6 @@ Partial Public Class Form1
 
                     'Objekt der Klasse BlueM initialisieren
                     Sim1 = New BlueM.Opt.Apps.BlueMSim()
-
-
-                Case ANW_SMUSI 'Anwendung Smusi
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Objekt der Klasse Smusi initialisieren
-                    'Sim1 = New BlueM.Opt.Apps.Smusi()
 
 
                 Case ANW_TALSIM 'Anwendung TALSIM
@@ -436,13 +427,6 @@ Partial Public Class Form1
 
                     'Objekt der Klasse Talsim5 initialisieren
                     Sim1 = New BlueM.Opt.Apps.Talsim5()
-
-
-                Case ANW_SWMM   'Anwendung SWMM
-                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-                    'Objekt der Klasse SWMM initialisieren
-                    Sim1 = New BlueM.Opt.Apps.SWMM()
 
 
                 Case ANW_TESTPROBLEMS 'Anwendung Testprobleme
@@ -461,7 +445,7 @@ Partial Public Class Form1
                 Case ANW_TSP 'Anwendung Traveling Salesman Problem (TSP)
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'HACK: bei TSP Datensatz und Methode nicht notwendig, Abkürzung:
+                    'HACK: bei TSP Datensatz und Methode nicht notwendig, AbkÃ¼rzung:
                     'Start-Button aktivieren (keine Methodenauswahl erforderlich)
                     'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
                     Me.IsInitializing = True
@@ -476,7 +460,7 @@ Partial Public Class Form1
 
             'Bei Sim-Anwendungen
             If (Not IsNothing(Me.Sim1)) Then
-                'Settings an Sim1 übergeben
+                'Settings an Sim1 Ã¼bergeben
                 Call Me.Sim1.setSettings(Me.mSettings)
 
                 'ggf. Multithreading-Option aktivieren
@@ -488,22 +472,22 @@ Partial Public Class Form1
             'Datensatz UI aktivieren
             Call Me.Datensatz_initUI()
 
-            'Progress zurücksetzen
+            'Progress zurÃ¼cksetzen
             Call Me.mProgress.Initialize()
 
             'log
-            Common.Log.AddMessage(Common.Log.levels.info, $"Set application to {Me.Anwendung}")
+            Log.AddMessage(Log.levels.info, $"Set application to {Me.Anwendung}")
 
         Catch ex As Exception
 
-            MsgBox("Error while initializing the application:" & eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Error while initializing the application:" & Constants.eol & ex.Message, MsgBoxStyle.Critical)
             Me.IsInitializing = True
             Me.ComboBox_Anwendung.SelectedIndex = 0
             Me.IsInitializing = False
 
         End Try
 
-        'wegen verändertem Setting MultithreadingAllowed
+        'wegen verÃ¤ndertem Setting MultithreadingAllowed
         Call Me.EVO_Einstellungen1.refreshForm()
 
         'Mauszeiger wieder normal
@@ -519,10 +503,10 @@ Partial Public Class Form1
         Me.Label_Datensatz.Enabled = True
         Me.ComboBox_Datensatz.Enabled = True
 
-        'Tooltip zurücksetzen
+        'Tooltip zurÃ¼cksetzen
         Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
 
-        'Combo_Datensatz auffüllen
+        'Combo_Datensatz auffÃ¼llen
         Call Me.Datensatz_populateCombo()
 
         Select Case Me.Anwendung
@@ -555,21 +539,21 @@ Partial Public Class Form1
 
     End Sub
 
-    'Combo_Datensatz auffüllen
+    'Combo_Datensatz auffÃ¼llen
     '*************************
     Private Sub Datensatz_populateCombo()
 
         Dim i As Integer
         Dim pfad As String
 
-        'vorherige Einträge löschen
+        'vorherige EintrÃ¤ge lÃ¶schen
         Me.ComboBox_Datensatz.Items.Clear()
 
         Select Case Me.Anwendung
 
             Case ANW_TESTPROBLEMS
 
-                'Mit Testproblemen füllen
+                'Mit Testproblemen fÃ¼llen
                 Me.ComboBox_Datensatz.Items.AddRange(Testprobleme1.Testprobleme.ToArray())
 
             Case ANW_TSP
@@ -578,14 +562,14 @@ Partial Public Class Form1
 
             Case Else '(Sim-Anwendungen)
 
-                'Mit Benutzer-MRUSimDatensätze füllen
+                'Mit Benutzer-MRUSimDatensÃ¤tze fÃ¼llen
                 Try
                     If (My.Settings.MRUSimDatensaetze.Count > 0) Then
 
-                        'Combobox rückwärts füllen
+                        'Combobox rÃ¼ckwÃ¤rts fÃ¼llen
                         For i = My.Settings.MRUSimDatensaetze.Count - 1 To 0 Step -1
 
-                            'nur existierende, zur Anwendung passende Datensätze anzeigen
+                            'nur existierende, zur Anwendung passende DatensÃ¤tze anzeigen
                             pfad = My.Settings.MRUSimDatensaetze(i)
                             If (IO.File.Exists(pfad) _
                                 And IO.Path.GetExtension(pfad).ToUpper() = Me.Sim1.DatensatzExtension) Then
@@ -603,7 +587,7 @@ Partial Public Class Form1
 
     End Sub
 
-    'Arbeitsverzeichnis/Datensatz auswählen (nur Sim-Anwendungen)
+    'Arbeitsverzeichnis/Datensatz auswÃ¤hlen (nur Sim-Anwendungen)
     '************************************************************
     Private Sub Datensatz_browse(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_BrowseDatensatz.Click
 
@@ -620,7 +604,7 @@ Partial Public Class Form1
             OpenFileDialog1.FileName = IO.Path.Combine(Sim1.WorkDir_Original, Sim1.Datensatz & "." & Sim1.DatensatzDateiendungen(0))
         End If
 
-        'Dialog öffnen
+        'Dialog Ã¶ffnen
         DiagResult = OpenFileDialog1.ShowDialog()
 
         'Neuen Datensatz speichern
@@ -631,17 +615,17 @@ Partial Public Class Form1
             'Datensatz setzen
             Call Me.INI_Datensatz(pfad)
 
-            'Methodenauswahl wieder zurücksetzen 
-            '(Der Benutzer muss zuerst Ini neu ausführen!)
+            'Methodenauswahl wieder zurÃ¼cksetzen 
+            '(Der Benutzer muss zuerst Ini neu ausfÃ¼hren!)
             Me.ComboBox_Methode.SelectedItem = ""
 
         End If
 
     End Sub
 
-    'Sim-Datensatz zurücksetzen
+    'Sim-Datensatz zurÃ¼cksetzen
     '**************************
-    Private Sub Datensatz_reset(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_DatensatzZurücksetzen.Click
+    Private Sub Datensatz_reset(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_DatensatzZurÃ¼cksetzen.Click
 
         Call Sim1.resetDatensatz()
 
@@ -649,7 +633,7 @@ Partial Public Class Form1
 
     End Sub
 
-    'Datensatz wurde ausgewählt
+    'Datensatz wurde ausgewÃ¤hlt
     '**************************
     Private Sub Combo_Datensatz_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Datensatz.SelectedIndexChanged
         If (Not Me.IsInitializing) Then
@@ -665,16 +649,16 @@ Partial Public Class Form1
 
         Try
 
-            'Zurücksetzen
+            'ZurÃ¼cksetzen
             '------------
 
             'Tooltip
             Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, "")
 
             'Datensatz-Reset
-            Me.MenuItem_DatensatzZurücksetzen.Enabled = False
+            Me.MenuItem_DatensatzZurÃ¼cksetzen.Enabled = False
 
-            'gewählten Datensatz an Anwendung übergeben
+            'gewÃ¤hlten Datensatz an Anwendung Ã¼bergeben
             '------------------------------------------
             Select Case Me.Anwendung
 
@@ -717,7 +701,7 @@ Partial Public Class Form1
 
             End Select
 
-            'Methodenauswahl aktivieren und zurücksetzen
+            'Methodenauswahl aktivieren und zurÃ¼cksetzen
             '-------------------------------------------
             Me.Label_Methode.Enabled = True
             Me.ComboBox_Methode.Enabled = True
@@ -725,11 +709,11 @@ Partial Public Class Form1
             Me.ComboBox_Methode.SelectedItem = ""
             Me.IsInitializing = False
 
-            'Progress zurücksetzen
+            'Progress zurÃ¼cksetzen
             Call Me.mProgress.Initialize()
 
             'log
-            Common.Log.AddMessage(Common.Log.levels.info, $"Set dataset to {selectedDatensatz}")
+            Log.AddMessage(Log.levels.info, $"Set dataset to {selectedDatensatz}")
 
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical)
@@ -737,7 +721,7 @@ Partial Public Class Form1
 
     End Sub
 
-    'Methode wurde ausgewählt
+    'Methode wurde ausgewÃ¤hlt
     '************************
     Private Sub Combo_Method_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox_Methode.SelectedIndexChanged
         If (Not Me.IsInitializing) Then
@@ -765,10 +749,10 @@ Partial Public Class Form1
             Call Me.INI_Problem(selectedMethod)
 
             'Methodenspezifische Vorbereitungen
-            '(zunächst alles deaktivieren, danach je nach Methode aktivieren)
+            '(zunÃ¤chst alles deaktivieren, danach je nach Methode aktivieren)
             '================================================================
 
-            'Diagramm zurücksetzen
+            'Diagramm zurÃ¼cksetzen
             Me.Hauptdiagramm1.Reset()
 
             'Start Button deaktivieren
@@ -812,7 +796,7 @@ Partial Public Class Form1
                 Case METH_HOOKEJEEVES
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Kontrolle: Nur SO möglich!
+                    'Kontrolle: Nur SO mÃ¶glich!
                     If (Me.mProblem.Modus = EVO_MODE.Multi_Objective) Then
                         Throw New Exception("The method Hooke and Jeeves is only usable for single-objective optimization problems!")
                     End If
@@ -829,7 +813,7 @@ Partial Public Class Form1
                 Case METH_DDS
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Kontrolle: Nur SO möglich!
+                    'Kontrolle: Nur SO mÃ¶glich!
                     If (Me.mProblem.Modus = EVO_MODE.Multi_Objective) Then
                         Throw New Exception("The method DDS is only usable for single-objective optimization problems!")
                     End If
@@ -876,17 +860,17 @@ Partial Public Class Form1
 
             If (Me.Anwendung <> ANW_TESTPROBLEMS) Then
                 'Datensatz-Reset aktivieren
-                Me.MenuItem_DatensatzZurücksetzen.Enabled = True
+                Me.MenuItem_DatensatzZurÃ¼cksetzen.Enabled = True
             End If
 
-            'Multithreading-Option (de)aktivieren (Kombination ist maßgebend!)
+            'Multithreading-Option (de)aktivieren (Kombination ist maÃŸgebend!)
             Me.mSettings.General.MultithreadingAllowed = (Me.mSettings.General.MultithreadingAllowed And Me.controller.MultithreadingSupported)
             Call Me.EVO_Einstellungen1.refreshForm()
 
         Catch ex As Exception
 
-            MsgBox("Error while setting the method:" & eol & ex.Message, MsgBoxStyle.Critical)
-            'Combobox zurücksetzen
+            MsgBox("Error while setting the method:" & Constants.eol & ex.Message, MsgBoxStyle.Critical)
+            'Combobox zurÃ¼cksetzen
             Me.IsInitializing = True
             Me.ComboBox_Methode.SelectedIndex = 0
             Me.IsInitializing = False
@@ -899,31 +883,31 @@ Partial Public Class Form1
     End Sub
 
     ''' <summary>
-    ''' Problem initialisieren und überall bekannt machen
+    ''' Problem initialisieren und Ã¼berall bekannt machen
     ''' </summary>
-    ''' <param name="Method">gewählte Methode</param>
+    ''' <param name="Method">gewÃ¤hlte Methode</param>
     Private Sub INI_Problem(ByVal Method As String)
 
-        'Neues Problem mit ausgewählter Methode instanzieren
-        Me.mProblem = New BlueM.Opt.Common.Problem(Method)
+        'Neues Problem mit ausgewÃ¤hlter Methode instanzieren
+        Me.mProblem = New Problem(Method)
 
         'Problemdefinition
         '=================
         Select Case Me.Anwendung
 
-            Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM, ANW_TALSIM5
+            Case ANW_BLUEM, ANW_TALSIM, ANW_TALSIM5
 
                 'Bei allen Sim-Anwendungen
                 '-----------------------------------------------------
 
-                'WorkDir und Datensatz übergeben
+                'WorkDir und Datensatz Ã¼bergeben
                 Me.mProblem.WorkDir = Sim1.WorkDir_Original
                 Me.mProblem.Datensatz = Sim1.Datensatz
 
                 'EVO-Eingabedateien einlesen
                 Call Me.mProblem.Read_InputFiles(Me.Sim1.SimStart, Me.Sim1.SimEnde)
 
-                'Problem an Sim-Objekt übergeben
+                'Problem an Sim-Objekt Ã¼bergeben
                 Call Me.Sim1.setProblem(Me.mProblem)
 
 
@@ -940,21 +924,21 @@ Partial Public Class Form1
 
         End Select
 
-        'Problem an EVO_Einstellungen übergeben
+        'Problem an EVO_Einstellungen Ã¼bergeben
         '--------------------------------------
         Call Me.EVO_Einstellungen1.setProblem(Me.mProblem)
 
         'Individuumsklasse mit Problem initialisieren
         '--------------------------------------------
-        Call BlueM.Opt.Common.Individuum.Initialise(Me.mProblem)
+        Call Individuum.Initialise(Me.mProblem)
 
         'Problembeschreibung in Log schreiben
         '------------------------------------
-        Common.Log.AddMessage(Common.Log.levels.info, $"Set method to {Me.mProblem.Method}")
+        Log.AddMessage(Log.levels.info, $"Set method to {Me.mProblem.Method}")
         Dim msg As String
-        msg = "Optimization problem loaded:" & eol
+        msg = "Optimization problem loaded:" & Constants.eol
         msg &= Me.mProblem.Description()
-        Common.Log.AddMessage(Common.Log.levels.info, msg)
+        Log.AddMessage(Log.levels.info, msg)
 
         Me.Monitor1.SelectTabLog()
         Me.Monitor1.Show()
@@ -990,13 +974,13 @@ Partial Public Class Form1
         'Stoppuhr
         Dim AllOptTime As New Stopwatch
 
-        Common.Log.AddMessage(Common.Log.levels.info, "Starting optimization...")
+        Log.AddMessage(Log.levels.info, "Starting optimization...")
 
         Call StarteDurchlauf(AllOptTime)
 
         MsgBox("Optimization ended!", MsgBoxStyle.Information, "BlueM.Opt")
 
-        Common.Log.AddMessage(Common.Log.levels.info, $"The optimization took {AllOptTime.Elapsed.Days}d {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
+        Log.AddMessage(Log.levels.info, $"The optimization took {AllOptTime.Elapsed.Days}d {AllOptTime.Elapsed.Hours}h {AllOptTime.Elapsed.Minutes}m {AllOptTime.Elapsed.Seconds}s {AllOptTime.Elapsed.Milliseconds}ms")
 
     End Sub
 
@@ -1036,7 +1020,7 @@ Partial Public Class Form1
             'Settings deaktivieren
             Call Me.EVO_Einstellungen1.freeze()
 
-            'Settings an Hauptdiagramm übergeben
+            'Settings an Hauptdiagramm Ã¼bergeben
             Call Me.Hauptdiagramm1.setSettings(Me.mSettings)
 
             'Diagramm vorbereiten und initialisieren
@@ -1044,7 +1028,7 @@ Partial Public Class Form1
 
             Select Case Anwendung
 
-                Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM, ANW_TALSIM5
+                Case ANW_BLUEM, ANW_TALSIM, ANW_TALSIM5
                     'Sim-Anwendungen
 
                     'Save settings to file
@@ -1053,7 +1037,7 @@ Partial Public Class Form1
 
                     'Set log file
                     Dim logfilename As String = IO.Path.Combine(Me.mProblem.WorkDir, $"{Me.mProblem.Datensatz}.BlueM.Opt.{starttime:yyyyMMddHHmm}.log")
-                    BlueM.Opt.Common.Log.SetLogFile(logfilename)
+                    Log.SetLogFile(logfilename)
 
                     'Prepare OptResult (database)
                     Call Me.Sim1.PrepareOptResult(starttime)
@@ -1070,7 +1054,7 @@ Partial Public Class Form1
                         End If
                     End If
 
-                    'Controller für Sim initialisieren und starten
+                    'Controller fÃ¼r Sim initialisieren und starten
                     Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Sim1)
                     Call controller.Start()
@@ -1078,7 +1062,7 @@ Partial Public Class Form1
                 Case ANW_TESTPROBLEMS
                     'Testprobleme
 
-                    'Controller für Testproblem initialisieren und starten
+                    'Controller fÃ¼r Testproblem initialisieren und starten
                     Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
                     Call controller.InitApp(Me.Testprobleme1)
                     Call controller.Start()
@@ -1086,17 +1070,17 @@ Partial Public Class Form1
                 Case ANW_TSP
                     'Traveling Salesman
 
-                    'Controller für TSP initialisieren und starten
+                    'Controller fÃ¼r TSP initialisieren und starten
                     Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                    'Call controller.InitApp() bei TSP nicht benötigt
+                    'Call controller.InitApp() bei TSP nicht benÃ¶tigt
                     Call controller.Start()
 
             End Select
 
         Catch ex As Exception
 
-            'Globale Fehlerbehandlung für Optimierungslauf:
-            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
+            'Globale Fehlerbehandlung fÃ¼r Optimierungslauf:
+            Log.AddMessage(Log.levels.error, ex.Message)
             MsgBox(ex.Message, MsgBoxStyle.Critical, "Error")
 
         Finally
@@ -1119,7 +1103,7 @@ Partial Public Class Form1
     ''' </summary>
     Private Sub PAUSE()
 
-        'nur wenn Optimierung läuft
+        'nur wenn Optimierung lÃ¤uft
         If (Me.isRun) Then
 
             If (Not Me.isPause) Then
@@ -1135,7 +1119,7 @@ Partial Public Class Form1
 
                 'Pausen Magic :-)
                 Do While (Me.isPause)
-                    System.Threading.Thread.Sleep(20)
+                    Threading.Thread.Sleep(20)
                     Application.DoEvents()
                 Loop
 
@@ -1176,7 +1160,7 @@ Partial Public Class Form1
             res = MsgBox("Are you sure you want to abort the optimization?", MsgBoxStyle.YesNo)
 
             If (res = MsgBoxResult.Yes) Then
-                'Pause ausschalten, sonst läuft die immer weiter
+                'Pause ausschalten, sonst lÃ¤uft die immer weiter
                 Me.isPause = False
                 'Controller stoppen
                 Call Me.controller.Stoppen()
@@ -1204,7 +1188,7 @@ Partial Public Class Form1
     'Diagrammfunktionen
     '###################
 
-    'Diagramm-Button hat selbst keine funktionalität -> nur DropDown
+    'Diagramm-Button hat selbst keine funktionalitÃ¤t -> nur DropDown
     '***************************************************************
     Private Sub Button_Diagramm_ButtonClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripSplitButton_Diagramm.ButtonClick
         Call Me.ToolStripSplitButton_Diagramm.ShowDropDown()
@@ -1222,7 +1206,7 @@ Partial Public Class Form1
         SaveFileDialog1.DefaultExt = Me.Hauptdiagramm1.Export.Data.Excel.FileExtension
         SaveFileDialog1.FileName = Me.Hauptdiagramm1.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "Excel files (*.xls)|*.xls"
-        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+        If (Me.SaveFileDialog1.ShowDialog() = DialogResult.OK) Then
             Me.Hauptdiagramm1.Export.Data.Excel.Series = Nothing 'export all series
             Me.Hauptdiagramm1.Export.Data.Excel.IncludeLabels = True
             Me.Hauptdiagramm1.Export.Data.Excel.IncludeIndex = True
@@ -1238,7 +1222,7 @@ Partial Public Class Form1
         SaveFileDialog1.DefaultExt = Me.Hauptdiagramm1.Export.Image.PNG.FileExtension
         SaveFileDialog1.FileName = Me.Hauptdiagramm1.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "PNG files (*.png)|*.png"
-        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+        If (Me.SaveFileDialog1.ShowDialog() = DialogResult.OK) Then
             Me.Hauptdiagramm1.Export.Image.PNG.GrayScale = False
             Me.Hauptdiagramm1.Export.Image.PNG.Save(Me.SaveFileDialog1.FileName)
         End If
@@ -1250,7 +1234,7 @@ Partial Public Class Form1
         SaveFileDialog1.DefaultExt = Me.Hauptdiagramm1.Export.Template.FileExtension
         SaveFileDialog1.FileName = Me.Hauptdiagramm1.Name + "." + SaveFileDialog1.DefaultExt
         SaveFileDialog1.Filter = "TeeChart files (*.ten)|*.ten"
-        If (Me.SaveFileDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK) Then
+        If (Me.SaveFileDialog1.ShowDialog() = DialogResult.OK) Then
             Me.Hauptdiagramm1.Export.Template.IncludeData = True
             Me.Hauptdiagramm1.Export.Template.Save(Me.SaveFileDialog1.FileName)
         End If
@@ -1265,7 +1249,7 @@ Partial Public Class Form1
         Dim Achsen As New Collection
 
         ReDim tmpZielindex(2)                       'Maximal 3 Achsen
-        'Zunächst keine Achsenzuordnung (-1)
+        'ZunÃ¤chst keine Achsenzuordnung (-1)
         For i = 0 To tmpZielindex.GetUpperBound(0)
             tmpZielindex(i) = -1
         Next
@@ -1279,7 +1263,7 @@ Partial Public Class Form1
 
                 Call Testprobleme1.DiagInitialise(Me.Hauptdiagramm1)
 
-            Case ANW_BLUEM, ANW_SMUSI, ANW_SWMM, ANW_TALSIM, ANW_TALSIM5
+            Case ANW_BLUEM, ANW_TALSIM, ANW_TALSIM5
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
                 Select Case Me.mProblem.Method
@@ -1405,7 +1389,7 @@ Partial Public Class Form1
                             'Multi-Objective
                             '===============
 
-                            'für jedes OptZiel eine Achse hinzufügen
+                            'fÃ¼r jedes OptZiel eine Achse hinzufÃ¼gen
                             j = 0
                             For i = 0 To Me.mProblem.NumObjectives - 1
                                 If (Me.mProblem.List_ObjectiveFunctions(i).isPrimObjective) Then
@@ -1427,7 +1411,7 @@ Partial Public Class Form1
 
                             'Warnung bei mehr als 3 OptZielen
                             If (Me.mProblem.NumPrimObjective > 3) Then
-                                MsgBox("The number of primary objectives is more than 3!" & eol _
+                                MsgBox("The number of primary objectives is more than 3!" & Constants.eol _
                                         & "Only the first three primary objectives will be displayed in the main chart!", MsgBoxStyle.Information)
                             End If
 
@@ -1461,7 +1445,7 @@ Partial Public Class Form1
             Me.scatterplot2 = New BlueM.Opt.Diagramm.Scatterplot(Me.mProblem, Sim1.OptResult, Sim1.OptResultRef)
         Else
             Cursor = Cursors.Default
-            MsgBox($"There are already two scatterplot matrices open!{eol}Please close at least one of them first!", MsgBoxStyle.Information)
+            MsgBox($"There are already two scatterplot matrices open!{Constants.eol}Please close at least one of them first!", MsgBoxStyle.Information)
         End If
 
         Cursor = Cursors.Default
@@ -1489,7 +1473,7 @@ Partial Public Class Form1
 
     End Sub
 
-#Region "Lösungsauswahl"
+#Region "LÃ¶sungsauswahl"
 
     ''' <summary>
     ''' Button to show selected Solutions clicked
@@ -1498,12 +1482,12 @@ Partial Public Class Form1
     ''' <param name="e"></param>
     ''' <remarks></remarks>
     Private Sub ToolStripButton_SelectedSolutions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_SelectedSolutions.Click
-        'Lösungsdialog initialisieren
+        'LÃ¶sungsdialog initialisieren
         If (IsNothing(Me.solutionDialog)) Then
             Me.solutionDialog = New SolutionDialog(Me.mProblem)
         End If
 
-        'Lösungsdialog anzeigen
+        'LÃ¶sungsdialog anzeigen
         Call Me.solutionDialog.Show()
         Call Me.solutionDialog.BringToFront()
     End Sub
@@ -1513,7 +1497,7 @@ Partial Public Class Form1
     '***************************
     Public Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
-        'Notwendige Bedingungen überprüfen
+        'Notwendige Bedingungen Ã¼berprÃ¼fen
         '---------------------------------
         If (IsNothing(Sim1)) Then
             'Anwendung != Sim
@@ -1522,21 +1506,21 @@ Partial Public Class Form1
         Else
 
             Dim indID_clicked As Integer
-            Dim ind As Common.Individuum
+            Dim ind As Individuum
 
             Try
                 'Solution-ID
                 indID_clicked = s.Labels(valueIndex)
 
-                'Lösung holen
+                'LÃ¶sung holen
                 ind = Sim1.OptResult.getSolution(indID_clicked)
 
-                'Lösung auswählen
+                'LÃ¶sung auswÃ¤hlen
                 Call Me.selectSolution(ind)
 
             Catch ex As Exception
-                Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
-                MsgBox($"Solution is not selectable!{Common.Constants.eol}{ex.Message}", MsgBoxStyle.Information)
+                Log.AddMessage(Log.levels.error, ex.Message)
+                MsgBox($"Solution is not selectable!{Constants.eol}{ex.Message}", MsgBoxStyle.Information)
             End Try
 
         End If
@@ -1548,7 +1532,7 @@ Partial Public Class Form1
     ''' </summary>
     ''' <param name="id">the solution ID to select</param>
     Private Overloads Sub selectSolution(id As Integer) Handles solutionDialog.SelectedSolutionsIDRequested
-        Dim ind As Common.Individuum
+        Dim ind As Individuum
         Try
             ind = Sim1.OptResult.getSolution(id)
             Call Me.selectSolution(ind)
@@ -1561,30 +1545,30 @@ Partial Public Class Form1
     ''' Selects a solution
     ''' </summary>
     ''' <param name="ind">the individual to select</param>
-    Private Overloads Sub selectSolution(ByVal ind As Common.Individuum) Handles scatterplot1.pointSelected, scatterplot2.pointSelected, customPlot.pointSelected
+    Private Overloads Sub selectSolution(ByVal ind As Individuum) Handles scatterplot1.pointSelected, scatterplot2.pointSelected, customPlot.pointSelected
 
         Dim isOK As Boolean
 
-        'Lösung zu ausgewählten Lösungen hinzufügen
+        'LÃ¶sung zu ausgewÃ¤hlten LÃ¶sungen hinzufÃ¼gen
         isOK = Sim1.OptResult.selectSolution(ind.ID)
 
         If (isOK) Then
 
-            'Lösungsdialog initialisieren
+            'LÃ¶sungsdialog initialisieren
             If (IsNothing(Me.solutionDialog)) Then
                 Me.solutionDialog = New SolutionDialog(Me.mProblem)
             End If
 
-            'Lösungsdialog anzeigen
+            'LÃ¶sungsdialog anzeigen
             Call Me.solutionDialog.Show()
 
-            'Lösung zum Lösungsdialog hinzufügen
+            'LÃ¶sung zum LÃ¶sungsdialog hinzufÃ¼gen
             Call Me.solutionDialog.addSolution(ind)
 
-            'Lösung im Hauptdiagramm anzeigen
+            'LÃ¶sung im Hauptdiagramm anzeigen
             Call Me.Hauptdiagramm1.DrawSelectedSolution(ind)
 
-            'Lösung in den Scatterplots anzeigen
+            'LÃ¶sung in den Scatterplots anzeigen
             If (Not IsNothing(Me.scatterplot1)) Then
                 Call Me.scatterplot1.showSelectedSolution(ind)
             End If
@@ -1598,21 +1582,21 @@ Partial Public Class Form1
             End If
         End If
 
-        'Lösungsdialog nach vorne bringen
+        'LÃ¶sungsdialog nach vorne bringen
         Call Me.solutionDialog.BringToFront()
 
     End Sub
 
-    'Lösungsauswahl zurücksetzen
+    'LÃ¶sungsauswahl zurÃ¼cksetzen
     '***************************
     Public Sub clearSelectedSolutions()
 
-        'Serie der ausgewählten Lösungen löschen
+        'Serie der ausgewÃ¤hlten LÃ¶sungen lÃ¶schen
         '=======================================
 
         'Im Hauptdiagramm
         '----------------
-        Call Me.Hauptdiagramm1.LöscheAusgewählteLösungen()
+        Call Me.Hauptdiagramm1.LÃ¶scheAusgewÃ¤hlteLÃ¶sungen()
 
         'In den Scatterplot-Matrizen
         '---------------------------
@@ -1629,42 +1613,42 @@ Partial Public Class Form1
             Call Me.customPlot.clearSelection()
         End If
 
-        'Auswahl intern zurücksetzen
+        'Auswahl intern zurÃ¼cksetzen
         '===========================
         Call Sim1.OptResult.clearSelectedSolutions()
 
     End Sub
 
     ''' <summary>
-    ''' Lösungsauswahl aktualisieren
+    ''' LÃ¶sungsauswahl aktualisieren
     ''' </summary>
-    ''' <param name="selectedSolution_IDs">Array von Lösungs-IDs</param>
+    ''' <param name="selectedSolution_IDs">Array von LÃ¶sungs-IDs</param>
     ''' <remarks></remarks>
     Public Sub updateSelectedSolutions(ByVal selectedSolution_IDs() As Integer)
 
-        'Selektierte Lösungen neu setzen
+        'Selektierte LÃ¶sungen neu setzen
         Call Sim1.OptResult.clearSelectedSolutions()
         For Each id As Integer In selectedSolution_IDs
             Call Sim1.OptResult.selectSolution(id)
         Next
 
         'Im Hauptdiagramm neu zeichnen
-        Call Me.Hauptdiagramm1.LöscheAusgewählteLösungen()
-        For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+        Call Me.Hauptdiagramm1.LÃ¶scheAusgewÃ¤hlteLÃ¶sungen()
+        For Each ind As Individuum In Me.Sim1.OptResult.getSelectedSolutions
             Call Me.Hauptdiagramm1.DrawSelectedSolution(ind)
         Next
 
         'In den Scatterplot-Matrizen neu zeichnen
         If (Not IsNothing(Me.scatterplot1)) Then
             Call scatterplot1.clearSelection()
-            For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+            For Each ind As Individuum In Me.Sim1.OptResult.getSelectedSolutions
                 Call Me.scatterplot1.showSelectedSolution(ind)
             Next
         End If
 
         If (Not IsNothing(Me.scatterplot2)) Then
             Call scatterplot2.clearSelection()
-            For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+            For Each ind As Individuum In Me.Sim1.OptResult.getSelectedSolutions
                 Call Me.scatterplot2.showSelectedSolution(ind)
             Next
         End If
@@ -1672,19 +1656,18 @@ Partial Public Class Form1
         'Im CustomPlot neu zeichnen
         If (Not IsNothing(Me.customPlot)) Then
             Call Me.customPlot.clearSelection()
-            For Each ind As Common.Individuum In Me.Sim1.OptResult.getSelectedSolutions
+            For Each ind As Individuum In Me.Sim1.OptResult.getSelectedSolutions
                 Call Me.customPlot.showSelectedSolution(ind)
             Next
         End If
 
     End Sub
 
-    'ausgewählte Lösungen simulieren und in Wave anzeigen
+    'ausgewÃ¤hlte LÃ¶sungen simulieren und in Wave anzeigen
     '****************************************************
     Public Sub simulateSelectedSolutions(ByVal checkedSolution_IDs() As Integer)
 
         Dim isOK As Boolean
-        Dim isSWMM As Boolean
         Dim WorkDir_Prev, WorkDir As String
 
         Dim zre As Wave.TimeSeries
@@ -1700,18 +1683,18 @@ Partial Public Class Form1
         'Wait cursor
         Cursor = Cursors.WaitCursor
 
-        'Simulationen in eigenen Unterverzeichnissen ausführen (ohne Threads),
-        'WorDir_Current aber merken, und am Ende wieder zurücksetzen!
+        'Simulationen in eigenen Unterverzeichnissen ausfÃ¼hren (ohne Threads),
+        'WorDir_Current aber merken, und am Ende wieder zurÃ¼cksetzen!
         WorkDir_Prev = Sim1.WorkDir_Current
 
         'Wave instanzieren
         Dim Wave1 As New Wave.Wave()
 
-        'Alle ausgewählten Lösungen durchlaufen
+        'Alle ausgewÃ¤hlten LÃ¶sungen durchlaufen
         '======================================
-        For Each ind As Common.Individuum In Sim1.OptResult.getSelectedSolutions()
+        For Each ind As Individuum In Sim1.OptResult.getSelectedSolutions()
 
-            'Lösung per Checkbox ausgewählt?
+            'LÃ¶sung per Checkbox ausgewÃ¤hlt?
             '-------------------------------
             If (Not checkedSolution_IDs.Contains(ind.ID)) Then
                 Continue For
@@ -1734,31 +1717,25 @@ Partial Public Class Form1
 
             'TODO: Simulationsfehler abfangen!
 
-            'Sonderfall SWMM-Bechnung: keine Ganglinie anzuzeigen
-            If (TypeOf Me.Sim1 Is BlueM.Opt.Apps.SWMM) Then
-                isSWMM = True
-                Exit Sub
-            End If
-
-            'Zu zeichnenden Simulationsreihen zurücksetzen
+            'Zu zeichnenden Simulationsreihen zurÃ¼cksetzen
             SimSeries.Clear()
 
             'zu zeichnenden Reihen aus Liste der Ziele raussuchen
             '----------------------------------------------------
-            For Each objective As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+            For Each objective As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
 
-                If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Series _
-                    Or objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.ValueFromSeries) Then
+                If (objective.GetObjType = ObjectiveFunction.ObjectiveType.Series _
+                    Or objective.GetObjType = ObjectiveFunction.ObjectiveType.ValueFromSeries) Then
 
                     With objective
 
                         'Referenzreihe in Wave laden
                         '---------------------------
-                        If (objective.GetObjType = Common.ObjectiveFunction.ObjectiveType.Series) Then
-                            With CType(objective, Common.ObjectiveFunction_Series)
+                        If (objective.GetObjType = ObjectiveFunction.ObjectiveType.Series) Then
+                            With CType(objective, ObjectiveFunction_Series)
                                 'Referenzreihen nur jeweils ein Mal zeichnen
-                                'TODO: Dieselbe Referenzreihe könnte aber mehrfach mit jeweils 
-                                '      unterschiedlichen Evaluierungszeiträumen definiert sein.
+                                'TODO: Dieselbe Referenzreihe kÃ¶nnte aber mehrfach mit jeweils 
+                                '      unterschiedlichen EvaluierungszeitrÃ¤umen definiert sein.
                                 '      Dann sollte sie auch mehrfach gezeichnet werden.
                                 If (Not RefSeries.Contains(.RefSeriesFile & .RefName)) Then
                                     RefSeries.Add(.RefName, .RefSeriesFile & .RefName)
@@ -1774,7 +1751,7 @@ Partial Public Class Form1
                         If (Not SimSeries.Contains(.SimResultName)) Then
                             Call SimSeries.Add(.SimResultName, .SimResultName)
                             zre = Sim1.SimResult.Series(.SimResultName).Clone()
-                            'Lösungsnummer an Titel anhängen
+                            'LÃ¶sungsnummer an Titel anhÃ¤ngen
                             zre.Title &= $" (Solution {ind.ID})"
                             'Simreihe in Wave laden
                             Call Wave1.Import_Series(zre)
@@ -1790,7 +1767,7 @@ Partial Public Class Form1
         '-------------
         Dim app As New BlueM.Wave.App(Wave1)
 
-        'Simulationsverzeichnis zurücksetzen
+        'Simulationsverzeichnis zurÃ¼cksetzen
         Sim1.WorkDir_Current = WorkDir_Prev
 
         'Cursor
@@ -1798,13 +1775,13 @@ Partial Public Class Form1
 
     End Sub
 
-#End Region 'Lösungsauswahl
+#End Region 'LÃ¶sungsauswahl
 
 #End Region 'Diagrammfunktionen
 
 #Region "Ergebnisdatenbank"
 
-    'Ergebnis-Button hat selbst keine funktionalität -> nur DropDown
+    'Ergebnis-Button hat selbst keine funktionalitÃ¤t -> nur DropDown
     '***************************************************************
     Private Sub Button_ErgebnisDB_ButtonClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripSplitButton_ErgebnisDB.ButtonClick
         Call Me.ToolStripSplitButton_ErgebnisDB.ShowDropDown()
@@ -1819,7 +1796,7 @@ Partial Public Class Form1
 
         Try
 
-            'Datei-öffnen Dialog anzeigen
+            'Datei-Ã¶ffnen Dialog anzeigen
             Me.OpenFileDialog1.Filter = "Access databases (*.mdb)|*.mdb"
             Me.OpenFileDialog1.Title = "Select result DB"
             Me.OpenFileDialog1.FileName = ""
@@ -1900,16 +1877,16 @@ Partial Public Class Form1
                     Dim serie As Steema.TeeChart.Styles.Series
                     Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-                    'Lösungen
+                    'LÃ¶sungen
                     '========
                     If (importDialog.ComboBox_SekPop.SelectedItem <> "exclusively") Then
 
-                        For Each ind As Common.Individuum In Sim1.OptResult.Solutions
+                        For Each ind As Individuum In Sim1.OptResult.Solutions
 
                             If (Me.Hauptdiagramm1.ZielIndexZ = -1 And Me.Hauptdiagramm1.ZielIndexY = -1) Then
                                 '1D
                                 '--
-                                'Constraintverletzung prüfen
+                                'Constraintverletzung prÃ¼fen
                                 If (ind.Is_Feasible) Then
                                     serie = Me.Hauptdiagramm1.getSeriesPoint("Population", "red")
                                 Else
@@ -1920,7 +1897,7 @@ Partial Public Class Form1
                             ElseIf (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                                 '2D
                                 '--
-                                'Constraintverletzung prüfen
+                                'Constraintverletzung prÃ¼fen
                                 If (ind.Is_Feasible) Then
                                     serie = Me.Hauptdiagramm1.getSeriesPoint("Population", "Orange")
                                 Else
@@ -1931,7 +1908,7 @@ Partial Public Class Form1
                             Else
                                 '3D
                                 '--
-                                'Constraintverletzung prüfen
+                                'Constraintverletzung prÃ¼fen
                                 If (ind.Is_Feasible) Then
                                     serie3D = Me.Hauptdiagramm1.getSeries3DPoint("Population", "Orange")
                                 Else
@@ -1947,11 +1924,11 @@ Partial Public Class Form1
 
                     Call My.Application.DoEvents()
 
-                    'Sekundärpopulation
+                    'SekundÃ¤rpopulation
                     '==================
                     If (importDialog.ComboBox_SekPop.SelectedItem <> "none") Then
 
-                        For Each sekpopind As Common.Individuum In Sim1.OptResult.getSekPop()
+                        For Each sekpopind As Individuum In Sim1.OptResult.getSekPop()
                             If (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                                 '2D
                                 '--
@@ -2023,7 +2000,7 @@ Partial Public Class Form1
                     'Start-Button deaktivieren
                     Me.Button_Start.Enabled = False
 
-                    'Simulationen vorbereiten (weil möglicherweise vorher noch nicht geschehen!)
+                    'Simulationen vorbereiten (weil mÃ¶glicherweise vorher noch nicht geschehen!)
                     Call Me.Sim1.prepareSimulation()
 
                 End If
@@ -2031,7 +2008,7 @@ Partial Public Class Form1
             End If
 
         Catch ex As Exception
-            MsgBox("Error while loading result database:" & eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Error while loading result database:" & Constants.eol & ex.Message, MsgBoxStyle.Critical)
 
         Finally
 
@@ -2052,7 +2029,7 @@ Partial Public Class Form1
 
         Try
 
-            'Datei-öffnen Dialog anzeigen
+            'Datei-Ã¶ffnen Dialog anzeigen
             Me.OpenFileDialog1.Filter = "Access-Database (*.mdb)|*.mdb"
             Me.OpenFileDialog1.Title = "Result comparison: select optimization result"
             Me.OpenFileDialog1.FileName = ""
@@ -2064,7 +2041,7 @@ Partial Public Class Form1
                 sourceFile = Me.OpenFileDialog1.FileName
 
                 'Abfrage
-                diagresult = MsgBox("Should the optimization parameters of the comparison result be loaded as well?" & eol _
+                diagresult = MsgBox("Should the optimization parameters of the comparison result be loaded as well?" & Constants.eol _
                                 & "(This requires that the optimization parameter definition of both results are identical!)", MsgBoxStyle.YesNo)
 
                 If (diagresult = Windows.Forms.DialogResult.Yes) Then
@@ -2086,7 +2063,7 @@ Partial Public Class Form1
                 Dim serie As Steema.TeeChart.Styles.Points
                 Dim serie3D As Steema.TeeChart.Styles.Points3D
 
-                For Each sekpopind As Common.Individuum In Sim1.OptResultRef.getSekPop()
+                For Each sekpopind As Individuum In Sim1.OptResultRef.getSekPop()
                     If (Me.Hauptdiagramm1.ZielIndexZ = -1) Then
                         '2D
                         '--
@@ -2129,15 +2106,15 @@ Partial Public Class Form1
                     'Berechnung
                     indicatorDiff = -HypervolumeDiff.calc_indicator()
 
-                    'Nadir-Punkt holen (für spätere Verwendung bei Referenz-Hypervolumen)
+                    'Nadir-Punkt holen (fÃ¼r spÃ¤tere Verwendung bei Referenz-Hypervolumen)
                     nadir = HypervolumeDiff.nadir
 
                     'In Zwischenablage kopieren
                     Call Clipboard.SetDataObject(indicatorDiff, True)
 
                     'Anzeige in Messagebox
-                    MsgBox("Hypervolume difference to comparison result:" & eol _
-                        & indicatorDiff.ToString() & eol _
+                    MsgBox("Hypervolume difference to comparison result:" & Constants.eol _
+                        & indicatorDiff.ToString() & Constants.eol _
                         & "(Value was copied to the clipboard)", MsgBoxStyle.Information, "Hypervolume")
 
                 End If
@@ -2150,7 +2127,7 @@ Partial Public Class Form1
 
                 'Im Monitor anzeigen
                 Dim colorline1 As New Steema.TeeChart.Tools.ColorLine(Me.Monitor1.Diag.Chart)
-                colorline1.Pen.Color = System.Drawing.Color.Red
+                colorline1.Pen.Color = Color.Red
                 colorline1.Pen.Width = 2
                 colorline1.AllowDrag = False
                 colorline1.Axis = Me.Monitor1.Diag.Axes.Right
@@ -2159,7 +2136,7 @@ Partial Public Class Form1
             End If
 
         Catch ex As Exception
-            MsgBox("Error while loading reference result database:" & eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Error while loading reference result database:" & Constants.eol & ex.Message, MsgBoxStyle.Critical)
 
         Finally
 
@@ -2175,11 +2152,11 @@ Partial Public Class Form1
     ''' Die Startwerte der Optparameter evaluieren
     ''' </summary>
     ''' <returns>boolean success</returns>
-    ''' <remarks>nur für Sim-Anwendungen!</remarks>
+    ''' <remarks>nur fÃ¼r Sim-Anwendungen!</remarks>
     Private Function evaluateStartwerte() As Boolean
 
         Dim isOK As Boolean
-        Dim startind As BlueM.Opt.Common.Individuum
+        Dim startind As Individuum
 
         startind = Me.mProblem.getIndividuumStart()
 

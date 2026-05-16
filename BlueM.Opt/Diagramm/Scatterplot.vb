@@ -17,23 +17,24 @@
 '
 Imports System.Windows.Forms
 Imports System.Drawing
+Imports BlueM.Opt.Common
 
 ''' <summary>
-''' Zeigt den Lösungs- oder Entscheidungsraum in Form einer Scatterplot-Matrix an
+''' Zeigt den LÃ¶sungs- oder Entscheidungsraum in Form einer Scatterplot-Matrix an
 ''' </summary>
 Partial Public Class Scatterplot
     Inherits System.Windows.Forms.Form
 
     'Das Problem
-    Private mProblem As BlueM.Opt.Common.Problem
+    Private mProblem As Problem
 
-    Private Diags(,) As BlueM.Opt.Diagramm.Diagramm
+    Private Diags(,) As Diagramm
     Private NearestPointTools(,) As Steema.TeeChart.Tools.NearestPoint
     Private dimension As Integer
-    Private OptResult, OptResultRef As BlueM.Opt.OptResult.OptResult
+    Private OptResult, OptResultRef As OptResult.OptResult
     Private selectedIndices() As Integer
     Private ShowSekPopOnly, ShowStartValue, ShowIstWerte, ShowRefResult As Boolean
-    Private ShownSpace As BlueM.Opt.Common.SPACE
+    Private ShownSpace As SPACE
 
     Private ReadOnly Property HighlightingIsActive As Boolean
         Get
@@ -42,11 +43,11 @@ Partial Public Class Scatterplot
     End Property
 
     ''' <summary>
-    ''' Event wird ausgelöst, wenn in der Scatterplot-Matrix eine Lösung ausgewählt wird
+    ''' Event wird ausgelÃ¶st, wenn in der Scatterplot-Matrix eine LÃ¶sung ausgewÃ¤hlt wird
     ''' </summary>
-    ''' <param name="ind">Das ausgewählte Individuum</param>
+    ''' <param name="ind">Das ausgewÃ¤hlte Individuum</param>
     ''' <remarks>wird von Form1.selectSolution() verarbeitet</remarks>
-    Public Event pointSelected(ByVal ind As Common.Individuum)
+    Public Event pointSelected(ByVal ind As Individuum)
 
     ''' <summary>
     ''' Konstruktor
@@ -54,30 +55,30 @@ Partial Public Class Scatterplot
     ''' <param name="prob">Das Optimierungsproblem</param>
     ''' <param name="optres">Das Optimierungsergebnis</param>
     ''' <param name="optresref">Ein Referenz-Optimierungsergebnis (darf Nothing sein)</param>
-    Public Sub New(ByRef prob As BlueM.Opt.Common.Problem, ByVal optres As BlueM.Opt.OptResult.OptResult, ByVal optresref As BlueM.Opt.OptResult.OptResult)
+    Public Sub New(ByRef prob As Problem, ByVal optres As OptResult.OptResult, ByVal optresref As OptResult.OptResult)
 
         Dim Dialog As ScatterplotDialog
         Dim diagresult As DialogResult
 
-        ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        ' Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent()
 
-        ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        ' FÃ¼gen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         'Problem speichern
         Me.mProblem = prob
 
-        'Optimierungsergebnis übergeben
+        'Optimierungsergebnis Ã¼bergeben
         Me.OptResult = optres
         Me.OptResultRef = optresref
 
         'Scatterplot-Dialog aufrufen
         Dim refResultExists As Boolean = Not IsNothing(Me.OptResultRef)
-        Dialog = New BlueM.Opt.Diagramm.ScatterplotDialog(Me.mProblem, refResultExists)
+        Dialog = New ScatterplotDialog(Me.mProblem, refResultExists)
         diagresult = Dialog.ShowDialog()
 
         If (diagresult = DialogResult.OK) Then
-            'Einstellungen übernehmen
+            'Einstellungen Ã¼bernehmen
             Me.ShownSpace = Dialog.selectedSpace
             Me.selectedIndices = Dialog.selectedIndices
             Me.ShowSekPopOnly = Dialog.ShowSekPopOnly
@@ -85,7 +86,7 @@ Partial Public Class Scatterplot
             Me.ShowStartValue = Dialog.ShowStartValue
             Me.ShowIstWerte = Dialog.ShowIstWerte
 
-            If (Me.ShowRefResult And Me.ShownSpace = Common.SPACE.DecisionSpace) Then
+            If (Me.ShowRefResult And Me.ShownSpace = Constants.SPACE.DecisionSpace) Then
                 If (Not Me.OptResultRef.holdsOptparameters) Then
                     MsgBox("The comparison result was loaded without optimization parameters and can therefore not be displayed in the decision space!", MsgBoxStyle.Information, "Scatterplot matrix")
                     Me.ShowRefResult = False
@@ -114,18 +115,18 @@ Partial Public Class Scatterplot
         'Diagramme zeichnen
         Select Case Me.ShownSpace
 
-            Case Common.SPACE.SolutionSpace
+            Case Constants.SPACE.SolutionSpace
                 Me.Text &= " - Solution space"
                 Call Me.draw_solutionspace()
 
-            Case Common.SPACE.DecisionSpace
+            Case Constants.SPACE.DecisionSpace
                 Me.Text &= " - Decision space"
                 Call Me.draw_decisionspace()
 
         End Select
 
-        'Bereits ausgewählte Lösungen anzeigen
-        For Each ind As Common.Individuum In Me.OptResult.getSelectedSolutions
+        'Bereits ausgewÃ¤hlte LÃ¶sungen anzeigen
+        For Each ind As Individuum In Me.OptResult.getSelectedSolutions
             Call Me.showSelectedSolution(ind)
         Next
 
@@ -134,7 +135,7 @@ Partial Public Class Scatterplot
 
     End Sub
 
-    'Lösungsraum zeichnen
+    'LÃ¶sungsraum zeichnen
     '********************
     Private Sub draw_solutionspace()
 
@@ -142,11 +143,11 @@ Partial Public Class Scatterplot
         Dim xAchse, yAchse As String
         Dim min() As Double
         Dim max() As Double
-        Dim ind As BlueM.Opt.Common.Individuum
+        Dim ind As Individuum
         Dim serie, serie_inv As Steema.TeeChart.Styles.Series
         Dim shape1 As Steema.TeeChart.Styles.Shape
 
-        'Min und Max für Achsen bestimmen
+        'Min und Max fÃ¼r Achsen bestimmen
         '--------------------------------
         ReDim min(Me.dimension - 1)
         ReDim max(Me.dimension - 1)
@@ -154,13 +155,13 @@ Partial Public Class Scatterplot
             min(i) = Double.MaxValue
             max(i) = Double.MinValue
             If (Me.ShowSekPopOnly) Then
-                'Nur Sekundäre Population
+                'Nur SekundÃ¤re Population
                 For Each ind In Me.OptResult.getSekPop()
                     min(i) = Math.Min(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, min(i))
                     max(i) = Math.Max(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, max(i))
                 Next
             Else
-                'Alle Lösungen
+                'Alle LÃ¶sungen
                 For Each ind In Me.OptResult.Solutions
                     min(i) = Math.Min(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, min(i))
                     max(i) = Math.Max(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, max(i))
@@ -192,15 +193,15 @@ Partial Public Class Scatterplot
 
         Next
 
-        'Schleife über Spalten
+        'Schleife Ã¼ber Spalten
         '---------------------
         For i = 0 To Me.dimension - 1
-            'Schleife über Reihen
+            'Schleife Ã¼ber Reihen
             '--------------------
             For j = 0 To Me.dimension - 1
 
                 'Neues Diagramm erstellen
-                Me.Diags(i, j) = New BlueM.Opt.Diagramm.Diagramm()
+                Me.Diags(i, j) = New Diagramm()
                 Me.matrix.Controls.Add(Me.Diags(i, j), i, j)
 
                 With Me.Diags(i, j)
@@ -247,11 +248,11 @@ Partial Public Class Scatterplot
                     If (max(i) >= 1000 Or min(i) <= -1000) Then .Axes.Bottom.Labels.ValueFormat = "0.##E0"
                     If (max(j) >= 1000 Or min(j) <= -1000) Then .Axes.Left.Labels.ValueFormat = "0.##E0"
 
-                    'Achsen nur an den Rändern anzeigen
+                    'Achsen nur an den RÃ¤ndern anzeigen
                     '----------------------------------
                     'YAchsen
                     If (i = 0) Then
-                        'Achse standardmäßig anzeigen
+                        'Achse standardmÃ¤ÃŸig anzeigen
                     ElseIf (i = Me.dimension - 1) Then
                         'Achse rechts anzeigen
                         .Axes.Left.OtherSide = True
@@ -259,19 +260,19 @@ Partial Public Class Scatterplot
                         'Achse verstecken
                         .Axes.Left.Title.Visible = False
                         .Axes.Left.Labels.CustomSize = 1
-                        .Axes.Left.Labels.Font.Color = System.Drawing.Color.Empty
+                        .Axes.Left.Labels.Font.Color = Color.Empty
                     End If
                     'XAchsen
                     If (j = 0) Then
                         'Achse oben anzeigen
                         .Axes.Bottom.OtherSide = True
                     ElseIf (j = Me.dimension - 1) Then
-                        'Achse standardmäßig anzeigen
+                        'Achse standardmÃ¤ÃŸig anzeigen
                     Else
                         'Achse verstecken
                         .Axes.Bottom.Title.Visible = False
                         .Axes.Bottom.Labels.CustomSize = 1
-                        .Axes.Bottom.Labels.Font.Color = System.Drawing.Color.Empty
+                        .Axes.Bottom.Labels.Font.Color = Color.Empty
                     End If
 
                     'IstWerte eintragen
@@ -281,20 +282,20 @@ Partial Public Class Scatterplot
                             (Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).hasCurrentValue Or
                             Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).hasCurrentValue)) Then
 
-                            shape1 = New Steema.TeeChart.Styles.Shape(.Chart)
-                            shape1.Style = Steema.TeeChart.Styles.ShapeStyles.Rectangle
-                            shape1.Title = "Area of improvement"
-
                             'Shape formatieren
-                            shape1.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer)) 'Light Green, 75% transparent
-                            shape1.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer)) 'Light Green, 75% transparent
+                            shape1 = New Steema.TeeChart.Styles.Shape(.Chart) With {
+                                .Style = Steema.TeeChart.Styles.ShapeStyles.Rectangle,
+                                .Title = "Area of improvement",
+                                .Color = Color.FromArgb(64, 128, 255, 128) 'Light Green, 75% transparent
+                                }
+                            shape1.Brush.Color = Color.FromArgb(64, 128, 255, 128) 'Light Green, 75% transparent
                             shape1.Pen.Transparency = 0
                             shape1.Pen.Color = Color.Green
                             shape1.Pen.Width = 1
 
                             'X-Werte
                             If Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).hasCurrentValue Then
-                                If Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction = Common.EVO_DIRECTION.Minimization Then
+                                If Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction = Constants.EVO_DIRECTION.Minimization Then
                                     shape1.X0 = min(i) * 0.9 ^ (min(i) / Math.Abs(min(i)))
                                     shape1.X1 = Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction
                                 Else
@@ -307,7 +308,7 @@ Partial Public Class Scatterplot
                             End If
                             'Y-Werte
                             If Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).hasCurrentValue Then
-                                If Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction = Common.EVO_DIRECTION.Minimization Then
+                                If Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction = Constants.EVO_DIRECTION.Minimization Then
                                     shape1.Y0 = min(j) * 0.9 ^ (min(j) / Math.Abs(min(j)))
                                     shape1.Y1 = Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).CurrentValue * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction
                                 Else
@@ -333,20 +334,20 @@ Partial Public Class Scatterplot
                     'add event handler
                     AddHandler Me.NearestPointTools(i, j).Change, AddressOf Me.OnNearestPointChange
 
-                    'Lösungen eintragen
+                    'LÃ¶sungen eintragen
                     '==================
                     If Not Me.ShowSekPopOnly Then
-                        'Alle Lösungen
+                        'Alle LÃ¶sungen
                         '-------------
                         serie = .getSeriesPoint($"{xAchse}, {yAchse}", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         serie_inv = .getSeriesPoint($"{xAchse}, {yAchse} (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         For Each ind In Me.OptResult.Solutions
-                            'Constraintverletzung prüfen
+                            'Constraintverletzung prÃ¼fen
                             If (ind.Is_Feasible) Then
-                                'gültige Lösung Zeichnen
+                                'gÃ¼ltige LÃ¶sung Zeichnen
                                 serie.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID.ToString())
                             Else
-                                'ungültige Lösung zeichnen
+                                'ungÃ¼ltige LÃ¶sung zeichnen
                                 serie_inv.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID.ToString())
                             End If
                         Next
@@ -354,7 +355,7 @@ Partial Public Class Scatterplot
                         Me.NearestPointTools(i, j).Series = serie
                     End If
 
-                    'Sekundäre Population
+                    'SekundÃ¤re Population
                     '--------------------
                     serie = .getSeriesPoint($"{xAchse}, {yAchse} (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                     For Each ind In Me.OptResult.getSekPop()
@@ -484,7 +485,7 @@ Partial Public Class Scatterplot
         Dim max() As Double
         Dim serie, serie_inv As Steema.TeeChart.Styles.Series
 
-        'Min und Max für Achsen bestimmen
+        'Min und Max fÃ¼r Achsen bestimmen
         '--------------------------------
         ReDim min(Me.dimension - 1)
         ReDim max(Me.dimension - 1)
@@ -493,15 +494,15 @@ Partial Public Class Scatterplot
             max(i) = Me.mProblem.List_OptParameter(Me.selectedIndices(i)).Max
         Next
 
-        'Schleife über Spalten
+        'Schleife Ã¼ber Spalten
         '---------------------
         For i = 0 To Me.dimension - 1
-            'Schleife über Reihen
+            'Schleife Ã¼ber Reihen
             '--------------------
             For j = 0 To Me.dimension - 1
 
                 'Neues Diagramm erstellen
-                Me.Diags(i, j) = New BlueM.Opt.Diagramm.Diagramm()
+                Me.Diags(i, j) = New Diagramm()
                 Me.matrix.Controls.Add(Me.Diags(i, j), i, j)
 
                 With Me.Diags(i, j)
@@ -548,11 +549,11 @@ Partial Public Class Scatterplot
                     'If (max(i) >= 1000 Or min(i) <= -1000) Then .Axes.Bottom.Labels.ValueFormat = "0.##E0"
                     'If (max(j) >= 1000 Or min(j) <= -1000) Then .Axes.Left.Labels.ValueFormat = "0.##E0"
 
-                    'Achsen nur an den Rändern anzeigen
+                    'Achsen nur an den RÃ¤ndern anzeigen
                     '----------------------------------
                     'YAchsen
                     If (i = 0) Then
-                        'Achse standardmäßig anzeigen
+                        'Achse standardmÃ¤ÃŸig anzeigen
                     ElseIf (i = Me.dimension - 1) Then
                         'Achse rechts anzeigen
                         .Axes.Left.OtherSide = True
@@ -560,19 +561,19 @@ Partial Public Class Scatterplot
                         'Achse verstecken
                         .Axes.Left.Title.Visible = False
                         .Axes.Left.Labels.CustomSize = 1
-                        .Axes.Left.Labels.Font.Color = System.Drawing.Color.Empty
+                        .Axes.Left.Labels.Font.Color = Color.Empty
                     End If
                     'XAchsen
                     If (j = 0) Then
                         'Achse oben anzeigen
                         .Axes.Bottom.OtherSide = True
                     ElseIf (j = dimension - 1) Then
-                        'Achse standardmäßig anzeigen
+                        'Achse standardmÃ¤ÃŸig anzeigen
                     Else
                         'Achse verstecken
                         .Axes.Bottom.Title.Visible = False
                         .Axes.Bottom.Labels.CustomSize = 1
-                        .Axes.Bottom.Labels.Font.Color = System.Drawing.Color.Empty
+                        .Axes.Bottom.Labels.Font.Color = Color.Empty
                     End If
 
                     'setup NearestPoint tool
@@ -589,17 +590,17 @@ Partial Public Class Scatterplot
                     'Punkte eintragen
                     '================
                     If Not Me.ShowSekPopOnly Then
-                        'Alle Lösungen
+                        'Alle LÃ¶sungen
                         '-------------
                         serie = .getSeriesPoint($"{xAchse}, {yAchse}", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
                         serie_inv = .getSeriesPoint($"{xAchse}, {yAchse} (invalid)", "Gray", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Common.Individuum In Me.OptResult.Solutions
-                            'Constraintverletzung prüfen
+                        For Each ind As Individuum In Me.OptResult.Solutions
+                            'Constraintverletzung prÃ¼fen
                             If (ind.Is_Feasible) Then
-                                'gültige Lösung Zeichnen
+                                'gÃ¼ltige LÃ¶sung Zeichnen
                                 serie.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID.ToString())
                             Else
-                                'ungültige Lösung zeichnen
+                                'ungÃ¼ltige LÃ¶sung zeichnen
                                 serie_inv.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID.ToString())
                             End If
                         Next
@@ -607,10 +608,10 @@ Partial Public Class Scatterplot
                         Me.NearestPointTools(i, j).Series = serie
                     End If
 
-                    'Sekundäre Population
+                    'SekundÃ¤re Population
                     '--------------------
                     serie = .getSeriesPoint($"{xAchse}, {yAchse} (sec pop)", "Green", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                    For Each ind As Common.Individuum In Me.OptResult.getSekPop()
+                    For Each ind As Individuum In Me.OptResult.getSekPop()
                         serie.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID.ToString())
                     Next
                     If Me.ShowSekPopOnly Then
@@ -622,7 +623,7 @@ Partial Public Class Scatterplot
                     '===========================
                     If (Me.ShowRefResult) Then
                         serie = .getSeriesPoint($"{xAchse}, {yAchse} (comparison result)", "Blue", Steema.TeeChart.Styles.PointerStyles.Circle, 2)
-                        For Each ind As Common.Individuum In Me.OptResultRef.getSekPop()
+                        For Each ind As Individuum In Me.OptResultRef.getSekPop()
                             serie.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID & " (comparison result)")
                         Next
                     End If
@@ -718,12 +719,12 @@ Partial Public Class Scatterplot
         End If
     End Sub
 
-    'Einen Punkt auswählen
+    'Einen Punkt auswÃ¤hlen
     '*********************
     Private Sub seriesClick(ByVal sender As Object, ByVal s As Steema.TeeChart.Styles.Series, ByVal valueIndex As Integer, ByVal e As System.Windows.Forms.MouseEventArgs)
 
         Dim indID_clicked As Integer
-        Dim ind As Common.Individuum
+        Dim ind As Individuum
 
         'Punkt-Informationen bestimmen
         '-----------------------------
@@ -731,20 +732,20 @@ Partial Public Class Scatterplot
             'Solution-ID
             indID_clicked = s.Labels(valueIndex)
 
-            'Lösung holen
+            'LÃ¶sung holen
             '------------
             ind = Me.OptResult.getSolution(indID_clicked)
 
             If (ind.ID = indID_clicked) Then
 
-                'Lösung auswählen (wird von Form1.selectSolution() verarbeitet)
+                'LÃ¶sung auswÃ¤hlen (wird von Form1.selectSolution() verarbeitet)
                 RaiseEvent pointSelected(ind)
 
             End If
 
         Catch ex As Exception
-            Common.Log.AddMessage(Common.Log.levels.error, ex.Message)
-            MsgBox($"Solution is not selectable!{Common.Constants.eol}{ex.Message}", MsgBoxStyle.Information)
+            Log.AddMessage(Log.levels.error, ex.Message)
+            MsgBox($"Solution is not selectable!{Constants.eol}{ex.Message}", MsgBoxStyle.Information)
         End Try
 
     End Sub
@@ -754,7 +755,7 @@ Partial Public Class Scatterplot
     ''' </summary>
     ''' <param name="ind">the solution to highlight</param>
     ''' <remarks></remarks>
-    Private Sub showHighlightedSolution(ByVal ind As Common.Individuum)
+    Private Sub showHighlightedSolution(ByVal ind As Individuum)
 
         Dim serie As Steema.TeeChart.Styles.Points
         Dim i, j As Integer
@@ -777,9 +778,9 @@ Partial Public Class Scatterplot
 
                 'plot the point
                 Select Case Me.ShownSpace
-                    Case Common.SPACE.SolutionSpace
+                    Case Constants.SPACE.SolutionSpace
                         serie.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID.ToString())
-                    Case Common.SPACE.DecisionSpace
+                    Case Constants.SPACE.DecisionSpace
                         serie.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID.ToString())
                 End Select
             Next j
@@ -788,16 +789,16 @@ Partial Public Class Scatterplot
     End Sub
 
     ''' <summary>
-    ''' Eine ausgewählte Lösung in den Diagrammen anzeigen
+    ''' Eine ausgewÃ¤hlte LÃ¶sung in den Diagrammen anzeigen
     ''' </summary>
-    ''' <param name="ind">das ausgewählte Individuum</param>
+    ''' <param name="ind">das ausgewÃ¤hlte Individuum</param>
     ''' <remarks>wird von Form1.selectSolution() aufgerufen</remarks>
-    Public Sub showSelectedSolution(ByVal ind As Common.Individuum)
+    Public Sub showSelectedSolution(ByVal ind As Individuum)
 
         Dim serie As Steema.TeeChart.Styles.Series
         Dim i, j As Integer
 
-        'Lösung in alle Diagramme eintragen
+        'LÃ¶sung in alle Diagramme eintragen
         '----------------------------------
         For i = 0 To dimension - 1
             For j = 0 To dimension - 1
@@ -813,9 +814,9 @@ Partial Public Class Scatterplot
                     serie = .getSeriesPoint("Selected solutions", "Red", Steema.TeeChart.Styles.PointerStyles.Circle, 3)
 
                     Select Case Me.ShownSpace
-                        Case Common.SPACE.SolutionSpace
+                        Case Constants.SPACE.SolutionSpace
                             serie.Add(ind.Objectives(Me.selectedIndices(i)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(i)).Direction, ind.Objectives(Me.selectedIndices(j)) * Me.mProblem.List_ObjectiveFunctions(Me.selectedIndices(j)).Direction, ind.ID.ToString())
-                        Case Common.SPACE.DecisionSpace
+                        Case Constants.SPACE.DecisionSpace
                             serie.Add(ind.OptParameter_RWerte(Me.selectedIndices(i)), ind.OptParameter_RWerte(Me.selectedIndices(j)), ind.ID.ToString())
                     End Select
 
@@ -833,7 +834,7 @@ Partial Public Class Scatterplot
     End Sub
 
     ''' <summary>
-    ''' Serie der ausgewählten Lösungen löschen
+    ''' Serie der ausgewÃ¤hlten LÃ¶sungen lÃ¶schen
     ''' </summary>
     Public Sub clearSelection()
 
@@ -843,7 +844,7 @@ Partial Public Class Scatterplot
         For i = 0 To Me.Diags.GetUpperBound(0)
             For j = 0 To Me.Diags.GetUpperBound(1)
 
-                'Serie löschen
+                'Serie lÃ¶schen
                 serie = Me.Diags(i, j).getSeriesPoint("Selected solutions")
                 serie.Dispose()
 

@@ -15,12 +15,10 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.IO
-Imports BlueM
 
 ''' <summary>
 ''' Klasse Problem
-''' Definiert das zu lösende Optimierungsproblem
+''' Definiert das zu lÃ¶sende Optimierungsproblem
 ''' </summary>
 Public Class Problem
 
@@ -62,7 +60,7 @@ Public Class Problem
     ''' <summary>
     ''' Liste der Objective Functions
     ''' </summary>
-    ''' <remarks>Enthält sowohl Objective Functions als auch PrimaryObjectiveFunctions</remarks>
+    ''' <remarks>EnthÃ¤lt sowohl Objective Functions als auch PrimaryObjectiveFunctions</remarks>
     Public List_ObjectiveFunctions() As ObjectiveFunction
     ''' <summary>
     ''' Liste der Constraint Functions
@@ -129,13 +127,13 @@ Public Class Problem
     ''' Optimierungsmodus
     ''' </summary>
     ''' <returns>Single-Objective oder Multi-Objective</returns>
-    Public ReadOnly Property Modus() As BlueM.Opt.Common.Constants.EVO_MODE
+    Public ReadOnly Property Modus() As Constants.EVO_MODE
         Get
             Select Case Me.NumPrimObjective
                 Case 1
-                    Return EVO_MODE.Single_Objective
+                    Return Constants.EVO_MODE.Single_Objective
                 Case Is > 1
-                    Return EVO_MODE.Multi_Objective
+                    Return Constants.EVO_MODE.Multi_Objective
                 Case Else
                     Throw New Exception("No primary objective functions are defined!")
             End Select
@@ -215,21 +213,21 @@ Public Class Problem
     Public ReadOnly Property Description() As String
         Get
             Dim msg As String
-            msg = $"Objective Functions ({Me.NumPrimObjective} primary, {Me.NumSecObjectives} secondary):" & eol
+            msg = $"Objective Functions ({Me.NumPrimObjective} primary, {Me.NumSecObjectives} secondary):" & Constants.eol
             For Each obj As ObjectiveFunction In Me.List_ObjectiveFunctions
-                msg &= "* " & obj.Description & eol
+                msg &= "* " & obj.Description & Constants.eol
             Next
-            msg &= $"Optimization parameters ({Me.NumOptParams}):" & eol
+            msg &= $"Optimization parameters ({Me.NumOptParams}):" & Constants.eol
             For Each optparam As OptParameter In Me.List_OptParameter
-                msg &= "* " & optparam.Bezeichnung & eol
+                msg &= "* " & optparam.Bezeichnung & Constants.eol
             Next
-            msg &= $"Model parameters ({Me.NumModelParams}):" & eol
+            msg &= $"Model parameters ({Me.NumModelParams}):" & Constants.eol
             For Each modparam As Struct_ModellParameter In Me.List_ModellParameter
-                msg &= "* " & modparam.Bezeichnung & eol
+                msg &= "* " & modparam.Bezeichnung & Constants.eol
             Next
-            msg &= $"Constraints ({Me.NumConstraints}):" & eol
+            msg &= $"Constraints ({Me.NumConstraints}):" & Constants.eol
             For Each constraint As Constraintfunction In Me.List_Constraintfunctions
-                msg &= "* " & constraint.Bezeichnung & eol
+                msg &= "* " & constraint.Bezeichnung & Constants.eol
             Next
             Return msg
         End Get
@@ -279,7 +277,7 @@ Public Class Problem
         '-----------
         'Modell-/Optparameter validieren
         Call Me.Validate_OPT_fits_to_MOD()
-        'Prüfen der Anfangswerte
+        'PrÃ¼fen der Anfangswerte
         Call Me.Validate_Startvalues()
 
 
@@ -298,8 +296,8 @@ Public Class Problem
 
         Dim Datei As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & FILEEXT_OPT)
 
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As New IO.FileStream(Datei, IO.FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As New IO.StreamReader(FiStr, Text.Encoding.GetEncoding("iso8859-1"))
 
         Dim Zeile As String
         Dim AnzParam As Integer = 0
@@ -315,8 +313,8 @@ Public Class Problem
 
         ReDim List_OptParameter(AnzParam - 1)
 
-        'Zurück zum Dateianfang und lesen
-        FiStr.Seek(0, SeekOrigin.Begin)
+        'ZurÃ¼ck zum Dateianfang und lesen
+        FiStr.Seek(0, IO.SeekOrigin.Begin)
 
         Dim array() As String
         Dim Bez_str As String = ""
@@ -327,19 +325,19 @@ Public Class Problem
                 Continue Do
             End If
             'OptParameter instanzieren
-            List_OptParameter(i) = New BlueM.Opt.Common.OptParameter()
+            List_OptParameter(i) = New OptParameter()
             array = Zeile.Split("|")
             'Werte zuweisen
             List_OptParameter(i).Bezeichnung = array(1).Trim()
             List_OptParameter(i).Einheit = array(2).Trim()
-            List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Common.Provider.FortranProvider)
-            List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Common.Provider.FortranProvider)
-            List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Common.Provider.FortranProvider)
+            List_OptParameter(i).StartWert = Convert.ToDouble(array(3).Trim(), Provider.FortranProvider)
+            List_OptParameter(i).Min = Convert.ToDouble(array(4).Trim(), Provider.FortranProvider)
+            List_OptParameter(i).Max = Convert.ToDouble(array(5).Trim(), Provider.FortranProvider)
 
             'liegt eine Beziehung vor?
             If (i > 0 And array.GetUpperBound(0) > 6) Then
                 If Not array(6).Trim() = "" Then
-                    Me.List_OptParameter(i).Beziehung = Common.Constants.getRelationship(array(6).Trim())
+                    Me.List_OptParameter(i).Beziehung = Constants.getRelationship(array(6).Trim())
                 End If
             End If
 
@@ -366,8 +364,8 @@ Public Class Problem
 
         Dim Datei As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & FILEEXT_MOD)
 
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As New IO.FileStream(Datei, IO.FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As New IO.StreamReader(FiStr, Text.Encoding.GetEncoding("iso8859-1"))
 
         Dim Zeile As String
         Dim AnzParam As Integer = 0
@@ -383,8 +381,8 @@ Public Class Problem
 
         ReDim Me.List_ModellParameter(AnzParam - 1)
 
-        'Zurück zum Dateianfang und lesen
-        FiStr.Seek(0, SeekOrigin.Begin)
+        'ZurÃ¼ck zum Dateianfang und lesen
+        FiStr.Seek(0, IO.SeekOrigin.Begin)
 
         Dim array() As String
         Dim i As Integer = 0
@@ -405,7 +403,7 @@ Public Class Problem
                 .ZeileNr = Convert.ToInt16(array(6).Trim())
                 .SpVon = If(array(7).Trim() <> "", Convert.ToInt16(array(7).Trim()), 0)
                 .SpBis = If(array(8).Trim() <> "", Convert.ToInt16(array(8).Trim()), 0)
-                .Faktor = Convert.ToDouble(array(9).Trim(), Common.Provider.FortranProvider)
+                .Faktor = Convert.ToDouble(array(9).Trim(), Provider.FortranProvider)
             End With
             i += 1
         Loop Until StrRead.Peek() = -1
@@ -424,7 +422,6 @@ Public Class Problem
     Private Sub Read_OBF(ByVal SimStart As DateTime, ByVal SimEnde As DateTime)
 
         Const AnzSpalten_ObjFSeries As Integer = 13                 'Anzahl Spalten Reihenvergleich in der OBF-Datei
-        Const AnzSpalten_ObjFValue As Integer = 12                  'Anzahl Spalten Wertevergleich in der OBF-Datei
         Const AnzSpalten_ObjFValueFromSeries As Integer = 13        'Anzahl Spalten Reihenwertevergleich in der OBF-Datei
         Const AnzSpalten_ObjFAggregate As Integer = 5               'Anzahl Spalten Aggregierte Ziele in der OBF-Datei
 
@@ -436,11 +433,11 @@ Public Class Problem
         Dim filepath As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & FILEEXT_OBF)
 
         'Open the file
-        Dim FiStr As New FileStream(filepath, FileMode.Open, IO.FileAccess.Read)
-        Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As New IO.FileStream(filepath, IO.FileMode.Open, IO.FileAccess.Read)
+        Dim StrRead As New IO.StreamReader(FiStr, Text.Encoding.GetEncoding("iso8859-1"))
 
         ReDim Me.List_ObjectiveFunctions(-1)
-        Dim currentObjectiveType As Common.ObjectiveFunction.ObjectiveType
+        Dim currentObjectiveType As ObjectiveFunction.ObjectiveType
 
         Try
 
@@ -454,7 +451,7 @@ Public Class Problem
                 If Zeile.StartsWith("*Series") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.Series
                 ElseIf Zeile.StartsWith("*Values") Then
-                    currentObjectiveType = ObjectiveFunction.ObjectiveType.Value
+                    Throw New Exception("The block ""*Values"" is no longer supported in the OBF file!")
                 ElseIf Zeile.StartsWith("*ValueFromSeries") Then
                     currentObjectiveType = ObjectiveFunction.ObjectiveType.ValueFromSeries
                 ElseIf Zeile.StartsWith("*Aggregate") Then
@@ -485,7 +482,7 @@ Public Class Problem
                         End If
 
                         'ObjectiveFunction instanzieren
-                        Dim Objective_Series As New Common.ObjectiveFunction_Series()
+                        Dim Objective_Series As New ObjectiveFunction_Series()
 
                         'Gemeinsame Spalten einlesen
                         Call Me.Read_OBF_CommonColumns(Objective_Series, Zeile)
@@ -510,7 +507,7 @@ Public Class Problem
                             .RefSeriesFile = WerteArray(12).Trim()
                             If (WerteArray(13).Trim() <> "") Then
                                 .hasCurrentValue = True
-                                .CurrentValue = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
+                                .CurrentValue = Convert.ToDouble(WerteArray(13).Trim(), Provider.FortranProvider)
                                 'Reverse the sign for objective functions that should be maximized (#198)
                                 If .Direction = EVO_DIRECTION.Maximization Then
                                     .CurrentValue = .CurrentValue * -1
@@ -529,46 +526,6 @@ Public Class Problem
                         Me.List_ObjectiveFunctions(i) = Objective_Series
                         i += 1
 
-                    Case ObjectiveFunction.ObjectiveType.Value
-
-                        'Wertevergleich
-                        '==============
-
-                        'Kontrolle
-                        If (WerteArray.GetUpperBound(0) <> AnzSpalten_ObjFValue + 1) Then
-                            Throw New Exception("The block ""Values"" in the OBF input file has the wrong number of columns!")
-                        End If
-
-                        'ObjectiveFunction instanzieren
-                        Dim Objective_Value As New Common.Objectivefunction_Value()
-
-                        'Gemeinsame Spalten einlesen
-                        Call Me.Read_OBF_CommonColumns(Objective_Value, Zeile)
-
-                        'Restliche Spalten einlesen
-                        With Objective_Value
-                            .Block = WerteArray(9).Trim()
-                            .Column = WerteArray(10).Trim()
-                            If (WerteArray(11).Trim() <> "") Then
-                                .RefValue = Convert.ToDouble(WerteArray(11).Trim(), Common.Provider.FortranProvider)
-                            End If
-                            If (WerteArray(12).Trim() <> "") Then
-                                .hasCurrentValue = True
-                                .CurrentValue = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
-                                'Reverse the sign for objective functions that should be maximized (#198)
-                                If .Direction = EVO_DIRECTION.Maximization Then
-                                    .CurrentValue = .CurrentValue * -1
-                                End If
-                            Else
-                                .hasCurrentValue = False
-                            End If
-                        End With
-
-                        'Neue ObjectiveFunction abspeichern
-                        ReDim Preserve Me.List_ObjectiveFunctions(i)
-                        Me.List_ObjectiveFunctions(i) = Objective_Value
-                        i += 1
-
                     Case ObjectiveFunction.ObjectiveType.ValueFromSeries
 
                         'ReihenWertevergleich
@@ -580,7 +537,7 @@ Public Class Problem
                         End If
 
                         'ObjectiveFunction instanzieren
-                        Dim Objective_ValueFromSeries As New Common.ObjectiveFunction_ValueFromSeries()
+                        Dim Objective_ValueFromSeries As New ObjectiveFunction_ValueFromSeries()
 
                         'Gemeinsame Spalten einlesen
                         Call Me.Read_OBF_CommonColumns(Objective_ValueFromSeries, Zeile)
@@ -603,11 +560,11 @@ Public Class Problem
                             End If
                             .ValueFunction = WerteArray(11).Trim()
                             If (WerteArray(12).Trim() <> "") Then
-                                .RefValue = Convert.ToDouble(WerteArray(12).Trim(), Common.Provider.FortranProvider)
+                                .RefValue = Convert.ToDouble(WerteArray(12).Trim(), Provider.FortranProvider)
                             End If
                             If (WerteArray(13).Trim() <> "") Then
                                 .hasCurrentValue = True
-                                .CurrentValue = Convert.ToDouble(WerteArray(13).Trim(), Common.Provider.FortranProvider)
+                                .CurrentValue = Convert.ToDouble(WerteArray(13).Trim(), Provider.FortranProvider)
                                 'Reverse the sign for objective functions that should be maximized (#198)
                                 If .Direction = EVO_DIRECTION.Maximization Then
                                     .CurrentValue = .CurrentValue * -1
@@ -633,7 +590,7 @@ Public Class Problem
                         End If
 
                         'ObjectiveFunction instanzieren
-                        Dim Objective_Aggregate As New Common.ObjectiveFunction_Aggregate()
+                        Dim Objective_Aggregate As New ObjectiveFunction_Aggregate()
 
                         'Spalten einlesen
                         With Objective_Aggregate
@@ -645,13 +602,13 @@ Public Class Problem
                             .Description = WerteArray(2).Trim()
                             .Group = WerteArray(3).Trim()
                             If (WerteArray(4).Trim() = "+") Then
-                                .Direction = Common.EVO_DIRECTION.Maximization
+                                .Direction = Constants.EVO_DIRECTION.Maximization
                             Else
-                                .Direction = Common.EVO_DIRECTION.Minimization
+                                .Direction = Constants.EVO_DIRECTION.Minimization
                             End If
                             If (WerteArray(5).Trim() <> "") Then
                                 .hasCurrentValue = True
-                                .CurrentValue = Convert.ToDouble(WerteArray(5).Trim(), Common.Provider.FortranProvider)
+                                .CurrentValue = Convert.ToDouble(WerteArray(5).Trim(), Provider.FortranProvider)
                                 'Reverse the sign for objective functions that should be maximized (#198)
                                 If .Direction = EVO_DIRECTION.Maximization Then
                                     .CurrentValue = .CurrentValue * -1
@@ -696,7 +653,7 @@ Public Class Problem
     ''' <param name="objective">objective function in der die Werte abgelegt werden sollen</param>
     ''' <param name="zeile">Zeile der OBF-Datei</param>
     ''' <remarks></remarks>
-    Private Sub Read_OBF_CommonColumns(ByRef objective As BlueM.Opt.Common.ObjectiveFunction, ByVal zeile As String)
+    Private Sub Read_OBF_CommonColumns(ByRef objective As ObjectiveFunction, ByVal zeile As String)
 
         Dim WerteArray() As String
 
@@ -711,9 +668,9 @@ Public Class Problem
             .Description = WerteArray(2).Trim()
             .Group = WerteArray(3).Trim()
             If (WerteArray(4).Trim() = "+") Then
-                .Direction = Common.EVO_DIRECTION.Maximization
+                .Direction = Constants.EVO_DIRECTION.Maximization
             Else
-                .Direction = Common.EVO_DIRECTION.Minimization
+                .Direction = Constants.EVO_DIRECTION.Minimization
             End If
 
             If (WerteArray(5).Trim() = "+") Then
@@ -751,16 +708,16 @@ Public Class Problem
                 refSeries = fileInstance.getTimeSeries(refName)
             End If
         Catch ex As Exception
-            Throw New Exception($"Unable to read reference series '{filePath}'!{eol}Error: {ex.Message}", ex)
+            Throw New Exception($"Unable to read reference series '{filePath}'!{Constants.eol}Error: {ex.Message}", ex)
         End Try
 
-        'Zeitraum der Referenzreihe überprüfen
+        'Zeitraum der Referenzreihe Ã¼berprÃ¼fen
         If (refSeries.StartDate > EvalStart Or refSeries.EndDate < EvalEnde) Then
             'Referenzreihe deckt Evaluierungszeitraum nicht ab
             Throw New Exception($"The reference series '{filePath}' does not cover the evaluation period!")
         End If
 
-        'Referenzreihe auf Evaluierungszeitraum kürzen
+        'Referenzreihe auf Evaluierungszeitraum kÃ¼rzen
         Call refSeries.Cut(EvalStart, EvalEnde)
         If refSeries.Length = 0 Then
             Throw New Exception($"The reference series '{filePath}' is empty after cutting to the evaluation period!")
@@ -789,7 +746,7 @@ Public Class Problem
         'Format:
         '*|---------------|----------|-------|-----------|------------|----------------------|-----------------------------|
         '*|               |          |       |           |            |      Grenzwert       |        Grenzreihe           |
-        '*| Bezeichnung   | GrenzTyp | Datei | SimGröße  | Oben/Unten | WertTyp  | Grenzwert | Grenzgröße | Datei          |
+        '*| Bezeichnung   | GrenzTyp | Datei | SimGrÃ¶ÃŸe  | Oben/Unten | WertTyp  | Grenzwert | GrenzgrÃ¶ÃŸe | Datei          |
         '*|---------------|----------|-------|-----------|------------|----------|-----------|------------|----------------|
 
         Dim i As Integer
@@ -799,10 +756,10 @@ Public Class Problem
 
         Dim Datei As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & FILEEXT_CON)
 
-        If (File.Exists(Datei)) Then
+        If (IO.File.Exists(Datei)) Then
 
-            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim FiStr As New IO.FileStream(Datei, IO.FileMode.Open, IO.FileAccess.Read)
+            Dim StrRead As New IO.StreamReader(FiStr, Text.Encoding.GetEncoding("iso8859-1"))
 
             i = 0
             Do
@@ -818,7 +775,7 @@ Public Class Problem
                 End If
                 'Neues Constraint anlegen
                 ReDim Preserve Me.List_Constraintfunctions(i)
-                Me.List_Constraintfunctions(i) = New Common.Constraintfunction()
+                Me.List_Constraintfunctions(i) = New Constraintfunction()
                 'Werte zuweisen
                 With Me.List_Constraintfunctions(i)
                     .Bezeichnung = WerteArray(1).Trim()
@@ -828,7 +785,7 @@ Public Class Problem
                     .GrenzPos = WerteArray(5).Trim()
                     .WertFunktion = WerteArray(6).Trim()
                     If (WerteArray(7).Trim() <> "") Then
-                        .GrenzWert = Convert.ToDouble(WerteArray(7).Trim(), Common.Provider.FortranProvider)
+                        .GrenzWert = Convert.ToDouble(WerteArray(7).Trim(), Provider.FortranProvider)
                     End If
                     .GrenzGr = WerteArray(8).Trim()
                     .GrenzReiheDatei = WerteArray(9).Trim()
@@ -865,7 +822,7 @@ Public Class Problem
                             .GrenzReihe = fileInstance.getTimeSeries(.GrenzGr)
                         End If
 
-                        'Zeitraum der Grenzwertreihe überprüfen
+                        'Zeitraum der Grenzwertreihe Ã¼berprÃ¼fen
                         '--------------------------------------
                         GrenzStart = .GrenzReihe.StartDate
                         GrenzEnde = .GrenzReihe.EndDate
@@ -874,7 +831,7 @@ Public Class Problem
                             'Grenzwertreihe deckt Simulationszeitraum nicht ab
                             Throw New Exception($"Constraints: The threshold series '{ .GrenzReiheDatei}' does not cover the simulation period!")
                         Else
-                            'Zielreihe auf Simulationszeitraum kürzen
+                            'Zielreihe auf Simulationszeitraum kÃ¼rzen
                             Call .GrenzReihe.Cut(SimStart, SimEnde)
                             If .GrenzReihe.Length = 0 Then
                                 Throw New Exception($"Constraints: The threshold series '{ .GrenzReiheDatei}' is empty after cutting to the simulation period!")
@@ -901,7 +858,7 @@ Public Class Problem
 
 
     ''' <summary>
-    ''' Prüft ob Optparameter und Modellparameter zusammenpassen
+    ''' PrÃ¼ft ob Optparameter und Modellparameter zusammenpassen
     ''' </summary>
     Private Sub Validate_OPT_fits_to_MOD()
 
@@ -910,7 +867,7 @@ Public Class Problem
         Dim isValid_B As Boolean = True
         Dim isValid As Boolean = False
 
-        'A: Prüfung ob für jeden OptParameter mindestens ein Modellparameter existiert
+        'A: PrÃ¼fung ob fÃ¼r jeden OptParameter mindestens ein Modellparameter existiert
         For i = 0 To List_OptParameter.GetUpperBound(0)
             isValid = False
             For j = 0 To List_ModellParameter.GetUpperBound(0)
@@ -923,7 +880,7 @@ Public Class Problem
             End If
         Next
 
-        'B: Prüfung ob jeder ModellParameter einem richtigen OptParameter zugewiesen ist.
+        'B: PrÃ¼fung ob jeder ModellParameter einem richtigen OptParameter zugewiesen ist.
         For i = 0 To List_ModellParameter.GetUpperBound(0)
             isValid = False
             For j = 0 To List_OptParameter.GetUpperBound(0)
@@ -947,7 +904,7 @@ Public Class Problem
     End Sub
 
     ''' <summary>
-    ''' Prüft ob die Startwerte der OptParameter innerhalb der Min und Max Grenzen liegen
+    ''' PrÃ¼ft ob die Startwerte der OptParameter innerhalb der Min und Max Grenzen liegen
     ''' </summary>
     Private Sub Validate_Startvalues()
         Dim i As Integer
@@ -960,7 +917,7 @@ Public Class Problem
     End Sub
 
     '''' <summary>
-    '''' Validierungsfunktion der Ziele Datei (Objectives), prüft ob die Gruppenzuordnung passt
+    '''' Validierungsfunktion der Ziele Datei (Objectives), prÃ¼ft ob die Gruppenzuordnung passt
     '''' </summary>
 
     'Public Sub Validate_Objectives()
@@ -992,8 +949,8 @@ Public Class Problem
     ''' </summary>
     ''' <remarks>
     ''' Beta-Version - erlaubt Kalirbierung der Tagesganlinie
-    ''' dafür muss für den jeweiligen Tagesgangwert in der .mod Datei in der Spalte "Elem" "TGG_QH" eingetragen werden
-    ''' Vorschlag: Aktivierung der kalibrierung des Tagesganlinie über einen Schalter, damit diese Funktion nicht bei jeder optimierung aufgerufen wird
+    ''' dafÃ¼r muss fÃ¼r den jeweiligen Tagesgangwert in der .mod Datei in der Spalte "Elem" "TGG_QH" eingetragen werden
+    ''' Vorschlag: Aktivierung der kalibrierung des Tagesganlinie Ã¼ber einen Schalter, damit diese Funktion nicht bei jeder optimierung aufgerufen wird
     ''' Kontakt: Valentin Gamerith
     ''' </remarks>
     Private Sub VG_Kalibrierung_Tagesganglinie()
@@ -1018,13 +975,13 @@ Public Class Problem
                 Next
             End If
         Next
-        'Überprüft ob 24 Werte zugeordnet wurden
+        'ÃœberprÃ¼ft ob 24 Werte zugeordnet wurden
         If VG_check_24 = 24 Then
             'Faktor um auf 24 zu kommen:Xi = Xsim,i * n/Summe(Xi,Sim)
             VG_Faktor = VG_check_24 / VG_sum_TGG
             For i = 0 To List_ModellParameter.GetUpperBound(0)
                 If Trim(List_ModellParameter(i).Element) = "TGG_QH" Then
-                    List_ModellParameter(i).Faktor = VG_Faktor 'setzt den Faktor für den jeweiligen Tagesgangwert
+                    List_ModellParameter(i).Faktor = VG_Faktor 'setzt den Faktor fÃ¼r den jeweiligen Tagesgangwert
                 End If
             Next
         Else
@@ -1032,17 +989,17 @@ Public Class Problem
     End Sub
 
     ''' <summary>
-    ''' Gibt ein neues Individuum zurück, dessen Optparameter alle auf die Startwerte gesetzt sind
+    ''' Gibt ein neues Individuum zurÃ¼ck, dessen Optparameter alle auf die Startwerte gesetzt sind
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>Das Individuum erhält die ID 1</remarks>
-    Public Function getIndividuumStart() As BlueM.Opt.Common.Individuum
+    ''' <remarks>Das Individuum erhÃ¤lt die ID 1</remarks>
+    Public Function getIndividuumStart() As Individuum
 
-        Dim startind As BlueM.Opt.Common.Individuum
+        Dim startind As Individuum
 
         Dim i As Integer
 
-        startind = New BlueM.Opt.Common.Individuum_PES("start", 1)
+        startind = New Individuum_PES("start", 1)
         'Startwerte der OptParameter setzen
         For i = 0 To Me.NumOptParams - 1
             startind.OptParameter(i).RWert = Me.List_OptParameter(i).StartWert

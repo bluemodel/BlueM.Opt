@@ -15,7 +15,8 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.IO
+Imports System.Drawing
+Imports System.Windows.Forms
 
 ''' <summary>
 ''' Der Monitor stellt ein Diagramm und ein Textfeld (Log) zur Verfügung
@@ -73,7 +74,7 @@ Partial Public Class Monitor
     ''' <param name="text">der Text</param>
     Public Sub LogAppend(ByVal text As String)
         Call Me.LogAppendText(text)
-        System.Windows.Forms.Application.DoEvents()
+        Application.DoEvents()
     End Sub
 
     ''' <summary>
@@ -122,14 +123,14 @@ Partial Public Class Monitor
             .Chart.Axes.Right.Ticks.Color = Drawing.Color.Black
             .Chart.Axes.Left.Ticks.Width = 1
             .Chart.Axes.Right.Ticks.Width = 1
-            .BackColor = System.Drawing.Color.Transparent
-            .Cursor = System.Windows.Forms.Cursors.Default
+            .BackColor = Color.Transparent
+            .Cursor = Cursors.Default
             .Header.Visible = False
             '.Legend.Visible = False
             .Legend.Alignment = Steema.TeeChart.LegendAlignments.Bottom
             .Legend.LegendStyle = Steema.TeeChart.LegendStyles.Series
             .Location = New System.Drawing.Point(0, 0)
-            .Panel.Brush.Color = System.Drawing.Color.Transparent
+            .Panel.Brush.Color = Color.Transparent
             .Panel.Color = Drawing.Color.White
             .Panel.Bevel.Outer = Steema.TeeChart.Drawing.BevelStyles.None
             .Panel.Bevel.Inner = Steema.TeeChart.Drawing.BevelStyles.None

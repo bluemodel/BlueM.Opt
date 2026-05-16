@@ -16,9 +16,10 @@
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
 Imports System.Drawing
+Imports BlueM.Opt.Common
 
 ''' <summary>
-''' Klasse stellt Diagrammfunktionalitäten zur Verfügung
+''' Klasse stellt DiagrammfunktionalitÃ¤ten zur VerfÃ¼gung
 ''' </summary>
 ''' <remarks>Erweiterung der Klasse Steema.TeeChart.TChart</remarks>
 Public Class Diagramm
@@ -46,7 +47,7 @@ Public Class Diagramm
         Me.Chart.Axes.Bottom.Grid.Visible = True
     End Sub
 
-    'Diagramm zurücksetzen
+    'Diagramm zurÃ¼cksetzen
     '*********************
     Public Sub Reset()
         With Me
@@ -63,7 +64,7 @@ Public Class Diagramm
         Try
             Call Steema.TeeChart.Editor.Show(Me)
         Catch ex As Exception
-            MsgBox("Fehler in TeeChart!" & BlueM.Opt.Common.eol & ex.Message, MsgBoxStyle.Critical)
+            MsgBox("Fehler in TeeChart!" & Constants.eol & ex.Message, MsgBoxStyle.Critical)
         End Try
     End Sub
 
@@ -72,7 +73,7 @@ Public Class Diagramm
 #Region "Serienverwaltung"
 
     'Serien-Initialisierung (Punkt)
-    'gibt die Serie zurück
+    'gibt die Serie zurÃ¼ck
     '******************************
     Public Function getSeriesPoint(ByVal title As String, _
                                       Optional ByVal colorName As String = "", _
@@ -84,7 +85,7 @@ Public Class Diagramm
         Dim baseColor, borderColor As Color
         Dim serie As Steema.TeeChart.Styles.Points
 
-        'Überprüfen, ob Serie bereits existiert
+        'ÃœberprÃ¼fen, ob Serie bereits existiert
         For i = 0 To Me.Chart.Series.Count - 1
             If (Me.Chart.Series(i).Title = title) Then
                 serie = Me.Chart.Series(i)
@@ -92,13 +93,14 @@ Public Class Diagramm
             End If
         Next
 
-        'Sonst Serie neu hinzufügen
-        serie = New Steema.TeeChart.Styles.Points(Me.Chart)
-        serie.Title = title
+        'Sonst Serie neu hinzufÃ¼gen
+        serie = New Steema.TeeChart.Styles.Points(Me.Chart) With {
+            .Title = title,
+            .ColorEach = ColEach
+        }
         serie.Pointer.Style = style
         serie.Pointer.HorizSize = size
         serie.Pointer.VertSize = size
-        serie.ColorEach = ColEach
         If (Not colorName = "") Then
             baseColor = Color.FromName(colorName)
             serie.Pointer.Color = baseColor
@@ -106,7 +108,7 @@ Public Class Diagramm
             borderColor = getDarkerColor(baseColor)
             serie.Pointer.Pen.Color = borderColor
         End If
-        
+
         Call Me.add_MarksTips(serie)
         serie.Cursor = Windows.Forms.Cursors.Hand
 
@@ -115,7 +117,7 @@ Public Class Diagramm
     End Function
 
     'Serien-Initialisierung (Linie)
-    'gibt die Serie zurück
+    'gibt die Serie zurÃ¼ck
     '******************************
     Public Function getSeriesLine(ByVal title As String, _
                                       Optional ByVal colorName As String = "") As Steema.TeeChart.Styles.Line
@@ -123,7 +125,7 @@ Public Class Diagramm
         Dim i As Integer
         Dim serie As Steema.TeeChart.Styles.Line
 
-        'Überprüfen, ob Serie bereits existiert
+        'ÃœberprÃ¼fen, ob Serie bereits existiert
         For i = 0 To Me.Chart.Series.Count - 1
             If (Me.Chart.Series(i).Title = title) Then
                 serie = Me.Chart.Series(i)
@@ -131,11 +133,12 @@ Public Class Diagramm
             End If
         Next
 
-        'Sonst Serie neu hinzufügen
-        serie = New Steema.TeeChart.Styles.Line(Me.Chart)
-        serie.Title = title
+        'Sonst Serie neu hinzufÃ¼gen
+        serie = New Steema.TeeChart.Styles.Line(Me.Chart) With {
+            .Title = title
+        }
         If (Not colorName = "") Then
-            serie.Color = Drawing.Color.FromName(colorName)
+            serie.Color = Color.FromName(colorName)
         End If
 
         Call Me.add_MarksTips(serie, Steema.TeeChart.Styles.MarksStyles.XY)
@@ -145,7 +148,7 @@ Public Class Diagramm
     End Function
 
     'Serien-Initialisierung (3DPunkt)
-    'gibt die Serie zurück
+    'gibt die Serie zurÃ¼ck
     '********************************
     Public Function getSeries3DPoint(ByVal title As String, _
                                       Optional ByVal colorName As String = "", _
@@ -155,9 +158,9 @@ Public Class Diagramm
 
         Dim i As Integer
         Dim baseColor, borderColor As Color
-        Dim serie As New Steema.TeeChart.Styles.Points3D
+        Dim serie As Steema.TeeChart.Styles.Points3D
 
-        'Überprüfen, ob Serie bereits existiert
+        'ÃœberprÃ¼fen, ob Serie bereits existiert
         For i = 0 To Me.Chart.Series.Count - 1
             If (Me.Chart.Series(i).Title = title) Then
                 serie = Me.Chart.Series(i)
@@ -165,18 +168,19 @@ Public Class Diagramm
             End If
         Next
 
-        'Sonst Serie neu hinzufügen
-        serie = New Steema.TeeChart.Styles.Points3D(Me.Chart)
-        serie.Title = title
+        'Sonst Serie neu hinzufÃ¼gen
+        serie = New Steema.TeeChart.Styles.Points3D(Me.Chart) With {
+            .Title = title,
+            .Depth = size,
+            .ColorEach = ColEach
+        }
         serie.Pointer.Style = style
         serie.Pointer.HorizSize = size
         serie.Pointer.VertSize = size
         serie.Pointer.Draw3D = True
-        serie.Depth = size
         serie.LinePen.Visible = False
-        serie.ColorEach = ColEach
         If (Not colorName = "") Then
-            baseColor = Drawing.Color.FromName(colorName)
+            baseColor = Color.FromName(colorName)
             serie.Color = baseColor
             'Border-Color etwas dunkler
             borderColor = getDarkerColor(baseColor)
@@ -191,7 +195,7 @@ Public Class Diagramm
 
     End Function
 
-    'Serien werden von Hinten gelöscht
+    'Serien werden von Hinten gelÃ¶scht
     '*********************************
     Sub DeleteSeries(ByVal Max As Integer, ByVal Min As Integer)
 
@@ -204,16 +208,17 @@ Public Class Diagramm
 
     End Sub
 
-    'MarksTips zu einer Serie hinzufügen
+    'MarksTips zu einer Serie hinzufÃ¼gen
     '***********************************
     Public Sub add_MarksTips(ByVal serie As Steema.TeeChart.Styles.Series, Optional ByVal style As Steema.TeeChart.Styles.MarksStyles = Steema.TeeChart.Styles.MarksStyles.Label)
 
         Dim myMarksTip As Steema.TeeChart.Tools.MarksTip
-        myMarksTip = New Steema.TeeChart.Tools.MarksTip(Me.Chart)
-        myMarksTip.Series = serie
-        myMarksTip.MouseAction = Steema.TeeChart.Tools.MarksTipMouseAction.Move
-        myMarksTip.MouseDelay = 10 'millisekunden
-        myMarksTip.Style = style
+        myMarksTip = New Steema.TeeChart.Tools.MarksTip(Me.Chart) With {
+            .Series = serie,
+            .MouseAction = Steema.TeeChart.Tools.MarksTipMouseAction.Move,
+            .MouseDelay = 10, 'millisekunden
+            .Style = style
+        }
 
     End Sub
 
@@ -222,7 +227,7 @@ Public Class Diagramm
 #Region "Misc"
 
     ''' <summary>
-    ''' Erzeugt von einer übergebenen Farbe eine etwas dunklere Farbe
+    ''' Erzeugt von einer Ã¼bergebenen Farbe eine etwas dunklere Farbe
     ''' </summary>
     ''' <param name="baseColor">die Basisfarbe</param>
     ''' <returns>eine etwas dunklere Farbe</returns>

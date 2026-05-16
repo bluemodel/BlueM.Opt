@@ -92,7 +92,6 @@
     <Compile Include="ObjectiveFunctions\ObjectiveFunction_Aggregate.vb" />
     <Compile Include="ObjectiveFunctions\ObjectiveFunction_Series.vb" />
     <Compile Include="ObjectiveFunctions\ObjectiveFunction_ValueFromSeries.vb" />
-    <Compile Include="ObjectiveFunctions\Objectivefunction_Value.vb" />
     <Compile Include="Problem.vb" />
     <Compile Include="OptParameter.vb" />
     <Compile Include="Progress.vb" />

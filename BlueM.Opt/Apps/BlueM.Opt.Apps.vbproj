@@ -112,11 +112,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Sim.vb" />
-    <None Include="SMUSI\Smusi.vb">
-      <SubType>Code</SubType>
-    </None>
-    <Compile Include="SWMM\SWMM.vb" />
-    <Compile Include="SWMM\SWMMThread.vb" />
     <Compile Include="TALSIM\TALSIM5.vb" />
     <Compile Include="TALSIM\TALSIM.vb" />
     <Compile Include="TALSIM\TALSIM5Thread.vb" />
@@ -175,10 +170,6 @@
     <Content Include="BlueM\x86\BlueM.Sim.dll" />
     <Content Include="BlueM\x86\BLUEM.SIM_RELEASE-NOTES.txt" />
     <Content Include="BlueM\x86\libifcoremd.dll" />
-    <Content Include="SWMM\IHWB.SWMM.DllAdapter.dll" />
-    <Content Include="SWMM\SWMM5.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="TALSIM\sqlite3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

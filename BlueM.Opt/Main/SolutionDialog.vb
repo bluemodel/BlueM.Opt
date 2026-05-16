@@ -15,14 +15,16 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports BlueM.Opt.Common
+
 ''' <summary>
-''' Zeigt die ausgewählten Lösungen an
+''' Zeigt die ausgewÃ¤hlten LÃ¶sungen an
 ''' </summary>
 Partial Public Class SolutionDialog
     Inherits System.Windows.Forms.Form
 
     'Das Problem
-    Private mProblem As BlueM.Opt.Common.Problem
+    Private mProblem As Problem
 
     'Properties
     '**********
@@ -52,12 +54,12 @@ Partial Public Class SolutionDialog
     ''' Konstruktor
     ''' </summary>
     ''' <param name="prob">Das Problem</param>
-    Public Sub New(ByRef prob As BlueM.Opt.Common.Problem)
+    Public Sub New(ByRef prob As Problem)
 
-        ' Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        ' Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent()
 
-        ' Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        ' FÃ¼gen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         'Problem speichern
         Me.mProblem = prob
@@ -75,8 +77,12 @@ Partial Public Class SolutionDialog
 
         'Ziele
         '--------
-        For Each feature As Common.ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
-            column = New DataGridViewTextBoxColumn()
+        For Each feature As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
+            column = New DataGridViewTextBoxColumn With {
+                .Name = feature.Description,
+                .ReadOnly = True,
+                .DefaultCellStyle = cellstyle.Clone()
+            }
             If (feature.isPrimObjective) Then
                 cellstyle.BackColor = Color.LightGreen
                 column.HeaderText = feature.Description & " (*)"
@@ -86,9 +92,6 @@ Partial Public Class SolutionDialog
                 column.HeaderText = feature.Description
                 column.HeaderCell.ToolTipText = "Secondary objective function"
             End If
-            column.ReadOnly = True
-            column.Name = feature.Description
-            column.DefaultCellStyle = cellstyle.Clone()
             Me.DataGridView1.Columns.Add(column)
         Next
 
@@ -96,13 +99,14 @@ Partial Public Class SolutionDialog
         '-----------
         cellstyle.BackColor = Color.LightCoral
 
-        For Each Constraint As Common.Constraintfunction In Me.mProblem.List_Constraintfunctions
-            column = New DataGridViewTextBoxColumn()
-            column.ReadOnly = True
-            column.HeaderText = Constraint.Bezeichnung
+        For Each Constraint As Constraintfunction In Me.mProblem.List_Constraintfunctions
+            column = New DataGridViewTextBoxColumn With {
+                .Name = Constraint.Bezeichnung,
+                .DefaultCellStyle = cellstyle.Clone(),
+                .ReadOnly = True,
+                .HeaderText = Constraint.Bezeichnung
+            }
             column.HeaderCell.ToolTipText = "Constraint"
-            column.Name = Constraint.Bezeichnung
-            column.DefaultCellStyle = cellstyle.Clone()
             Me.DataGridView1.Columns.Add(column)
         Next
 
@@ -110,13 +114,14 @@ Partial Public Class SolutionDialog
         '------------
         cellstyle.BackColor = Color.LightGray
 
-        For Each OptPara As BlueM.Opt.Common.OptParameter In Me.mProblem.List_OptParameter
-            column = New DataGridViewTextBoxColumn()
-            column.ReadOnly = True
-            column.HeaderText = OptPara.Bezeichnung
+        For Each OptPara As OptParameter In Me.mProblem.List_OptParameter
+            column = New DataGridViewTextBoxColumn With {
+                .Name = OptPara.Bezeichnung,
+                .DefaultCellStyle = cellstyle.Clone(),
+                .ReadOnly = True,
+                .HeaderText = OptPara.Bezeichnung
+            }
             column.HeaderCell.ToolTipText = "Optimization parameter"
-            column.Name = OptPara.Bezeichnung
-            column.DefaultCellStyle = cellstyle.Clone()
             Me.DataGridView1.Columns.Add(column)
         Next
 
@@ -129,10 +134,10 @@ Partial Public Class SolutionDialog
     End Sub
 
     ''' <summary>
-    ''' Ein Individuum zur Lösungsauswahl hinzufügen
+    ''' Ein Individuum zur LÃ¶sungsauswahl hinzufÃ¼gen
     ''' </summary>
-    ''' <param name="ind">das ausgewählte Individuum</param>
-    Public Sub addSolution(ByVal ind As Common.Individuum)
+    ''' <param name="ind">das ausgewÃ¤hlte Individuum</param>
+    Public Sub addSolution(ByVal ind As Individuum)
 
         Dim i As Integer
         Dim cellvalues() As Object
@@ -169,7 +174,7 @@ Partial Public Class SolutionDialog
         row.CreateCells(Me.DataGridView1, cellvalues)
         row.HeaderCell.Value = ind.ID.ToString()
 
-        'Zeile hinzufügen
+        'Zeile hinzufÃ¼gen
         Me.DataGridView1.Rows.Add(row)
 
         'Spalten anpassen
@@ -177,7 +182,7 @@ Partial Public Class SolutionDialog
 
     End Sub
 
-    'Automatisches speichern von Zellenänderungen
+    'Automatisches speichern von ZellenÃ¤nderungen
     '********************************************
     Private Sub dataGridView1_CurrentCellDirtyStateChanged(ByVal sender As Object, ByVal e As EventArgs) Handles DataGridView1.CurrentCellDirtyStateChanged
 
@@ -187,45 +192,45 @@ Partial Public Class SolutionDialog
 
     End Sub
 
-    'Nicht angehakte Lösungen aus Lösungsauwahl entfernen
+    'Nicht angehakte LÃ¶sungen aus LÃ¶sungsauwahl entfernen
     '****************************************************
     Private Sub ToolStripButton_unselect_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_unselect.Click
 
-        'Zeilen löschen
+        'Zeilen lÃ¶schen
         For Each row As DataGridViewRow In Me.DataGridView1.Rows
             If (row.Cells(0).Value = "False") Then
                 Me.DataGridView1.Rows.Remove(row)
             End If
         Next
 
-        'Event auslösen
+        'Event auslÃ¶sen
         RaiseEvent SelectedSolutionsChanged(Me.checkedSolutions)
 
     End Sub
 
-    'Lösungsauswahl zurücksetzen
+    'LÃ¶sungsauswahl zurÃ¼cksetzen
     '***************************
     Private Sub ToolStripButton_Clear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Clear.Click
 
-        'Alle Zeilen löschen
+        'Alle Zeilen lÃ¶schen
         Call Me.DataGridView1.Rows.Clear()
 
-        'Lösungsdialog verstecken
+        'LÃ¶sungsdialog verstecken
         Call Me.Hide()
 
-        'Event auslösen
+        'Event auslÃ¶sen
         RaiseEvent SelectedSolutionsCleared()
 
     End Sub
 
-    'Ausgewählte Lösungen simulieren
+    'AusgewÃ¤hlte LÃ¶sungen simulieren
     '*******************************
     Private Sub ToolStripButton_Simulate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Wave.Click
 
         'Cursor
         Cursor = Cursors.WaitCursor
 
-        'Event auslösen
+        'Event auslÃ¶sen
         RaiseEvent SelectedSolutionsSimulationRequested(Me.checkedSolutions)
 
         'Cursor
@@ -264,11 +269,11 @@ Partial Public Class SolutionDialog
         RaiseEvent SelectedSolutionsIDRequested(id)
     End Sub
 
-    'Form schließen
+    'Form schlieÃŸen
     '**************
     Private Sub SolutionDialog_FormClosing(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
 
-        'verhindern, dass das Formular komplett gelöscht wird
+        'verhindern, dass das Formular komplett gelÃ¶scht wird
         e.Cancel = True
 
         'Formular verstecken

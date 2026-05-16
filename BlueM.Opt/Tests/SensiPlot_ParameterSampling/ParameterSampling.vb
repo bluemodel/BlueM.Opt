@@ -1,4 +1,4 @@
-﻿'BlueM.Opt
+'BlueM.Opt
 'Copyright (C) BlueM Dev Group
 'Website: <https://www.bluemodel.org>
 '
@@ -16,6 +16,7 @@
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
 Imports System.Windows.Forms
+Imports BlueM.Opt.Common
 
 ''' <summary>
 ''' Form with diagram for testing SensiPlot ParameterSampling
@@ -45,15 +46,15 @@ Public Class ParameterSampling
 
         'sample optparameters
         Dim parameterCombinations As List(Of Double())
-        Dim sampler As New BlueM.Opt.Algos.SensiPlot.ParameterSampler()
+        Dim sampler As New Algos.SensiPlot.ParameterSampler()
 
-        parameterCombinations = sampler.Sample(NumParams, NumSteps, BlueM.Opt.Common.Settings_Sensiplot.SensiType.evenDistribution)
+        parameterCombinations = sampler.Sample(NumParams, NumSteps, Settings_Sensiplot.SensiType.evenDistribution)
         plotParameterCombinations(parameterCombinations, "even distribution")
 
-        parameterCombinations = sampler.Sample(NumParams, NumSteps, BlueM.Opt.Common.Settings_Sensiplot.SensiType.randomDistribution)
+        parameterCombinations = sampler.Sample(NumParams, NumSteps, Settings_Sensiplot.SensiType.randomDistribution)
         plotParameterCombinations(parameterCombinations, "random distribution")
 
-        parameterCombinations = sampler.Sample(NumParams, NumSteps, BlueM.Opt.Common.Settings_Sensiplot.SensiType.latinHypercube)
+        parameterCombinations = sampler.Sample(NumParams, NumSteps, Settings_Sensiplot.SensiType.latinHypercube)
         plotParameterCombinations(parameterCombinations, "latin hypercube sampling")
 
     End Sub

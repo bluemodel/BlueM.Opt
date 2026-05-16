@@ -17,7 +17,7 @@
 '
 ''' <summary>
 ''' Klasse OptParameter
-''' für das Speichern eines Optimierungsparameters und zugehöriger Informationen
+''' fÃ¼r das Speichern eines Optimierungsparameters und zugehÃ¶riger Informationen
 ''' </summary>
 Public Class OptParameter
 
@@ -29,8 +29,8 @@ Public Class OptParameter
 
     'Parameterwerte
     Public Xn As Double                         'Skalierter Parameterwert
-    Public Min As Double                        'Minwert für die Umrechnung in reellen Parameterwert
-    Public Max As Double                        'Maxwert für die Umrechnung in reellen Parameterwert
+    Public Min As Double                        'Minwert fÃ¼r die Umrechnung in reellen Parameterwert
+    Public Max As Double                        'Maxwert fÃ¼r die Umrechnung in reellen Parameterwert
 
     Public Property RWert() As Double           'Reeller Parameterwert
         Get
@@ -45,11 +45,11 @@ Public Class OptParameter
 
     'Schrittweite
     Public Dn As Double
-    'Schiefemaß
+    'SchiefemaÃŸ
     Public C As Double
 
     'Beziehung
-    Public Beziehung As Common.Constants.Relationship
+    Public Beziehung As Constants.Relationship
 
 #End Region 'Eigenschaften
 
@@ -84,16 +84,16 @@ Public Class OptParameter
     '*******************************
     Public Function Clone() As OptParameter
 
-        Clone = New OptParameter()
-
-        Clone.Bezeichnung = Me.Bezeichnung
-        Clone.Einheit = Me.Einheit
-        Clone.Xn = Me.Xn
-        Clone.Dn = Me.Dn
-        Clone.Min = Me.Min
-        Clone.Max = Me.Max
-        Clone.StartWert = Me.StartWert
-        Clone.Beziehung = Me.Beziehung
+        Clone = New OptParameter With {
+            .Bezeichnung = Me.Bezeichnung,
+            .Einheit = Me.Einheit,
+            .Xn = Me.Xn,
+            .Dn = Me.Dn,
+            .Min = Me.Min,
+            .Max = Me.Max,
+            .StartWert = Me.StartWert,
+            .Beziehung = Me.Beziehung
+        }
 
         Return Clone
 
@@ -118,7 +118,7 @@ Public Class OptParameter
 
     'Konvertiert eine Liste von OptParametern in ein Array von Doubles (Xn)
     '**********************************************************************
-    Public Shared Function Get_OptParas_Xn(ByVal OptParameter() As BlueM.Opt.Common.OptParameter) As Double()
+    Public Shared Function Get_OptParas_Xn(ByVal OptParameter() As OptParameter) As Double()
 
         Dim i As Integer
         Dim Xn() As Double

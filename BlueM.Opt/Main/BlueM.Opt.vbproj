@@ -278,9 +278,9 @@
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </Content>
-    <Content Include="BLUEM.OPT_RELEASE-NOTES.txt">
+    <None Include="CHANGELOG.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
     <None Include="Resources\BlueM.png" />
     <None Include="Resources\chart_curve.png" />
     <None Include="Resources\EVO.ico" />

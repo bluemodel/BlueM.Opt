@@ -15,10 +15,10 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports BlueM.Opt.Common.Constants
+Imports BlueM.Opt.Common
 
 Public Class SensiPlotController
-    Implements BlueM.Opt.Algos.IController
+    Implements Algos.IController
 
     ''' <summary>
     ''' Multithreading Support
@@ -29,17 +29,17 @@ Public Class SensiPlotController
         End Get
     End Property
 
-    Private myProblem As BlueM.Opt.Common.Problem
-    Private mySettings As BlueM.Opt.Common.Settings
-    Private myProgress As BlueM.Opt.Common.Progress
-    Private myHauptDiagramm As BlueM.Opt.Diagramm.Hauptdiagramm
+    Private myProblem As Problem
+    Private mySettings As Settings
+    Private myProgress As Progress
+    Private myHauptDiagramm As Diagramm.Hauptdiagramm
 
-    Private myAppType As BlueM.Opt.Common.ApplicationTypes
-    Private WithEvents Sim1 As BlueM.Opt.Apps.Sim
+    Private myAppType As ApplicationTypes
+    Private WithEvents Sim1 As Apps.Sim
 
     Private stopped As Boolean
 
-    Public Sub Init(ByRef inputProblem As Common.Problem, ByRef inputSettings As Common.Settings, ByRef inputProgress As Common.Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
+    Public Sub Init(ByRef inputProblem As Problem, ByRef inputSettings As Settings, ByRef inputProgress As Progress, ByRef inputHptDiagramm As Diagramm.Hauptdiagramm) Implements IController.Init
         Me.myProblem = inputProblem
         Me.mySettings = inputSettings
         Me.myProgress = inputProgress
@@ -66,7 +66,7 @@ Public Class SensiPlotController
         Dim i, n, NumParams, NumSteps As Integer
         Dim x, y, z As Double
         Dim isOK As Boolean
-        Dim ind As Common.Individuum
+        Dim ind As Individuum
         Dim serie As Steema.TeeChart.Styles.Points
         Dim serie3D As New Steema.TeeChart.Styles.Points3D
         Dim surface As New Steema.TeeChart.Styles.Surface
@@ -109,7 +109,7 @@ Public Class SensiPlotController
                 surface.Brush.Transparency = 70
                 surface.Pen.Visible = False
                 surface.Title = "SensiPlot"
-                surface.Cursor = System.Windows.Forms.Cursors.Hand
+                surface.Cursor = Windows.Forms.Cursors.Hand
             End If
         End If
 
@@ -129,7 +129,7 @@ Public Class SensiPlotController
             If (Me.stopped) Then Exit Sub
 
             n = i + 1
-            Common.Log.AddMessage(Common.Log.levels.info, $"Sensiplot simulation {n}:")
+            Log.AddMessage(Log.levels.info, $"Sensiplot simulation {n}:")
 
             Dim parameterCombination As Double() = parameterCombinations(i)
 
@@ -137,7 +137,7 @@ Public Class SensiPlotController
             For j = 0 To NumParams - 1
                 With Me.myProblem.List_OptParameter(Me.mySettings.SensiPlot.Selected_OptParameters(j))
                     .Xn = parameterCombination(j)
-                    Common.Log.AddMessage(Common.Log.levels.info, $"* OptParameter { .Bezeichnung}: {Convert.ToString(.RWert, Common.Provider.FortranProvider)}")
+                    Log.AddMessage(Log.levels.info, $"* OptParameter { .Bezeichnung}: {Convert.ToString(.RWert, Provider.FortranProvider)}")
                 End With
             Next
 
@@ -166,19 +166,19 @@ Public Class SensiPlotController
 
                     If Not relationshipSatisfied Then
                         allRelationshipsSatisfied = False
-                        Common.Log.AddMessage(Common.Log.levels.warning, $"Relationship for optimization parameter {Me.myProblem.List_OptParameter(j).Bezeichnung} is not satisfied!")
+                        Log.AddMessage(Log.levels.warning, $"Relationship for optimization parameter {Me.myProblem.List_OptParameter(j).Bezeichnung} is not satisfied!")
                     End If
                 End If
             Next
 
             If Not allRelationshipsSatisfied Then
                 'Skip evaluation
-                Common.Log.AddMessage(Common.Log.levels.warning, $"Skipping evaluation of parameter combination {n} because of parameter relationship violations!")
+                Log.AddMessage(Log.levels.warning, $"Skipping evaluation of parameter combination {n} because of parameter relationship violations!")
             Else
                 'Evaluate parameter combination
 
                 'Individuum instanzieren
-                ind = New Common.Individuum_PES("SensiPlot", n)
+                ind = New Individuum_PES("SensiPlot", n)
 
                 'OptParameter ins Individuum kopieren
                 ind.OptParameter = Me.myProblem.List_OptParameter
@@ -235,7 +235,7 @@ Public Class SensiPlotController
 
             End If
 
-            System.Windows.Forms.Application.DoEvents()
+            Windows.Forms.Application.DoEvents()
 
         Next
 

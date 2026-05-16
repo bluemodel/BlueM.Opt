@@ -15,6 +15,9 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
+Imports System.Drawing
+Imports BlueM.Opt.Common
+
 ''' <summary>
 ''' Diagramm zeigt Lösungen (Individuen) im Lösungsraum an
 ''' </summary>
@@ -22,10 +25,10 @@ Public Class Hauptdiagramm
     Inherits Diagramm
 
     'lokale Referenz auf Settings
-    Private mSettings As BlueM.Opt.Common.Settings
+    Private mSettings As Settings
 
     'Das Problem
-    Private mProblem As BlueM.Opt.Common.Problem
+    Private mProblem As Problem
 
     'Zuordnung zwischen Zielfunktionen und Achsen
     Public ZielIndexX, ZielIndexY, ZielIndexZ As Integer
@@ -35,7 +38,7 @@ Public Class Hauptdiagramm
 
     'Diagramm Initialisierung (Titel und Achsen)
     '*******************************************
-    Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection, ByRef prob As BlueM.Opt.Common.Problem)
+    Public Sub DiagInitialise(ByVal Titel As String, ByVal Achsen As Collection, ByRef prob As Problem)
 
         Dim xachse, yachse, zachse As Diagramm.Achse
 
@@ -108,13 +111,14 @@ Public Class Hauptdiagramm
                 .Chart.Aspect.Orthogonal = False
                 .Chart.Aspect.Perspective = 62
                 .Chart.Aspect.Rotation = 329
-                .Chart.Aspect.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality
+                .Chart.Aspect.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
                 .Chart.Aspect.VertOffset = -20
                 .Chart.Aspect.Zoom = 66
 
                 'Rotate Tool
-                Dim rotate As New Steema.TeeChart.Tools.Rotate(.Chart)
-                rotate.Button = Windows.Forms.MouseButtons.Right
+                Dim rotate As New Steema.TeeChart.Tools.Rotate(.Chart) With {
+                    .Button = Windows.Forms.MouseButtons.Right
+                }
 
             End If
 
@@ -126,7 +130,7 @@ Public Class Hauptdiagramm
     ''' Settings setzen
     ''' </summary>
     ''' <param name="settings">Settings</param>
-    Public Sub setSettings(ByRef settings As BlueM.Opt.Common.Settings)
+    Public Sub setSettings(ByRef settings As Settings)
 
         'Settings übergeben
         Me.mSettings = settings
@@ -138,14 +142,14 @@ Public Class Hauptdiagramm
 
     'Lösung zeichnen
     '***************
-    Public Sub ZeichneIndividuum(ByVal ind As Common.Individuum, ByVal runde As Integer, ByVal pop As Integer, ByVal gen As Integer, ByVal nachf As Integer, _
-                               ByVal Farbe As System.Drawing.Color, Optional ByVal ColEach As Boolean = False)
+    Public Sub ZeichneIndividuum(ByVal ind As Individuum, ByVal runde As Integer, ByVal pop As Integer, ByVal gen As Integer, ByVal nachf As Integer,
+                               ByVal Farbe As Color, Optional ByVal ColEach As Boolean = False)
 
         Dim serie As Steema.TeeChart.Styles.Series
 
         'Ungültige Individuen immer Grau anzeigen!
         If (Not ind.Is_Feasible) Then
-            Farbe = System.Drawing.Color.Gray
+            Farbe = Color.Gray
         End If
 
         If (Me.mProblem.NumPrimObjective = 1) Then
@@ -157,7 +161,7 @@ Public Class Hauptdiagramm
                 serie = Me.getSeriesPoint($"Population {pop + 1}", , , , ColEach)
             End If
             Select Case Me.mProblem.Method
-                Case BlueM.Opt.Common.METH_PES
+                Case METH_PES
                     Call serie.Add(runde * Me.mSettings.PES.N_Gen * Me.mSettings.PES.N_Nachf + gen * Me.mSettings.PES.N_Nachf + nachf, ind.PrimObjectives(0) * Me.mProblem.List_PrimObjectiveFunctions(0).Direction, ind.ID.ToString(), Farbe)
                 Case Else
                     Throw New Exception("Drawing function not defined for this single objective method!")
@@ -193,7 +197,7 @@ Public Class Hauptdiagramm
     ''' Start-Individuum zeichnen
     ''' </summary>
     ''' <param name="ind">das Individuum, das mit den Startwerten evaluiert wurde</param>
-    Public Sub ZeichneStartWert(ByVal ind As Common.Individuum)
+    Public Sub ZeichneStartWert(ByVal ind As Individuum)
 
         Dim farbe As String
         Dim serie As Steema.TeeChart.Styles.Series
@@ -232,7 +236,7 @@ Public Class Hauptdiagramm
 
     'Population zeichnen
     '*******************
-    Public Sub ZeichneSekPopulation(ByVal pop() As Common.Individuum)
+    Public Sub ZeichneSekPopulation(ByVal pop() As Individuum)
 
         Dim i As Integer
         Dim serie, serie_inv As Steema.TeeChart.Styles.Series
@@ -240,7 +244,7 @@ Public Class Hauptdiagramm
         Dim values(,) As Double
 
         'Population in Array von Penalties transformieren
-        values = Common.Individuum.Get_All_Penalty_of_Array(pop)
+        values = Individuum.Get_All_Penalty_of_Array(pop)
 
         If (Me.mProblem.NumPrimObjective = 2) Then
             '2 Zielfunktionen
@@ -327,7 +331,7 @@ Public Class Hauptdiagramm
         If (Me.ZielIndexX <> -1) Then
             If (Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexX).hasCurrentValue) Then
                 colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
-                colorline1.Pen.Color = System.Drawing.Color.Red
+                colorline1.Pen.Color = Color.Red
                 colorline1.AllowDrag = False
                 colorline1.Draw3D = True
                 colorline1.Axis = Me.Axes.Bottom
@@ -339,7 +343,7 @@ Public Class Hauptdiagramm
         If (Me.ZielIndexY <> -1) Then
             If (Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).hasCurrentValue) Then
                 colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
-                colorline1.Pen.Color = System.Drawing.Color.Red
+                colorline1.Pen.Color = Color.Red
                 colorline1.AllowDrag = False
                 colorline1.Draw3D = True
                 colorline1.Axis = Me.Axes.Left
@@ -353,7 +357,7 @@ Public Class Hauptdiagramm
                 'TODO: ColorLine auf Depth-Axis geht nicht! (#203)
                 MsgBox($"The current value on the Z-axis ({Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexZ).Description}) can not be displayed (see #203)", MsgBoxStyle.Information)
                 'colorline1 = New Steema.TeeChart.Tools.ColorLine(Me.Chart)
-                'colorline1.Pen.Color = System.Drawing.Color.Red
+                'colorline1.Pen.Color = Color.Red
                 'colorline1.AllowDrag = False
                 'colorline1.Draw3D = True
                 'colorline1.Axis = Me.Axes.Depth
@@ -371,7 +375,7 @@ Public Class Hauptdiagramm
     ''' Draw a selected solution in the diagram
     ''' </summary>
     ''' <param name="ind">the solution to draw</param>
-    Public Sub DrawSelectedSolution(ind As Common.Individuum)
+    Public Sub DrawSelectedSolution(ind As Individuum)
 
         Dim x, y, z As Double
 
@@ -383,12 +387,12 @@ Public Class Hauptdiagramm
             serie.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie.Marks.Transparency = 50
             serie.Marks.ArrowLength = 10
-            If Me.mProblem.Method = Common.METH_SENSIPLOT Then
+            If Me.mProblem.Method = Constants.METH_SENSIPLOT Then
                 'x axis is optparameter, y axis is objective function
                 x = ind.OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).RWert
                 y = ind.Objectives(Me.mSettings.SensiPlot.Selected_Objective) * Me.mProblem.List_ObjectiveFunctions(Me.mSettings.SensiPlot.Selected_Objective).Direction
             Else
-                If Me.mProblem.Modus = Common.Constants.EVO_MODE.Single_Objective Then
+                If Me.mProblem.Modus = Constants.EVO_MODE.Single_Objective Then
                     'x axis is simulation ID (single objective)
                     x = ind.ID
                     y = ind.Objectives(Me.ZielIndexY) * Me.mProblem.List_ObjectiveFunctions(Me.ZielIndexY).Direction
@@ -407,7 +411,7 @@ Public Class Hauptdiagramm
             serie3D.Marks.Style = Steema.TeeChart.Styles.MarksStyles.Label
             serie3D.Marks.Transparency = 50
             serie3D.Marks.ArrowLength = 10
-            If Me.mProblem.Method = Common.METH_SENSIPLOT Then
+            If Me.mProblem.Method = Constants.METH_SENSIPLOT Then
                 'x and z axis are optparameters, y axis is objective function
                 x = ind.OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(0)).RWert
                 z = ind.OptParameter(Me.mSettings.SensiPlot.Selected_OptParameters(1)).RWert
