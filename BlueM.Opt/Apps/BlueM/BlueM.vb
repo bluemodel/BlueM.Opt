@@ -51,9 +51,9 @@ Public Class BlueMSim
 #Region "Properties"
 
     ''' <summary>
-    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
+    ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen kÃ¶nnen
     ''' </summary>
-    ''' <remarks>Die erste Dateiendung in dieser Collection repräsentiert den Datensatz (wird z.B. als Filter für OpenFile-Dialoge verwendet)</remarks>
+    ''' <remarks>Die erste Dateiendung in dieser Collection reprÃ¤sentiert den Datensatz (wird z.B. als Filter fÃ¼r OpenFile-Dialoge verwendet)</remarks>
     Public Overrides ReadOnly Property DatensatzDateiendungen() As Collections.Specialized.StringCollection
         Get
             Dim exts As New Collections.Specialized.StringCollection()
@@ -70,7 +70,7 @@ Public Class BlueMSim
     End Property
 
     ''' <summary>
-    ''' Ob die Anwendung Multithreading unterstützt
+    ''' Ob die Anwendung Multithreading unterstÃ¼tzt
     ''' </summary>
     ''' <returns>True</returns>
     Public Overrides ReadOnly Property MultithreadingSupported() As Boolean
@@ -169,12 +169,12 @@ Public Class BlueMSim
         Dim Ganglinie As String = ""
         Dim CSV_Format As String = ""
 
-        'ALL-Datei öffnen
+        'ALL-Datei Ã¶ffnen
         '----------------
         Dim Datei As String = IO.Path.Combine(Me.WorkDir_Original, Me.Datensatz & ".ALL")
 
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
+        Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         'Alle Zeilen durchlaufen
         Dim Zeile As String
@@ -192,12 +192,12 @@ Public Class BlueMSim
                 SimDT_str = Zeile.Substring(35).Trim
             End If
 
-            'Überprüfen ob die Ganglinien (.WEL Datei) ausgegeben wird
+            'ÃœberprÃ¼fen ob die Ganglinien (.WEL Datei) ausgegeben wird
             If (Zeile.StartsWith(" Ganglinienausgabe ....... [J/N] :")) Then
                 Ganglinie = Zeile.Substring(35).Trim
             End If
 
-            'Überprüfen ob CSV Format eingeschaltet ist
+            'ÃœberprÃ¼fen ob CSV Format eingeschaltet ist
             If (Zeile.StartsWith(" ... CSV-Format .......... [J/N] :")) Then
                 CSV_Format = Zeile.Substring(35).Trim
             End If
@@ -218,7 +218,7 @@ Public Class BlueMSim
 
         'Fehlermeldung CSv Format nicht eingeschaltet
         If CSV_Format <> "J" Then
-            Throw New Exception("Das CSV Format für die .WEL Datei ist nicht eingeschaltet. Bitte in .ALL unter '... CSV-Format' einschalten.")
+            Throw New Exception("Das CSV Format fÃ¼r die .WEL Datei ist nicht eingeschaltet. Bitte in .ALL unter '... CSV-Format' einschalten.")
         End If
 
 
@@ -228,7 +228,7 @@ Public Class BlueMSim
 
 #Region "Evaluierung"
 
-    'Gibt zurück ob ein beliebiger Thread beendet ist und ibt die ID diesen freien Threads zurück
+    'Gibt zurÃ¼ck ob ein beliebiger Thread beendet ist und ibt die ID diesen freien Threads zurÃ¼ck
     '********************************************************************************************
     Protected Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
         ThreadFree = False
@@ -243,8 +243,8 @@ Public Class BlueMSim
 
     End Function
 
-    'BlauesModell ausführen (simulieren)
-    'Startet einen neuen Thread und übergibt ihm die Child ID
+    'BlauesModell ausfÃ¼hren (simulieren)
+    'Startet einen neuen Thread und Ã¼bergibt ihm die Child ID
     '********************************************************
     Protected Overrides Function launchSim(ByVal Thread_ID As Integer, ByVal Child_ID As Integer) As Boolean
 
@@ -262,7 +262,7 @@ Public Class BlueMSim
 
     End Function
 
-    'BlueM ohne Thread ausführen
+    'BlueM ohne Thread ausfÃ¼hren
     '***************************
     Protected Overrides Function launchSim() As Boolean
 
@@ -270,7 +270,7 @@ Public Class BlueMSim
 
         Try
 
-            'Datensatz übergeben und initialisieren
+            'Datensatz Ã¼bergeben und initialisieren
             Call bluem_dll(0).Initialize(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz))
 
             Dim SimEnde As DateTime = BlueM_EngineDotNetAccess.BlueMDate2DateTime(bluem_dll(0).GetSimulationEndDate())
@@ -308,8 +308,8 @@ Public Class BlueMSim
 
     End Function
 
-    'Prüft ob des aktuelle Child mit der ID die oben übergeben wurde fertig ist
-    'Gibt die Thread ID zurück um zum auswerten in das Arbeitsverzeichnis zu wechseln
+    'PrÃ¼ft ob des aktuelle Child mit der ID die oben Ã¼bergeben wurde fertig ist
+    'Gibt die Thread ID zurÃ¼ck um zum auswerten in das Arbeitsverzeichnis zu wechseln
     '********************************************************************************
     Protected Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         ThreadReady = False
@@ -331,10 +331,10 @@ Public Class BlueMSim
     '-------------------------------
     Protected Overrides Sub SIM_Ergebnis_Lesen()
 
-        'Altes Simulationsergebnis löschen
+        'Altes Simulationsergebnis lÃ¶schen
         Me.SimResult.Clear()
 
-        'Benötigte SimReihen zusammenstellen
+        'BenÃ¶tigte SimReihen zusammenstellen
         'TODO: das braucht eigentlich nicht nach jeder Simulation nochmal neu getan zu werden
         Dim SimReihen As New Dictionary(Of String, List(Of String)) '{file: [series]}
         SimReihen.Add("WEL", New List(Of String))
@@ -357,15 +357,15 @@ Public Class BlueMSim
 
         'WEL-Datei einlesen
         '------------------
-        Dim WELtmp As Wave.Fileformats.WEL = New Wave.Fileformats.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".WEL"))
+        Dim WELtmp As New Wave.Fileformats.WEL(IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".WEL"))
 
-        'Benötigte Reihen für Import selektieren
+        'BenÃ¶tigte Reihen fÃ¼r Import selektieren
         For Each series As String In SimReihen("WEL")
             WELtmp.selectSeries(series)
         Next
         'Datei einlesen
         WELtmp.readFile()
-        'Zeitreihen übernehmen
+        'Zeitreihen Ã¼bernehmen
         For Each zre As Wave.TimeSeries In WELtmp.TimeSeries.Values
             Me.SimResult.Series.Add(zre.Title, zre)
         Next
@@ -375,15 +375,15 @@ Public Class BlueMSim
         If (Me.useKWL) Then
 
             Dim KWLpath As String = IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".KWL")
-            Dim KWLtmp As Wave.Fileformats.WEL = New Wave.Fileformats.WEL(KWLpath)
+            Dim KWLtmp As New Wave.Fileformats.WEL(KWLpath)
 
-            'Benötigte Reihen für Import selektieren
+            'BenÃ¶tigte Reihen fÃ¼r Import selektieren
             For Each series As String In SimReihen("KWL")
                 KWLtmp.selectSeries(series)
             Next
             'Datei einlesen
             KWLtmp.readFile()
-            'Zeitreihen übernehmen
+            'Zeitreihen Ã¼bernehmen
             For Each zre As Wave.TimeSeries In KWLtmp.TimeSeries.Values
                 Me.SimResult.Series.Add(zre.Title, zre)
             Next
@@ -394,9 +394,9 @@ Public Class BlueMSim
 
 #End Region 'Evaluierung
 
-#Region "Qualitätswertberechnung"
+#Region "QualitÃ¤tswertberechnung"
 
-    'Qualitätswert aus PRB-Datei
+    'QualitÃ¤tswert aus PRB-Datei
     'TODO: PRB geht nicht (#153)
     '***********************
     Private Function CalculateObjective_PRB(ByVal objective As Common.ObjectiveFunction) As Double
@@ -411,9 +411,9 @@ Public Class BlueMSim
 
         ''Diff
         ''----
-        ''Überflüssige Stützstellen (P) entfernen
+        ''ÃœberflÃ¼ssige StÃ¼tzstellen (P) entfernen
         ''---------------------------------------
-        ''Anzahl Stützstellen bestimmen
+        ''Anzahl StÃ¼tzstellen bestimmen
         'Dim stuetz As Integer = 0
         'Dim P_vorher As Double = -99
         'For i = 0 To SimReihe.GetUpperBound(0)
@@ -433,16 +433,16 @@ Public Class BlueMSim
         '        stuetz += 1
         '    End If
         'Next
-        ''Reihe um eine Stützstelle erweitern
+        ''Reihe um eine StÃ¼tzstelle erweitern
         ''PRBtmp(stuetz, 0) = PRBtmp(stuetz - 1, 0)
         ''PRBtmp(stuetz, 1) = PRBtmp(stuetz - 1, 1)
 
-        ''An Stützstellen der ZielReihe interpolieren
+        ''An StÃ¼tzstellen der ZielReihe interpolieren
         ''-------------------------------------------
         'Dim PRBintp(ziel.ZielReihe.GetUpperBound(0), 1) As Object
         'Dim j As Integer
         'For i = 0 To ziel.ZielReihe.GetUpperBound(0)
-        '    'zugehörige Lamelle in SimReihe finden
+        '    'zugehÃ¶rige Lamelle in SimReihe finden
         '    j = 0
         '    Do While (PRBtmp(j, 1) < ziel.ZielReihe(i, 1))
         '        j += 1
@@ -470,8 +470,8 @@ Public Class BlueMSim
         Dim Zeile As String
         Read_PRB = True
 
-        Dim FiStr As FileStream = New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As New FileStream(DateiPfad, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
         Dim StrReadSync As TextReader = TextReader.Synchronized(StrRead)
 
         'Array redimensionieren
@@ -485,7 +485,7 @@ Public Class BlueMSim
             End If
         Loop Until StrRead.Peek() = -1
 
-        'Zeile mit Spaltenüberschriften überspringen
+        'Zeile mit SpaltenÃ¼berschriften Ã¼berspringen
         Zeile = StrRead.ReadLine.ToString
 
         For j = 0 To AnzZeil - 1
@@ -497,9 +497,9 @@ Public Class BlueMSim
         StrRead.Close()
         FiStr.Close()
 
-        'Überflüssige Stützstellen (P) entfernen
+        'ÃœberflÃ¼ssige StÃ¼tzstellen (P) entfernen
         '---------------------------------------
-        'Anzahl Stützstellen bestimmen
+        'Anzahl StÃ¼tzstellen bestimmen
         Dim stuetz As Integer = 0
         Dim P_vorher As Double = -99
         For j = 0 To PRB.GetUpperBound(0)
@@ -523,7 +523,7 @@ Public Class BlueMSim
 
     End Function
 
-#End Region 'Qualitätswertberechnung
+#End Region 'QualitÃ¤tswertberechnung
 
 #End Region 'Methoden
 

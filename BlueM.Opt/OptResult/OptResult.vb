@@ -34,19 +34,19 @@ Public Class OptResult
     Private db_path As String                        'Pfad zur Ergebnisdatenbank
     Private db As OleDb.OleDbConnection
 
-    'Array von Lösungen
+    'Array von LÃ¶sungen
     Public Solutions() As Common.Individuum
 
-    'Structure für Sekundäre Population
+    'Structure fÃ¼r SekundÃ¤re Population
     Public Structure Struct_SekPop
         Public iGen As Integer                      'Generationsnummer
         Public SolutionIDs() As Integer             'Array von Solution-IDs
     End Structure
 
-    'Array von Sekundären Populationen
+    'Array von SekundÃ¤ren Populationen
     Public SekPops() As Struct_SekPop
 
-    'Array von ausgewählten Lösungen
+    'Array von ausgewÃ¤hlten LÃ¶sungen
     Private selSolutionIDs() As Integer
 
     ''' <summary>
@@ -63,7 +63,7 @@ Public Class OptResult
     ''' <param name="starttime">optional start time to use for the database filename</param>
     Public Sub New(ByVal Datensatzname As String, ByRef prob As Common.Problem, Optional ByVal createNewMdb As Boolean = True, Optional starttime As DateTime = Nothing)
 
-        'Standardmäßig mit Optparametern
+        'StandardmÃ¤ÃŸig mit Optparametern
         Me.holdsOptparameters = True
 
         'Datensatzname speichern
@@ -88,18 +88,18 @@ Public Class OptResult
 
 #Region "Ergebnisspeicher"
 
-    'Eine Lösung auswählen
+    'Eine LÃ¶sung auswÃ¤hlen
     '*********************
     Public Function selectSolution(ByVal ID As Integer) As Boolean
 
-        'Überprüfen, ob Lösung bereits ausgewählt ist      
+        'ÃœberprÃ¼fen, ob LÃ¶sung bereits ausgewÃ¤hlt ist      
         For Each _id As Integer In Me.selSolutionIDs
             If (_id = ID) Then
                 Return False
             End If
         Next
 
-        'Lösung zu Auswahl hinzufügen
+        'LÃ¶sung zu Auswahl hinzufÃ¼gen
         ReDim Preserve Me.selSolutionIDs(Me.selSolutionIDs.GetUpperBound(0) + 1)
         Me.selSolutionIDs(Me.selSolutionIDs.GetUpperBound(0)) = ID
 
@@ -107,7 +107,7 @@ Public Class OptResult
 
     End Function
 
-    'Ausgewählte Lösungen holen
+    'AusgewÃ¤hlte LÃ¶sungen holen
     '**************************
     Public ReadOnly Property getSelectedSolutions() As Common.Individuum()
         Get
@@ -119,7 +119,7 @@ Public Class OptResult
         End Get
     End Property
 
-    'Lösungsauswahl zurücksetzen
+    'LÃ¶sungsauswahl zurÃ¼cksetzen
     '***************************
     Public Sub clearSelectedSolutions()
 
@@ -127,11 +127,11 @@ Public Class OptResult
 
     End Sub
 
-    'Eine Lösung zum Optimierungsergebnis hinzufügen
+    'Eine LÃ¶sung zum Optimierungsergebnis hinzufÃ¼gen
     '***********************************************
     Public Sub addSolution(ByVal Ind As Common.Individuum)
 
-        'Lösung zu OptResult hinzufügen
+        'LÃ¶sung zu OptResult hinzufÃ¼gen
         ReDim Preserve Me.Solutions(Me.Solutions.GetUpperBound(0) + 1)
         Me.Solutions(Me.Solutions.GetUpperBound(0)) = Ind.Clone()
 
@@ -140,7 +140,7 @@ Public Class OptResult
 
     End Sub
 
-    'Eine Lösung identifizieren
+    'Eine LÃ¶sung identifizieren
     '**************************
     Public Function getSolution(ByVal ID As Integer) As Common.Individuum
 
@@ -156,7 +156,7 @@ Public Class OptResult
 
     End Function
 
-    'Sekundäre Population hinzufügen
+    'SekundÃ¤re Population hinzufÃ¼gen
     '*******************************
     Public Sub setSekPop(ByVal pop() As Common.Individuum, ByVal _igen As Integer)
 
@@ -172,23 +172,23 @@ Public Class OptResult
         'SekPop aus DB lesen
         SekPop = Me.db_getSekPop(_igen)
 
-        'SekPop zu OptResult hinzufügen
+        'SekPop zu OptResult hinzufÃ¼gen
         Call Me.addSekPop(SekPop)
 
     End Sub
 
-    'Sekundäre Population zu OptResult hinzufügen
+    'SekundÃ¤re Population zu OptResult hinzufÃ¼gen
     '********************************************
     Private Sub addSekPop(ByVal _sekpop As Struct_SekPop)
 
-        'Array von Sekundären Populationen um eins erweitern
+        'Array von SekundÃ¤ren Populationen um eins erweitern
         ReDim Preserve Me.SekPops(Me.SekPops.GetUpperBound(0) + 1)
-        'SekPop hinzufügen
+        'SekPop hinzufÃ¼gen
         Me.SekPops(Me.SekPops.GetUpperBound(0)) = _sekpop
 
     End Sub
 
-    'Sekundäre Population holen
+    'SekundÃ¤re Population holen
     '**************************
     Public Function getSekPop(Optional ByVal _igen As Integer = -1) As Common.Individuum()
 
@@ -203,10 +203,10 @@ Public Class OptResult
 
         ReDim sekpopsolutions(-1)
 
-        'Alle Sekundären Populationen durchlaufen
+        'Alle SekundÃ¤ren Populationen durchlaufen
         For Each sekpop As Struct_SekPop In Me.SekPops
             If (sekpop.iGen = _igen) Then
-                'SekPop gefunden, Lösungen holen
+                'SekPop gefunden, LÃ¶sungen holen
                 sekpopsolutions = getSolutions(sekpop.SolutionIDs)
             End If
         Next
@@ -215,7 +215,7 @@ Public Class OptResult
 
     End Function
 
-    'Gibt die Penalty-Werte einer Sekundären Population zurück
+    'Gibt die Penalty-Werte einer SekundÃ¤ren Population zurÃ¼ck
     '*********************************************************
     Public Function getSekPopValues(Optional ByVal igen As Integer = -1) As Double(,)
 
@@ -228,7 +228,7 @@ Public Class OptResult
             igen = Me.db_getLastGenNo()
         End If
 
-        'Wenn es keine Sekundäre Population in der DB gibt, abbrechen
+        'Wenn es keine SekundÃ¤re Population in der DB gibt, abbrechen
         If (igen = -1) Then
             ReDim values(-1, -1)
             Return values
@@ -248,7 +248,7 @@ Public Class OptResult
 
     End Function
 
-    'Lösungen anhand von IDs holen
+    'LÃ¶sungen anhand von IDs holen
     '*****************************
     Private Function getSolutions(ByVal IDs() As Integer) As Common.Individuum()
 
@@ -265,7 +265,7 @@ Public Class OptResult
 
     End Function
 
-    'Beste Lösung zurückgeben
+    'Beste LÃ¶sung zurÃ¼ckgeben
     '************************
     Public Function getBestSolution() As Common.Individuum
 
@@ -288,7 +288,7 @@ Public Class OptResult
 
 #Region "Ergebnisdatenbank"
 
-    'Methoden für die Ergebnisdatenbank
+    'Methoden fÃ¼r die Ergebnisdatenbank
     '##################################
 
     ''' <summary>
@@ -339,7 +339,7 @@ Public Class OptResult
         Dim fieldnames As List(Of String)
 
         Call db_connect()
-        Dim command As OleDbCommand = New OleDbCommand("", db)
+        Dim command As New OleDbCommand("", db)
 
         'Tabelle 'QWerte'
         '----------------
@@ -369,12 +369,12 @@ Public Class OptResult
 
     End Sub
 
-    'Ergebnisdatenbank für PES vorbereiten
+    'Ergebnisdatenbank fÃ¼r PES vorbereiten
     '*************************************
     Private Sub db_prepare_PES()
 
         Call db_connect()
-        Dim command As OleDbCommand = New OleDbCommand("", db)
+        Dim command As New OleDbCommand("", db)
 
         'Tabelle 'OptParameter'
         '----------------------
@@ -413,13 +413,13 @@ Public Class OptResult
         End Try
     End Sub
 
-    'Verbindung zu Ergebnisdatenbank schließen
+    'Verbindung zu Ergebnisdatenbank schlieÃŸen
     '*****************************************
     Private Sub db_disconnect()
         db.Close()
     End Sub
 
-    'Eine PES-Lösung in die ErgebnisDB schreiben
+    'Eine PES-LÃ¶sung in die ErgebnisDB schreiben
     '*******************************************
     Private Overloads Function db_insert(ByVal ind As Common.Individuum) As Boolean
 
@@ -429,7 +429,7 @@ Public Class OptResult
         Dim fieldnames As List(Of String)
         Dim fieldvalues As List(Of String)
 
-        Dim command As OleDbCommand = New OleDbCommand("", db)
+        Dim command As New OleDbCommand("", db)
 
         'Sim schreiben
         '-------------
@@ -475,15 +475,15 @@ Public Class OptResult
 
     End Function
 
-    'Sekundäre Population in DB speichern
+    'SekundÃ¤re Population in DB speichern
     '************************************
     Private Sub db_setSekPop(ByVal SekPop(,) As Double, ByVal igen As Integer)
 
         Call db_connect()
 
-        Dim command As OleDbCommand = New OleDbCommand("", db)
+        Dim command As New OleDbCommand("", db)
 
-        ''Alte SekPop löschen
+        ''Alte SekPop lÃ¶schen
         'command.CommandText = "DELETE FROM SekPop"
         'command.ExecuteNonQuery()
 
@@ -493,7 +493,7 @@ Public Class OptResult
         Dim Sim_ID As Integer
         For i = 0 To SekPop.GetUpperBound(0)
 
-            'zugehörige Sim_ID bestimmen
+            'zugehÃ¶rige Sim_ID bestimmen
             bedingung = ""
             For j = 0 To Me.mProblem.NumPrimObjective - 1
                 bedingung &= $" AND QWerte.[{Me.mProblem.List_PrimObjectiveFunctions(j).Description}] = " & SekPop(i, j).ToString(Common.Provider.FortranProvider)
@@ -584,11 +584,11 @@ Public Class OptResult
     ''' <param name="loadOptParameters">Ob auch die OptParameter-Werte eingelesen werden sollen</param>
     ''' <remarks>
     ''' Das Optimierungsproblem (d.h. ObjectiveFunctions, OptParameter, Constraints), 
-    ''' ebenso wie die Methode, müssen mit der DB übereinstimmen!
+    ''' ebenso wie die Methode, mÃ¼ssen mit der DB Ã¼bereinstimmen!
     ''' </remarks>
     Public Sub db_load(ByVal sourceFile As String, Optional ByVal loadOptParameters As Boolean = True)
 
-        'Optparameter gewünscht?
+        'Optparameter gewÃ¼nscht?
         Me.holdsOptparameters = loadOptParameters
 
         Try
@@ -600,7 +600,7 @@ Public Class OptResult
                 Case Common.METH_PES, Common.METH_HOOKEJEEVES, Common.METH_METAEVO
                     'Individuen laden
                     Call Me.db_getIndividuen_PES()
-                    'Sekundärpopulationen laden
+                    'SekundÃ¤rpopulationen laden
                     Call Me.db_loadSekPops()
                 Case Common.METH_SENSIPLOT
                     'Nur Individuen laden
@@ -615,7 +615,7 @@ Public Class OptResult
 
     End Sub
 
-    'Alle Lösungen aus der DB als PES-Individuen einlesen
+    'Alle LÃ¶sungen aus der DB als PES-Individuen einlesen
     '****************************************************
     Private Sub db_getIndividuen_PES()
 
@@ -628,7 +628,7 @@ Public Class OptResult
         'Connect
         Call db_connect()
 
-        'Alle Lösungen aus DB lesen
+        'Alle LÃ¶sungen aus DB lesen
         '--------------------------
         If (Me.holdsOptparameters) Then
             'mit OptParameter
@@ -646,7 +646,7 @@ Public Class OptResult
         'Disconnect
         Call db_disconnect()
 
-        'Alle Lösungen als Individuen übernehmen
+        'Alle LÃ¶sungen als Individuen Ã¼bernehmen
         '---------------------------------------
         ReDim Me.Solutions(numSolutions - 1)
 
@@ -685,7 +685,7 @@ Public Class OptResult
 
     End Sub
 
-    'Sekundärpopulationen aus DB laden
+    'SekundÃ¤rpopulationen aus DB laden
     '*********************************
     Private Sub db_loadSekPops()
 

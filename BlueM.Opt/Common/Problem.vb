@@ -298,8 +298,8 @@ Public Class Problem
 
         Dim Datei As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & FILEEXT_OPT)
 
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         Dim Zeile As String
         Dim AnzParam As Integer = 0
@@ -366,8 +366,8 @@ Public Class Problem
 
         Dim Datei As String = IO.Path.Combine(Me.mWorkDir, Me.Datensatz & "." & FILEEXT_MOD)
 
-        Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
-        Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+        Dim FiStr As New FileStream(Datei, FileMode.Open, IO.FileAccess.ReadWrite)
+        Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
         Dim Zeile As String
         Dim AnzParam As Integer = 0
@@ -760,8 +760,8 @@ Public Class Problem
 
         If (File.Exists(Datei)) Then
 
-            Dim FiStr As FileStream = New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
-            Dim StrRead As StreamReader = New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim FiStr As New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
+            Dim StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
 
             i = 0
             Do
