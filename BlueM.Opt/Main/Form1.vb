@@ -258,14 +258,14 @@ Partial Public Class Form1
     End Sub
 
     ''' <summary>
-    ''' Handles Release notes menu item clicked
+    ''' Handles Changelog menu item clicked
     ''' Opens the release notes
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
-    Private Sub ReleaseNotesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReleaseNotesToolStripMenuItem.Click
+    Private Sub ToolStripMenuItem_Changelog_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem_Changelog.Click
         Dim filepath As String
-        filepath = IO.Path.Combine(Application.StartupPath, "BLUEM.OPT_RELEASE-NOTES.txt")
+        filepath = IO.Path.Combine(Application.StartupPath, "CHANGELOG.md")
         Try
             System.Diagnostics.Process.Start(filepath)
         Catch ex As Exception

@@ -4,11 +4,11 @@ Partial Class Form1
 
     Public Sub New()
         MyBase.New()
-        'Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        'Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         IsInitializing = True
         InitializeComponent()
     End Sub
-    'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
+    'Das Formular Ã¼berschreibt den LÃ¶schvorgang, um die Komponentenliste zu bereinigen.
     Protected Overloads Overrides Sub Dispose(ByVal Disposing As Boolean)
         If Disposing Then
             If Not components Is Nothing Then
@@ -17,12 +17,12 @@ Partial Class Form1
         End If
         MyBase.Dispose(Disposing)
     End Sub
-    'Wird vom Windows Form-Designer benötigt.
+    'Wird vom Windows Form-Designer benÃ¶tigt.
     Private components As System.ComponentModel.IContainer
     Public ToolTip1 As System.Windows.Forms.ToolTip
-    'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benötigt.
-    'Das Verändern mit dem Windows Form-Designer ist nicht möglich.
-    'Das Verändern mit dem Code-Editor ist nicht möglich.
+    'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benÃ¶tigt.
+    'Das VerÃ¤ndern mit dem Windows Form-Designer ist nicht mÃ¶glich.
+    'Das VerÃ¤ndern mit dem Code-Editor ist nicht mÃ¶glich.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim MenuStrip1 As System.Windows.Forms.MenuStrip
@@ -36,9 +36,9 @@ Partial Class Form1
         Dim ToolStripSeparator7 As System.Windows.Forms.ToolStripSeparator
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Dim Margins1 As Steema.TeeChart.Margins = New Steema.TeeChart.Margins()
-        Me.MenuItem_DatensatzZurücksetzen = New System.Windows.Forms.ToolStripMenuItem()
+        Me.MenuItem_DatensatzZurÃ¼cksetzen = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_Help = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ReleaseNotesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem_Changelog = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_About = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.Button_Start = New System.Windows.Forms.Button()
@@ -99,22 +99,22 @@ Partial Class Form1
         '
         'MenuItem_Tools
         '
-        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurücksetzen})
+        MenuItem_Tools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_DatensatzZurÃ¼cksetzen})
         MenuItem_Tools.Name = "MenuItem_Tools"
         MenuItem_Tools.Size = New System.Drawing.Size(46, 20)
         MenuItem_Tools.Text = "Tools"
         '
-        'MenuItem_DatensatzZurücksetzen
+        'MenuItem_DatensatzZurÃ¼cksetzen
         '
-        Me.MenuItem_DatensatzZurücksetzen.Enabled = False
-        Me.MenuItem_DatensatzZurücksetzen.Name = "MenuItem_DatensatzZurücksetzen"
-        Me.MenuItem_DatensatzZurücksetzen.Size = New System.Drawing.Size(143, 22)
-        Me.MenuItem_DatensatzZurücksetzen.Text = "Reset dataset"
+        Me.MenuItem_DatensatzZurÃ¼cksetzen.Enabled = False
+        Me.MenuItem_DatensatzZurÃ¼cksetzen.Name = "MenuItem_DatensatzZurÃ¼cksetzen"
+        Me.MenuItem_DatensatzZurÃ¼cksetzen.Size = New System.Drawing.Size(143, 22)
+        Me.MenuItem_DatensatzZurÃ¼cksetzen.Text = "Reset dataset"
         '
         'MenuItem_Info
         '
         MenuItem_Info.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        MenuItem_Info.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_Help, Me.ReleaseNotesToolStripMenuItem, Me.ToolStripMenuItem_About})
+        MenuItem_Info.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_Help, Me.ToolStripMenuItem_Changelog, Me.ToolStripMenuItem_About})
         MenuItem_Info.Name = "MenuItem_Info"
         MenuItem_Info.Size = New System.Drawing.Size(24, 20)
         MenuItem_Info.Text = "?"
@@ -122,19 +122,19 @@ Partial Class Form1
         'ToolStripMenuItem_Help
         '
         Me.ToolStripMenuItem_Help.Name = "ToolStripMenuItem_Help"
-        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(145, 22)
+        Me.ToolStripMenuItem_Help.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem_Help.Text = "Help"
         '
-        'ReleaseNotesToolStripMenuItem
+        'ToolStripMenuItem_Changelog
         '
-        Me.ReleaseNotesToolStripMenuItem.Name = "ReleaseNotesToolStripMenuItem"
-        Me.ReleaseNotesToolStripMenuItem.Size = New System.Drawing.Size(145, 22)
-        Me.ReleaseNotesToolStripMenuItem.Text = "Release notes"
+        Me.ToolStripMenuItem_Changelog.Name = "ToolStripMenuItem_Changelog"
+        Me.ToolStripMenuItem_Changelog.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem_Changelog.Text = "Changelog"
         '
         'ToolStripMenuItem_About
         '
         Me.ToolStripMenuItem_About.Name = "ToolStripMenuItem_About"
-        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(145, 22)
+        Me.ToolStripMenuItem_About.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem_About.Text = "About"
         '
         'ToolStripSeparator4
@@ -313,7 +313,7 @@ Partial Class Form1
         '
         Me.ToolStripMenuItem_SettingsLoad.Image = Global.BlueM.Opt.My.Resources.Resources.page_white_get
         Me.ToolStripMenuItem_SettingsLoad.Name = "ToolStripMenuItem_SettingsLoad"
-        Me.ToolStripMenuItem_SettingsLoad.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem_SettingsLoad.Size = New System.Drawing.Size(153, 22)
         Me.ToolStripMenuItem_SettingsLoad.Text = "Load settings..."
         '
         'ToolStripSplitButton_ErgebnisDB
@@ -555,7 +555,6 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.Bottom.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.Bottom.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Bottom.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.Bottom.UseMaxPixelPos = True
         '
         '
         '
@@ -668,7 +667,6 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.Depth.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.Depth.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Depth.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.Depth.UseMaxPixelPos = True
         '
         '
         '
@@ -781,7 +779,6 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.DepthTop.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.DepthTop.UseMaxPixelPos = True
         '
         '
         '
@@ -894,7 +891,6 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.Left.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.Left.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Left.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.Left.UseMaxPixelPos = True
         '
         '
         '
@@ -1007,7 +1003,6 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.Right.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.Right.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Right.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.Right.UseMaxPixelPos = True
         '
         '
         '
@@ -1120,7 +1115,6 @@ Partial Class Form1
         Me.Hauptdiagramm1.Axes.Top.Title.Shadow.Brush.Color = System.Drawing.Color.DarkGray
         Me.Hauptdiagramm1.Axes.Top.Title.Shadow.Brush.Solid = True
         Me.Hauptdiagramm1.Axes.Top.Title.Shadow.Brush.Visible = True
-        Me.Hauptdiagramm1.Axes.Top.UseMaxPixelPos = True
         '
         '
         '
@@ -1713,7 +1707,7 @@ Partial Class Form1
     Private WithEvents Label_Methode As System.Windows.Forms.Label
     Friend WithEvents Button_BrowseDatensatz As System.Windows.Forms.Button
     Friend WithEvents ComboBox_Datensatz As System.Windows.Forms.ComboBox
-    Private WithEvents MenuItem_DatensatzZurücksetzen As System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents MenuItem_DatensatzZurÃ¼cksetzen As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_About As System.Windows.Forms.ToolStripMenuItem
     Private WithEvents ToolStripMenuItem_Help As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
@@ -1735,6 +1729,6 @@ Partial Class Form1
     Private WithEvents ToolStripButton_Monitor As System.Windows.Forms.ToolStripButton
     Private WithEvents ToolStripMenuItem_SettingsLoad As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripButton_SelectedSolutions As System.Windows.Forms.ToolStripButton
-    Friend WithEvents ReleaseNotesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem_Changelog As ToolStripMenuItem
     Friend WithEvents ToolStripButton_CustomPlot As ToolStripButton
 End Class
