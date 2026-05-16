@@ -385,18 +385,6 @@ Public MustInherit Class ObjectiveFunction
                 Dim variabilityratio As Double = (std_sim / avg_sim) / (std_obs / avg_obs)
                 objectiveValue = 1 - Math.Sqrt((corr - 1) ^ 2 + (biasratio - 1) ^ 2 + (variabilityratio - 1) ^ 2)
 
-            Case "NASHSUTT"
-                'Modified Nash Sutcliffe (deprecated)
-                '1 - NSE
-                '------------------------------------
-                objectiveValue = 1.0 - compareSeries(SimSeries, RefSeries, "NSE")
-
-            Case "LNNASHSUTT"
-                'Modified Logarithmic Nash Sutcliffe (deprecated)
-                '1 - lnNSE
-                '------------------------------------------------
-                objectiveValue = 1.0 - compareSeries(SimSeries, RefSeries, "lnNSE")
-
             Case Else
                 Throw New Exception($"The objective function '{[Function]}' is not supported for series comparisons!")
 
