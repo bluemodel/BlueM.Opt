@@ -403,8 +403,8 @@ Public Class Problem
                 .Datei = array(4).Trim()
                 .Element = array(5).Trim()
                 .ZeileNr = Convert.ToInt16(array(6).Trim())
-                .SpVon = Convert.ToInt16(array(7).Trim())
-                .SpBis = Convert.ToInt16(array(8).Trim())
+                .SpVon = If(array(7).Trim() <> "", Convert.ToInt16(array(7).Trim()), 0)
+                .SpBis = If(array(8).Trim() <> "", Convert.ToInt16(array(8).Trim()), 0)
                 .Faktor = Convert.ToDouble(array(9).Trim(), Common.Provider.FortranProvider)
             End With
             i += 1

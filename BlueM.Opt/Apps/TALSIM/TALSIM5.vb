@@ -15,22 +15,22 @@
 'You should have received a copy of the GNU General Public License
 'along with this program. If not, see <https://www.gnu.org/licenses/>.
 '
-Imports System.IO
 Imports System.Threading
-Imports System.Globalization
-Imports BlueM
+Imports System.Windows.Forms
 Imports BlueM.Opt.Common
+Imports Microsoft.Data.Sqlite
 
 ''' <summary>
-''' Class TALSIM for carrying out simulations using TALSIM
+''' Class TALSIM5 for carrying out simulations using TALSIM5 (same simulation executable but different dataset format than TALSIM4)
 ''' </summary>
 ''' <remarks></remarks>
-Public Class Talsim
+Public Class Talsim5
     Inherits Sim
 
-#Region "Eigenschaften"
-
     Private ReadOnly exe_path As String
+    Private scenarioId As Integer
+    Private simulationId As Integer
+    Private timeseriesPath As String
 
     ''' <summary>
     ''' List of result file extensions to use (e.g. "WEL", "KTR.WEL", "CHLO.WEL", "WBL", etc.)
@@ -38,12 +38,30 @@ Public Class Talsim
     Private ReadOnly resultFiles As List(Of String)
 
     '**** Multithreading ****
-    Dim MyTalsimThreads() As TalsimThread
+    Dim MyTalsimThreads() As Talsim5Thread
     Dim MyThreads() As Thread
 
-#End Region 'Eigenschaften
+    ''' <summary>
+    ''' Class to represent a scenario in a TALSIM5 database
+    ''' </summary>
+    Friend Class Scenario
+        Public Id As Integer
+        Public Name As String
+        Public Overrides Function ToString() As String
+            Return $"{Id}: {Name}"
+        End Function
+    End Class
 
-#Region "Properties"
+    ''' <summary>
+    ''' Class to represent a simulation in a Talsim5 database
+    ''' </summary>
+    Friend Class Simulation
+        Public Id As Integer
+        Public Name As String
+        Public Overrides Function ToString() As String
+            Return $"{Id}: {Name}"
+        End Function
+    End Class
 
     ''' <summary>
     ''' Alle Dateiendungen (ohne Punkt), die in einem Datensatz vorkommen können
@@ -53,12 +71,7 @@ Public Class Talsim
         Get
             Dim exts As New Collections.Specialized.StringCollection()
 
-            exts.AddRange(New String() {"ALL", "SYS", "FKT", "KTR", "EXT", "JGG", "WGG",
-                                        "TGG", "TAL", "HYA", "TRS", "EZG", "EIN", "URB",
-                                        "VER", "RUE", "BEK", "BOA", "BOD", "LNZ", "EFL",
-                                        "DIF", "FKA", "SCE", "QAB", "UPD", "OPF", "KAL",
-                                        "HYO", "TEM", "ZIE", "QUA", "PRO", "GRW", "IRR",
-                                        "RFD", "ABZ"})
+            exts.AddRange(New String() {"DB", "SCE", "QAB", "UPD", "VAR", "OPF", "ZIE", "PRO", "RFD", "ABZ"})
 
             Return exts
 
@@ -69,18 +82,17 @@ Public Class Talsim
     ''' Ob die Anwendung Multithreading unterstützt
     ''' </summary>
     ''' <returns>True</returns>
-    Public Overrides ReadOnly Property MultithreadingSupported() As Boolean
+    Public Overrides ReadOnly Property MultithreadingSupported As Boolean = True
+
+    ''' <summary>
+    ''' Path to the database file (in the current working directory)
+    ''' </summary>
+    ''' <returns></returns>
+    Private ReadOnly Property DBFile As String
         Get
-            Return True
+            Return IO.Path.Combine(Me.WorkDir_Current, Me.Datensatz & ".db")
         End Get
     End Property
-
-#End Region 'Properties
-
-#Region "Methoden"
-
-    'Methoden
-    '########
 
     'Konstruktor
     '***********
@@ -97,7 +109,7 @@ Public Class Talsim
         'attempt to get exe_path from UserSettings
         exe_path = My.Settings.TALSIM_path
 
-        If (Not File.Exists(exe_path)) Then
+        If (Not IO.File.Exists(exe_path)) Then
             'use default location instead
             exe_path = IO.Path.Combine(System.Windows.Forms.Application.StartupPath(), "TALSIM\talsimw64.exe")
             If My.Settings.TALSIM_path.Trim() <> "" Then
@@ -105,7 +117,7 @@ Public Class Talsim
             End If
         End If
 
-        If (Not File.Exists(exe_path)) Then
+        If (Not IO.File.Exists(exe_path)) Then
             Throw New Exception(exe_path & " not found!")
         End If
 
@@ -119,10 +131,10 @@ Public Class Talsim
         Call MyBase.prepareSimulation()
 
         'Thread-Objekte instanzieren
-        TalsimThread.exe_path = Me.exe_path
+        Talsim5Thread.exe_path = Me.exe_path
         ReDim MyTalsimThreads(n_Threads - 1)
         For i = 0 To n_Threads - 1
-            MyTalsimThreads(i) = New TalsimThread(i, -1, "Folder", Datensatz)
+            MyTalsimThreads(i) = New Talsim5Thread(i, -1, "Folder", Datensatz, Me.scenarioId, Me.simulationId, Me.timeseriesPath)
             MyTalsimThreads(i).set_is_OK()
         Next
         ReDim MyThreads(n_Threads - 1)
@@ -156,80 +168,44 @@ Public Class Talsim
 
     End Sub
 
-#Region "Eingabedateien lesen"
-
-    'Simulationsparameter einlesen
-    '*****************************
+    ''' <summary>
+    ''' Simulationsparameter einlesen
+    ''' </summary>
     Protected Overrides Sub Read_SimParameter()
 
-        Dim line As String
-        Dim kvp As String()
-        Dim settings As New Dictionary(Of String, String)
+        'Show Talsim5 settings dialog
+        Dim dlg As New TALSIM5_Dialog(Me.DBFile)
+        If dlg.ShowDialog() <> DialogResult.OK Then
+            Throw New Exception("Talsim5 settings not set!")
+        End If
+        'save settings from dialog
+        Me.scenarioId = dlg.SelectedScenario.Id
+        Me.simulationId = dlg.SelectedSimulation.Id
+        Me.timeseriesPath = dlg.TimeseriesPath
 
-        'open the .ALL file
-        '------------------
-        Dim Datei As String = IO.Path.Combine(Me.WorkDir_Original, Me.Datensatz & ".ALL")
-
-        'read all settings
-        Try
-            Using FiStr As New FileStream(Datei, FileMode.Open, IO.FileAccess.Read)
-                Using StrRead As New StreamReader(FiStr, System.Text.Encoding.GetEncoding("iso8859-1"))
-                    Do
-                        line = StrRead.ReadLine.ToString().Trim()
-
-                        If line.Length = 0 Then Continue Do
-
-                        If line.Contains("=") And Not (line.StartsWith("*") Or line.StartsWith("#") Or line.StartsWith("[")) Then
-                            kvp = line.Split("=")
-                            settings.Add(kvp(0).ToUpper(), kvp(1).ToUpper())
-                        End If
-
-                    Loop Until StrRead.Peek() = -1
+        'read simulation start and end from database
+        Using connection As New SqliteConnection($"Data Source={Me.DBFile}")
+            connection.Open()
+            Using command As SqliteCommand = connection.CreateCommand()
+                command.CommandText = "
+                    SELECT SimulationStart, SimulationEnd, TimeStep
+                    FROM Simulation
+                    WHERE Id = @SimulationId
+                "
+                command.Parameters.AddWithValue("@SimulationId", Me.simulationId)
+                Using reader As SqliteDataReader = command.ExecuteReader()
+                    While reader.Read()
+                        Me.SimStart = reader.GetDateTime(0)
+                        Me.SimEnde = reader.GetDateTime(1)
+                        'TODO: what if we have a monthly timestep?
+                        Me.SimDT = New TimeSpan(0, reader.GetInt32(2), 0)
+                    End While
                 End Using
             End Using
-        Catch ex As Exception
-            Throw New Exception($"Error while reading file {Datei}: {ex.Message}")
-        End Try
-
-        'check settings
-        'WEL output
-        If Not settings.ContainsKey("WEL") Then
-            Throw New Exception("Key ""WEL"" not found in .ALL file!")
-        End If
-        If Not settings("WEL") = "J" Then
-            Throw New Exception($"Result output in WEL format is not switched on in {Datei}! Please set to 'WEL=J'!")
-        End If
-
-        'Simstart and Simend
-        If Not settings.ContainsKey("SIMSTART") Or Not settings.ContainsKey("SIMEND") Then
-            Throw New Exception("Key ""SimStart"" and/or ""SimEnd"" not found in .ALL file!")
-        End If
-        'parse and store SimStart and SimEnd
-        'date format can be "dd.MM.yyyy HH:mm" or "dd/MM/yyyy HH:mm"
-        Me.SimStart = New DateTime(settings("SIMSTART").Substring(6, 4),
-                                   settings("SIMSTART").Substring(3, 2),
-                                   settings("SIMSTART").Substring(0, 2),
-                                   settings("SIMSTART").Substring(11, 2),
-                                   settings("SIMSTART").Substring(14, 2),
-                                   0)
-        Me.SimEnde = New DateTime(settings("SIMEND").Substring(6, 4),
-                                   settings("SIMEND").Substring(3, 2),
-                                   settings("SIMEND").Substring(0, 2),
-                                   settings("SIMEND").Substring(11, 2),
-                                   settings("SIMEND").Substring(14, 2),
-                                   0)
-        If Not settings.ContainsKey("TIMESTEP_MIN") Then
-            Throw New Exception("Key ""TimeStep_min"" not found in .ALL file!")
-        End If
-        'store timestep length
-        'TODO: what if TIMESTEP_MONTH=J?
-        Me.SimDT = New TimeSpan(0, settings("TIMESTEP_MIN"), 0)
+            connection.Close()
+        End Using
 
     End Sub
-
-#End Region 'Eingabedateien lesen
-
-#Region "Evaluierung"
 
     ''' <summary>
     ''' Gibt zurück ob ein beliebiger Thread beendet ist und gibt die ID diesen freien Threads zurück
@@ -240,7 +216,7 @@ Public Class Talsim
     Protected Overrides Function ThreadFree(ByRef Thread_ID As Integer) As Boolean
         ThreadFree = False
 
-        For Each Thr_C As TalsimThread In MyTalsimThreads
+        For Each Thr_C As Talsim5Thread In MyTalsimThreads
             If Thr_C.Sim_Is_OK = True And Thr_C.get_Child_ID = -1 Then
                 ThreadFree = True
                 Thread_ID = Thr_C.get_Thread_ID
@@ -263,7 +239,7 @@ Public Class Talsim
         Dim Folder As String
 
         Folder = getThreadWorkDir(Thread_ID)
-        MyTalsimThreads(Thread_ID) = New TalsimThread(Thread_ID, Child_ID, Folder, Datensatz)
+        MyTalsimThreads(Thread_ID) = New Talsim5Thread(Thread_ID, Child_ID, Folder, Datensatz, Me.scenarioId, Me.simulationId, Me.timeseriesPath)
         MyThreads(Thread_ID) = New Thread(AddressOf MyTalsimThreads(Thread_ID).launchSim) With {
             .IsBackground = True
         }
@@ -288,16 +264,16 @@ Public Class Talsim
 
         Try
 
-            'write the path to the dataset and the dataset name into a new run file
+            'write the required settings into a new run file
             'this is done for every simulation because the workdir may change
-            Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim.run")
-            If (Not File.Exists(runfile)) Then
+            Dim runfile As String = IO.Path.Combine(IO.Path.GetDirectoryName(exe_path), "talsim5.run")
+            If (Not IO.File.Exists(runfile)) Then
                 Throw New Exception(runfile & " not found!")
             End If
             Dim line As String
             'read the template run file
-            filestr = New FileStream(runfile, FileMode.Open, IO.FileAccess.Read)
-            strread = New StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
+            filestr = New IO.FileStream(runfile, IO.FileMode.Open, IO.FileAccess.Read)
+            strread = New IO.StreamReader(filestr, System.Text.Encoding.GetEncoding("iso8859-1"))
             Dim lines As New Collections.Generic.List(Of String)
             Do
                 line = strread.ReadLine()
@@ -309,14 +285,20 @@ Public Class Talsim
             'write a new run file
             Dim runfilename As String = MyBase.Datensatz & ".run"
             runfile = IO.Path.Combine(IO.Path.GetDirectoryName(Me.exe_path), runfilename)
-            Dim strwrite As New StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
+            Dim strwrite As New IO.StreamWriter(runfile, False, System.Text.Encoding.GetEncoding("iso8859-1"))
             For Each line In lines
                 If line.StartsWith("Path=") Then
-                    'update the sim path
                     line = "Path=" & MyBase.WorkDir_Current
                 ElseIf line.StartsWith("System=") Then
-                    'update the dataset name
                     line = "System=" & MyBase.Datensatz
+                ElseIf line.StartsWith("DBFile=") Then
+                    line = "DBFile=" & Me.DBFile
+                ElseIf line.StartsWith("ZrePath=") Then
+                    line = "ZrePath=" & Me.timeseriesPath & "\"
+                ElseIf line.StartsWith("ScenarioId=") Then
+                    line = "ScenarioId=" & Me.scenarioId.ToString()
+                ElseIf line.StartsWith("SimulationId=") Then
+                    line = "SimulationId=" & Me.simulationId.ToString()
                 End If
                 strwrite.WriteLine(line)
             Next
@@ -399,18 +381,61 @@ Public Class Talsim
     Protected Overrides Function ThreadReady(ByRef Thread_ID As Integer, ByRef SimIsOK As Boolean, ByVal Child_ID As Integer) As Boolean
         ThreadReady = False
 
-        For Each Thr_C As TalsimThread In MyTalsimThreads
+        For Each Thr_C As Talsim5Thread In MyTalsimThreads
             If Thr_C.launch_Ready = True And Thr_C.get_Child_ID = Child_ID Then
                 ThreadReady = True
                 SimIsOK = Thr_C.Sim_Is_OK
                 Thread_ID = Thr_C.get_Thread_ID
                 MyThreads(Thread_ID).Join()
-                MyTalsimThreads(Thread_ID) = New TalsimThread(Thread_ID, -1, "Folder", Datensatz)
+                MyTalsimThreads(Thread_ID) = New Talsim5Thread(Thread_ID, -1, "Folder", Datensatz, Me.scenarioId, Me.simulationId, Me.timeseriesPath)
                 MyTalsimThreads(Thread_ID).set_is_OK()
             End If
         Next
 
     End Function
+
+    ''' <summary>
+    ''' Update model parameters in database
+    ''' </summary>
+    Public Overrides Sub Write_ModellParameter()
+
+        'ModellParameter aus OptParametern kalkulieren()
+        Call MyBase.OptParameter_to_ModellParameter()
+
+        Try
+            Using connection As New SqliteConnection($"Data Source={Me.DBFile}")
+                connection.Open()
+                Dim i As Integer = 0
+                Using transaction As SqliteTransaction = connection.BeginTransaction()
+                    For Each modParam As Struct_ModellParameter In Me.mProblem.List_ModellParameter
+                        Try
+                            Using command As SqliteCommand = connection.CreateCommand()
+                                command.CommandText = $"
+                                    UPDATE {modParam.DBTable}
+                                    SET {modParam.DBField} = @Value
+                                    WHERE Id = @Id
+                                "
+                                command.Parameters.AddWithValue("@Value", Me.Akt.ModPara(i))
+                                command.Parameters.AddWithValue("@Id", modParam.DBId)
+                                Dim nrows As Integer = command.ExecuteNonQuery()
+                                If nrows = 0 Then
+                                    Throw New Exception($"No row with Id {modParam.DBId} found in table {modParam.DBTable} for updating model parameter '{modParam.Bezeichnung}'!")
+                                End If
+                                i += 1
+                            End Using
+                        Catch ex As Exception
+                            Throw New Exception($"Error while updating model parameter '{modParam.Bezeichnung}' in database: {ex.Message}", ex)
+                        End Try
+                    Next
+                    transaction.Commit()
+                End Using
+                connection.Close()
+            End Using
+        Catch ex As Exception
+            Throw New Exception($"Error while updating model parameters in database: {ex.Message}", ex)
+        End Try
+
+    End Sub
 
     ''' <summary>
     ''' Simulationsergebnis lesen
@@ -460,8 +485,4 @@ Public Class Talsim
 
     End Sub
 
-#End Region 'Evaluierung
-
-#End Region 'Methoden
-
-End Class
+    End Class

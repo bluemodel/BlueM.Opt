@@ -534,7 +534,7 @@ Public MustInherit Class Sim
 
     'ModellParameter aus OptParametern errechnen
     '*******************************************
-    Private Sub OptParameter_to_ModellParameter()
+    Protected Sub OptParameter_to_ModellParameter()
         Dim i As Integer
         Dim j As Integer
 
@@ -555,7 +555,7 @@ Public MustInherit Class Sim
 
     'Die ModellParameter in die Eingabedateien des SimModells schreiben
     '******************************************************************
-    Public Sub Write_ModellParameter()
+    Public Overridable Sub Write_ModellParameter()
 
         Dim WertStr As String
         Dim AnzZeichen, AnzNachkomma As Short

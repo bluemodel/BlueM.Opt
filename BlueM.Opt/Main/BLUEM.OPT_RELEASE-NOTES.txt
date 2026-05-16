@@ -2,8 +2,12 @@
 BlueM.Opt Release Notes
 ===============================================================
 
-Version X.X.X
+Version 2.6.0
 -------------
+NEW:
+* Added support for Talsim datasets in Talsim5 database format (select `TALSIM5` as the app)
+
+CHANGED:
 * Updated Talsim.Engine to v4.1.22
 * Updated BlueM.Wave to v2.17.0
 

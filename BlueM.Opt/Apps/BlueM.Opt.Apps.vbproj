@@ -117,9 +117,20 @@
     </None>
     <Compile Include="SWMM\SWMM.vb" />
     <Compile Include="SWMM\SWMMThread.vb" />
+    <Compile Include="TALSIM\TALSIM5.vb" />
     <Compile Include="TALSIM\TALSIM.vb" />
+    <Compile Include="TALSIM\TALSIM5Thread.vb" />
+    <Compile Include="TALSIM\TALSIM5_Dialog.Designer.vb">
+      <DependentUpon>TALSIM5_Dialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TALSIM\TALSIM5_Dialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="TALSIM\TALSIMThread.vb" />
     <Compile Include="Testprobleme\Testprobleme.vb" />
+    <None Include="TALSIM\talsim5.run">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -127,6 +138,9 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TALSIM\TALSIM5_Dialog.resx">
+      <DependentUpon>TALSIM5_Dialog.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -192,6 +206,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite">
+      <Version>10.0.8</Version>
+    </PackageReference>
     <PackageReference Include="Steema.TeeChart.NET">
       <Version>4.2023.4.18</Version>
     </PackageReference>

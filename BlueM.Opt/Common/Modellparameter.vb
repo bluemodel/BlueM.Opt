@@ -59,6 +59,34 @@ Public Structure Struct_ModellParameter
     ''' </summary>
     ''' <remarks>ModellParameter = OptimierungsParameter * Faktor</remarks>
     Public Faktor As Double
+
+    ''' <summary>
+    ''' Name of the table in the database, in which the parameter is defined
+    ''' </summary>
+    Public ReadOnly Property DBTable As String
+        Get
+            Return Me.Datei
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Name of the field of the table, in which the parameter is defined
+    ''' </summary>
+    Public ReadOnly Property DBField As String
+        Get
+            Return Me.Element
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Id of the row to update
+    ''' </summary>
+    Public ReadOnly Property DBId As Integer
+        Get
+            Return Me.ZeileNr
+        End Get
+    End Property
+
     ''' <summary>
     ''' Klont einen Modellparameter
     ''' </summary>
