@@ -76,7 +76,7 @@ Public MustInherit Class ObjectiveFunction
     Public Factor As Double
 
     ''' <summary>
-    ''' File extension of the result file from which to read the simulation result, e.g. "WEL", "ASC", "KTR.WEL", "WBL", etc.
+    ''' File extension of the result file from which to read the simulation result, e.g. "WEL", "KTR.WEL", "WBL", etc.
     ''' </summary>
     Public FileExtension As String
 
