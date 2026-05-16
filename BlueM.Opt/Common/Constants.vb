@@ -36,7 +36,6 @@ Public Module Constants
     'Anwendungen
     Public Const ANW_BLUEM As String = "BlueM.Sim"
     Public Const ANW_SMUSI As String = "SMUSI"
-    Public Const ANW_SWMM As String = "SWMM"
     Public Const ANW_TALSIM As String = "TALSIM"
     Public Const ANW_TALSIM5 As String = "TALSIM5"
     Public Const ANW_TESTPROBLEMS As String = "Testproblems"
@@ -50,13 +49,13 @@ Public Module Constants
     Public Const METH_DDS As String = "DDS"
     Public Const METH_TSP As String = "TSP"
 
-    'Lösungs- / Entscheidungsraum
+    'LÃ¶sungs- / Entscheidungsraum
     Public Enum SPACE As Integer
         DecisionSpace = 0
         SolutionSpace = 1
     End Enum
 
-    'Option für Startvorgabe für Optimierung
+    'Option fÃ¼r Startvorgabe fÃ¼r Optimierung
     Public Enum EVO_STARTPARAMETERS As Integer
         Random = 1
         Original = 2
@@ -76,17 +75,17 @@ Public Module Constants
 
     'Option zur Erzeugung der Eltern
     Public Enum PES_REPRODOP As Integer
-        Selection = 1                           'zufällige Selektion as Bestwertspeicher
+        Selection = 1                           'zufÃ¤llige Selektion as Bestwertspeicher
         XX_Discrete = 2                         'Rekombination nach x/x-Schema, diskretes vertauschen der Gene
-        XX_Average = 3                          'Rekombination nach x/x-Schema, mittelwertbildung der Gene über y-Eltern
+        XX_Average = 3                          'Rekombination nach x/x-Schema, mittelwertbildung der Gene Ã¼ber y-Eltern
         XY_Discrete = 4                         'Rekombination nach x/y-Schema, diskretes vertauschen der Gene
-        XY_Average = 5                          'Rekombination nach x/y-Schema, mittelwertbildung der Gene über y-Eltern
+        XY_Average = 5                          'Rekombination nach x/y-Schema, mittelwertbildung der Gene Ã¼ber y-Eltern
         Neighborhood = 6                        'Neighborhood-Rekombination
         XX_Average_Discrete = 7                 'Rekombination nach x/x-Schema, diskretes vertauschen der Gene, miteln der Strategieparameter 
         XY_Average_Discrete = 8                 'Rekombination nach x/y-Schema, diskretes vertauschen der Gene, miteln der Strategieparameter
     End Enum
 
-    'Option für die Mutation
+    'Option fÃ¼r die Mutation
     Public Enum PES_MUTATIONSOP As Integer
         Rechenberg = 1
         Schwefel = 2
@@ -97,10 +96,10 @@ Public Module Constants
     Public Enum EVO_POP_ELTERN As Integer
         Recombination = 1                       'Rekombination aus den PopEltern
         Average = 2                             'Mittelwertbildung aus den PopEltern
-        Selection = 3                           'zufällige Selektion aus Bestwertspeicher
+        Selection = 3                           'zufÃ¤llige Selektion aus Bestwertspeicher
     End Enum
 
-    'Option zur Ermittlung der Populationsqualität
+    'Option zur Ermittlung der PopulationsqualitÃ¤t
     Public Enum EVO_POP_PENALTY As Integer
         Average = 1                             'SingleObjective
         Worst = 2                               'SingleObjective

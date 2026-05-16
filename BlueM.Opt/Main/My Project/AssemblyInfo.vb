@@ -3,9 +3,9 @@ Imports System.Runtime.CompilerServices
 Imports System.Runtime.InteropServices
 Imports BlueM.Opt.Common.Constants
 
-' Allgemeine Informationen über eine Assembly werden über die folgende
-' Attributgruppe gesteuert. Ändern Sie diese Attributwerte, um die
-' Assemblyinformationen zu ändern
+' Allgemeine Informationen Ã¼ber eine Assembly werden Ã¼ber die folgende
+' Attributgruppe gesteuert. Ã„ndern Sie diese Attributwerte, um die
+' Assemblyinformationen zu Ã¤ndern
 
 
 <Assembly: AssemblyTitle("BlueM.Opt")>
@@ -13,22 +13,21 @@ Imports BlueM.Opt.Common.Constants
                                & "BlueM.Opt is an optimization framework for optimization, autocalibration and sensitivity analysis of model parameters and the visualization thereof." & eol & eol _
                                & "Included simulation models:" & eol _
                                & "* BlueM.Sim v0.9.8 (https://www.bluemodel.org)" & eol _
-                               & "* SWMM v5.0.018 (http://www.epa.gov/ednnrmrl/models/swmm/)" & eol _
                                & "* Talsim (https://www.talsim.de/)")>
 <Assembly: AssemblyCompany("BlueM Dev Group")> 
 <Assembly: AssemblyProduct("BlueM.Opt")>
-<Assembly: AssemblyCopyright("Copyright © BlueM Dev Group")>
+<Assembly: AssemblyCopyright("Copyright Â© BlueM Dev Group")>
 <Assembly: AssemblyTrademark("")>
 <Assembly: AssemblyCulture("")>
 
-' Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:
+' Versionsinformationen fÃ¼r eine Assembly bestehen aus den folgenden vier Werten:
 
 '	Hauptversion
 '	Nebenversion
 '	Revision
 '	Buildnummer
 
-' Sie können alle Werte festlegen, oder für Revision und Buildnummer den Standard
+' Sie kÃ¶nnen alle Werte festlegen, oder fÃ¼r Revision und Buildnummer den Standard
 ' mit '*' verwenden. Siehe unten
 
 
