@@ -137,7 +137,7 @@ Public Class Diagramm
             .Title = title
         }
         If (Not colorName = "") Then
-            serie.Color = Drawing.Color.FromName(colorName)
+            serie.Color = Color.FromName(colorName)
         End If
 
         Call Me.add_MarksTips(serie, Steema.TeeChart.Styles.MarksStyles.XY)
@@ -179,7 +179,7 @@ Public Class Diagramm
         serie.Pointer.Draw3D = True
         serie.LinePen.Visible = False
         If (Not colorName = "") Then
-            baseColor = Drawing.Color.FromName(colorName)
+            baseColor = Color.FromName(colorName)
             serie.Color = baseColor
             'Border-Color etwas dunkler
             borderColor = getDarkerColor(baseColor)

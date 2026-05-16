@@ -259,7 +259,7 @@ Partial Public Class Scatterplot
                         'Achse verstecken
                         .Axes.Left.Title.Visible = False
                         .Axes.Left.Labels.CustomSize = 1
-                        .Axes.Left.Labels.Font.Color = System.Drawing.Color.Empty
+                        .Axes.Left.Labels.Font.Color = Color.Empty
                     End If
                     'XAchsen
                     If (j = 0) Then
@@ -271,7 +271,7 @@ Partial Public Class Scatterplot
                         'Achse verstecken
                         .Axes.Bottom.Title.Visible = False
                         .Axes.Bottom.Labels.CustomSize = 1
-                        .Axes.Bottom.Labels.Font.Color = System.Drawing.Color.Empty
+                        .Axes.Bottom.Labels.Font.Color = Color.Empty
                     End If
 
                     'IstWerte eintragen
@@ -285,9 +285,9 @@ Partial Public Class Scatterplot
                             shape1 = New Steema.TeeChart.Styles.Shape(.Chart) With {
                                 .Style = Steema.TeeChart.Styles.ShapeStyles.Rectangle,
                                 .Title = "Area of improvement",
-                                .Color = System.Drawing.Color.FromArgb(64, 128, 255, 128) 'Light Green, 75% transparent
+                                .Color = Color.FromArgb(64, 128, 255, 128) 'Light Green, 75% transparent
                                 }
-                            shape1.Brush.Color = System.Drawing.Color.FromArgb(64, 128, 255, 128) 'Light Green, 75% transparent
+                            shape1.Brush.Color = Color.FromArgb(64, 128, 255, 128) 'Light Green, 75% transparent
                             shape1.Pen.Transparency = 0
                             shape1.Pen.Color = Color.Green
                             shape1.Pen.Width = 1
@@ -560,7 +560,7 @@ Partial Public Class Scatterplot
                         'Achse verstecken
                         .Axes.Left.Title.Visible = False
                         .Axes.Left.Labels.CustomSize = 1
-                        .Axes.Left.Labels.Font.Color = System.Drawing.Color.Empty
+                        .Axes.Left.Labels.Font.Color = Color.Empty
                     End If
                     'XAchsen
                     If (j = 0) Then
@@ -572,7 +572,7 @@ Partial Public Class Scatterplot
                         'Achse verstecken
                         .Axes.Bottom.Title.Visible = False
                         .Axes.Bottom.Labels.CustomSize = 1
-                        .Axes.Bottom.Labels.Font.Color = System.Drawing.Color.Empty
+                        .Axes.Bottom.Labels.Font.Color = Color.Empty
                     End If
 
                     'setup NearestPoint tool
