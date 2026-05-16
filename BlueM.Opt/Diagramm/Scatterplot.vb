@@ -285,9 +285,9 @@ Partial Public Class Scatterplot
                             shape1 = New Steema.TeeChart.Styles.Shape(.Chart) With {
                                 .Style = Steema.TeeChart.Styles.ShapeStyles.Rectangle,
                                 .Title = "Area of improvement",
-                                .Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer)) 'Light Green, 75% transparent
+                                .Color = System.Drawing.Color.FromArgb(64, 128, 255, 128) 'Light Green, 75% transparent
                                 }
-                            shape1.Brush.Color = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer)) 'Light Green, 75% transparent
+                            shape1.Brush.Color = System.Drawing.Color.FromArgb(64, 128, 255, 128) 'Light Green, 75% transparent
                             shape1.Pen.Transparency = 0
                             shape1.Pen.Color = Color.Green
                             shape1.Pen.Width = 1
