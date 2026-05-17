@@ -46,5 +46,5 @@ jobs:
         with:
           name: "v${{ steps.version.outputs.full }}"
           draft: true
-          body: "[Full changelog](https://github.com/bluemodel/BlueM.Opt/blob/${{ steps.version.outputs.full }}/BlueM.Opt/Main/BLUEM.OPT_RELEASE-NOTES.txt)"
+          body: "[Full changelog](https://github.com/bluemodel/BlueM.Opt/blob/${{ steps.version.outputs.full }}/BlueM.Opt/Main/CHANGELOG.md)"
           files: BlueM.Opt_${{ steps.version.outputs.full }}_x64.zip
