@@ -197,6 +197,10 @@ Public MustInherit Class Sim
         'Simulationsdaten einlesen
         Try
             Call Me.Read_SimParameter()
+
+            Log.AddMessage(levels.info, $"Simulation period: {Me.SimStart} - {Me.SimEnde}")
+            Log.AddMessage(levels.info, $"Simulation timestep: {Me.SimDT.Minutes} minutes")
+
         Catch ex As Exception
             Throw New Exception("Unable to read simulation parameters!" & Constants.eol & ex.Message)
         End Try

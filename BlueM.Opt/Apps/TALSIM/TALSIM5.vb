@@ -172,6 +172,8 @@ Public Class Talsim5
     ''' </summary>
     Protected Overrides Sub Read_SimParameter()
 
+        Log.AddMessage(levels.info, $"Talsim5 database: {Me.DBFile}")
+
         'Show Talsim5 settings dialog
         Dim dlg As New TALSIM5_Dialog(Me.DBFile)
         If dlg.ShowDialog() <> Windows.Forms.DialogResult.OK Then
@@ -181,6 +183,10 @@ Public Class Talsim5
         Me.scenarioId = dlg.SelectedScenario.Id
         Me.simulationId = dlg.SelectedSimulation.Id
         Me.timeseriesPath = dlg.TimeseriesPath
+
+        Log.AddMessage(levels.info, $"Selected scenario id: {Me.scenarioId}")
+        Log.AddMessage(levels.info, $"Selected simulation id: {Me.simulationId}")
+        Log.AddMessage(levels.info, $"Selected timeseries path: {Me.timeseriesPath}")
 
         'read simulation start and end from database
         Using connection As New SqliteConnection($"Data Source={Me.DBFile}")
