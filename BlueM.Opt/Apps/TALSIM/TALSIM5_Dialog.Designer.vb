@@ -1,4 +1,4 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class TALSIM5_Dialog
     Inherits System.Windows.Forms.Form
 
@@ -26,11 +26,11 @@ Partial Class TALSIM5_Dialog
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.OK_Button = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
-        Me.Label_DBPath = New System.Windows.Forms.Label()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.Label5 = New System.Windows.Forms.Label()
+        Me.Label_Database = New System.Windows.Forms.Label()
+        Me.Label_Scenario = New System.Windows.Forms.Label()
+        Me.Label_Simulation = New System.Windows.Forms.Label()
+        Me.Label_TimeseriesFolder = New System.Windows.Forms.Label()
+        Me.Label_PathDatabase = New System.Windows.Forms.Label()
         Me.ComboBox_Scenario = New System.Windows.Forms.ComboBox()
         Me.ComboBox_Simulation = New System.Windows.Forms.ComboBox()
         Me.TextBox_TimeseriesPath = New System.Windows.Forms.TextBox()
@@ -73,50 +73,50 @@ Partial Class TALSIM5_Dialog
         Me.Cancel_Button.TabIndex = 1
         Me.Cancel_Button.Text = "Cancel"
         '
-        'Label1
+        'Label_Database
         '
-        Me.Label_DBPath.AutoSize = True
-        Me.Label_DBPath.Location = New System.Drawing.Point(12, 9)
-        Me.Label_DBPath.Name = "Label1"
-        Me.Label_DBPath.Size = New System.Drawing.Size(56, 13)
-        Me.Label_DBPath.TabIndex = 1
-        Me.Label_DBPath.Text = "Database:"
+        Me.Label_Database.AutoSize = True
+        Me.Label_Database.Location = New System.Drawing.Point(12, 9)
+        Me.Label_Database.Name = "Label_Database"
+        Me.Label_Database.Size = New System.Drawing.Size(56, 13)
+        Me.Label_Database.TabIndex = 0
+        Me.Label_Database.Text = "Database:"
         '
-        'Label2
+        'Label_Scenario
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(12, 34)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(52, 13)
-        Me.Label2.TabIndex = 2
-        Me.Label2.Text = "Scenario:"
+        Me.Label_Scenario.AutoSize = True
+        Me.Label_Scenario.Location = New System.Drawing.Point(12, 34)
+        Me.Label_Scenario.Name = "Label_Scenario"
+        Me.Label_Scenario.Size = New System.Drawing.Size(52, 13)
+        Me.Label_Scenario.TabIndex = 2
+        Me.Label_Scenario.Text = "Scenario:"
         '
-        'Label3
+        'Label_Simulation
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(13, 61)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(58, 13)
-        Me.Label3.TabIndex = 3
-        Me.Label3.Text = "Simulation:"
+        Me.Label_Simulation.AutoSize = True
+        Me.Label_Simulation.Location = New System.Drawing.Point(13, 61)
+        Me.Label_Simulation.Name = "Label_Simulation"
+        Me.Label_Simulation.Size = New System.Drawing.Size(58, 13)
+        Me.Label_Simulation.TabIndex = 4
+        Me.Label_Simulation.Text = "Simulation:"
         '
-        'Label4
+        'Label_TimeseriesFolder
         '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(13, 90)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(89, 13)
-        Me.Label4.TabIndex = 4
-        Me.Label4.Text = "Timeseries folder:"
+        Me.Label_TimeseriesFolder.AutoSize = True
+        Me.Label_TimeseriesFolder.Location = New System.Drawing.Point(13, 90)
+        Me.Label_TimeseriesFolder.Name = "Label_TimeseriesFolder"
+        Me.Label_TimeseriesFolder.Size = New System.Drawing.Size(89, 13)
+        Me.Label_TimeseriesFolder.TabIndex = 6
+        Me.Label_TimeseriesFolder.Text = "Timeseries folder:"
         '
-        'Label5
+        'Label_PathDatabase
         '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(114, 9)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(74, 13)
-        Me.Label5.TabIndex = 5
-        Me.Label5.Text = "pathDatabase"
+        Me.Label_PathDatabase.AutoSize = True
+        Me.Label_PathDatabase.Location = New System.Drawing.Point(114, 9)
+        Me.Label_PathDatabase.Name = "Label_PathDatabase"
+        Me.Label_PathDatabase.Size = New System.Drawing.Size(74, 13)
+        Me.Label_PathDatabase.TabIndex = 1
+        Me.Label_PathDatabase.Text = "pathDatabase"
         '
         'ComboBox_Scenario
         '
@@ -127,7 +127,7 @@ Partial Class TALSIM5_Dialog
         Me.ComboBox_Scenario.Location = New System.Drawing.Point(117, 31)
         Me.ComboBox_Scenario.Name = "ComboBox_Scenario"
         Me.ComboBox_Scenario.Size = New System.Drawing.Size(201, 21)
-        Me.ComboBox_Scenario.TabIndex = 6
+        Me.ComboBox_Scenario.TabIndex = 3
         '
         'ComboBox_Simulation
         '
@@ -138,7 +138,7 @@ Partial Class TALSIM5_Dialog
         Me.ComboBox_Simulation.Location = New System.Drawing.Point(117, 58)
         Me.ComboBox_Simulation.Name = "ComboBox_Simulation"
         Me.ComboBox_Simulation.Size = New System.Drawing.Size(201, 21)
-        Me.ComboBox_Simulation.TabIndex = 7
+        Me.ComboBox_Simulation.TabIndex = 5
         '
         'TextBox_TimeseriesPath
         '
@@ -147,15 +147,15 @@ Partial Class TALSIM5_Dialog
         Me.TextBox_TimeseriesPath.Location = New System.Drawing.Point(117, 87)
         Me.TextBox_TimeseriesPath.Name = "TextBox_TimeseriesPath"
         Me.TextBox_TimeseriesPath.Size = New System.Drawing.Size(165, 20)
-        Me.TextBox_TimeseriesPath.TabIndex = 8
+        Me.TextBox_TimeseriesPath.TabIndex = 7
         '
-        'Button1
+        'Button_BrowseFolder
         '
         Me.Button_BrowseFolder.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Button_BrowseFolder.Location = New System.Drawing.Point(288, 85)
-        Me.Button_BrowseFolder.Name = "Button1"
+        Me.Button_BrowseFolder.Name = "Button_BrowseFolder"
         Me.Button_BrowseFolder.Size = New System.Drawing.Size(30, 23)
-        Me.Button_BrowseFolder.TabIndex = 9
+        Me.Button_BrowseFolder.TabIndex = 8
         Me.Button_BrowseFolder.Text = "..."
         Me.Button_BrowseFolder.UseVisualStyleBackColor = True
         '
@@ -170,16 +170,16 @@ Partial Class TALSIM5_Dialog
         Me.Controls.Add(Me.TextBox_TimeseriesPath)
         Me.Controls.Add(Me.ComboBox_Simulation)
         Me.Controls.Add(Me.ComboBox_Scenario)
-        Me.Controls.Add(Me.Label5)
-        Me.Controls.Add(Me.Label4)
-        Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.Label_DBPath)
+        Me.Controls.Add(Me.Label_PathDatabase)
+        Me.Controls.Add(Me.Label_TimeseriesFolder)
+        Me.Controls.Add(Me.Label_Simulation)
+        Me.Controls.Add(Me.Label_Scenario)
+        Me.Controls.Add(Me.Label_Database)
         Me.Controls.Add(Me.TableLayoutPanel1)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
+        Me.MinimumSize = New System.Drawing.Size(346, 199)
         Me.Name = "TALSIM5_Dialog"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
@@ -192,11 +192,11 @@ Partial Class TALSIM5_Dialog
     Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
     Friend WithEvents OK_Button As System.Windows.Forms.Button
     Friend WithEvents Cancel_Button As System.Windows.Forms.Button
-    Friend WithEvents Label_DBPath As Windows.Forms.Label
-    Friend WithEvents Label2 As Windows.Forms.Label
-    Friend WithEvents Label3 As Windows.Forms.Label
-    Friend WithEvents Label4 As Windows.Forms.Label
-    Friend WithEvents Label5 As Windows.Forms.Label
+    Friend WithEvents Label_Database As Windows.Forms.Label
+    Friend WithEvents Label_Scenario As Windows.Forms.Label
+    Friend WithEvents Label_Simulation As Windows.Forms.Label
+    Friend WithEvents Label_TimeseriesFolder As Windows.Forms.Label
+    Friend WithEvents Label_PathDatabase As Windows.Forms.Label
     Friend WithEvents ComboBox_Scenario As Windows.Forms.ComboBox
     Friend WithEvents ComboBox_Simulation As Windows.Forms.ComboBox
     Friend WithEvents TextBox_TimeseriesPath As Windows.Forms.TextBox

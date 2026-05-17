@@ -72,7 +72,7 @@ Friend Class TALSIM5_Dialog
         Me.dbPath = dbPath
 
         'show database path
-        Me.Label_DBPath.Text = dbPath
+        Me.Label_PathDatabase.Text = dbPath
 
         'read scenarios from database
         Dim scenarios As New List(Of Talsim5.Scenario)
