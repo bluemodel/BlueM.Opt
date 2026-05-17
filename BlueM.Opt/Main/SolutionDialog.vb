@@ -80,8 +80,7 @@ Partial Public Class SolutionDialog
         For Each feature As ObjectiveFunction In Me.mProblem.List_ObjectiveFunctions
             column = New DataGridViewTextBoxColumn With {
                 .Name = feature.Description,
-                .ReadOnly = True,
-                .DefaultCellStyle = cellstyle.Clone()
+                .ReadOnly = True
             }
             If (feature.isPrimObjective) Then
                 cellstyle.BackColor = Color.LightGreen
@@ -92,6 +91,7 @@ Partial Public Class SolutionDialog
                 column.HeaderText = feature.Description
                 column.HeaderCell.ToolTipText = "Secondary objective function"
             End If
+            column.DefaultCellStyle = cellstyle.Clone()
             Me.DataGridView1.Columns.Add(column)
         Next
 
