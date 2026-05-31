@@ -37,8 +37,9 @@ namespace BlueM.Opt.Algos.NSGAII
         }
 
         private MOOProblem mMOOProblem;
-        private BlueM.Opt.Common.Settings mSettings;
-        private BlueM.Opt.Common.Progress mProgress;
+        private Settings mSettings;
+        private Progress mProgress;
+        private Hauptdiagramm Hauptdiagramm1;
         private bool stopped;
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace BlueM.Opt.Algos.NSGAII
             this.mProgress = inputProgress;
 
             this.mMOOProblem = new MOOProblem(inputProblem);
-            this.mMOOProblem.Hauptdiagramm1 = inputHauptdiagramm;
+            this.Hauptdiagramm1 = inputHauptdiagramm;
         }
 
         /// <summary>
@@ -124,7 +125,7 @@ namespace BlueM.Opt.Algos.NSGAII
                     pop.Add(ind);
                     i++;
                 }
-                this.mMOOProblem.Hauptdiagramm1.ZeichneSekPopulation(pop.ToArray());
+                this.Hauptdiagramm1.ZeichneSekPopulation(pop.ToArray());
 
                 Application.DoEvents();
             }
@@ -150,13 +151,13 @@ namespace BlueM.Opt.Algos.NSGAII
             {
                 //paint sim solution
                 //TODO: handle invalid solutions
-                var serie = this.mMOOProblem.Hauptdiagramm1.getSeriesPoint("NSGAII", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
+                var serie = this.Hauptdiagramm1.getSeriesPoint("NSGAII", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
                 serie.Add(ind.ID, ind.PrimObjectives[0], ind.ID.ToString());
             }
             else
             {
                 //paint testproblem solution
-                this.mMOOProblem.Testproblem1.PaintSolution(ind, 0, ref this.mMOOProblem.Hauptdiagramm1);
+                this.mMOOProblem.Testproblem1.PaintSolution(ind, 0, ref this.Hauptdiagramm1);
             }
         }
 

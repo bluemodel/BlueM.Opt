@@ -29,7 +29,6 @@ namespace BlueM.Opt.Algos.NSGAII
         public Constants.ApplicationTypes AppType;
         public BlueM.Opt.Apps.Sim Sim1;
         public BlueM.Opt.Apps.Testproblem Testproblem1;
-        public BlueM.Opt.Diagramm.Hauptdiagramm Hauptdiagramm1;
 
         private int run;
 
