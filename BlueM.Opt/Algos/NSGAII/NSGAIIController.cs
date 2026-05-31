@@ -43,12 +43,12 @@ namespace BlueM.Opt.Algos.NSGAII
         private bool stopped;
 
         /// <summary>
-        /// Initialisiert den NSGAII-Controller und übergibt alle erforderlichen Objekte
+        /// Initialize the NSGAII controller
         /// </summary>
-        /// <param name="inputProblem">das Problem</param>
-        /// <param name="inputSettings">die Einstellungen</param>
-        /// <param name="inputProgress">der Verlauf</param>
-        /// <param name="inputHauptdiagramm">das Hauptdiagramm</param>
+        /// <param name="inputProblem">the problem</param>
+        /// <param name="inputSettings">the settings</param>
+        /// <param name="inputProgress">the progress indicator</param>
+        /// <param name="inputHauptdiagramm">the main chart</param>
         public void Init(ref Problem inputProblem, ref Settings inputSettings, ref Progress inputProgress, ref Hauptdiagramm inputHauptdiagramm)
         {
             //store objects
@@ -60,9 +60,9 @@ namespace BlueM.Opt.Algos.NSGAII
         }
 
         /// <summary>
-        /// Initialisiert den Controller für Sim-Anwendungen
+        /// Inialize the controller for simulation apps
         /// </summary>
-        /// <param name="inputSim">Sim-Objekt</param>
+        /// <param name="inputSim">sim instance</param>
         public void InitApp(ref BlueM.Opt.Apps.Sim inputSim)
         {
             this.mMOOProblem.Sim1 = inputSim;
@@ -70,9 +70,9 @@ namespace BlueM.Opt.Algos.NSGAII
         }
 
         /// <summary>
-        /// Initialisiert den Controller für Testprobleme
+        /// Initialize the controller for testproblem apps
         /// </summary>
-        /// <param name="inputTestproblem">Testproblem-Objekt</param>
+        /// <param name="inputTestproblem">test problem instance</param>
         public void InitApp(ref BlueM.Opt.Apps.Testproblem inputTestproblem)
         {
             this.mMOOProblem.Testproblem1 = inputTestproblem;
@@ -80,7 +80,7 @@ namespace BlueM.Opt.Algos.NSGAII
         }
 
         /// <summary>
-        /// Startet die Optimierung
+        /// Starts the optimization process
         /// </summary>
         public void Start()
         {
