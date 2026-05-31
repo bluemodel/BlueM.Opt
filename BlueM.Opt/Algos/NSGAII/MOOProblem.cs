@@ -19,25 +19,21 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 using MOEA.ComponentModels.SolutionModels;
 using MOEA.Core.ComponentModels;
 using MOEA.Core.ProblemModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BlueM.Opt.Common;
 
 namespace BlueM.Opt.Algos.NSGAII
 {
     internal class MOOProblem : IMOOProblem
     {
-        private BlueM.Opt.Common.Problem problem;
+        private Problem problem;
+        public Constants.ApplicationTypes AppType;
         public BlueM.Opt.Apps.Sim Sim1;
-        public BlueM.Opt.Apps.Testprobleme Testproblem;
-        public BlueM.Opt.Common.Constants.ApplicationTypes myAppType;
+        public BlueM.Opt.Apps.Testproblem Testproblem1;
         public BlueM.Opt.Diagramm.Hauptdiagramm Hauptdiagramm1;
 
         private int run;
 
-        public MOOProblem(BlueM.Opt.Common.Problem problem)
+        public MOOProblem(Problem problem)
         {
             this.problem = problem;
             this.run = 0;
@@ -49,34 +45,27 @@ namespace BlueM.Opt.Algos.NSGAII
 
             if (isLastObjective) run++;
 
-            BlueM.Opt.Common.Individuum ind = new BlueM.Opt.Common.Individuum_PES("NSGAII", run + 1); //+1 wegen Evaluierung der Startwerte vor Optimierungsbeginn
+            Individuum ind = new Individuum_PES("NSGAII", run + 1); //+1 wegen Evaluierung der Startwerte vor Optimierungsbeginn
 
-            //OptParameter ins Individuum kopieren
+            //convert solution to individuum
             ContinuousVector x = (ContinuousVector)s;
             for (int j = 0; j < ind.OptParameter.Length; j++)
             {
                 ind.OptParameter[j].Xn = x[j];
             }
-            //Evaluierung
-            if (this.myAppType == BlueM.Opt.Common.Constants.ApplicationTypes.Sim)
+            //evaluation
+            if (this.AppType == Constants.ApplicationTypes.Sim)
             {
-                //Evaluierung des Simulationsmodells
+                //evaluate sim problem
+                //TODO: we should be evaluating all objectives at once, but NSGAII only allows to evaluate one objective at a time. So we need to store the results of the other objectives somewhere and return them when needed.
                 bool SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, true);
 
-                //TODO: Evaluierungsfehler verarbeiten
-
-                if (isLastObjective)
-                {
-                    //Lösung im TeeChart einzeichnen
-                    var serie = this.Hauptdiagramm1.getSeriesPoint("NSGAII", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
-                    serie.Add(run, ind.PrimObjectives[0], run.ToString());
-                }
-
+                //TODO: handle evaluation errors
             }
             else
             {
-                //Evaluierung des Testproblems
-                this.Testproblem.Evaluate(ref ind, 0, ref this.Hauptdiagramm1, isLastObjective);
+                //evaluate test problem
+                this.Testproblem1.Evaluate(ref ind);
             }
             if (isLastObjective) System.Windows.Forms.Application.DoEvents();
 

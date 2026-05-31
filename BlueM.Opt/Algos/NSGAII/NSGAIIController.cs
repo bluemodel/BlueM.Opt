@@ -19,15 +19,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 using BlueM.Opt.Common;
 using BlueM.Opt.Diagramm;
 using MOEA.AlgorithmModels;
-using MOEA.Benchmarks;
 using MOEA.ComponentModels;
 using MOEA.ComponentModels.SolutionModels;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BlueM.Opt.Algos.NSGAII
@@ -54,9 +48,9 @@ namespace BlueM.Opt.Algos.NSGAII
         /// <param name="inputSettings">die Einstellungen</param>
         /// <param name="inputProgress">der Verlauf</param>
         /// <param name="inputHauptdiagramm">das Hauptdiagramm</param>
-        public void Init(ref BlueM.Opt.Common.Problem inputProblem, ref BlueM.Opt.Common.Settings inputSettings, ref BlueM.Opt.Common.Progress inputProgress, ref BlueM.Opt.Diagramm.Hauptdiagramm inputHauptdiagramm)
+        public void Init(ref Problem inputProblem, ref Settings inputSettings, ref Progress inputProgress, ref Hauptdiagramm inputHauptdiagramm)
         {
-            //Objekte übergeben
+            //store objects
             this.mSettings = inputSettings;
             this.mProgress = inputProgress;
 
@@ -71,17 +65,17 @@ namespace BlueM.Opt.Algos.NSGAII
         public void InitApp(ref BlueM.Opt.Apps.Sim inputSim)
         {
             this.mMOOProblem.Sim1 = inputSim;
-            this.mMOOProblem.myAppType = BlueM.Opt.Common.Constants.ApplicationTypes.Sim;
+            this.mMOOProblem.AppType = Constants.ApplicationTypes.Sim;
         }
 
         /// <summary>
         /// Initialisiert den Controller für Testprobleme
         /// </summary>
         /// <param name="inputTestproblem">Testproblem-Objekt</param>
-        public void InitApp(ref BlueM.Opt.Apps.Testprobleme inputTestproblem)
+        public void InitApp(ref BlueM.Opt.Apps.Testproblem inputTestproblem)
         {
-            this.mMOOProblem.Testproblem = inputTestproblem;
-            this.mMOOProblem.myAppType = BlueM.Opt.Common.Constants.ApplicationTypes.Testproblems;
+            this.mMOOProblem.Testproblem1 = inputTestproblem;
+            this.mMOOProblem.AppType = Constants.ApplicationTypes.Testproblems;
         }
 
         /// <summary>
@@ -91,46 +85,41 @@ namespace BlueM.Opt.Algos.NSGAII
         {
             this.stopped = false;
 
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            //Declarations
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
             int i, j;
 
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            //Initialize
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+            //initialize NSGAII algorithm
             NSGAII<ContinuousVector> algorithm = new NSGAII<ContinuousVector>(this.mMOOProblem);
-
             //TODO: get this from settings
             algorithm.PopulationSize = 100;
-
-            this.mProgress.Initialize(0, 0, 1000, 0);
-
             algorithm.Initialize();
 
-            //TODO: add event handler
-            //algorithm.SolutionEvaluated += Algorithm_SolutionEvaluated;
+            //initialize progress bar
+            this.mProgress.Initialize(0, 0, 1000, algorithm.PopulationSize);
+
+            //add event handler
+            algorithm.SolutionEvaluated += Algorithm_SolutionEvaluated;
 
             //run optimization
             while (!algorithm.IsTerminated && !this.stopped)
             {
                 algorithm.Evolve();
+
                 this.mProgress.NextGen();
-                Console.WriteLine("Current Generation: {0}", algorithm.CurrentGeneration);
-                Console.WriteLine("Size of Archive: {0}", algorithm.NondominatedArchiveSize);
+                this.mProgress.iNachf = 0;
+
+                Log.AddMessage(Log.levels.info, $"Current Generation: {algorithm.CurrentGeneration}");
+                Log.AddMessage(Log.levels.info, $"Size of Archive: {algorithm.NondominatedArchiveSize}");
 
                 //draw pareto front
                 NondominatedPopulation<ContinuousVector> paretoFront = algorithm.NondominatedArchive;
                 List<Individuum> pop = new List<Individuum>();
                 i = 0;
-                foreach (ContinuousVector s in paretoFront.Solutions)
+                foreach (ContinuousVector solution in paretoFront.Solutions)
                 {
                     var ind = new Individuum_PES("NSGAII", i + 1); //TODO: this is not the actual ID
                     for (j = 0; j < mMOOProblem.GetObjectiveCount(); j++)
                     {
-                        ind.Objectives[j] = s.FindObjectiveAt(j);
+                        ind.Objectives[j] = solution.FindObjectiveAt(j);
                     }
                     pop.Add(ind);
                     i++;
@@ -139,18 +128,36 @@ namespace BlueM.Opt.Algos.NSGAII
 
                 Application.DoEvents();
             }
+            //TODO: do something with this final solution?
             ContinuousVector finalSolution = algorithm.GlobalBestSolution;
-            //NondominatedPopulation<ContinuousVector> paretoFront = algorithm.NondominatedArchive;
-
-            //var serie = this.mMOOProblem.Hauptdiagramm1.getSeriesPoint("NSGAII", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
-            //serie.Add(run, ind.PrimObjectives[0], run.ToString());
-
-            //TODO: Verlaufsanzeige (this.mProgress)
         }
 
         private void Algorithm_SolutionEvaluated(ContinuousVector solution, int solution_index)
         {
-            throw new NotImplementedException();
+            this.mProgress.NextNachf();
+
+            //convert solution to individuum
+            Individuum ind = new Individuum_PES("NSGAII", solution_index + 1);
+            for (int i = 0; i < this.mMOOProblem.GetObjectiveCount(); i++)
+            {
+                ind.Objectives[i] = solution.FindObjectiveAt(i);
+            }
+
+            //TODO: store solution in database here ?
+
+            //paint solution
+            if (this.mMOOProblem.AppType == Constants.ApplicationTypes.Sim)
+            {
+                //paint sim solution
+                //TODO: handle invalid solutions
+                var serie = this.mMOOProblem.Hauptdiagramm1.getSeriesPoint("NSGAII", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
+                serie.Add(ind.ID, ind.PrimObjectives[0], ind.ID.ToString());
+            }
+            else
+            {
+                //paint testproblem solution
+                this.mMOOProblem.Testproblem1.PaintSolution(ind, 0, ref this.mMOOProblem.Hauptdiagramm1);
+            }
         }
 
         public void Stoppen()
