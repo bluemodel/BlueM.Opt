@@ -3,7 +3,7 @@ Partial Class EVO_Einstellungen
 
     Inherits System.Windows.Forms.UserControl
 
-    'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
+    'Das Formular Ã¼berschreibt den LÃ¶schvorgang, um die Komponentenliste zu bereinigen.
     Protected Overloads Overrides Sub Dispose(ByVal Disposing As Boolean)
         If Disposing Then
             If Not components Is Nothing Then
@@ -12,11 +12,11 @@ Partial Class EVO_Einstellungen
         End If
         MyBase.Dispose(Disposing)
     End Sub
-    'Wird vom Windows Form-Designer benötigt.
+    'Wird vom Windows Form-Designer benÃ¶tigt.
     Private components As System.ComponentModel.IContainer
-    'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benötigt.
-    'Das Verändern mit dem Windows Form-Designer ist nicht möglich.
-    'Das Verändern mit dem Code-Editor ist nicht möglich.
+    'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benÃ¶tigt.
+    'Das VerÃ¤ndern mit dem Windows Form-Designer ist nicht mÃ¶glich.
+    'Das VerÃ¤ndern mit dem Code-Editor ist nicht mÃ¶glich.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim Label_OptModus As System.Windows.Forms.Label
@@ -154,6 +154,7 @@ Partial Class EVO_Einstellungen
         Me.TSP_Label_n_cities = New System.Windows.Forms.Label()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox()
+        Me.TabPage_NSGAII = New System.Windows.Forms.TabPage()
         Label_OptModus = New System.Windows.Forms.Label()
         LabelStrategie = New System.Windows.Forms.Label()
         LabelStartwerte = New System.Windows.Forms.Label()
@@ -557,6 +558,7 @@ Partial Class EVO_Einstellungen
         Me.TabControl1.Controls.Add(Me.TabPage_DDS)
         Me.TabControl1.Controls.Add(Me.TabPage_SensiPlot)
         Me.TabControl1.Controls.Add(Me.TabPage_TSP)
+        Me.TabControl1.Controls.Add(Me.TabPage_NSGAII)
         Me.TabControl1.Location = New System.Drawing.Point(2, 16)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
@@ -1673,6 +1675,16 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Settings:"
         '
+        'TabPage_NSGAII
+        '
+        Me.TabPage_NSGAII.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_NSGAII.Name = "TabPage_NSGAII"
+        Me.TabPage_NSGAII.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_NSGAII.Size = New System.Drawing.Size(221, 668)
+        Me.TabPage_NSGAII.TabIndex = 8
+        Me.TabPage_NSGAII.Text = "NSGA-II"
+        Me.TabPage_NSGAII.UseVisualStyleBackColor = True
+        '
         'EVO_Einstellungen
         '
         Me.Controls.Add(Me.GroupBox_Einstellungen)
@@ -1855,4 +1867,5 @@ Partial Class EVO_Einstellungen
     Private WithEvents SensiPlot_RadioButton_ModeRandom As RadioButton
     Private WithEvents SensiPlot_RadioButton_ModeLatinHypercube As RadioButton
     Friend WithEvents SensiPlot_Label_NumCombinations As Label
+    Friend WithEvents TabPage_NSGAII As TabPage
 End Class

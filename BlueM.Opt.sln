@@ -43,6 +43,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSGAII", "BlueM.Opt\Algos\NSGAII\NSGAII.csproj", "{834C1F58-5422-4750-8B18-C240CF09C10D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -174,6 +176,12 @@ Global
 		{BBDDC177-F059-4139-9A0E-C4B7D03F2786}.Debug|x86.ActiveCfg = Debug|x86
 		{BBDDC177-F059-4139-9A0E-C4B7D03F2786}.Release|x64.ActiveCfg = Release|x64
 		{BBDDC177-F059-4139-9A0E-C4B7D03F2786}.Release|x86.ActiveCfg = Release|x86
+		{834C1F58-5422-4750-8B18-C240CF09C10D}.Debug|x64.ActiveCfg = Debug|x64
+		{834C1F58-5422-4750-8B18-C240CF09C10D}.Debug|x64.Build.0 = Debug|x64
+		{834C1F58-5422-4750-8B18-C240CF09C10D}.Debug|x86.ActiveCfg = Debug|x64
+		{834C1F58-5422-4750-8B18-C240CF09C10D}.Debug|x86.Build.0 = Debug|x64
+		{834C1F58-5422-4750-8B18-C240CF09C10D}.Release|x64.ActiveCfg = Release|x64
+		{834C1F58-5422-4750-8B18-C240CF09C10D}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -188,6 +196,7 @@ Global
 		{6FCD5583-4A2A-4298-8A48-D46FAEFC5D7C} = {44D440EE-4641-44A1-B177-2DD0FDD6FB75}
 		{2BC34399-890A-4C37-85A4-3F8D633835B9} = {2846C8D3-E679-4D5C-95B4-4CF3E4BF7122}
 		{BBDDC177-F059-4139-9A0E-C4B7D03F2786} = {2846C8D3-E679-4D5C-95B4-4CF3E4BF7122}
+		{834C1F58-5422-4750-8B18-C240CF09C10D} = {44D440EE-4641-44A1-B177-2DD0FDD6FB75}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4558EFAB-BB97-40C0-BF67-4380356C931B}

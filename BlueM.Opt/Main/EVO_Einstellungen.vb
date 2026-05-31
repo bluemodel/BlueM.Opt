@@ -171,6 +171,11 @@ Public Class EVO_Einstellungen
                 Me.mSettings.PES = New Settings_PES()
                 Me.mSettings.PES.setStandard(Me.mProblem.Modus)
 
+            Case METH_NSGAII
+                'NSGA-Settings instanzieren
+                Me.mSettings.NSGAII = New Settings_NSGAII()
+                'Me.mSettings.NSGAII.setStandard()
+
             Case METH_HOOKEJEEVES
                 'HJ-Settings instanzieren
                 Me.mSettings.HookeJeeves = New Settings_HookeJeeves()
@@ -240,6 +245,9 @@ Public Class EVO_Einstellungen
 
                 Case METH_PES
                     Me.TabControl1.TabPages.Add(Me.TabPage_PES)
+
+                Case METH_NSGAII
+                    Me.TabControl1.TabPages.Add(Me.TabPage_NSGAII)
 
                 Case METH_HOOKEJEEVES
                     Me.TabControl1.TabPages.Add(Me.TabPage_HookeJeeves)
