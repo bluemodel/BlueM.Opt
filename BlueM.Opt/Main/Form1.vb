@@ -40,7 +40,7 @@ Partial Public Class Form1
     Private mProgress As Progress
 
     'Apps
-    Private Testprobleme1 As BlueM.Opt.Apps.Testprobleme
+    Private Testproblem1 As BlueM.Opt.Apps.Testproblem
     Public WithEvents Sim1 As BlueM.Opt.Apps.Sim
 
     'Controller
@@ -432,9 +432,6 @@ Partial Public Class Form1
                 Case ANW_TESTPROBLEMS 'Anwendung Testprobleme
                     'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-                    'Testprobleme instanzieren
-                    Testprobleme1 = New BlueM.Opt.Apps.Testprobleme()
-
                     'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
                     Me.IsInitializing = True
                     Call Me.ComboBox_Methode.Items.Clear()
@@ -554,7 +551,7 @@ Partial Public Class Form1
             Case ANW_TESTPROBLEMS
 
                 'Mit Testproblemen füllen
-                Me.ComboBox_Datensatz.Items.AddRange(Testprobleme1.Testprobleme.ToArray())
+                Me.ComboBox_Datensatz.Items.AddRange([Enum].GetNames(GetType(Apps.TestproblemFactory.Testproblems)))
 
             Case ANW_TSP
 
@@ -664,11 +661,12 @@ Partial Public Class Form1
 
                 Case ANW_TESTPROBLEMS
 
-                    'Testproblem setzen
-                    Testprobleme1.setTestproblem(selectedDatensatz)
+                    'Testproblem instanzieren
+                    Dim testproblemtype As BlueM.Opt.Apps.TestproblemFactory.Testproblems = [Enum].Parse(GetType(BlueM.Opt.Apps.TestproblemFactory.Testproblems), selectedDatensatz)
+                    Testproblem1 = BlueM.Opt.Apps.TestproblemFactory.CreateTestProblem(testproblemtype)
 
                     'Tooltip anzeigen
-                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testprobleme1.TestProblemDescription)
+                    Me.ToolTip1.SetToolTip(Me.ComboBox_Datensatz, Testproblem1.Description)
 
                 Case Else '(Alle Sim-Anwendungen)
 
@@ -915,7 +913,7 @@ Partial Public Class Form1
 
                 'Bei Testproblemen definieren diese das Problem selbst
                 '-----------------------------------------------------
-                Call Testprobleme1.getProblem(Me.mProblem)
+                Call Testproblem1.DefineProblem(Me.mProblem)
 
 
             Case ANW_TSP
@@ -1064,7 +1062,7 @@ Partial Public Class Form1
 
                     'Controller für Testproblem initialisieren und starten
                     Call controller.Init(Me.mProblem, Me.mSettings, Me.mProgress, Me.Hauptdiagramm1)
-                    Call controller.InitApp(Me.Testprobleme1)
+                    Call controller.InitApp(Me.Testproblem1)
                     Call controller.Start()
 
                 Case ANW_TSP
@@ -1261,7 +1259,7 @@ Partial Public Class Form1
             Case ANW_TESTPROBLEMS 'Testprobleme
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-                Call Testprobleme1.DiagInitialise(Me.Hauptdiagramm1)
+                Call Testproblem1.InitializeChart(Me.Hauptdiagramm1)
 
             Case ANW_BLUEM, ANW_TALSIM, ANW_TALSIM5
                 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

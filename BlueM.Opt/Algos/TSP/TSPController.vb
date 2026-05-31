@@ -59,7 +59,7 @@ Public Class TSPController
         'not applicable
     End Sub
 
-    Public Sub InitApp(ByRef inputTestprobleme As Apps.Testprobleme) Implements IController.InitApp
+    Public Sub InitApp(ByRef inputTestprobleme As Apps.Testproblem) Implements IController.InitApp
         'not applicable
     End Sub
 

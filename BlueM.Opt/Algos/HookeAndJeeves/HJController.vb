@@ -39,7 +39,7 @@ Public Class HJController
 
     Private myAppType As ApplicationTypes
     Private WithEvents Sim1 As Apps.Sim
-    Private Testprobleme1 As Apps.Testprobleme
+    Private Testproblem1 As Apps.Testproblem
 
     Private stopped As Boolean
 
@@ -76,9 +76,9 @@ Public Class HJController
     ''' <summary>
     ''' Initialisiert den Controller für Testprobleme
     ''' </summary>
-    Public Sub InitApp(ByRef inputTestprobleme As Apps.Testprobleme) Implements IController.InitApp
+    Public Sub InitApp(ByRef inputTestprobleme As Apps.Testproblem) Implements IController.InitApp
         Me.myAppType = ApplicationTypes.Testproblems
-        Me.Testprobleme1 = inputTestprobleme
+        Me.Testproblem1 = inputTestprobleme
     End Sub
 
     ''' <summary>
@@ -162,7 +162,8 @@ Public Class HJController
 
             Else
                 'Evaluierung Testproblem
-                Call Me.Testprobleme1.Evaluate(ind, 0, Me.myHauptDiagramm)
+                Call Me.Testproblem1.Evaluate(ind)
+                Call Me.Testproblem1.PaintSolution(ind, 0, Me.myHauptDiagramm)
 
             End If
             Call Windows.Forms.Application.DoEvents()
@@ -207,7 +208,8 @@ Public Class HJController
 
                 Else
                     'Evaluierung Testproblem
-                    Call Me.Testprobleme1.Evaluate(ind, 0, Me.myHauptDiagramm)
+                    Call Me.Testproblem1.Evaluate(ind)
+                    Call Me.Testproblem1.PaintSolution(ind, 0, Me.myHauptDiagramm)
 
                 End If
                 Call Windows.Forms.Application.DoEvents()
@@ -245,7 +247,8 @@ Public Class HJController
 
                     Else
                         'Evaluierung Testproblem
-                        Call Me.Testprobleme1.Evaluate(ind, 0, Me.myHauptDiagramm)
+                        Call Me.Testproblem1.Evaluate(ind)
+                        Call Me.Testproblem1.PaintSolution(ind, 0, Me.myHauptDiagramm)
 
                     End If
                     Call Windows.Forms.Application.DoEvents()

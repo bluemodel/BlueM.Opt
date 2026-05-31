@@ -122,7 +122,21 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="TALSIM\TALSIMThread.vb" />
-    <Compile Include="Testprobleme\Testprobleme.vb" />
+    <Compile Include="Testproblems\ZitzlerDebT4.vb" />
+    <Compile Include="Testproblems\ZitzlerDebT3.vb" />
+    <Compile Include="Testproblems\ZitzlerDebT2.vb" />
+    <Compile Include="Testproblems\ZitzlerDebT1.vb" />
+    <Compile Include="Testproblems\Schwefel24.vb" />
+    <Compile Include="Testproblems\FloodMitigation.vb" />
+    <Compile Include="Testproblems\DependentParameters.vb" />
+    <Compile Include="Testproblems\Deb1.vb" />
+    <Compile Include="Testproblems\Constraints.vb" />
+    <Compile Include="Testproblems\Box.vb" />
+    <Compile Include="Testproblems\TestproblemFactory.vb" />
+    <Compile Include="Testproblems\Testproblem.vb" />
+    <Compile Include="Testproblems\Ackley.vb" />
+    <Compile Include="Testproblems\Beale.vb" />
+    <Compile Include="Testproblems\Sinus.vb" />
     <None Include="TALSIM\talsim5.run">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

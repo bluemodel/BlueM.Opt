@@ -41,7 +41,7 @@ Public Class ESController
 
     Private myAppType As ApplicationTypes
     Private WithEvents Sim1 As Apps.Sim
-    Private Testprobleme1 As Apps.Testprobleme
+    Private Testproblem1 As Apps.Testproblem
 
     Private PES1 As PES
 
@@ -86,9 +86,9 @@ Public Class ESController
     ''' <summary>
     ''' Initialisiert den Controller für Testprobleme
     ''' </summary>
-    Public Sub InitApp(ByRef inputTestprobleme As Apps.Testprobleme) Implements IController.InitApp
+    Public Sub InitApp(ByRef inputTestprobleme As Apps.Testproblem) Implements IController.InitApp
         Me.myAppType = ApplicationTypes.Testproblems
-        Me.Testprobleme1 = inputTestprobleme
+        Me.Testproblem1 = inputTestprobleme
     End Sub
 
     ''' <summary>
@@ -205,7 +205,8 @@ Public Class ESController
                             '===================================
 
                             'Lösung evaluieren und zeichnen
-                            Call Testprobleme1.Evaluate(inds(i_Nachf), PES1.PES_iAkt.iAktPop, Me.myHauptDiagramm)
+                            Call Testproblem1.Evaluate(inds(i_Nachf))
+                            Call Testproblem1.PaintSolution(inds(i_Nachf), PES1.PES_iAkt.iAktPop, Me.myHauptDiagramm)
 
                             'Evaluierung verarbeiten
                             Call Me.processIndividuum_PES(inds(i_Nachf), i_Nachf)

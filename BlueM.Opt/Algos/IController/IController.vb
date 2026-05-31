@@ -49,7 +49,7 @@ Public Interface IController
     ''' Initialisiert den Controller für Testprobleme
     ''' </summary>
     ''' <param name="inputTestprobleme">das Testproblem</param>
-    Sub InitApp(ByRef inputTestprobleme As Apps.Testprobleme)
+    Sub InitApp(ByRef inputTestprobleme As Apps.Testproblem)
 
     ''' <summary>
     ''' Optimierung starten

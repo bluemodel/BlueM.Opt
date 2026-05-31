@@ -51,7 +51,7 @@ Public Class SensiPlotController
         Me.Sim1 = inputSim
     End Sub
 
-    Public Sub InitApp(ByRef inputTestprobleme As Apps.Testprobleme) Implements IController.InitApp
+    Public Sub InitApp(ByRef inputTestprobleme As Apps.Testproblem) Implements IController.InitApp
         Throw New Exception("SensiPlot can not be used for test problems!")
     End Sub
 

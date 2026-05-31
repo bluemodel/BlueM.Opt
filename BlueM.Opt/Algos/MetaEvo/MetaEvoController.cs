@@ -36,7 +36,7 @@ namespace BlueM.Opt.Algos.MetaEvo
 
         //### Variablen ###
         BlueM.Opt.Apps.Sim sim;
-        BlueM.Opt.Apps.Testprobleme testprobleme;
+        BlueM.Opt.Apps.Testproblem testproblem;
 
         BlueM.Opt.Common.Constants.ApplicationTypes apptype;
 
@@ -91,10 +91,10 @@ namespace BlueM.Opt.Algos.MetaEvo
         /// Initialisiert den Controller für Testprobleme
         /// </summary>
         /// <param name="inputTestproblem">Testproblem-Objekt</param>
-        public void InitApp(ref BlueM.Opt.Apps.Testprobleme testprobleme_input)
+        public void InitApp(ref BlueM.Opt.Apps.Testproblem testprobleme_input)
         {
             this.apptype = BlueM.Opt.Common.Constants.ApplicationTypes.Testproblems;
-            this.testprobleme = testprobleme_input;
+            this.testproblem = testprobleme_input;
         }
 
         /// <summary>
@@ -907,7 +907,8 @@ namespace BlueM.Opt.Algos.MetaEvo
             if (this.apptype == BlueM.Opt.Common.Constants.ApplicationTypes.Testproblems)
             {
                 //Evaluieren und zeichnen
-                this.testprobleme.Evaluate(ref ind, 0, ref this.hauptdiagramm1);
+                this.testproblem.Evaluate(ref ind);
+                this.testproblem.PaintSolution(ind, 0, ref this.hauptdiagramm1);
             }
 
             //Simulation

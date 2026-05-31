@@ -40,7 +40,7 @@ namespace modelEAU.DDS
         private BlueM.Opt.Common.Progress mProgress;
         private BlueM.Opt.Diagramm.Hauptdiagramm Hauptdiagramm1;
         private BlueM.Opt.Apps.Sim Sim1;
-        private BlueM.Opt.Apps.Testprobleme Testproblem;
+        private BlueM.Opt.Apps.Testproblem Testproblem1;
 
         private BlueM.Opt.Common.Constants.ApplicationTypes myAppType;
 
@@ -76,9 +76,9 @@ namespace modelEAU.DDS
         /// Initialisiert den Controller für Testprobleme
         /// </summary>
         /// <param name="inputTestproblem">Testproblem-Objekt</param>
-        public void InitApp(ref BlueM.Opt.Apps.Testprobleme inputTestproblem)
+        public void InitApp(ref BlueM.Opt.Apps.Testproblem inputTestproblem)
         {
-            this.Testproblem = inputTestproblem;
+            this.Testproblem1 = inputTestproblem;
             this.myAppType = BlueM.Opt.Common.Constants.ApplicationTypes.Testproblems;
         }
 
@@ -182,7 +182,8 @@ namespace modelEAU.DDS
                 {
                     //Evaluierung des Testproblems
                     //----------------------------
-                    this.Testproblem.Evaluate(ref ind, 0, ref this.Hauptdiagramm1);
+                    this.Testproblem1.Evaluate(ref ind);
+                    this.Testproblem1.PaintSolution(ind, 0, ref this.Hauptdiagramm1);
                 }
 
                 System.Windows.Forms.Application.DoEvents();
@@ -249,7 +250,8 @@ namespace modelEAU.DDS
                 {
                     //Evaluierung des Testproblems
                     //----------------------------
-                    this.Testproblem.Evaluate(ref ind, 0, ref this.Hauptdiagramm1);
+                    this.Testproblem1.Evaluate(ref ind);
+                    this.Testproblem1.PaintSolution(ind, 0, ref this.Hauptdiagramm1);
                 }
 
                 System.Windows.Forms.Application.DoEvents();
