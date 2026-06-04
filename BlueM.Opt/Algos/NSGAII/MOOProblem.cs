@@ -38,13 +38,9 @@ namespace BlueM.Opt.Algos.NSGAII
             this.run = 0;
         }
 
-        public double CalcObjective(MOOSolution s, int objective_index)
+        public double[] CalcObjective(MOOSolution s)
         {
-            //TODO: handle secondary objectives which need to be evaluated but are not counted in GetObjectiveCount() and not included in the index
-
-            bool isLastObjective = (objective_index == this.GetObjectiveCount() - 1);
-
-            if (isLastObjective) run++;
+            run++;
 
             Individuum ind = new Individuum_PES("NSGAII", run + 1); //+1 wegen Evaluierung der Startwerte vor Optimierungsbeginn
 
@@ -58,8 +54,7 @@ namespace BlueM.Opt.Algos.NSGAII
             if (this.AppType == Constants.ApplicationTypes.Sim)
             {
                 //evaluate sim problem
-                //TODO: we should be evaluating all objectives at once, but NSGAII only allows to evaluate one objective at a time. So we need to store the results of the other objectives somewhere and return them when needed.
-                bool SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, isLastObjective);
+                bool SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, true);
 
                 //TODO: handle evaluation errors
             }
@@ -68,9 +63,8 @@ namespace BlueM.Opt.Algos.NSGAII
                 //evaluate test problem
                 this.Testproblem1.Evaluate(ref ind);
             }
-            if (isLastObjective) System.Windows.Forms.Application.DoEvents();
 
-            return ind.PrimObjectives[objective_index];
+            return ind.PrimObjectives;
         }
 
         public int GetDimensionCount()
