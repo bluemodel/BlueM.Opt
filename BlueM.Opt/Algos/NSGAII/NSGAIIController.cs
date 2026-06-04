@@ -144,7 +144,7 @@ namespace BlueM.Opt.Algos.NSGAII
                 {
                     //store in database
                     this.mMOOProblem.Sim1.OptResult.setSekPop(pop.ToArray(), this.iGeneration);
-                    //Umweg über Sim1.OptResult gehen, weil es keine Individuum-IDs gibt (#177)
+                    //paint population from database so that we get proper IDs in the chart
                     this.Hauptdiagramm1.ZeichneSekPopulation(this.mMOOProblem.Sim1.OptResult.getSekPop());
                 }
                 else {
