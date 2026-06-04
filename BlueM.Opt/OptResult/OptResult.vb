@@ -599,7 +599,7 @@ Public Class OptResult
             Me.db_path = sourceFile
 
             Select Case Me.mProblem.Method
-                Case Constants.METH_PES, Constants.METH_HOOKEJEEVES, Constants.METH_METAEVO
+                Case Constants.METH_PES, Constants.METH_NSGAII, Constants.METH_HOOKEJEEVES, Constants.METH_METAEVO
                     'Individuen laden
                     Call Me.db_getIndividuen_PES()
                     'Sekundärpopulationen laden

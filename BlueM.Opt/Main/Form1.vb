@@ -798,7 +798,7 @@ Partial Public Class Form1
                     Me.controller = New BlueM.Opt.Algos.NSGAII.NSGAIIController()
 
                     'Ergebnis-Buttons
-                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = False
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
 
                     'TODO: Progress mit Standardwerten initialisieren
 

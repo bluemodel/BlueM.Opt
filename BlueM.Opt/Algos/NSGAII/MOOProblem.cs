@@ -34,6 +34,16 @@ namespace BlueM.Opt.Algos.NSGAII
 
         public MOOProblem(Problem problem)
         {
+            if (problem.NumSecObjectives > 0)
+            {
+                //TODO: handle secondary objectives
+                throw new System.Exception("NSGA-II does not yet support secondary objectives!");
+            }
+            if (problem.NumConstraints > 0)
+            {
+                //TODO: handle constraints
+                throw new System.Exception("NSGA-II does not yet support constraints!");
+            }
             this.problem = problem;
             this.run = 0;
         }
@@ -54,7 +64,8 @@ namespace BlueM.Opt.Algos.NSGAII
             if (this.AppType == Constants.ApplicationTypes.Sim)
             {
                 //evaluate sim problem
-                bool SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, true);
+                //don't store in DB because we don't have a proper ID here
+                bool SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, false);
 
                 //TODO: handle evaluation errors
             }

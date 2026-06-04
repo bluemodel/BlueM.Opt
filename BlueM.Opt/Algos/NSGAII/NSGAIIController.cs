@@ -44,6 +44,10 @@ namespace BlueM.Opt.Algos.NSGAII
         private Hauptdiagramm Hauptdiagramm1;
         private bool stopped;
 
+        private int iGeneration;
+        private int iChild;
+        private int solutionId;
+
         /// <summary>
         /// Initialize the NSGAII controller
         /// </summary>
@@ -59,6 +63,10 @@ namespace BlueM.Opt.Algos.NSGAII
 
             this.mMOOProblem = new MOOProblem(inputProblem);
             this.Hauptdiagramm1 = inputHauptdiagramm;
+
+            this.iGeneration = 0;
+            this.iChild = 0;
+            this.solutionId = 1; //start at 1 because of evaluation of start values before optimization starts
         }
 
         /// <summary>
@@ -110,8 +118,8 @@ namespace BlueM.Opt.Algos.NSGAII
                 this.mProgress.NextGen();
                 this.mProgress.iNachf = 0;
 
-                Log.AddMessage(Log.levels.info, $"Current Generation: {algorithm.CurrentGeneration}");
-                Log.AddMessage(Log.levels.info, $"Size of Archive: {algorithm.NondominatedArchiveSize}");
+                Log.AddMessage(Log.levels.info, $"Current generation: {this.iGeneration}");
+                Log.AddMessage(Log.levels.info, $"Size of nondominated archive: {algorithm.NondominatedArchiveSize}");
 
                 //process pareto front
                 NondominatedPopulation<ContinuousVector> paretoFront = algorithm.NondominatedArchive;
@@ -119,7 +127,8 @@ namespace BlueM.Opt.Algos.NSGAII
                 i = 0;
                 foreach (ContinuousVector solution in paretoFront.Solutions)
                 {
-                    var ind = new Individuum_PES("NSGAII", i + 1); //TODO: this is not the actual ID
+                    var ind = new Individuum_PES("NSGA-II", i + 1); //TODO: this is not the actual ID
+                    //TODO: we only get primary objectives here, we need to handle secondary objectives as well!
                     for (j = 0; j < mMOOProblem.GetObjectiveCount(); j++)
                     {
                         ind.Objectives[j] = solution.FindObjectiveAt(j);
@@ -134,7 +143,7 @@ namespace BlueM.Opt.Algos.NSGAII
                 if (this.mMOOProblem.AppType == Constants.ApplicationTypes.Sim)
                 {
                     //store in database
-                    this.mMOOProblem.Sim1.OptResult.setSekPop(pop.ToArray(), algorithm.CurrentGeneration);
+                    this.mMOOProblem.Sim1.OptResult.setSekPop(pop.ToArray(), this.iGeneration);
                     //Umweg über Sim1.OptResult gehen, weil es keine Individuum-IDs gibt (#177)
                     this.Hauptdiagramm1.ZeichneSekPopulation(this.mMOOProblem.Sim1.OptResult.getSekPop());
                 }
@@ -143,6 +152,9 @@ namespace BlueM.Opt.Algos.NSGAII
                 }
 
                 Application.DoEvents();
+
+                this.iGeneration++;
+                this.iChild = 0;
             }
             //TODO: do something with this final solution?
             ContinuousVector finalSolution = algorithm.GlobalBestSolution;
@@ -150,29 +162,40 @@ namespace BlueM.Opt.Algos.NSGAII
 
         private void Algorithm_SolutionEvaluated(ContinuousVector solution, int solution_index)
         {
+            this.iChild++;
+            this.solutionId++;
+
             this.mProgress.NextNachf();
 
             //convert solution to individuum
-            Individuum ind = new Individuum_PES("NSGAII", solution_index + 1);
+            Individuum ind = new Individuum_PES("NSGA-II", this.solutionId);
+            for (int i = 0; i < mMOOProblem.GetDimensionCount(); i++)
+            {
+                ind.OptParameter[i].Xn = solution[i];
+            }
+            //TODO: we only get primary objectives here, we need to handle secondary objectives as well!
             for (int i = 0; i < this.mMOOProblem.GetObjectiveCount(); i++)
             {
                 ind.Objectives[i] = solution.FindObjectiveAt(i);
             }
 
-            //TODO: store solution in database here ?
-
             //paint solution
             if (this.mMOOProblem.AppType == Constants.ApplicationTypes.Sim)
             {
+                //store in DB
+                if (this.mMOOProblem.Sim1.StoreIndividuals) 
+                {
+                    this.mMOOProblem.Sim1.OptResult.addSolution(ind);
+                }
                 //paint sim solution
-                //TODO: handle invalid solutions
-                this.Hauptdiagramm1.ZeichneIndividuum(ind, 0, 0, 0, solution_index + 1, Color.Orange);
+                this.Hauptdiagramm1.ZeichneIndividuum(ind, 0, 0, 0, this.iChild, Color.Orange);
             }
             else
             {
                 //paint testproblem solution
                 this.mMOOProblem.Testproblem1.PaintSolution(ind, 0, ref this.Hauptdiagramm1);
             }
+            Application.DoEvents();
         }
 
         public void Stoppen()
