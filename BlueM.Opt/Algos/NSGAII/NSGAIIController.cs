@@ -100,8 +100,7 @@ namespace BlueM.Opt.Algos.NSGAII
 
             //initialize NSGAII algorithm
             NSGAII<ContinuousVector> algorithm = new NSGAII<ContinuousVector>(this.mMOOProblem);
-            //TODO: get this from settings
-            algorithm.PopulationSize = 100;
+            algorithm.PopulationSize = this.mSettings.NSGAII.PopulationSize;
             algorithm.Initialize();
 
             //initialize progress bar

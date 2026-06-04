@@ -95,6 +95,9 @@ Partial Class EVO_Einstellungen
         Me.PES_Combo_PopStrategie = New System.Windows.Forms.ComboBox()
         Me.PES_Combo_PopPenalty = New System.Windows.Forms.ComboBox()
         Me.BindingSource_PES_PopPenaltyOptions = New System.Windows.Forms.BindingSource(Me.components)
+        Me.TabPage_NSGAII = New System.Windows.Forms.TabPage()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.NSGA_PopulationSize = New System.Windows.Forms.NumericUpDown()
         Me.TabPage_HookeJeeves = New System.Windows.Forms.TabPage()
         Me.HJ_Numeric_DeltaFinish = New System.Windows.Forms.NumericUpDown()
         Me.BindingSource_HookeJeeves = New System.Windows.Forms.BindingSource(Me.components)
@@ -154,7 +157,7 @@ Partial Class EVO_Einstellungen
         Me.TSP_Label_n_cities = New System.Windows.Forms.Label()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox()
-        Me.TabPage_NSGAII = New System.Windows.Forms.TabPage()
+        Me.BindingSource_NSGAII = New System.Windows.Forms.BindingSource(Me.components)
         Label_OptModus = New System.Windows.Forms.Label()
         LabelStrategie = New System.Windows.Forms.Label()
         LabelStartwerte = New System.Windows.Forms.Label()
@@ -213,6 +216,8 @@ Partial Class EVO_Einstellungen
         CType(Me.PES_Numeric_AnzPop, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PES_Numeric_AnzPopEltern, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BindingSource_PES_PopPenaltyOptions, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage_NSGAII.SuspendLayout()
+        CType(Me.NSGA_PopulationSize, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_HookeJeeves.SuspendLayout()
         CType(Me.HJ_Numeric_DeltaFinish, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BindingSource_HookeJeeves, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -242,6 +247,7 @@ Partial Class EVO_Einstellungen
         CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Einstellungen.SuspendLayout()
+        CType(Me.BindingSource_NSGAII, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Label_OptModus
@@ -553,12 +559,12 @@ Partial Class EVO_Einstellungen
             Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage_General)
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
+        Me.TabControl1.Controls.Add(Me.TabPage_NSGAII)
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
         Me.TabControl1.Controls.Add(Me.TabPage_MetaEvo)
         Me.TabControl1.Controls.Add(Me.TabPage_DDS)
         Me.TabControl1.Controls.Add(Me.TabPage_SensiPlot)
         Me.TabControl1.Controls.Add(Me.TabPage_TSP)
-        Me.TabControl1.Controls.Add(Me.TabPage_NSGAII)
         Me.TabControl1.Location = New System.Drawing.Point(2, 16)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(0)
         Me.TabControl1.Name = "TabControl1"
@@ -1020,6 +1026,38 @@ Partial Class EVO_Einstellungen
         '
         Me.BindingSource_PES_PopPenaltyOptions.DataMember = "PopPenaltyOptions"
         Me.BindingSource_PES_PopPenaltyOptions.DataSource = Me.BindingSource_PES
+        '
+        'TabPage_NSGAII
+        '
+        Me.TabPage_NSGAII.Controls.Add(Me.Label4)
+        Me.TabPage_NSGAII.Controls.Add(Me.NSGA_PopulationSize)
+        Me.TabPage_NSGAII.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_NSGAII.Name = "TabPage_NSGAII"
+        Me.TabPage_NSGAII.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_NSGAII.Size = New System.Drawing.Size(221, 668)
+        Me.TabPage_NSGAII.TabIndex = 8
+        Me.TabPage_NSGAII.Text = "NSGA-II"
+        Me.TabPage_NSGAII.UseVisualStyleBackColor = True
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(6, 13)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(81, 13)
+        Me.Label4.TabIndex = 1
+        Me.Label4.Text = "Population size:"
+        '
+        'NSGA_PopulationSize
+        '
+        Me.NSGA_PopulationSize.DataBindings.Add(New System.Windows.Forms.Binding("Value", Me.BindingSource_NSGAII, "PopulationSize", True))
+        Me.NSGA_PopulationSize.Location = New System.Drawing.Point(130, 11)
+        Me.NSGA_PopulationSize.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.NSGA_PopulationSize.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.NSGA_PopulationSize.Name = "NSGA_PopulationSize"
+        Me.NSGA_PopulationSize.Size = New System.Drawing.Size(83, 20)
+        Me.NSGA_PopulationSize.TabIndex = 0
+        Me.NSGA_PopulationSize.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'TabPage_HookeJeeves
         '
@@ -1675,15 +1713,9 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Settings:"
         '
-        'TabPage_NSGAII
+        'BindingSource_NSGAII
         '
-        Me.TabPage_NSGAII.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage_NSGAII.Name = "TabPage_NSGAII"
-        Me.TabPage_NSGAII.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage_NSGAII.Size = New System.Drawing.Size(221, 668)
-        Me.TabPage_NSGAII.TabIndex = 8
-        Me.TabPage_NSGAII.Text = "NSGA-II"
-        Me.TabPage_NSGAII.UseVisualStyleBackColor = True
+        Me.BindingSource_NSGAII.DataSource = GetType(BlueM.Opt.Common.Settings_NSGAII)
         '
         'EVO_Einstellungen
         '
@@ -1722,6 +1754,9 @@ Partial Class EVO_Einstellungen
         CType(Me.PES_Numeric_AnzPop, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PES_Numeric_AnzPopEltern, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.BindingSource_PES_PopPenaltyOptions, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage_NSGAII.ResumeLayout(False)
+        Me.TabPage_NSGAII.PerformLayout()
+        CType(Me.NSGA_PopulationSize, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_HookeJeeves.ResumeLayout(False)
         Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.HJ_Numeric_DeltaFinish, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1761,6 +1796,7 @@ Partial Class EVO_Einstellungen
         CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
+        CType(Me.BindingSource_NSGAII, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1868,4 +1904,7 @@ Partial Class EVO_Einstellungen
     Private WithEvents SensiPlot_RadioButton_ModeLatinHypercube As RadioButton
     Friend WithEvents SensiPlot_Label_NumCombinations As Label
     Friend WithEvents TabPage_NSGAII As TabPage
+    Friend WithEvents Label4 As Label
+    Friend WithEvents NSGA_PopulationSize As NumericUpDown
+    Friend WithEvents BindingSource_NSGAII As BindingSource
 End Class

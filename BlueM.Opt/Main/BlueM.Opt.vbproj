@@ -255,6 +255,7 @@
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_DDS.datasource" />
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_HookeJeeves.datasource" />
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_MetaEvo.datasource" />
+    <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_NSGAII.datasource" />
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_PES.datasource" />
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_Sensiplot.datasource" />
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_TSP.datasource" />

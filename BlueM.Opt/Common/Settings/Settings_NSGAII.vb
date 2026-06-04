@@ -19,10 +19,10 @@ Imports System.Xml.Serialization
 
 Public Class Settings_NSGAII
 
-    'TODO: add NSGA-II specific settings here
+    Public Property PopulationSize As Integer
 
     Public Sub setStandard()
-        Throw New NotImplementedException()
+        Me.PopulationSize = 100
     End Sub
 
 End Class
