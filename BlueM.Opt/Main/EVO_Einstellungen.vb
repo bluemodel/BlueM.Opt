@@ -345,6 +345,7 @@ Public Class EVO_Einstellungen
         PES_Combo_PopStrategie.SelectedIndexChanged,
         PES_Combo_PopPenalty.SelectedIndexChanged,
         NSGA_PopulationSize.ValueChanged,
+        NSGA_MaxGenerations.ValueChanged,
         MetaEvo_Combo_Role.SelectedIndexChanged,
         MetaEvo_Combo_OpMode.SelectedIndexChanged,
         TSP_ComboBox_prob_instance.SelectedIndexChanged,

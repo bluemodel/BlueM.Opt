@@ -101,10 +101,11 @@ namespace BlueM.Opt.Algos.NSGAII
             //initialize NSGAII algorithm
             NSGAII<ContinuousVector> algorithm = new NSGAII<ContinuousVector>(this.mMOOProblem);
             algorithm.PopulationSize = this.mSettings.NSGAII.PopulationSize;
+            algorithm.MaxGenerations = this.mSettings.NSGAII.MaxGenerations;
             algorithm.Initialize();
 
             //initialize progress bar
-            this.mProgress.Initialize(0, 0, 1000, algorithm.PopulationSize);
+            this.mProgress.Initialize(0, 0, algorithm.MaxGenerations, algorithm.PopulationSize);
 
             //add event handler
             algorithm.SolutionEvaluated += Algorithm_SolutionEvaluated;

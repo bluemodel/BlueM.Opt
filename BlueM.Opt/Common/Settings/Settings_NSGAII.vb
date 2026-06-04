@@ -21,8 +21,11 @@ Public Class Settings_NSGAII
 
     Public Property PopulationSize As Integer
 
+    Public Property MaxGenerations As Integer
+
     Public Sub setStandard()
         Me.PopulationSize = 100
+        Me.MaxGenerations = 1000
     End Sub
 
 End Class

@@ -96,8 +96,11 @@ Partial Class EVO_Einstellungen
         Me.PES_Combo_PopPenalty = New System.Windows.Forms.ComboBox()
         Me.BindingSource_PES_PopPenaltyOptions = New System.Windows.Forms.BindingSource(Me.components)
         Me.TabPage_NSGAII = New System.Windows.Forms.TabPage()
+        Me.NSGA_MaxGenerations = New System.Windows.Forms.NumericUpDown()
+        Me.Label6 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.NSGA_PopulationSize = New System.Windows.Forms.NumericUpDown()
+        Me.BindingSource_NSGAII = New System.Windows.Forms.BindingSource(Me.components)
         Me.TabPage_HookeJeeves = New System.Windows.Forms.TabPage()
         Me.HJ_Numeric_DeltaFinish = New System.Windows.Forms.NumericUpDown()
         Me.BindingSource_HookeJeeves = New System.Windows.Forms.BindingSource(Me.components)
@@ -157,7 +160,6 @@ Partial Class EVO_Einstellungen
         Me.TSP_Label_n_cities = New System.Windows.Forms.Label()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_Einstellungen = New System.Windows.Forms.GroupBox()
-        Me.BindingSource_NSGAII = New System.Windows.Forms.BindingSource(Me.components)
         Label_OptModus = New System.Windows.Forms.Label()
         LabelStrategie = New System.Windows.Forms.Label()
         LabelStartwerte = New System.Windows.Forms.Label()
@@ -217,7 +219,9 @@ Partial Class EVO_Einstellungen
         CType(Me.PES_Numeric_AnzPopEltern, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BindingSource_PES_PopPenaltyOptions, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_NSGAII.SuspendLayout()
+        CType(Me.NSGA_MaxGenerations, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NSGA_PopulationSize, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.BindingSource_NSGAII, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_HookeJeeves.SuspendLayout()
         CType(Me.HJ_Numeric_DeltaFinish, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BindingSource_HookeJeeves, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -247,7 +251,6 @@ Partial Class EVO_Einstellungen
         CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox_Einstellungen.SuspendLayout()
-        CType(Me.BindingSource_NSGAII, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Label_OptModus
@@ -1029,6 +1032,8 @@ Partial Class EVO_Einstellungen
         '
         'TabPage_NSGAII
         '
+        Me.TabPage_NSGAII.Controls.Add(Me.NSGA_MaxGenerations)
+        Me.TabPage_NSGAII.Controls.Add(Me.Label6)
         Me.TabPage_NSGAII.Controls.Add(Me.Label4)
         Me.TabPage_NSGAII.Controls.Add(Me.NSGA_PopulationSize)
         Me.TabPage_NSGAII.Location = New System.Drawing.Point(4, 22)
@@ -1038,6 +1043,26 @@ Partial Class EVO_Einstellungen
         Me.TabPage_NSGAII.TabIndex = 8
         Me.TabPage_NSGAII.Text = "NSGA-II"
         Me.TabPage_NSGAII.UseVisualStyleBackColor = True
+        '
+        'NSGA_MaxGenerations
+        '
+        Me.NSGA_MaxGenerations.DataBindings.Add(New System.Windows.Forms.Binding("Value", Me.BindingSource_NSGAII, "MaxGenerations", True))
+        Me.NSGA_MaxGenerations.Location = New System.Drawing.Point(130, 38)
+        Me.NSGA_MaxGenerations.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.NSGA_MaxGenerations.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.NSGA_MaxGenerations.Name = "NSGA_MaxGenerations"
+        Me.NSGA_MaxGenerations.Size = New System.Drawing.Size(83, 20)
+        Me.NSGA_MaxGenerations.TabIndex = 3
+        Me.NSGA_MaxGenerations.Value = New Decimal(New Integer() {1000, 0, 0, 0})
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(6, 40)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(88, 13)
+        Me.Label6.TabIndex = 2
+        Me.Label6.Text = "Max generations:"
         '
         'Label4
         '
@@ -1057,7 +1082,11 @@ Partial Class EVO_Einstellungen
         Me.NSGA_PopulationSize.Name = "NSGA_PopulationSize"
         Me.NSGA_PopulationSize.Size = New System.Drawing.Size(83, 20)
         Me.NSGA_PopulationSize.TabIndex = 0
-        Me.NSGA_PopulationSize.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.NSGA_PopulationSize.Value = New Decimal(New Integer() {100, 0, 0, 0})
+        '
+        'BindingSource_NSGAII
+        '
+        Me.BindingSource_NSGAII.DataSource = GetType(BlueM.Opt.Common.Settings_NSGAII)
         '
         'TabPage_HookeJeeves
         '
@@ -1713,10 +1742,6 @@ Partial Class EVO_Einstellungen
         Me.GroupBox_Einstellungen.TabStop = False
         Me.GroupBox_Einstellungen.Text = "Settings:"
         '
-        'BindingSource_NSGAII
-        '
-        Me.BindingSource_NSGAII.DataSource = GetType(BlueM.Opt.Common.Settings_NSGAII)
-        '
         'EVO_Einstellungen
         '
         Me.Controls.Add(Me.GroupBox_Einstellungen)
@@ -1756,7 +1781,9 @@ Partial Class EVO_Einstellungen
         CType(Me.BindingSource_PES_PopPenaltyOptions, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_NSGAII.ResumeLayout(False)
         Me.TabPage_NSGAII.PerformLayout()
+        CType(Me.NSGA_MaxGenerations, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.NSGA_PopulationSize, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.BindingSource_NSGAII, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_HookeJeeves.ResumeLayout(False)
         Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.HJ_Numeric_DeltaFinish, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1796,7 +1823,6 @@ Partial Class EVO_Einstellungen
         CType(Me.TSP_Numeric_n_parents, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TSP_Numeric_n_cities, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox_Einstellungen.ResumeLayout(False)
-        CType(Me.BindingSource_NSGAII, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1907,4 +1933,6 @@ Partial Class EVO_Einstellungen
     Friend WithEvents Label4 As Label
     Friend WithEvents NSGA_PopulationSize As NumericUpDown
     Friend WithEvents BindingSource_NSGAII As BindingSource
+    Friend WithEvents NSGA_MaxGenerations As NumericUpDown
+    Friend WithEvents Label6 As Label
 End Class
