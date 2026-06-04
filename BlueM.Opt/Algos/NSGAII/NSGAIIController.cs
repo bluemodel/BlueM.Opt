@@ -16,12 +16,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
+using BlueM.Opt.Apps;
 using BlueM.Opt.Common;
 using BlueM.Opt.Diagramm;
 using MOEA.AlgorithmModels;
 using MOEA.ComponentModels;
 using MOEA.ComponentModels.SolutionModels;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueM.Opt.Algos.NSGAII
@@ -111,7 +113,7 @@ namespace BlueM.Opt.Algos.NSGAII
                 Log.AddMessage(Log.levels.info, $"Current Generation: {algorithm.CurrentGeneration}");
                 Log.AddMessage(Log.levels.info, $"Size of Archive: {algorithm.NondominatedArchiveSize}");
 
-                //draw pareto front
+                //process pareto front
                 NondominatedPopulation<ContinuousVector> paretoFront = algorithm.NondominatedArchive;
                 List<Individuum> pop = new List<Individuum>();
                 i = 0;
@@ -122,10 +124,23 @@ namespace BlueM.Opt.Algos.NSGAII
                     {
                         ind.Objectives[j] = solution.FindObjectiveAt(j);
                     }
+                    for (j = 0; j < mMOOProblem.GetDimensionCount(); j++)
+                    {
+                        ind.OptParameter[j].Xn = solution[j];
+                    }
                     pop.Add(ind);
                     i++;
                 }
-                this.Hauptdiagramm1.ZeichneSekPopulation(pop.ToArray());
+                if (this.mMOOProblem.AppType == Constants.ApplicationTypes.Sim)
+                {
+                    //store in database
+                    this.mMOOProblem.Sim1.OptResult.setSekPop(pop.ToArray(), algorithm.CurrentGeneration);
+                    //Umweg über Sim1.OptResult gehen, weil es keine Individuum-IDs gibt (#177)
+                    this.Hauptdiagramm1.ZeichneSekPopulation(this.mMOOProblem.Sim1.OptResult.getSekPop());
+                }
+                else {
+                    this.Hauptdiagramm1.ZeichneSekPopulation(pop.ToArray());
+                }
 
                 Application.DoEvents();
             }
@@ -151,8 +166,7 @@ namespace BlueM.Opt.Algos.NSGAII
             {
                 //paint sim solution
                 //TODO: handle invalid solutions
-                var serie = this.Hauptdiagramm1.getSeriesPoint("NSGAII", "Orange", Steema.TeeChart.Styles.PointerStyles.Circle, 3, false);
-                serie.Add(ind.ID, ind.PrimObjectives[0], ind.ID.ToString());
+                this.Hauptdiagramm1.ZeichneIndividuum(ind, 0, 0, 0, solution_index + 1, Color.Orange);
             }
             else
             {

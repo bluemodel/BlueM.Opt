@@ -321,7 +321,7 @@ Public Class OptResult
 
         'Methodenspezifische Anpassungen
         Select Case Me.mProblem.Method
-            Case Constants.METH_PES, Constants.METH_METAEVO, Constants.METH_SENSIPLOT, Constants.METH_HOOKEJEEVES, Constants.METH_DDS
+            Case Constants.METH_PES, Constants.METH_NSGAII, Constants.METH_METAEVO, Constants.METH_SENSIPLOT, Constants.METH_HOOKEJEEVES, Constants.METH_DDS
                 Call Me.db_prepare_PES()
             Case Else
                 Throw New NotImplementedException($"Method '{Me.mProblem.Method}' not implemented in OptResult.db_init()!")

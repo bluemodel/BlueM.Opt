@@ -84,6 +84,10 @@
       <Project>{4382061b-f0df-4d7d-9a09-306c940d19a5}</Project>
       <Name>BlueM.Opt.Diagramm</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\OptResult\BlueM.Opt.OptResult.vbproj">
+      <Project>{a7b7b98d-94be-47db-954f-bba2c1f53663}</Project>
+      <Name>BlueM.Opt.OptResult</Name>
+    </ProjectReference>
     <ProjectReference Include="..\IController\IController.vbproj">
       <Project>{1dbd183a-a900-4841-88fe-6258fd472c60}</Project>
       <Name>IController</Name>

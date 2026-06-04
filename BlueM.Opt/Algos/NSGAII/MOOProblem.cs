@@ -40,6 +40,8 @@ namespace BlueM.Opt.Algos.NSGAII
 
         public double CalcObjective(MOOSolution s, int objective_index)
         {
+            //TODO: handle secondary objectives which need to be evaluated but are not counted in GetObjectiveCount() and not included in the index
+
             bool isLastObjective = (objective_index == this.GetObjectiveCount() - 1);
 
             if (isLastObjective) run++;
@@ -57,7 +59,7 @@ namespace BlueM.Opt.Algos.NSGAII
             {
                 //evaluate sim problem
                 //TODO: we should be evaluating all objectives at once, but NSGAII only allows to evaluate one objective at a time. So we need to store the results of the other objectives somewhere and return them when needed.
-                bool SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, true);
+                bool SIM_Eval_is_OK = this.Sim1.Evaluate(ref ind, isLastObjective);
 
                 //TODO: handle evaluation errors
             }
