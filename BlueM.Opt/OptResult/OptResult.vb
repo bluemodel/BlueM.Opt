@@ -506,6 +506,8 @@ Public Class OptResult
                 'SekPop Member speichern
                 command.CommandText = $"INSERT INTO SekPop (Generation, Sim_ID) VALUES ({igen}, {Sim_ID});"
                 command.ExecuteNonQuery()
+            Else
+                Log.AddMessage(Log.levels.error, "Unable to determine Sim ID for solution!")
             End If
         Next
 
