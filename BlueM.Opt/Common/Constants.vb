@@ -47,6 +47,7 @@ Public Module Constants
     Public Const METH_METAEVO As String = "MetaEvo"
     Public Const METH_DDS As String = "DDS"
     Public Const METH_TSP As String = "TSP"
+    Public Const METH_NSGAII As String = "NSGA-II"
 
     'Lösungs- / Entscheidungsraum
     Public Enum SPACE As Integer

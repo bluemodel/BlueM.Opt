@@ -117,6 +117,7 @@
     <Compile Include="Settings\Settings_DDS.vb" />
     <Compile Include="Settings\Settings_HookeJeeves.vb" />
     <Compile Include="Settings\Settings_MetaEvo.vb" />
+    <Compile Include="Settings\Settings_NSGAII.vb" />
     <Compile Include="Settings\Settings_PES.vb" />
     <Compile Include="Settings\Settings_Sensiplot.vb" />
     <Compile Include="Settings\Settings_TSP.vb" />

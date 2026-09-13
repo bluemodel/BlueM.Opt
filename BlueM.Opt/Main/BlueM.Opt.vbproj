@@ -142,6 +142,10 @@
       <Project>{85403900-E545-4122-B1A0-8C30AE0D0F3C}</Project>
       <Name>MetaEvo</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Algos\NSGAII\NSGAII.csproj">
+      <Project>{834c1f58-5422-4750-8b18-c240cf09c10d}</Project>
+      <Name>NSGAII</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Algos\SensiPlot\SensiPlot.vbproj">
       <Project>{A9272445-616D-4B4F-ACFF-DE6F5591AF63}</Project>
       <Name>SensiPlot</Name>
@@ -251,6 +255,7 @@
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_DDS.datasource" />
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_HookeJeeves.datasource" />
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_MetaEvo.datasource" />
+    <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_NSGAII.datasource" />
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_PES.datasource" />
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_Sensiplot.datasource" />
     <None Include="My Project\DataSources\BlueM.Opt.Common.Settings_TSP.datasource" />
@@ -357,6 +362,9 @@ move /Y $(TargetDir)pfs2004.dll $(TargetDir)BlueM.Wave
 move /Y $(TargetDir)PureHDF.dll $(TargetDir)BlueM.Wave
 move /Y $(TargetDir)state_plane_nad27.pfs $(TargetDir)BlueM.Wave
 move /Y $(TargetDir)state_plane_nad83.pfs $(TargetDir)BlueM.Wave
-move /Y $(TargetDir)ufs.dll $(TargetDir)BlueM.Wave</PostBuildEvent>
+move /Y $(TargetDir)ufs.dll $(TargetDir)BlueM.Wave
+:: copy third-party license files to output
+COPY /Y $(SolutionDir)BlueM.Opt\Algos\NSGAII\lib\cs-moea.LICENSE $(TargetDir)
+COPY /Y $(SolutionDir)BlueM.Opt\Algos\NSGAII\lib\cs-statistics.LICENSE $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>

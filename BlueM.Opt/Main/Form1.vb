@@ -159,7 +159,7 @@ Partial Public Class Form1
 
         'Liste der Methoden in ComboBox schreiben und Anfangseinstellung wählen
         Me.ComboBox_Methode.Items.Clear()
-        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_METAEVO, METH_SENSIPLOT, METH_HOOKEJEEVES, METH_DDS})
+        Me.ComboBox_Methode.Items.AddRange(New Object() {"", METH_PES, METH_NSGAII, METH_METAEVO, METH_SENSIPLOT, METH_HOOKEJEEVES, METH_DDS})
         Me.ComboBox_Methode.SelectedIndex = 0
 
         'Einstellungen
@@ -435,7 +435,7 @@ Partial Public Class Form1
                     'HACK: bei Testproblemen als Methodenauswahl nur PES, H&J, MetaEVO und DDS zulassen!
                     Me.IsInitializing = True
                     Call Me.ComboBox_Methode.Items.Clear()
-                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_METAEVO, METH_HOOKEJEEVES, METH_DDS})
+                    Call Me.ComboBox_Methode.Items.AddRange(New String() {"", METH_PES, METH_NSGAII, METH_METAEVO, METH_HOOKEJEEVES, METH_DDS})
                     Me.IsInitializing = False
 
 
@@ -784,6 +784,18 @@ Partial Public Class Form1
 
                     'ES-Controller instanzieren
                     Me.controller = New BlueM.Opt.Algos.ES.ESController()
+
+                    'Ergebnis-Buttons
+                    Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True
+
+                    'TODO: Progress mit Standardwerten initialisieren
+
+
+                Case METH_NSGAII
+                    'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                    'ES-Controller instanzieren
+                    Me.controller = New BlueM.Opt.Algos.NSGAII.NSGAIIController()
 
                     'Ergebnis-Buttons
                     Me.ToolStripMenuItem_ErgebnisDBLoad.Enabled = True

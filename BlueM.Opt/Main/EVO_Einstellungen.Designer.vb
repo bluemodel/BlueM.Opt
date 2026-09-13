@@ -3,7 +3,7 @@ Partial Class EVO_Einstellungen
 
     Inherits System.Windows.Forms.UserControl
 
-    'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
+    'Das Formular Ã¼berschreibt den LÃ¶schvorgang, um die Komponentenliste zu bereinigen.
     Protected Overloads Overrides Sub Dispose(ByVal Disposing As Boolean)
         If Disposing Then
             If Not components Is Nothing Then
@@ -12,11 +12,11 @@ Partial Class EVO_Einstellungen
         End If
         MyBase.Dispose(Disposing)
     End Sub
-    'Wird vom Windows Form-Designer benötigt.
+    'Wird vom Windows Form-Designer benÃ¶tigt.
     Private components As System.ComponentModel.IContainer
-    'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benötigt.
-    'Das Verändern mit dem Windows Form-Designer ist nicht möglich.
-    'Das Verändern mit dem Code-Editor ist nicht möglich.
+    'Hinweis: Die folgende Prozedur wird vom Windows Form-Designer benÃ¶tigt.
+    'Das VerÃ¤ndern mit dem Windows Form-Designer ist nicht mÃ¶glich.
+    'Das VerÃ¤ndern mit dem Code-Editor ist nicht mÃ¶glich.
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim Label_OptModus As System.Windows.Forms.Label
@@ -95,6 +95,12 @@ Partial Class EVO_Einstellungen
         Me.PES_Combo_PopStrategie = New System.Windows.Forms.ComboBox()
         Me.PES_Combo_PopPenalty = New System.Windows.Forms.ComboBox()
         Me.BindingSource_PES_PopPenaltyOptions = New System.Windows.Forms.BindingSource(Me.components)
+        Me.TabPage_NSGAII = New System.Windows.Forms.TabPage()
+        Me.NSGA_MaxGenerations = New System.Windows.Forms.NumericUpDown()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.NSGA_PopulationSize = New System.Windows.Forms.NumericUpDown()
+        Me.BindingSource_NSGAII = New System.Windows.Forms.BindingSource(Me.components)
         Me.TabPage_HookeJeeves = New System.Windows.Forms.TabPage()
         Me.HJ_Numeric_DeltaFinish = New System.Windows.Forms.NumericUpDown()
         Me.BindingSource_HookeJeeves = New System.Windows.Forms.BindingSource(Me.components)
@@ -212,6 +218,10 @@ Partial Class EVO_Einstellungen
         CType(Me.PES_Numeric_AnzPop, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PES_Numeric_AnzPopEltern, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BindingSource_PES_PopPenaltyOptions, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage_NSGAII.SuspendLayout()
+        CType(Me.NSGA_MaxGenerations, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.NSGA_PopulationSize, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.BindingSource_NSGAII, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage_HookeJeeves.SuspendLayout()
         CType(Me.HJ_Numeric_DeltaFinish, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BindingSource_HookeJeeves, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -552,6 +562,7 @@ Partial Class EVO_Einstellungen
             Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage_General)
         Me.TabControl1.Controls.Add(Me.TabPage_PES)
+        Me.TabControl1.Controls.Add(Me.TabPage_NSGAII)
         Me.TabControl1.Controls.Add(Me.TabPage_HookeJeeves)
         Me.TabControl1.Controls.Add(Me.TabPage_MetaEvo)
         Me.TabControl1.Controls.Add(Me.TabPage_DDS)
@@ -1018,6 +1029,64 @@ Partial Class EVO_Einstellungen
         '
         Me.BindingSource_PES_PopPenaltyOptions.DataMember = "PopPenaltyOptions"
         Me.BindingSource_PES_PopPenaltyOptions.DataSource = Me.BindingSource_PES
+        '
+        'TabPage_NSGAII
+        '
+        Me.TabPage_NSGAII.Controls.Add(Me.NSGA_MaxGenerations)
+        Me.TabPage_NSGAII.Controls.Add(Me.Label6)
+        Me.TabPage_NSGAII.Controls.Add(Me.Label4)
+        Me.TabPage_NSGAII.Controls.Add(Me.NSGA_PopulationSize)
+        Me.TabPage_NSGAII.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage_NSGAII.Name = "TabPage_NSGAII"
+        Me.TabPage_NSGAII.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage_NSGAII.Size = New System.Drawing.Size(221, 668)
+        Me.TabPage_NSGAII.TabIndex = 8
+        Me.TabPage_NSGAII.Text = "NSGA-II"
+        Me.TabPage_NSGAII.UseVisualStyleBackColor = True
+        '
+        'NSGA_MaxGenerations
+        '
+        Me.NSGA_MaxGenerations.DataBindings.Add(New System.Windows.Forms.Binding("Value", Me.BindingSource_NSGAII, "MaxGenerations", True))
+        Me.NSGA_MaxGenerations.Location = New System.Drawing.Point(130, 38)
+        Me.NSGA_MaxGenerations.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.NSGA_MaxGenerations.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.NSGA_MaxGenerations.Name = "NSGA_MaxGenerations"
+        Me.NSGA_MaxGenerations.Size = New System.Drawing.Size(83, 20)
+        Me.NSGA_MaxGenerations.TabIndex = 3
+        Me.NSGA_MaxGenerations.Value = New Decimal(New Integer() {1000, 0, 0, 0})
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(6, 40)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(88, 13)
+        Me.Label6.TabIndex = 2
+        Me.Label6.Text = "Max generations:"
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(6, 13)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(81, 13)
+        Me.Label4.TabIndex = 1
+        Me.Label4.Text = "Population size:"
+        '
+        'NSGA_PopulationSize
+        '
+        Me.NSGA_PopulationSize.DataBindings.Add(New System.Windows.Forms.Binding("Value", Me.BindingSource_NSGAII, "PopulationSize", True))
+        Me.NSGA_PopulationSize.Location = New System.Drawing.Point(130, 11)
+        Me.NSGA_PopulationSize.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
+        Me.NSGA_PopulationSize.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.NSGA_PopulationSize.Name = "NSGA_PopulationSize"
+        Me.NSGA_PopulationSize.Size = New System.Drawing.Size(83, 20)
+        Me.NSGA_PopulationSize.TabIndex = 0
+        Me.NSGA_PopulationSize.Value = New Decimal(New Integer() {100, 0, 0, 0})
+        '
+        'BindingSource_NSGAII
+        '
+        Me.BindingSource_NSGAII.DataSource = GetType(BlueM.Opt.Common.Settings_NSGAII)
         '
         'TabPage_HookeJeeves
         '
@@ -1710,6 +1779,11 @@ Partial Class EVO_Einstellungen
         CType(Me.PES_Numeric_AnzPop, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PES_Numeric_AnzPopEltern, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.BindingSource_PES_PopPenaltyOptions, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage_NSGAII.ResumeLayout(False)
+        Me.TabPage_NSGAII.PerformLayout()
+        CType(Me.NSGA_MaxGenerations, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.NSGA_PopulationSize, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.BindingSource_NSGAII, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage_HookeJeeves.ResumeLayout(False)
         Me.TabPage_HookeJeeves.PerformLayout()
         CType(Me.HJ_Numeric_DeltaFinish, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1855,4 +1929,10 @@ Partial Class EVO_Einstellungen
     Private WithEvents SensiPlot_RadioButton_ModeRandom As RadioButton
     Private WithEvents SensiPlot_RadioButton_ModeLatinHypercube As RadioButton
     Friend WithEvents SensiPlot_Label_NumCombinations As Label
+    Friend WithEvents TabPage_NSGAII As TabPage
+    Friend WithEvents Label4 As Label
+    Friend WithEvents NSGA_PopulationSize As NumericUpDown
+    Friend WithEvents BindingSource_NSGAII As BindingSource
+    Friend WithEvents NSGA_MaxGenerations As NumericUpDown
+    Friend WithEvents Label6 As Label
 End Class

@@ -95,6 +95,7 @@ Public Class Settings
 
     Public General As Settings_General
     Public PES As Settings_PES
+    Public NSGAII As Settings_NSGAII
     Public HookeJeeves As Settings_HookeJeeves
     Public MetaEvo As Settings_MetaEvo
     Public DDS As Settings_DDS

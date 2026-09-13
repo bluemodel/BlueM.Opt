@@ -321,7 +321,7 @@ Public Class OptResult
 
         'Methodenspezifische Anpassungen
         Select Case Me.mProblem.Method
-            Case Constants.METH_PES, Constants.METH_METAEVO, Constants.METH_SENSIPLOT, Constants.METH_HOOKEJEEVES, Constants.METH_DDS
+            Case Constants.METH_PES, Constants.METH_NSGAII, Constants.METH_METAEVO, Constants.METH_SENSIPLOT, Constants.METH_HOOKEJEEVES, Constants.METH_DDS
                 Call Me.db_prepare_PES()
             Case Else
                 Throw New NotImplementedException($"Method '{Me.mProblem.Method}' not implemented in OptResult.db_init()!")
@@ -506,6 +506,8 @@ Public Class OptResult
                 'SekPop Member speichern
                 command.CommandText = $"INSERT INTO SekPop (Generation, Sim_ID) VALUES ({igen}, {Sim_ID});"
                 command.ExecuteNonQuery()
+            Else
+                Log.AddMessage(Log.levels.error, "Unable to determine Sim ID for solution!")
             End If
         Next
 
@@ -535,17 +537,18 @@ Public Class OptResult
 
         Call db_disconnect()
 
+        SekPop.iGen = iGen
+
         If (numrows > 0) Then
 
-            SekPop.iGen = iGen
             ReDim SekPop.SolutionIDs(numrows - 1)
-
             For i = 0 To numrows - 1
                 SekPop.SolutionIDs(i) = ds.Tables("SekPop").Rows(i).Item("Sim_ID")
             Next
 
         Else
-            Throw New Exception($"Secondary population of generation {iGen} not found in database!")
+            Log.AddMessage(Log.levels.error, $"Secondary population of generation {iGen} not found in database!")
+            ReDim SekPop.SolutionIDs(-1)
         End If
 
         Return SekPop
@@ -599,7 +602,7 @@ Public Class OptResult
             Me.db_path = sourceFile
 
             Select Case Me.mProblem.Method
-                Case Constants.METH_PES, Constants.METH_HOOKEJEEVES, Constants.METH_METAEVO
+                Case Constants.METH_PES, Constants.METH_NSGAII, Constants.METH_HOOKEJEEVES, Constants.METH_METAEVO
                     'Individuen laden
                     Call Me.db_getIndividuen_PES()
                     'Sekundärpopulationen laden

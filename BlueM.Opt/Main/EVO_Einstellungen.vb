@@ -107,6 +107,13 @@ Public Class EVO_Einstellungen
             Me.BindingSource_PES_Pop.Add(Me.mSettings.PES.Pop)
         End If
 
+        'NSGA-II
+        '-------
+        If (Not IsNothing(Me.mSettings.NSGAII)) Then
+            Me.BindingSource_NSGAII.Clear()
+            Me.BindingSource_NSGAII.Add(Me.mSettings.NSGAII)
+        End If
+
         'HookeJeeves
         '-----------
         If (Not IsNothing(Me.mSettings.HookeJeeves)) Then
@@ -170,6 +177,11 @@ Public Class EVO_Einstellungen
                 'PES-Settings instanzieren
                 Me.mSettings.PES = New Settings_PES()
                 Me.mSettings.PES.setStandard(Me.mProblem.Modus)
+
+            Case METH_NSGAII
+                'NSGA-Settings instanzieren
+                Me.mSettings.NSGAII = New Settings_NSGAII()
+                Me.mSettings.NSGAII.setStandard()
 
             Case METH_HOOKEJEEVES
                 'HJ-Settings instanzieren
@@ -240,6 +252,9 @@ Public Class EVO_Einstellungen
 
                 Case METH_PES
                     Me.TabControl1.TabPages.Add(Me.TabPage_PES)
+
+                Case METH_NSGAII
+                    Me.TabControl1.TabPages.Add(Me.TabPage_NSGAII)
 
                 Case METH_HOOKEJEEVES
                     Me.TabControl1.TabPages.Add(Me.TabPage_HookeJeeves)
@@ -329,6 +344,8 @@ Public Class EVO_Einstellungen
         PES_Combo_PopEltern.SelectedIndexChanged,
         PES_Combo_PopStrategie.SelectedIndexChanged,
         PES_Combo_PopPenalty.SelectedIndexChanged,
+        NSGA_PopulationSize.ValueChanged,
+        NSGA_MaxGenerations.ValueChanged,
         MetaEvo_Combo_Role.SelectedIndexChanged,
         MetaEvo_Combo_OpMode.SelectedIndexChanged,
         TSP_ComboBox_prob_instance.SelectedIndexChanged,
