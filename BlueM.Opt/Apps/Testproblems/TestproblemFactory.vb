@@ -31,6 +31,7 @@ Public Module TestproblemFactory
         Deb1
         DependentParameters
         FloodMitigation
+        NDND
         Schwefel24
         SinusFunktion
         ZitzlerDebT1
@@ -74,6 +75,8 @@ Public Module TestproblemFactory
                 testproblem = New ZitzlerDebT3()
             Case Testproblems.ZitzlerDebT4
                 testproblem = New ZitzlerDebT4()
+            Case Testproblems.NDND
+                testproblem = New NDND()
             Case Else
                 Throw New Exception("Unknown test problem: " & testproblemtype)
         End Select

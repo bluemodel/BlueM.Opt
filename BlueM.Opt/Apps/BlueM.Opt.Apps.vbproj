@@ -122,6 +122,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="TALSIM\TALSIMThread.vb" />
+    <Compile Include="Testproblems\NDND.vb" />
     <Compile Include="Testproblems\ZitzlerDebT4.vb" />
     <Compile Include="Testproblems\ZitzlerDebT3.vb" />
     <Compile Include="Testproblems\ZitzlerDebT2.vb" />
