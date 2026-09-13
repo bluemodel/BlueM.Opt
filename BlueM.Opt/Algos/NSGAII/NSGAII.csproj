@@ -98,5 +98,13 @@
       <Version>4.2023.4.18</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="lib\cs-moea.dll" />
+    <None Include="lib\cs-statistics.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lib\cs-moea.LICENSE" />
+    <None Include="lib\cs-statistics.LICENSE" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

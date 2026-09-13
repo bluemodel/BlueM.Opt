@@ -362,6 +362,9 @@ move /Y $(TargetDir)pfs2004.dll $(TargetDir)BlueM.Wave
 move /Y $(TargetDir)PureHDF.dll $(TargetDir)BlueM.Wave
 move /Y $(TargetDir)state_plane_nad27.pfs $(TargetDir)BlueM.Wave
 move /Y $(TargetDir)state_plane_nad83.pfs $(TargetDir)BlueM.Wave
-move /Y $(TargetDir)ufs.dll $(TargetDir)BlueM.Wave</PostBuildEvent>
+move /Y $(TargetDir)ufs.dll $(TargetDir)BlueM.Wave
+:: copy third-party license files to output
+COPY /Y $(SolutionDir)BlueM.Opt\Algos\NSGAII\lib\cs-moea.LICENSE $(TargetDir)
+COPY /Y $(SolutionDir)BlueM.Opt\Algos\NSGAII\lib\cs-statistics.LICENSE $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>
