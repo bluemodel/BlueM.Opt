@@ -535,17 +535,18 @@ Public Class OptResult
 
         Call db_disconnect()
 
+        SekPop.iGen = iGen
+
         If (numrows > 0) Then
 
-            SekPop.iGen = iGen
             ReDim SekPop.SolutionIDs(numrows - 1)
-
             For i = 0 To numrows - 1
                 SekPop.SolutionIDs(i) = ds.Tables("SekPop").Rows(i).Item("Sim_ID")
             Next
 
         Else
-            Throw New Exception($"Secondary population of generation {iGen} not found in database!")
+            Log.AddMessage(Log.levels.error, $"Secondary population of generation {iGen} not found in database!")
+            ReDim SekPop.SolutionIDs(-1)
         End If
 
         Return SekPop
