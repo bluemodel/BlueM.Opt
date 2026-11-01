@@ -6,7 +6,8 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/BlueM.Opt" # Location of package manifests
+    directories: 
+      - "/BlueM.Opt/**"
     schedule:
       interval: "weekly"
     groups:
@@ -16,6 +17,6 @@ updates:
           - "Microsoft.NET.Test.Sdk"
           
   - package-ecosystem: "github-actions"
-    directory: "/.github"
+    directory: "/"
     schedule:
       interval: "weekly"
