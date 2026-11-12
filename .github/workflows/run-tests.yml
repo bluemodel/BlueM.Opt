@@ -20,7 +20,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.3
 
       - name: Add vstest to PATH
-        uses: darenm/Setup-VSTest@v1.2
+        uses: darenm/Setup-VSTest@v1.3
 
       - name: Create empty TeeChart license file
         run: |
