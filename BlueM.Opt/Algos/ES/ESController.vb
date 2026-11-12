@@ -507,8 +507,8 @@ Public Class ESController
 
             'Linie
             Me.Line_Hypervolume = Me.myMonitor.Diag.getSeriesLine("Hypervolume", "Red")
-            Me.Line_Hypervolume.CustomHorizAxis = Me.myMonitor.Diag.Axes.Top
-            Me.Line_Hypervolume.CustomVertAxis = Me.myMonitor.Diag.Axes.Right
+            Me.Line_Hypervolume.HorizAxis = Steema.TeeChart.Styles.HorizontalAxis.Top
+            Me.Line_Hypervolume.VertAxis = Steema.TeeChart.Styles.VerticalAxis.Right
             Me.Line_Hypervolume.Color = Color.Red
             Me.Line_Hypervolume.Pointer.Visible = True
             Me.Line_Hypervolume.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle
