@@ -1,6 +1,15 @@
 ﻿BlueM.Opt Release Notes
 =======================
 
+Version 2.7.0
+-------------
+NEW:
+* Added NDND test problem
+
+CHANGED:
+* Updated Teehart to v6.2026.10.12
+* Updated BlueM.Wave to v2.17.1
+
 Version 2.6.0
 -------------
 NEW:
