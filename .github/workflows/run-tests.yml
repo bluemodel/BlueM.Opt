@@ -17,7 +17,7 @@ jobs:
           submodules: true
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1.3
 
       - name: Add vstest to PATH
         uses: darenm/Setup-VSTest@v1.2

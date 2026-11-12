@@ -20,7 +20,7 @@ jobs:
           submodules: true
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1.3
 
       - name: Create TeeChart license file from secret
         uses: lukasa1993/secret-file-action@v1.0.4
