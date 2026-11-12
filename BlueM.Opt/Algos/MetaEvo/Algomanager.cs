@@ -803,7 +803,7 @@ namespace BlueM.Opt.Algos.MetaEvo
 
             //Linie Entwicklung
             Line_evo_avg = monitor1.Diag.getSeriesLine("Durchschnittliche Entwicklung über " + solutionvolume.historylength + " Generationen", "Green");
-            Line_evo_avg.CustomVertAxis = monitor1.Diag.Axes.Right;
+            Line_evo_avg.VertAxis = Steema.TeeChart.Styles.VerticalAxis.Right;
             Line_evo_avg.Color = System.Drawing.Color.LimeGreen;
             Line_evo_avg.Pointer.Visible = true;
             Line_evo_avg.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle;
@@ -814,7 +814,7 @@ namespace BlueM.Opt.Algos.MetaEvo
 
             //Linie Schwellwert
             Line_evo_threshold = monitor1.Diag.getSeriesLine("Entwicklung Grenze", "Yellow");
-            Line_evo_threshold.CustomVertAxis = monitor1.Diag.Axes.Right;
+            Line_evo_threshold.VertAxis = Steema.TeeChart.Styles.VerticalAxis.Right;
             Line_evo_threshold.Color = System.Drawing.Color.Green;
             Line_evo_threshold.Pointer.Visible = true;
             Line_evo_threshold.Pointer.Style = Steema.TeeChart.Styles.PointerStyles.Circle;
