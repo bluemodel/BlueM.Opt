@@ -137,7 +137,7 @@
       <Name>BlueM.Opt.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Diagramm\BlueM.Opt.Diagramm.vbproj">
-      <Project>{4382061B-F0DF-4D7D-9A09-306C940D19A5}</Project>
+      <Project>{4382061b-f0df-4d7d-9a09-306c940d19a5}</Project>
       <Name>BlueM.Opt.Diagramm</Name>
     </ProjectReference>
   </ItemGroup>
