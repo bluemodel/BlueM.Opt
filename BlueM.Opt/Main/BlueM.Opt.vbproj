@@ -318,7 +318,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Steema.TeeChart.NET">
-      <Version>6.2026.10.12</Version>
+      <Version>6.2026.11.11</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />
